@@ -240,27 +240,65 @@ const defaults={
  history:[],activeWorkout:null
 };
 let data=JSON.parse(localStorage.getItem("bellPerformanceV2")||"null")||structuredClone(defaults);
+
+function normalizeData(){
+ data.settings=data.settings||{};
+ data.settings.phase=data.settings.phase||defaults.settings.phase;
+ data.settings.weight=Number(data.settings.weight)||defaults.settings.weight;
+ data.settings.goal=Number(data.settings.goal)||defaults.settings.goal;
+ data.settings.cardioType=data.settings.cardioType||"Running";
+
+ const old=data.settings.readiness||{};
+ data.settings.readiness={
+   sleepHours:Number.isFinite(+old.sleepHours)?+old.sleepHours:7,
+   sleepQuality:Number.isFinite(+old.sleepQuality)?+old.sleepQuality:(Number.isFinite(+old.sleep)?+old.sleep:4),
+   energy:Number.isFinite(+old.energy)?+old.energy:4,
+   motivation:Number.isFinite(+old.motivation)?+old.motivation:4,
+   stress:Number.isFinite(+old.stress)?+old.stress:3,
+   soreness:Number.isFinite(+old.soreness)?+old.soreness:3,
+   jointPain:Number.isFinite(+old.jointPain)?+old.jointPain:0,
+   restingHr:Number.isFinite(+old.restingHr)?+old.restingHr:0,
+   score:Number.isFinite(+old.score)?+old.score:78,
+   status:old.status||"GREEN"
+ };
+
+ data.plan=Array.isArray(data.plan)?data.plan:structuredClone(defaults.plan);
+ data.history=Array.isArray(data.history)?data.history:[];
+ if(data.activeWorkout && !Array.isArray(data.activeWorkout.exercises)) data.activeWorkout=null;
+}
+normalizeData();
+
 let timerInterval=null;
 
 function save(){localStorage.setItem("bellPerformanceV2",JSON.stringify(data));render();}
 function show(id,btn){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");}
 function readinessScore(){
  const r=data.settings.readiness;
- const sleepHoursScore=Math.max(0,Math.min(100,((+r.sleepHours-4)/4)*100));
- const sleepQualityScore=(+r.sleepQuality/5)*100;
- const energyScore=(+r.energy/5)*100;
- const motivationScore=(+r.motivation/5)*100;
- const stressScore=((6-(+r.stress))/5)*100;
- const sorenessScore=((6-(+r.soreness))/5)*100;
- const jointPainScore=((5-(+r.jointPain))/5)*100;
- const hrScore=[100,80,55,25][+r.restingHr] ?? 100;
+ const n=(value,fallback)=>Number.isFinite(+value)?+value:fallback;
+ const sleepHours=n(r.sleepHours,7);
+ const sleepQuality=n(r.sleepQuality,4);
+ const energyValue=n(r.energy,4);
+ const motivationValue=n(r.motivation,4);
+ const stressValue=n(r.stress,3);
+ const sorenessValue=n(r.soreness,3);
+ const jointPainValue=n(r.jointPain,0);
+ const restingHrValue=n(r.restingHr,0);
+
+ const sleepHoursScore=Math.max(0,Math.min(100,((sleepHours-4)/4)*100));
+ const sleepQualityScore=(sleepQuality/5)*100;
+ const energyScore=(energyValue/5)*100;
+ const motivationScore=(motivationValue/5)*100;
+ const stressScore=((6-stressValue)/5)*100;
+ const sorenessScore=((6-sorenessValue)/5)*100;
+ const jointPainScore=((5-jointPainValue)/5)*100;
+ const hrScore=[100,80,55,25][restingHrValue] ?? 100;
  let score=Math.round(
    sleepHoursScore*.18 + sleepQualityScore*.14 + energyScore*.18 +
    motivationScore*.10 + stressScore*.14 + sorenessScore*.10 +
    jointPainScore*.10 + hrScore*.06
  );
- if(+r.jointPain>=4) score=Math.min(score,49);
- if(+r.sleepHours<4.5) score=Math.min(score,49);
+ if(jointPainValue>=4) score=Math.min(score,49);
+ if(sleepHours<4.5) score=Math.min(score,49);
  return Math.max(0,Math.min(100,score));
 }
 function readiness(){
@@ -399,28 +437,42 @@ function render(){
  Object.entries(workoutTemplates).forEach(([name,tpl])=>{const el=document.createElement("div");el.className="item";el.innerHTML=`<div class="grow"><strong>${name}</strong><small>${tpl.exercises.map(e=>`${e.name} ${e.sets}×${e.reps}`).join(" • ")}</small></div><button style="width:auto;padding:8px 10px;margin:0" onclick="beginWorkout('${name}')">Begin</button>`;workoutList.appendChild(el);});
  historyList.innerHTML="";
  [...data.history].reverse().forEach(h=>{const el=document.createElement("div");el.className="item";const sets=h.exercises.reduce((a,e)=>a+e.sets.filter(s=>s.done).length,0);el.innerHTML=`<div class="grow"><strong>${h.name}</strong><small>${new Date(h.completedAt).toLocaleDateString()} • ${h.cardioType?`${h.cardioType} • `:""}${Math.round(h.elapsed/60)} min • ${sets} sets • ${h.readiness?.status||"-"} ${h.readiness?.score||""} • RPE ${h.rpe||"-"}</small></div>`;historyList.appendChild(el);});
- if(data.activeWorkout)openWorkoutUI();
+ if(data.activeWorkout && workoutModal.classList.contains("hidden")) openWorkoutUI();
 }
 function togglePlan(i){data.plan[i].complete=!data.plan[i].complete;save();}
 function addPlan(){const names=Object.keys(workoutTemplates);const mission=prompt("Enter mission code/name:\n"+names.join("\n"),names[0]);if(mission&&workoutTemplates[mission]){data.plan.push({mission,complete:false});save();}}
 function saveReadiness(){
  data.settings.readiness={
-   sleepHours:+sleepHours.value,sleepQuality:+sleepQuality.value,energy:+energy.value,
-   motivation:+motivation.value,stress:+stress.value,soreness:+soreness.value,
-   jointPain:+jointPain.value,restingHr:+restingHr.value
+   sleepHours:+sleepHours.value,
+   sleepQuality:+sleepQuality.value,
+   energy:+energy.value,
+   motivation:+motivation.value,
+   stress:+stress.value,
+   soreness:+soreness.value,
+   jointPain:+jointPain.value,
+   restingHr:+restingHr.value
  };
  data.settings.readiness.score=readinessScore();
  data.settings.readiness.status=readiness();
  save();
-};save();}
+ const status=data.settings.readiness.status;
+ const score=data.settings.readiness.score;
+ alert(`Readiness updated: ${status} (${score}/100). Today's workout has been scaled automatically.`);
+}
 function saveSettings(){data.settings.phase=phaseInput.value||"Foundation";data.settings.weight=+weightInput.value||0;data.settings.goal=+goalInput.value||0;save();}
-function beginToday(){const p=currentPlan();if(p)beginWorkout(p.mission);}
+function beginToday(){
+ const p=currentPlan();
+ if(p) beginWorkout(p.mission);
+ else alert("All planned sessions are complete. Choose a workout from the Workouts tab.");
+}
 function beginWorkout(name){
  const tpl=scaledTemplate(name);if(!tpl)return;
  data.activeWorkout={name,startTime:Date.now(),elapsed:0,running:true,notes:"",rpe:"",readiness:{score:readinessScore(),status:readiness()},
  cardioType:name.startsWith("R-")?(data.settings.cardioType||"Running"):null,
  exercises:tpl.exercises.map(e=>({name:e.name,prescription:`${e.sets} × ${e.reps}`,cue:e.cue,scaleNote:e.scaleNote,sets:Array.from({length:e.sets},(_,i)=>({set:i+1,weight:"",reps:e.reps,done:false}))}))};
- save();startTimer();
+ localStorage.setItem("bellPerformanceV2",JSON.stringify(data));
+ openWorkoutUI();
+ startTimer();
 }
 function openWorkoutUI(){
  const a=data.activeWorkout;if(!a)return;

@@ -5,5 +5,5 @@
   "display": "standalone",
   "background_color": "#08101d",
   "theme_color": "#0b1220",
-  "description": "Hybrid training app with readiness scaling, cardio modality selection, guided logging, and daily motivation."
+  "description": "Hybrid training app with fixed readiness scoring, automatic scaling, cardio selection, and guided workout logging."
 }

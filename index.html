@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Bell Performance" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Bell Performance</title>
+  <style>
+    :root{
+      --bg:#0b1220; --panel:#111827; --panel2:#1f2937; --line:#334155;
+      --text:#f8fafc; --muted:#94a3b8; --blue:#3b82f6; --green:#22c55e;
+      --yellow:#f59e0b; --red:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:var(--bg); color:var(--text); padding-bottom:88px;
+    }
+    header{
+      position:sticky; top:0; z-index:5; padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;
+      background:rgba(11,18,32,.94); backdrop-filter:blur(14px); border-bottom:1px solid var(--line);
+    }
+    h1{margin:0;font-size:22px}
+    .sub{color:var(--muted);font-size:13px;margin-top:4px}
+    main{padding:16px;max-width:760px;margin:auto}
+    .screen{display:none}.screen.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .card{
+      background:linear-gradient(180deg,var(--panel2),var(--panel)); border:1px solid var(--line);
+      border-radius:18px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.18);
+    }
+    .card h3{margin:0 0 10px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .big{font-size:28px;font-weight:800}
+    .accent{color:#60a5fa}.good{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}
+    .mission{margin-top:12px}
+    .mission-title{font-size:24px;font-weight:800}
+    label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}
+    input,select,textarea,button{
+      width:100%; border-radius:12px; border:1px solid var(--line); background:#0f172a;
+      color:var(--text); padding:12px; font-size:16px;
+    }
+    textarea{min-height:88px;resize:vertical}
+    button{background:var(--blue);border:none;font-weight:700;margin-top:10px}
+    button.secondary{background:#25324a}
+    button.danger{background:#7f1d1d}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{
+      background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:12px;
+      display:flex;gap:12px;align-items:center;
+    }
+    .item .grow{flex:1}
+    .item strong{display:block}
+    .item small{color:var(--muted)}
+    .pill{padding:6px 9px;border-radius:999px;background:#1e3a8a;font-size:12px;white-space:nowrap}
+    .check{width:22px;height:22px}
+    .scorebar{height:12px;background:#0f172a;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+    .scorebar > div{height:100%;background:var(--blue);width:0}
+    nav{
+      position:fixed;left:0;right:0;bottom:0;z-index:10;
+      display:grid;grid-template-columns:repeat(5,1fr);padding:8px 8px calc(env(safe-area-inset-bottom) + 8px);
+      background:rgba(17,24,39,.97);border-top:1px solid var(--line);backdrop-filter:blur(14px)
+    }
+    nav button{background:transparent;margin:0;padding:8px 4px;font-size:12px;color:var(--muted)}
+    nav button.active{color:white;background:#1e293b}
+    .icon{font-size:20px;display:block;margin-bottom:2px}
+    .section-title{margin:8px 0 12px}
+    .hint{font-size:12px;color:var(--muted);line-height:1.45}
+    @media(min-width:600px){.grid{grid-template-columns:repeat(4,1fr)}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Bell Performance</h1>
+  <div class="sub">Train for Life.</div>
+</header>
+
+<main>
+  <section id="home" class="screen active">
+    <div class="grid">
+      <div class="card"><h3>Phase</h3><div class="big accent" id="phaseOut">Foundation</div></div>
+      <div class="card"><h3>Weight</h3><div class="big"><span id="weightOut">207</span><small> lb</small></div></div>
+      <div class="card"><h3>Goal</h3><div class="big"><span id="goalOut">185</span><small> lb</small></div></div>
+      <div class="card"><h3>Readiness</h3><div class="big good" id="readyOut">GREEN</div></div>
+    </div>
+
+    <div class="card mission">
+      <h3>Today's Mission</h3>
+      <div class="mission-title" id="missionOut">S-2 Lower Strength</div>
+      <div class="sub" id="missionMeta">Home Gym • 60 min</div>
+      <button onclick="completeToday()">Mark Complete</button>
+    </div>
+
+    <div class="card mission">
+      <h3>Weekly Score</h3>
+      <div class="big" id="scoreOut">0%</div>
+      <div class="scorebar"><div id="scoreBar"></div></div>
+      <div class="hint" id="scoreDetail">0 of 7 planned sessions complete</div>
+    </div>
+
+    <div class="card mission">
+      <h3>Readiness Check</h3>
+      <div class="row">
+        <div><label>Sleep</label><select id="sleep"><option>5</option><option selected>4</option><option>3</option><option>2</option><option>1</option></select></div>
+        <div><label>Energy</label><select id="energy"><option>5</option><option selected>4</option><option>3</option><option>2</option><option>1</option></select></div>
+        <div><label>Stress</label><select id="stress"><option>5</option><option selected>3</option><option>2</option><option>1</option><option>4</option></select></div>
+        <div><label>Soreness</label><select id="soreness"><option>5</option><option selected>3</option><option>2</option><option>1</option><option>4</option></select></div>
+      </div>
+      <button class="secondary" onclick="saveReadiness()">Update Readiness</button>
+    </div>
+  </section>
+
+  <section id="plan" class="screen">
+    <h2 class="section-title">Weekly Planner</h2>
+    <div id="planList" class="list"></div>
+    <button onclick="addPlan()">Add Session</button>
+  </section>
+
+  <section id="workouts" class="screen">
+    <h2 class="section-title">Workout Library</h2>
+    <div id="workoutList" class="list"></div>
+  </section>
+
+  <section id="run" class="screen">
+    <h2 class="section-title">Log a Run</h2>
+    <div class="card">
+      <div class="row">
+        <div><label>Date</label><input type="date" id="runDate"></div>
+        <div><label>Type</label><select id="runType"><option>Easy Run</option><option>Recovery Run</option><option>Tempo Run</option><option>Intervals</option><option>Long Run</option></select></div>
+        <div><label>Miles</label><input type="number" step="0.1" id="runMiles"></div>
+        <div><label>Minutes</label><input type="number" step="1" id="runMinutes"></div>
+      </div>
+      <label>Notes</label><textarea id="runNotes"></textarea>
+      <button onclick="saveRun()">Save Run</button>
+    </div>
+    <div class="card mission"><h3>This Week</h3><div class="big"><span id="milesOut">0</span> mi</div></div>
+    <div id="runList" class="list"></div>
+  </section>
+
+  <section id="more" class="screen">
+    <h2 class="section-title">Settings & Data</h2>
+    <div class="card">
+      <label>Current Phase</label><input id="phaseInput" value="Foundation">
+      <div class="row">
+        <div><label>Current Weight</label><input type="number" id="weightInput" value="207"></div>
+        <div><label>Goal Weight</label><input type="number" id="goalInput" value="185"></div>
+      </div>
+      <button onclick="saveSettings()">Save Settings</button>
+    </div>
+    <div class="card mission">
+      <h3>Backup</h3>
+      <button class="secondary" onclick="exportData()">Export Data</button>
+      <label>Restore Backup</label>
+      <input type="file" id="importFile" accept="application/json">
+      <button class="secondary" onclick="importData()">Import Data</button>
+      <button class="danger" onclick="resetData()">Reset App</button>
+    </div>
+    <p class="hint">Your data is stored on this device in the browser. Export a backup periodically.</p>
+  </section>
+</main>
+
+<nav>
+  <button class="active" onclick="show('home',this)"><span class="icon">⌂</span>Home</button>
+  <button onclick="show('plan',this)"><span class="icon">☷</span>Plan</button>
+  <button onclick="show('workouts',this)"><span class="icon">⚒</span>Workouts</button>
+  <button onclick="show('run',this)"><span class="icon">➤</span>Run</button>
+  <button onclick="show('more',this)"><span class="icon">⚙</span>More</button>
+</nav>
+
+<script>
+const defaults = {
+  settings:{phase:"Foundation",weight:207,goal:185,readiness:{sleep:4,energy:4,stress:3,soreness:3}},
+  plan:[
+    {mission:"S-2 Lower Strength",location:"Home Gym",minutes:60,complete:false},
+    {mission:"R-2 Easy Run",location:"Outdoors",minutes:30,complete:false},
+    {mission:"S-1 Upper Strength",location:"Work Gym",minutes:60,complete:false},
+    {mission:"S-4 Athletic Lower",location:"Home Gym",minutes:45,complete:false},
+    {mission:"R-5 Long Run",location:"Outdoors",minutes:45,complete:false},
+    {mission:"S-3 Athletic Upper",location:"Work Gym",minutes:45,complete:false},
+    {mission:"R-1 Recovery Run",location:"Outdoors",minutes:20,complete:false}
+  ],
+  runs:[]
+};
+let data = JSON.parse(localStorage.getItem("bellPerformanceData")||"null") || structuredClone(defaults);
+
+const workouts = [
+  ["S-1 Upper Strength","Bench 5×5 • Weighted pull-ups • Incline DB press • Chest-supported row • Farmer carry"],
+  ["S-2 Lower Strength","Back squat 5×5 • RDL • Reverse lunge • Carry or sled"],
+  ["S-3 Athletic Upper","Push press • Chin-ups • Med-ball throws or battle ropes"],
+  ["S-4 Athletic Lower","Trap-bar deadlift • Box jump • Bulgarian split squat • Short sprints"],
+  ["M-1 Daily Reset","Deep squat • World's greatest stretch • Couch stretch • 90/90 • Open books • Dead hang"],
+  ["R-2 Easy Run","Conversational pace. Finish feeling like you could continue."],
+  ["R-5 Long Run","Easy aerobic pace. Add distance gradually."]
+];
+
+function save(){ localStorage.setItem("bellPerformanceData", JSON.stringify(data)); render(); }
+function show(id,btn){
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+}
+function readiness(){
+  const r=data.settings.readiness;
+  const avg=(+r.sleep + +r.energy + +(6-r.stress) + +(6-r.soreness))/4;
+  return avg>=4?"GREEN":avg>=3?"YELLOW":"RED";
+}
+function render(){
+  phaseOut.textContent=data.settings.phase; weightOut.textContent=data.settings.weight; goalOut.textContent=data.settings.goal;
+  const rd=readiness(); readyOut.textContent=rd; readyOut.className="big "+(rd==="GREEN"?"good":rd==="YELLOW"?"warn":"bad");
+  const next=data.plan.find(x=>!x.complete);
+  missionOut.textContent=next?next.mission:"Recovery / Free Choice";
+  missionMeta.textContent=next?`${next.location} • ${next.minutes} min`:"All planned sessions complete";
+  const done=data.plan.filter(x=>x.complete).length, total=data.plan.length, score=total?Math.round(done/total*100):0;
+  scoreOut.textContent=score+"%"; scoreBar.style.width=score+"%"; scoreDetail.textContent=`${done} of ${total} planned sessions complete`;
+  sleep.value=data.settings.readiness.sleep; energy.value=data.settings.readiness.energy; stress.value=data.settings.readiness.stress; soreness.value=data.settings.readiness.soreness;
+  phaseInput.value=data.settings.phase; weightInput.value=data.settings.weight; goalInput.value=data.settings.goal;
+  planList.innerHTML="";
+  data.plan.forEach((p,i)=>{
+    const el=document.createElement("div"); el.className="item";
+    el.innerHTML=`<input class="check" type="checkbox" ${p.complete?"checked":""} onchange="togglePlan(${i})">
+      <div class="grow"><strong>${p.mission}</strong><small>${p.location} • ${p.minutes} min</small></div>
+      <span class="pill">${p.complete?"Done":"Planned"}</span>`;
+    planList.appendChild(el);
+  });
+  workoutList.innerHTML="";
+  workouts.forEach(w=>{
+    const el=document.createElement("div"); el.className="item";
+    el.innerHTML=`<div class="grow"><strong>${w[0]}</strong><small>${w[1]}</small></div>`;
+    workoutList.appendChild(el);
+  });
+  runList.innerHTML="";
+  [...data.runs].reverse().forEach(r=>{
+    const el=document.createElement("div"); el.className="item";
+    el.innerHTML=`<div class="grow"><strong>${r.type} — ${r.miles} mi</strong><small>${r.date} • ${r.minutes} min${r.notes?" • "+r.notes:""}</small></div>`;
+    runList.appendChild(el);
+  });
+  const now=new Date(), weekAgo=new Date(now.getTime()-7*86400000);
+  const miles=data.runs.filter(r=>new Date(r.date)>=weekAgo).reduce((a,b)=>a+(+b.miles||0),0);
+  milesOut.textContent=miles.toFixed(1);
+}
+function togglePlan(i){data.plan[i].complete=!data.plan[i].complete; save();}
+function completeToday(){const i=data.plan.findIndex(x=>!x.complete);if(i>=0){data.plan[i].complete=true;save();}}
+function addPlan(){
+  const mission=prompt("Mission name or code:","S-1 Upper Strength"); if(!mission)return;
+  const location=prompt("Location:","Home Gym")||"Anywhere";
+  const minutes=Number(prompt("Minutes:","45"))||45;
+  data.plan.push({mission,location,minutes,complete:false}); save();
+}
+function saveReadiness(){
+  data.settings.readiness={sleep:+sleep.value,energy:+energy.value,stress:+stress.value,soreness:+soreness.value}; save();
+}
+function saveSettings(){
+  data.settings.phase=phaseInput.value||"Foundation"; data.settings.weight=+weightInput.value||0; data.settings.goal=+goalInput.value||0; save();
+}
+function saveRun(){
+  if(!runDate.value||!runMiles.value)return alert("Enter a date and mileage.");
+  data.runs.push({date:runDate.value,type:runType.value,miles:+runMiles.value,minutes:+runMinutes.value||0,notes:runNotes.value.trim()});
+  runMiles.value="";runMinutes.value="";runNotes.value="";save();
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bell-performance-backup.json";a.click();URL.revokeObjectURL(a.href);
+}
+function importData(){
+  const f=importFile.files[0]; if(!f)return alert("Choose a backup file.");
+  const reader=new FileReader(); reader.onload=()=>{try{data=JSON.parse(reader.result);save();alert("Backup restored.");}catch(e){alert("Invalid backup.");}}; reader.readAsText(f);
+}
+function resetData(){if(confirm("Reset all app data?")){data=structuredClone(defaults);save();}}
+runDate.value=new Date().toISOString().slice(0,10);
+render();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+</script>
+</body>
+</html>

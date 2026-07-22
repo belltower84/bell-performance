@@ -3,7 +3,7 @@
   "short_name": "Bell Performance",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0b1220",
-  "theme_color": "#111827",
-  "description": "Flexible hybrid training journal and planner."
+  "background_color": "#08101d",
+  "theme_color": "#0b1220",
+  "description": "Hybrid training app with readiness scaling, cardio modality selection, guided logging, and daily motivation."
 }

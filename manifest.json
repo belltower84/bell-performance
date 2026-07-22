@@ -1,9 +1,9 @@
 {
   "name": "Bell Performance",
   "short_name": "Bell Performance",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#08101d",
   "theme_color": "#0b1220",
-  "description": "Hybrid training app with stable full-screen workout tracking, visible readiness scaling, and personalized weight recommendations."
+  "description": "Hybrid performance app with readiness scaling, daily mobility, milestones, and macro guidance."
 }

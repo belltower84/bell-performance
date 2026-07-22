@@ -1,41 +1,34 @@
-BELL PERFORMANCE MOBILE APP V7
+BELL PERFORMANCE V8 — PERFORMANCE SYSTEM TEST BUILD
 
-FIXED
-- Workout tracker is now a true full-screen scrolling view.
-- Removed the sticky/composited tracker header that could scramble on iPhone.
-- Locked the background page while a workout is open.
-- Stabilized narrow-screen set-entry columns.
+NEW: DAILY MOBILITY
+- Dashboard mobility card
+- Auto focus based on today's planned workout
+- Manual focus: full body, hips, shoulders, low back, ankles
+- 6, 10, or 15 minute routines
+- Exercise checklist
+- Daily completion tracking
+- Mobility XP
 
-READINESS SCALING IS NOW VISIBLE AND REAL
-GREEN
-- Full prescribed sets
-- Full recommended working weight
+NEW: MISSIONS, XP, AND RANKS
+- Workout completion: +100 XP
+- Daily mobility completion: +40 XP
+- Green readiness day: +10 XP
+- Ranks from Foundation Athlete through Lifetime Athlete
+- Dashboard progress toward workout, mobility, and goal-weight milestones
+- Editable mission goals in Settings
 
-YELLOW
-- Recommended weight reduced 10%
-- Working sets reduced about 30%
-- Conditioning duration reduced about 25%
+NEW: NUTRITION GUIDE BETA
+- Training-day and recovery-day macro targets
+- Calories, protein, carbohydrate, and fat guidance
+- Editable height, age, activity, and goal mode
+- This is guidance only; food logging and meal building are not included yet
 
-RED
-- Recommended weight reduced 25%
-- Working sets reduced about 55%
-- No hard conditioning
-- Cardio becomes easy recovery work
-
-The dashboard and workout tracker now show the original sets, scaled sets, and readiness adjustment.
-
-WEIGHT RECOMMENDATIONS
-- Added reference maxes under Settings.
-- Defaults use Chris's known lifts:
-  Bench 315
-  Squat 455
-  Deadlift 455
-  Push press 185 (editable estimate)
-- Main lifts use percentage-based starting weights.
-- Assistance work uses conservative bodyweight or strength-based estimates.
-- Suggested weights prefill the workout log and can be changed set by set.
+ALSO
+- Existing readiness scaling, cardio selector, workout logging, recommendations, history, and daily quotes remain.
+- Existing local data is migrated forward.
 
 UPDATE
 Replace index.html, manifest.json, and sw.js in GitHub Pages.
-Commit, wait 2–3 minutes, open the site in Safari, and refresh.
+Commit and wait 2–3 minutes.
+Open the site in Safari and refresh once.
 Then fully close and reopen the Home Screen app.

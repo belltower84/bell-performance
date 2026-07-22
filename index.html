@@ -34,7 +34,7 @@
     .list{display:flex;flex-direction:column;gap:9px}.item{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:12px;display:flex;gap:10px;align-items:center}.grow{flex:1}
     .item strong{display:block}.item small{color:var(--muted)}.pill{font-size:11px;border-radius:999px;padding:5px 8px;background:#1e3a8a;white-space:nowrap}
     .scorebar{height:11px;background:#0f172a;border:1px solid var(--line);border-radius:999px;overflow:hidden}.scorebar div{height:100%;background:var(--blue);width:0}
-    .section-title{margin:5px 0 12px}.hint{color:var(--muted);font-size:12px;line-height:1.45}.hidden{display:none!important}
+    .section-title{margin:5px 0 12px}.hint{color:var(--muted);font-size:12px;line-height:1.45}.hidden{display:none!important}.status-line{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:8px 0}.mini-progress{height:8px;background:#0f172a;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:6px}.mini-progress div{height:100%;background:var(--blue);width:0}.mobility-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}.mobility-move{display:flex;gap:10px;align-items:flex-start;background:#0f172a;border:1px solid var(--line);border-radius:13px;padding:10px}.mobility-move input{width:23px;height:23px;flex:none;margin-top:1px}.macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}.macro-box{background:#0f172a;border:1px solid var(--line);border-radius:13px;padding:9px;text-align:center}.macro-box strong{display:block;font-size:18px}.macro-box small{color:var(--muted)}@media(max-width:430px){.macro-grid{grid-template-columns:1fr 1fr}}
     .exercise{background:#0f172a;border:1px solid var(--line);border-radius:17px;padding:13px;margin-bottom:12px}
     .exercise-head{display:flex;align-items:flex-start;gap:10px}.exercise-num{width:31px;height:31px;border-radius:50%;background:#1d4ed8;display:grid;place-items:center;font-weight:900;flex:none}
     .exercise-name{font-size:19px;font-weight:850}.prescription{color:var(--blue2);font-weight:750;margin-top:3px}.cue{color:var(--muted);font-size:12px;margin-top:4px}
@@ -85,6 +85,48 @@
     <div id="todayPreview" class="hint" style="margin-top:10px"></div>
     <button onclick="beginToday()">Begin Workout</button>
   </div>
+  <div class="card">
+    <h3>Performance Mission</h3>
+    <div class="status-line"><div><div class="mission-title" id="rankOut">Foundation Athlete</div><div class="sub" id="levelOut">Level 1</div></div><div class="pill" id="xpOut">0 XP</div></div>
+    <div class="mini-progress"><div id="xpBar"></div></div>
+    <div class="hint" id="milestoneSummary" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
+    <h3>Daily Mobility</h3>
+    <div class="row">
+      <div><label>Focus area</label>
+        <select id="mobilityFocus" onchange="saveMobilityFocus()">
+          <option value="Auto">Auto — match today's training</option>
+          <option value="Full Body">Full Body</option>
+          <option value="Hips">Hips</option>
+          <option value="Shoulders">Shoulders</option>
+          <option value="Low Back">Low Back</option>
+          <option value="Ankles">Ankles</option>
+        </select>
+      </div>
+      <div><label>Time</label>
+        <select id="mobilityMinutes" onchange="saveMobilityFocus()">
+          <option value="6">6 minutes</option>
+          <option value="10" selected>10 minutes</option>
+          <option value="15">15 minutes</option>
+        </select>
+      </div>
+    </div>
+    <div class="hint" id="mobilityReason"></div>
+    <div id="mobilityList" class="mobility-list"></div>
+    <button class="good" id="mobilityCompleteButton" onclick="completeMobility()">Complete Daily Mobility</button>
+  </div>
+  <div class="card">
+    <h3>Nutrition Guide — Beta</h3>
+    <div class="hint" id="nutritionMode"></div>
+    <div class="macro-grid">
+      <div class="macro-box"><strong id="calorieOut">—</strong><small>Calories</small></div>
+      <div class="macro-box"><strong id="proteinOut">—</strong><small>Protein</small></div>
+      <div class="macro-box"><strong id="carbOut">—</strong><small>Carbs</small></div>
+      <div class="macro-box"><strong id="fatOut">—</strong><small>Fat</small></div>
+    </div>
+    <div class="hint" style="margin-top:9px">Early guidance only—not yet a food logger. Targets change for training and recovery days.</div>
+  </div>
   <div class="card"><h3>Weekly Score</h3><div class="big" id="scoreOut">0%</div><div class="scorebar"><div id="scoreBar"></div></div><div class="hint" id="scoreDetail"></div></div>
   <div class="card">
     <h3>Daily Readiness Check</h3>
@@ -115,6 +157,26 @@
     <label>Current Phase</label><input id="phaseInput">
     <div class="row"><div><label>Current Weight</label><input type="number" id="weightInput"></div><div><label>Goal Weight</label><input type="number" id="goalInput"></div></div>
     <button onclick="saveSettings()">Save Settings</button>
+  </div>
+  <div class="card">
+    <h3>Mission Goals</h3>
+    <div class="row">
+      <div><label>Goal workouts</label><input id="goalWorkouts" type="number" min="1"></div>
+      <div><label>Goal mobility days</label><input id="goalMobility" type="number" min="1"></div>
+      <div><label>Goal pull-ups</label><input id="goalPullups" type="number" min="1"></div>
+      <div><label>Goal 5K time (minutes)</label><input id="goal5k" type="number" min="15" step="0.1"></div>
+    </div>
+    <button class="secondary" onclick="saveMissionGoals()">Save Mission Goals</button>
+  </div>
+  <div class="card">
+    <h3>Nutrition Setup — Beta</h3>
+    <div class="row">
+      <div><label>Height (inches)</label><input id="heightInput" type="number" min="48" max="84"></div>
+      <div><label>Age</label><input id="ageInput" type="number" min="16" max="90"></div>
+      <div><label>Activity</label><select id="activityInput"><option value="1.4">Moderate</option><option value="1.55">Active</option><option value="1.7">Very active</option></select></div>
+      <div><label>Goal pace</label><select id="nutritionGoalInput"><option value="cut">Fat loss</option><option value="maintain">Maintain</option><option value="gain">Lean gain</option></select></div>
+    </div>
+    <button class="secondary" onclick="saveNutritionSettings()">Update Macro Guide</button>
   </div>
   <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input type="file" id="importFile" accept="application/json"><button class="secondary" onclick="importData()">Import Data</button><button class="danger" onclick="resetData()">Reset App</button></div>
   <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
@@ -239,7 +301,11 @@ const defaults={
   {mission:"R-5 Long Run",complete:false},{mission:"S-3 Athletic Upper",complete:false},
   {mission:"R-1 Recovery Run",complete:false}
  ],
- history:[],activeWorkout:null
+ history:[],activeWorkout:null,
+ mobility:{focus:"Auto",minutes:10,completedDates:[],checks:{}},
+ readinessLog:[],
+ mission:{goalWorkouts:40,goalMobility:30,goalPullups:25,goal5k:28,currentPullups:20,current5k:null},
+ nutrition:{height:66,age:41,activity:1.55,goal:"cut"}
 };
 let data=JSON.parse(localStorage.getItem("bellPerformanceV2")||"null")||structuredClone(defaults);
 
@@ -272,6 +338,14 @@ function normalizeData(){
 
  data.plan=Array.isArray(data.plan)?data.plan:structuredClone(defaults.plan);
  data.history=Array.isArray(data.history)?data.history:[];
+ data.mobility=data.mobility||structuredClone(defaults.mobility);
+ data.mobility.focus=data.mobility.focus||"Auto";
+ data.mobility.minutes=Number(data.mobility.minutes)||10;
+ data.mobility.completedDates=Array.isArray(data.mobility.completedDates)?data.mobility.completedDates:[];
+ data.mobility.checks=data.mobility.checks||{};
+ data.readinessLog=Array.isArray(data.readinessLog)?data.readinessLog:[];
+ data.mission={...defaults.mission,...(data.mission||{})};
+ data.nutrition={...defaults.nutrition,...(data.nutrition||{})};
  if(data.activeWorkout && !Array.isArray(data.activeWorkout.exercises)) data.activeWorkout=null;
 }
 normalizeData();
@@ -280,6 +354,123 @@ let timerInterval=null;
 
 function save(){localStorage.setItem("bellPerformanceV2",JSON.stringify(data));render();}
 function show(id,btn){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");}
+function todayKey(){
+ const d=new Date();
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+const mobilityRoutines={
+ "Full Body":[
+  ["Cat-Camel","8 slow reps"],["World's Greatest Stretch","4/side"],["90/90 Hip Rotations","8 reps"],
+  ["Wall Slides","10 reps"],["Deep Squat Hold","45 seconds"],["Dead Hang","30 seconds"]
+ ],
+ "Hips":[
+  ["90/90 Hip Rotations","10 reps"],["Couch Stretch","45 sec/side"],["Adductor Rock-Back","8/side"],
+  ["Cossack Squat","6/side"],["Deep Squat Hold","60 seconds"],["Glute Bridge","12 reps"]
+ ],
+ "Shoulders":[
+  ["Wall Slides","10 reps"],["Band Pull-Apart","15 reps"],["Thread the Needle","6/side"],
+  ["Dead Hang","30–45 seconds"],["Doorway Pec Stretch","45 sec/side"],["Scapular Push-up","10 reps"]
+ ],
+ "Low Back":[
+  ["Cat-Camel","10 reps"],["Child's Pose Breathing","5 breaths"],["Open Book Rotation","6/side"],
+  ["Bird Dog","6/side"],["Hip Flexor Stretch","45 sec/side"],["Glute Bridge","12 reps"]
+ ],
+ "Ankles":[
+  ["Knee-to-Wall Ankle Rock","10/side"],["Calf Stretch","45 sec/side"],["Tibialis Raise","15 reps"],
+  ["Slow Calf Raise","12 reps"],["Deep Squat Pry","45 seconds"],["Single-Leg Balance","30 sec/side"]
+ ]
+};
+function resolvedMobilityFocus(){
+ if(data.mobility.focus!=="Auto") return data.mobility.focus;
+ const mission=currentPlan()?.mission||"";
+ if(mission.includes("Lower")||mission.includes("Run")) return "Hips";
+ if(mission.includes("Upper")) return "Shoulders";
+ return "Full Body";
+}
+function dailyMobilityRoutine(){
+ const focus=resolvedMobilityFocus();
+ const minutes=Number(data.mobility.minutes)||10;
+ const source=mobilityRoutines[focus]||mobilityRoutines["Full Body"];
+ const count=minutes<=6?4:minutes<=10?5:6;
+ return source.slice(0,count);
+}
+function saveMobilityFocus(){
+ data.mobility.focus=mobilityFocus.value;
+ data.mobility.minutes=+mobilityMinutes.value||10;
+ data.mobility.checks={};
+ save();
+}
+function toggleMobilityMove(index,checked){
+ const key=todayKey();
+ data.mobility.checks[key]=data.mobility.checks[key]||{};
+ data.mobility.checks[key][index]=checked;
+ localStorage.setItem("bellPerformanceV2",JSON.stringify(data));
+}
+function completeMobility(){
+ const key=todayKey();
+ if(!data.mobility.completedDates.includes(key)) data.mobility.completedDates.push(key);
+ save();
+}
+function workoutXP(){return data.history.length*100;}
+function mobilityXP(){return data.mobility.completedDates.length*40;}
+function readinessXP(){return data.readinessLog.filter(x=>x.score>=75).length*10;}
+function totalXP(){return workoutXP()+mobilityXP()+readinessXP();}
+function rankInfo(){
+ const xp=totalXP();
+ const levels=[
+  [0,"Foundation Athlete"],[500,"Developing Athlete"],[1200,"Hybrid Athlete"],
+  [2500,"Tactical Athlete"],[4500,"Performance Athlete"],[7000,"Lifetime Athlete"]
+ ];
+ let idx=0;
+ for(let i=0;i<levels.length;i++) if(xp>=levels[i][0]) idx=i;
+ const current=levels[idx],next=levels[Math.min(idx+1,levels.length-1)];
+ const level=idx+1;
+ const pct=idx===levels.length-1?100:Math.round((xp-current[0])/(next[0]-current[0])*100);
+ return {xp,rank:current[1],level,pct,next:next[0]};
+}
+function missionProgress(){
+ const workouts=data.history.length;
+ const mobility=data.mobility.completedDates.length;
+ const weightStart=207, current=Number(data.settings.weight)||207, goal=Number(data.settings.goal)||185;
+ const weightPct=goal===weightStart?100:Math.max(0,Math.min(100,Math.round((weightStart-current)/(weightStart-goal)*100)));
+ return {
+  workouts,pWorkouts:Math.min(100,Math.round(workouts/data.mission.goalWorkouts*100)),
+  mobility,pMobility:Math.min(100,Math.round(mobility/data.mission.goalMobility*100)),
+  weightPct
+ };
+}
+function macroTargets(){
+ const n=data.nutrition;
+ const kg=(Number(data.settings.weight)||207)*0.453592;
+ const cm=(Number(n.height)||66)*2.54;
+ const age=Number(n.age)||41;
+ const bmr=10*kg+6.25*cm-5*age+5;
+ let calories=Math.round((bmr*(Number(n.activity)||1.55))/50)*50;
+ if(n.goal==="cut") calories-=450;
+ if(n.goal==="gain") calories+=250;
+ const next=currentPlan();
+ const trainingDay=Boolean(next && !next.mission.startsWith("M-") && !next.mission.startsWith("R-1"));
+ if(!trainingDay) calories-=150;
+ calories=Math.max(1600,calories);
+ const protein=Math.round(Math.min(Number(data.settings.weight)||207,(Number(data.settings.goal)||185)*1.05)/5)*5;
+ const fat=Math.round(((Number(data.settings.weight)||207)*0.32)/5)*5;
+ const carbs=Math.max(50,Math.round((calories-protein*4-fat*9)/4/5)*5);
+ return {calories,protein,fat,carbs,trainingDay};
+}
+function saveMissionGoals(){
+ data.mission.goalWorkouts=+goalWorkouts.value||40;
+ data.mission.goalMobility=+goalMobility.value||30;
+ data.mission.goalPullups=+goalPullups.value||25;
+ data.mission.goal5k=+goal5k.value||28;
+ save();
+}
+function saveNutritionSettings(){
+ data.nutrition.height=+heightInput.value||66;
+ data.nutrition.age=+ageInput.value||41;
+ data.nutrition.activity=+activityInput.value||1.55;
+ data.nutrition.goal=nutritionGoalInput.value||"cut";
+ save();
+}
 function readinessScore(){
  const r=data.settings.readiness;
  const n=(value,fallback)=>Number.isFinite(+value)?+value:fallback;
@@ -483,6 +674,44 @@ function scaledTemplate(name){
 }
 function render(){
  const quote=getDailyQuote();
+ const rank=rankInfo(),mission=missionProgress(),macros=macroTargets();
+ rankOut.textContent=rank.rank;
+ levelOut.textContent=`Level ${rank.level} • ${rank.next>rank.xp?`${rank.next-rank.xp} XP to next rank`:"Top rank reached"}`;
+ xpOut.textContent=`${rank.xp} XP`;
+ xpBar.style.width=rank.pct+"%";
+ milestoneSummary.innerHTML=
+   `<strong>${mission.workouts}/${data.mission.goalWorkouts}</strong> workouts • `+
+   `<strong>${mission.mobility}/${data.mission.goalMobility}</strong> mobility days • `+
+   `<strong>${mission.weightPct}%</strong> toward goal weight`;
+ mobilityFocus.value=data.mobility.focus;
+ mobilityMinutes.value=String(data.mobility.minutes);
+ const resolved=resolvedMobilityFocus();
+ mobilityReason.textContent=data.mobility.focus==="Auto"
+   ?`Auto-selected ${resolved} based on today's training.`
+   :`${resolved} focus selected.`;
+ const key=todayKey(),doneToday=data.mobility.completedDates.includes(key),checks=data.mobility.checks[key]||{};
+ mobilityList.innerHTML="";
+ dailyMobilityRoutine().forEach((move,i)=>{
+   const el=document.createElement("label");
+   el.className="mobility-move";
+   el.innerHTML=`<input type="checkbox" ${checks[i]?"checked":""} onchange="toggleMobilityMove(${i},this.checked)"><div><strong>${move[0]}</strong><div class="hint">${move[1]}</div></div>`;
+   mobilityList.appendChild(el);
+ });
+ mobilityCompleteButton.textContent=doneToday?"Mobility Completed Today ✓":"Complete Daily Mobility";
+ mobilityCompleteButton.disabled=doneToday;
+ calorieOut.textContent=macros.calories;
+ proteinOut.textContent=macros.protein+"g";
+ carbOut.textContent=macros.carbs+"g";
+ fatOut.textContent=macros.fat+"g";
+ nutritionMode.textContent=`${macros.trainingDay?"Training-day":"Recovery-day"} target • ${data.nutrition.goal==="cut"?"Fat-loss":data.nutrition.goal==="gain"?"Lean-gain":"Maintenance"} mode`;
+ goalWorkouts.value=data.mission.goalWorkouts;
+ goalMobility.value=data.mission.goalMobility;
+ goalPullups.value=data.mission.goalPullups;
+ goal5k.value=data.mission.goal5k;
+ heightInput.value=data.nutrition.height;
+ ageInput.value=data.nutrition.age;
+ activityInput.value=String(data.nutrition.activity);
+ nutritionGoalInput.value=data.nutrition.goal;
  dailyQuote.textContent=`“${quote.text}”`;
  quoteAuthor.textContent=`— ${quote.author}`;
  cardioType.value=data.settings.cardioType || "Running";
@@ -534,6 +763,10 @@ function saveReadiness(){
  };
  data.settings.readiness.score=readinessScore();
  data.settings.readiness.status=readiness();
+ const key=todayKey();
+ const existing=data.readinessLog.findIndex(x=>x.date===key);
+ const entry={date:key,score:data.settings.readiness.score,status:data.settings.readiness.status};
+ if(existing>=0)data.readinessLog[existing]=entry;else data.readinessLog.push(entry);
  save();
  const status=data.settings.readiness.status;
  const score=data.settings.readiness.score;
@@ -590,13 +823,23 @@ function updateWorkoutProgress(){const a=data.activeWorkout;if(!a)return;const a
 function startTimer(){clearInterval(timerInterval);timerInterval=setInterval(()=>{if(data.activeWorkout&&data.activeWorkout.running){data.activeWorkout.elapsed=Math.floor((Date.now()-data.activeWorkout.startTime)/1000);updateTimerDisplay();}},1000);}
 function updateTimerDisplay(){const s=data.activeWorkout?data.activeWorkout.elapsed:0;workoutTimer.textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");timerButton.textContent=data.activeWorkout&&data.activeWorkout.running?"Pause":"Resume";}
 function toggleTimer(){const a=data.activeWorkout;if(!a)return;if(a.running){a.elapsed=Math.floor((Date.now()-a.startTime)/1000);a.running=false}else{a.startTime=Date.now()-a.elapsed*1000;a.running=true}persistActive();updateTimerDisplay();}
-function closeWorkout(){persistActive();workoutModal.classList.add("hidden");clearInterval(timerInterval);}
+function closeWorkout(){
+ if(data.activeWorkout) persistActive();
+ workoutModal.classList.add("hidden");
+ clearInterval(timerInterval);
+ document.body.classList.remove("workout-open");
+ document.body.style.top="";
+ window.scrollTo(0,savedPageScroll);
+}
 function finishWorkout(){
  const a=data.activeWorkout;if(!a)return;
  a.rpe=sessionRpe.value;a.notes=sessionNotes.value;a.completedAt=new Date().toISOString();a.elapsed=Math.max(a.elapsed,Math.floor((Date.now()-a.startTime)/1000));
  data.history.push(a);
  const p=data.plan.find(x=>x.mission===a.name&&!x.complete);if(p)p.complete=true;
- data.activeWorkout=null;clearInterval(timerInterval);workoutModal.classList.add("hidden");save();
+ data.activeWorkout=null;
+ closeWorkout();
+ save();
+ alert("Workout complete. +100 XP earned.");
 }
 function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bell-performance-backup.json";a.click();URL.revokeObjectURL(a.href);}
 function importData(){const f=importFile.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{data=JSON.parse(reader.result);save();alert("Backup restored.");}catch(e){alert("Invalid backup.");}};reader.readAsText(f);}

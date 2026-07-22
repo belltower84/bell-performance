@@ -9,46 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
   <title>Bell Performance</title>
-  <style>
-    :root{
-      --bg:#08101d;--panel:#111827;--panel2:#1e293b;--line:#334155;
-      --text:#f8fafc;--muted:#94a3b8;--blue:#3b82f6;--blue2:#60a5fa;
-      --green:#22c55e;--yellow:#f59e0b;--red:#ef4444;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:92px}
-    header{position:sticky;top:0;z-index:30;padding:calc(env(safe-area-inset-top) + 13px) 16px 13px;background:rgba(8,16,29,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
-    h1{margin:0;font-size:21px}.sub{color:var(--muted);font-size:12px;margin-top:3px}
-    main{max-width:760px;margin:auto;padding:14px}.screen{display:none}.screen.active{display:block}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
-    .card h3{margin:0 0 9px;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
-    .big{font-size:27px;font-weight:850}.accent{color:var(--blue2)}.good{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}
-    .mission-title{font-size:24px;font-weight:850;margin-bottom:4px}
-    label{display:block;color:var(--muted);font-size:12px;margin:10px 0 5px}
-    input,select,textarea,button{width:100%;border-radius:12px;border:1px solid var(--line);background:#0f172a;color:var(--text);padding:11px;font-size:16px}
-    textarea{min-height:75px;resize:vertical}
-    button{border:none;background:var(--blue);font-weight:800;margin-top:9px}
-    button.secondary{background:#26344c}button.good{background:#166534;color:#fff}button.danger{background:#7f1d1d}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-    .list{display:flex;flex-direction:column;gap:9px}.item{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:12px;display:flex;gap:10px;align-items:center}.grow{flex:1}
-    .item strong{display:block}.item small{color:var(--muted)}.pill{font-size:11px;border-radius:999px;padding:5px 8px;background:#1e3a8a;white-space:nowrap}
-    .scorebar{height:11px;background:#0f172a;border:1px solid var(--line);border-radius:999px;overflow:hidden}.scorebar div{height:100%;background:var(--blue);width:0}
-    .section-title{margin:5px 0 12px}.hint{color:var(--muted);font-size:12px;line-height:1.45}.hidden{display:none!important}.status-line{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:8px 0}.mini-progress{height:8px;background:#0f172a;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:6px}.mini-progress div{height:100%;background:var(--blue);width:0}.mobility-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}.mobility-move{display:flex;gap:10px;align-items:flex-start;background:#0f172a;border:1px solid var(--line);border-radius:13px;padding:10px}.mobility-move input{width:23px;height:23px;flex:none;margin-top:1px}.macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}.macro-box{background:#0f172a;border:1px solid var(--line);border-radius:13px;padding:9px;text-align:center}.macro-box strong{display:block;font-size:18px}.macro-box small{color:var(--muted)}@media(max-width:430px){.macro-grid{grid-template-columns:1fr 1fr}}
-    .exercise{background:#0f172a;border:1px solid var(--line);border-radius:17px;padding:13px;margin-bottom:12px}
-    .exercise-head{display:flex;align-items:flex-start;gap:10px}.exercise-num{width:31px;height:31px;border-radius:50%;background:#1d4ed8;display:grid;place-items:center;font-weight:900;flex:none}
-    .exercise-name{font-size:19px;font-weight:850}.prescription{color:var(--blue2);font-weight:750;margin-top:3px}.cue{color:var(--muted);font-size:12px;margin-top:4px}
-    .set-head,.set-row{display:grid;grid-template-columns:30px minmax(0,1fr) minmax(0,1fr) 44px;gap:6px;align-items:center;min-width:0}.set-head{color:var(--muted);font-size:11px;margin-top:12px}.set-row{margin-top:7px}
-    .set-row input{min-width:0;padding:9px 5px;text-align:center;font-size:16px}.set-check{width:24px;height:24px;margin:auto}
-    .timer{font-variant-numeric:tabular-nums;font-size:34px;font-weight:900;text-align:center;margin:8px 0}.workout-top{position:relative;z-index:1;background:var(--bg);padding:8px 0 12px;border-bottom:1px solid var(--line);margin-bottom:12px}
-    .progress-label{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:5px}
-    nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 7px calc(env(safe-area-inset-bottom) + 7px);background:rgba(17,24,39,.98);border-top:1px solid var(--line)}
-    nav button{margin:0;background:transparent;color:var(--muted);padding:7px 3px;font-size:11px}nav button.active{background:#1e293b;color:#fff}.icon{font-size:19px;display:block;margin-bottom:1px}
-    .modal{position:fixed;inset:0;z-index:100;background:var(--bg);display:block;overflow:hidden}
-    .modal-box{position:absolute;inset:0;width:100%;max-width:none;height:100%;max-height:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--bg);border-radius:0;padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 28px);border:0;transform:translateZ(0)}
-    body.workout-open{overflow:hidden;position:fixed;width:100%}
-    @media(min-width:620px){.grid{grid-template-columns:repeat(4,1fr)}.modal-box{left:50%;right:auto;width:min(760px,100%);transform:translateX(-50%) translateZ(0)}}
-  </style>
+  <link rel="stylesheet" href="./css/app.css">
 </head>
 <body>
 <header><h1>Bell Performance</h1><div class="sub">Train for Life.</div></header>
@@ -80,8 +41,12 @@
   </div>
   <div class="card">
     <h3>Today's Workout</h3>
-    <div class="mission-title" id="missionOut"></div>
-    <div class="sub" id="missionMeta"></div>
+    <div class="mission-title" id="todayMission">Next workout</div>
+    <div class="sub">
+      <span id="todayLocation">—</span> •
+      <span id="todayDuration">—</span>
+    </div>
+    <div class="pill" id="todayScale" style="margin-top:10px">Loading readiness scale…</div>
     <div id="todayPreview" class="hint" style="margin-top:10px"></div>
     <button onclick="beginToday()">Begin Workout</button>
   </div>
@@ -145,18 +110,33 @@
   </div>
 </section>
 
-<section id="plan" class="screen"><h2 class="section-title">Weekly Plan</h2><div id="planList" class="list"></div><button onclick="addPlan()">Add Session</button></section>
+<section id="plan" class="screen"><h2 class="section-title">Weekly Plan</h2><div id="planList" class="list"></div></section>
 
-<section id="workouts" class="screen"><h2 class="section-title">Workout Library</h2><div id="workoutList" class="list"></div></section>
+<section id="workouts" class="screen"><h2 class="section-title">Workout Library</h2><div id="workoutLibrary" class="list"></div></section>
 
 <section id="history" class="screen"><h2 class="section-title">Training History</h2><div id="historyList" class="list"></div></section>
 
 <section id="more" class="screen">
   <h2 class="section-title">Settings & Data</h2>
   <div class="card">
+    <h3>Profile</h3>
     <label>Current Phase</label><input id="phaseInput">
-    <div class="row"><div><label>Current Weight</label><input type="number" id="weightInput"></div><div><label>Goal Weight</label><input type="number" id="goalInput"></div></div>
-    <button onclick="saveSettings()">Save Settings</button>
+    <div class="row">
+      <div><label>Current Weight</label><input type="number" id="weightInput"></div>
+      <div><label>Goal Weight</label><input type="number" id="goalInput"></div>
+    </div>
+    <button onclick="saveProfile()">Save Profile</button>
+  </div>
+  <div class="card">
+    <h3>Max Lifts</h3>
+    <div class="row">
+      <div><label>Bench Press 1RM</label><input id="benchMax" type="number" inputmode="decimal"></div>
+      <div><label>Back Squat 1RM</label><input id="squatMax" type="number" inputmode="decimal"></div>
+      <div><label>Deadlift 1RM</label><input id="deadliftMax" type="number" inputmode="decimal"></div>
+      <div><label>Push Press 1RM</label><input id="pushPressMax" type="number" inputmode="decimal"></div>
+    </div>
+    <button class="secondary" onclick="saveMaxes()">Save Max Lifts</button>
+    <div class="hint">These values drive the recommended starting weights in your workouts.</div>
   </div>
   <div class="card">
     <h3>Mission Goals</h3>
@@ -178,7 +158,7 @@
     </div>
     <button class="secondary" onclick="saveNutritionSettings()">Update Macro Guide</button>
   </div>
-  <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input type="file" id="importFile" accept="application/json"><button class="secondary" onclick="importData()">Import Data</button><button class="danger" onclick="resetData()">Reset App</button></div>
+  <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input type="file" id="importFile" accept="application/json" onchange="importData(event)"><button class="danger" onclick="resetApp()">Reset App</button></div>
   <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
 </section>
 </main>
@@ -186,665 +166,34 @@
 <div id="workoutModal" class="modal hidden">
   <div class="modal-box">
     <div class="workout-top">
-      <div class="progress-label"><span id="activeTitle"></span><span id="activeProgress"></span></div>
-      <div class="scorebar"><div id="activeBar"></div></div>
+      <div class="progress-label"><span id="activeTitle"></span><span id="workoutProgressText"></span></div>
+      <div class="scorebar"><div id="workoutProgressBar"></div></div>
     </div>
     <div class="card">
       <h3>Workout Timer</h3><div class="timer" id="workoutTimer">00:00</div>
-      <div class="row"><button class="secondary" onclick="toggleTimer()" id="timerButton">Pause</button><button class="secondary" onclick="closeWorkout()">Save & Exit</button></div>
+      <div class="row"><button class="secondary" onclick="closeWorkout()">Save & Exit</button><button class="danger" onclick="discardWorkout()">Discard</button></div>
     </div>
-    <div id="exerciseContainer"></div>
-    <div class="card"><label>Session RPE</label><input type="number" min="1" max="10" id="sessionRpe"><label>Workout Notes</label><textarea id="sessionNotes"></textarea><button class="good" onclick="finishWorkout()">Finish Workout</button></div>
+    <div id="activeExercises"></div>
+    <div class="card"><label>Session RPE</label><input type="number" min="1" max="10" id="sessionRpe"><label>Workout Notes</label><textarea id="sessionNotes"></textarea><button class="good" onclick="completeWorkout()">Finish Workout</button></div>
   </div>
 </div>
 
 <nav>
-<button class="active" onclick="show('home',this)"><span class="icon">⌂</span>Home</button>
-<button onclick="show('plan',this)"><span class="icon">☷</span>Plan</button>
-<button onclick="show('workouts',this)"><span class="icon">⚒</span>Workouts</button>
-<button onclick="show('history',this)"><span class="icon">◷</span>History</button>
-<button onclick="show('more',this)"><span class="icon">⚙</span>More</button>
+<button class="active" data-screen="home"><span class="icon">⌂</span>Home</button>
+<button data-screen="plan"><span class="icon">☷</span>Plan</button>
+<button data-screen="workouts"><span class="icon">⚒</span>Workouts</button>
+<button data-screen="history"><span class="icon">◷</span>History</button>
+<button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 
-<script>
-const workoutTemplates={
-"S-1 Upper Strength":{
- duration:60,location:"Home or Work Gym",
- exercises:[
-  {name:"Bench Press",sets:5,reps:"5",rest:150,cue:"Leave 1–2 reps in reserve."},
-  {name:"Weighted Pull-up",sets:4,reps:"5–8",rest:120,cue:"Full hang. Chest toward bar."},
-  {name:"Incline Dumbbell Press",sets:3,reps:"8–12",rest:90,cue:"Controlled lowering."},
-  {name:"Chest-Supported Row",sets:4,reps:"8–12",rest:90,cue:"Pause at the top."},
-  {name:"Farmer Carry",sets:4,reps:"40 yd",rest:60,cue:"Tall posture and hard brace."}
- ]},
-"S-2 Lower Strength":{
- duration:60,location:"Home Gym",
- exercises:[
-  {name:"Back Squat",sets:5,reps:"5",rest:180,cue:"Smooth reps. No grinders."},
-  {name:"Romanian Deadlift",sets:4,reps:"6–8",rest:120,cue:"Hinge and keep lats tight."},
-  {name:"Reverse Lunge",sets:3,reps:"8/leg",rest:90,cue:"Control knee and pelvis."},
-  {name:"Standing Calf Raise",sets:3,reps:"12–15",rest:60,cue:"Full stretch and pause."},
-  {name:"Farmer Carry",sets:5,reps:"40 yd",rest:60,cue:"Strong posture."}
- ]},
-"S-3 Athletic Upper":{
- duration:45,location:"Home or Work Gym",
- exercises:[
-  {name:"Push Press",sets:5,reps:"3",rest:120,cue:"Fast bar speed."},
-  {name:"Chin-up",sets:4,reps:"AMRAP -2",rest:90,cue:"Stop before form breaks."},
-  {name:"Single-Arm Dumbbell Row",sets:3,reps:"10/side",rest:75,cue:"Drive elbow toward hip."},
-  {name:"Push-up",sets:3,reps:"15–20",rest:60,cue:"Rigid plank position."},
-  {name:"Battle Rope or Med-Ball Throw",sets:8,reps:"15 sec",rest:45,cue:"Explosive effort."}
- ]},
-"S-4 Athletic Lower":{
- duration:50,location:"Home Gym or Outdoors",
- exercises:[
-  {name:"Box Jump",sets:5,reps:"3",rest:60,cue:"Land quietly."},
-  {name:"Trap-Bar Deadlift",sets:5,reps:"3",rest:150,cue:"Fast, clean reps."},
-  {name:"Bulgarian Split Squat",sets:3,reps:"8/leg",rest:90,cue:"Stable trunk."},
-  {name:"Kettlebell Swing",sets:4,reps:"15",rest:60,cue:"Snap the hips."},
-  {name:"Short Sprint",sets:6,reps:"15–20 sec",rest:90,cue:"Full quality each rep."}
- ]},
-"R-1 Recovery Run":{duration:20,location:"Outdoors",exercises:[{name:"Recovery Run",sets:1,reps:"20 min easy",rest:0,cue:"Very easy pace. Nasal breathing when possible."}]},
-"R-2 Easy Run":{duration:30,location:"Outdoors",exercises:[{name:"Easy Run",sets:1,reps:"2–3 miles",rest:0,cue:"Conversational pace."}]},
-"R-3 Tempo Run":{duration:30,location:"Outdoors",exercises:[{name:"Warm-up Walk/Jog",sets:1,reps:"8 min",rest:0,cue:"Start easy."},{name:"Tempo Run",sets:3,reps:"5 min",rest:120,cue:"Controlled hard pace."},{name:"Cool-down",sets:1,reps:"5 min",rest:0,cue:"Easy jog or walk."}]},
-"R-4 Intervals":{duration:30,location:"Outdoors",exercises:[{name:"Warm-up",sets:1,reps:"10 min",rest:0,cue:"Easy jog plus drills."},{name:"Fast Interval",sets:6,reps:"1 min",rest:120,cue:"Fast, not all-out."},{name:"Cool-down",sets:1,reps:"5 min",rest:0,cue:"Walk or jog."}]},
-"R-5 Long Run":{duration:45,location:"Outdoors",exercises:[{name:"Long Easy Run",sets:1,reps:"3–5 miles",rest:0,cue:"Keep effort easy and steady."}]},
-"M-1 Daily Reset":{duration:10,location:"Anywhere",exercises:[{name:"Deep Squat Hold",sets:1,reps:"60 sec",rest:0,cue:"Use support if needed."},{name:"World's Greatest Stretch",sets:1,reps:"5/side",rest:0,cue:"Slow rotation."},{name:"Couch Stretch",sets:1,reps:"45 sec/side",rest:0,cue:"Keep ribs down."},{name:"90/90 Hip Rotations",sets:1,reps:"10",rest:0,cue:"Stay tall."},{name:"Dead Hang",sets:1,reps:"30–45 sec",rest:0,cue:"Relax shoulders."}]}
-};
-
-const motivationalQuotes=[
- {text:"Discipline is choosing between what you want now and what you want most.",author:"Abraham Lincoln"},
- {text:"Success is the sum of small efforts repeated day in and day out.",author:"Robert Collier"},
- {text:"You do not rise to the level of your goals. You fall to the level of your systems.",author:"James Clear"},
- {text:"The secret of getting ahead is getting started.",author:"Mark Twain"},
- {text:"Strength does not come from what you can do. It comes from overcoming what you once thought you could not.",author:"Rikki Rogers"},
- {text:"The man who moves a mountain begins by carrying away small stones.",author:"Confucius"},
- {text:"Hard work beats talent when talent does not work hard.",author:"Tim Notke"},
- {text:"The only bad workout is the one that did not happen.",author:"Unknown"},
- {text:"Do today what others will not, so tomorrow you can do what others cannot.",author:"Jerry Rice"},
- {text:"Motivation gets you started. Habit keeps you going.",author:"Jim Ryun"},
- {text:"We are what we repeatedly do. Excellence, then, is not an act, but a habit.",author:"Often attributed to Aristotle"},
- {text:"You will never always be motivated, so you must learn to be disciplined.",author:"Unknown"},
- {text:"The pain of discipline is far less than the pain of regret.",author:"Sarah Bombell"},
- {text:"A year from now, you may wish you had started today.",author:"Karen Lamb"},
- {text:"It is a shame for a man to grow old without seeing the beauty and strength of which his body is capable.",author:"Socrates"},
- {text:"Fall seven times, stand up eight.",author:"Japanese proverb"},
- {text:"Courage is not having the strength to go on; it is going on when you do not have the strength.",author:"Often attributed to Napoleon"},
- {text:"Your body can stand almost anything. It is your mind you have to convince.",author:"Unknown"},
- {text:"The work you do when no one is watching is what makes the difference when everyone is watching.",author:"Unknown"},
- {text:"Do not count the days. Make the days count.",author:"Muhammad Ali"},
- {text:"If you are tired of starting over, stop giving up.",author:"Unknown"},
- {text:"You cannot improve what you do not consistently practice.",author:"Unknown"},
- {text:"Little by little, a little becomes a lot.",author:"Tanzanian proverb"},
- {text:"The future depends on what you do today.",author:"Mahatma Gandhi"},
- {text:"Train hard, recover well, and show up again.",author:"Bell Performance"},
- {text:"Earn the confidence you want through the work you do today.",author:"Bell Performance"},
- {text:"Strong enough for the task. Fit enough for the mission. Ready for the life.",author:"Bell Performance"},
- {text:"Today is not about proving everything. It is about moving one step forward.",author:"Bell Performance"},
- {text:"Consistency is a form of courage.",author:"Bell Performance"},
- {text:"Build the body that can carry the life you want to live.",author:"Bell Performance"},
- {text:"Stay ready so you do not have to get ready.",author:"Traditional saying"}
-];
-
-function getDailyQuote(){
- const now=new Date();
- const start=new Date(now.getFullYear(),0,0);
- const day=Math.floor((now-start)/86400000);
- return motivationalQuotes[day % motivationalQuotes.length];
-}
-
-const defaults={
- settings:{phase:"Foundation",weight:207,goal:185,cardioType:"Running",maxes:{bench:315,squat:455,deadlift:455,pushPress:185},readiness:{sleepHours:7,sleepQuality:4,energy:4,motivation:4,stress:3,soreness:3,jointPain:0,restingHr:0,score:78,status:"GREEN"}},
- plan:[
-  {mission:"S-2 Lower Strength",complete:false},{mission:"R-2 Easy Run",complete:false},
-  {mission:"S-1 Upper Strength",complete:false},{mission:"S-4 Athletic Lower",complete:false},
-  {mission:"R-5 Long Run",complete:false},{mission:"S-3 Athletic Upper",complete:false},
-  {mission:"R-1 Recovery Run",complete:false}
- ],
- history:[],activeWorkout:null,
- mobility:{focus:"Auto",minutes:10,completedDates:[],checks:{}},
- readinessLog:[],
- mission:{goalWorkouts:40,goalMobility:30,goalPullups:25,goal5k:28,currentPullups:20,current5k:null},
- nutrition:{height:66,age:41,activity:1.55,goal:"cut"}
-};
-let data=JSON.parse(localStorage.getItem("bellPerformanceV2")||"null")||structuredClone(defaults);
-
-function normalizeData(){
- data.settings=data.settings||{};
- data.settings.phase=data.settings.phase||defaults.settings.phase;
- data.settings.weight=Number(data.settings.weight)||defaults.settings.weight;
- data.settings.goal=Number(data.settings.goal)||defaults.settings.goal;
- data.settings.cardioType=data.settings.cardioType||"Running";
- data.settings.maxes={
-   bench:Number(data.settings.maxes?.bench)||315,
-   squat:Number(data.settings.maxes?.squat)||455,
-   deadlift:Number(data.settings.maxes?.deadlift)||455,
-   pushPress:Number(data.settings.maxes?.pushPress)||185
- };
-
- const old=data.settings.readiness||{};
- data.settings.readiness={
-   sleepHours:Number.isFinite(+old.sleepHours)?+old.sleepHours:7,
-   sleepQuality:Number.isFinite(+old.sleepQuality)?+old.sleepQuality:(Number.isFinite(+old.sleep)?+old.sleep:4),
-   energy:Number.isFinite(+old.energy)?+old.energy:4,
-   motivation:Number.isFinite(+old.motivation)?+old.motivation:4,
-   stress:Number.isFinite(+old.stress)?+old.stress:3,
-   soreness:Number.isFinite(+old.soreness)?+old.soreness:3,
-   jointPain:Number.isFinite(+old.jointPain)?+old.jointPain:0,
-   restingHr:Number.isFinite(+old.restingHr)?+old.restingHr:0,
-   score:Number.isFinite(+old.score)?+old.score:78,
-   status:old.status||"GREEN"
- };
-
- data.plan=Array.isArray(data.plan)?data.plan:structuredClone(defaults.plan);
- data.history=Array.isArray(data.history)?data.history:[];
- data.mobility=data.mobility||structuredClone(defaults.mobility);
- data.mobility.focus=data.mobility.focus||"Auto";
- data.mobility.minutes=Number(data.mobility.minutes)||10;
- data.mobility.completedDates=Array.isArray(data.mobility.completedDates)?data.mobility.completedDates:[];
- data.mobility.checks=data.mobility.checks||{};
- data.readinessLog=Array.isArray(data.readinessLog)?data.readinessLog:[];
- data.mission={...defaults.mission,...(data.mission||{})};
- data.nutrition={...defaults.nutrition,...(data.nutrition||{})};
- if(data.activeWorkout && !Array.isArray(data.activeWorkout.exercises)) data.activeWorkout=null;
-}
-normalizeData();
-
-let timerInterval=null;
-
-function save(){localStorage.setItem("bellPerformanceV2",JSON.stringify(data));render();}
-function show(id,btn){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");}
-function todayKey(){
- const d=new Date();
- return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-const mobilityRoutines={
- "Full Body":[
-  ["Cat-Camel","8 slow reps"],["World's Greatest Stretch","4/side"],["90/90 Hip Rotations","8 reps"],
-  ["Wall Slides","10 reps"],["Deep Squat Hold","45 seconds"],["Dead Hang","30 seconds"]
- ],
- "Hips":[
-  ["90/90 Hip Rotations","10 reps"],["Couch Stretch","45 sec/side"],["Adductor Rock-Back","8/side"],
-  ["Cossack Squat","6/side"],["Deep Squat Hold","60 seconds"],["Glute Bridge","12 reps"]
- ],
- "Shoulders":[
-  ["Wall Slides","10 reps"],["Band Pull-Apart","15 reps"],["Thread the Needle","6/side"],
-  ["Dead Hang","30–45 seconds"],["Doorway Pec Stretch","45 sec/side"],["Scapular Push-up","10 reps"]
- ],
- "Low Back":[
-  ["Cat-Camel","10 reps"],["Child's Pose Breathing","5 breaths"],["Open Book Rotation","6/side"],
-  ["Bird Dog","6/side"],["Hip Flexor Stretch","45 sec/side"],["Glute Bridge","12 reps"]
- ],
- "Ankles":[
-  ["Knee-to-Wall Ankle Rock","10/side"],["Calf Stretch","45 sec/side"],["Tibialis Raise","15 reps"],
-  ["Slow Calf Raise","12 reps"],["Deep Squat Pry","45 seconds"],["Single-Leg Balance","30 sec/side"]
- ]
-};
-function resolvedMobilityFocus(){
- if(data.mobility.focus!=="Auto") return data.mobility.focus;
- const mission=currentPlan()?.mission||"";
- if(mission.includes("Lower")||mission.includes("Run")) return "Hips";
- if(mission.includes("Upper")) return "Shoulders";
- return "Full Body";
-}
-function dailyMobilityRoutine(){
- const focus=resolvedMobilityFocus();
- const minutes=Number(data.mobility.minutes)||10;
- const source=mobilityRoutines[focus]||mobilityRoutines["Full Body"];
- const count=minutes<=6?4:minutes<=10?5:6;
- return source.slice(0,count);
-}
-function saveMobilityFocus(){
- data.mobility.focus=mobilityFocus.value;
- data.mobility.minutes=+mobilityMinutes.value||10;
- data.mobility.checks={};
- save();
-}
-function toggleMobilityMove(index,checked){
- const key=todayKey();
- data.mobility.checks[key]=data.mobility.checks[key]||{};
- data.mobility.checks[key][index]=checked;
- localStorage.setItem("bellPerformanceV2",JSON.stringify(data));
-}
-function completeMobility(){
- const key=todayKey();
- if(!data.mobility.completedDates.includes(key)) data.mobility.completedDates.push(key);
- save();
-}
-function workoutXP(){return data.history.length*100;}
-function mobilityXP(){return data.mobility.completedDates.length*40;}
-function readinessXP(){return data.readinessLog.filter(x=>x.score>=75).length*10;}
-function totalXP(){return workoutXP()+mobilityXP()+readinessXP();}
-function rankInfo(){
- const xp=totalXP();
- const levels=[
-  [0,"Foundation Athlete"],[500,"Developing Athlete"],[1200,"Hybrid Athlete"],
-  [2500,"Tactical Athlete"],[4500,"Performance Athlete"],[7000,"Lifetime Athlete"]
- ];
- let idx=0;
- for(let i=0;i<levels.length;i++) if(xp>=levels[i][0]) idx=i;
- const current=levels[idx],next=levels[Math.min(idx+1,levels.length-1)];
- const level=idx+1;
- const pct=idx===levels.length-1?100:Math.round((xp-current[0])/(next[0]-current[0])*100);
- return {xp,rank:current[1],level,pct,next:next[0]};
-}
-function missionProgress(){
- const workouts=data.history.length;
- const mobility=data.mobility.completedDates.length;
- const weightStart=207, current=Number(data.settings.weight)||207, goal=Number(data.settings.goal)||185;
- const weightPct=goal===weightStart?100:Math.max(0,Math.min(100,Math.round((weightStart-current)/(weightStart-goal)*100)));
- return {
-  workouts,pWorkouts:Math.min(100,Math.round(workouts/data.mission.goalWorkouts*100)),
-  mobility,pMobility:Math.min(100,Math.round(mobility/data.mission.goalMobility*100)),
-  weightPct
- };
-}
-function macroTargets(){
- const n=data.nutrition;
- const kg=(Number(data.settings.weight)||207)*0.453592;
- const cm=(Number(n.height)||66)*2.54;
- const age=Number(n.age)||41;
- const bmr=10*kg+6.25*cm-5*age+5;
- let calories=Math.round((bmr*(Number(n.activity)||1.55))/50)*50;
- if(n.goal==="cut") calories-=450;
- if(n.goal==="gain") calories+=250;
- const next=currentPlan();
- const trainingDay=Boolean(next && !next.mission.startsWith("M-") && !next.mission.startsWith("R-1"));
- if(!trainingDay) calories-=150;
- calories=Math.max(1600,calories);
- const protein=Math.round(Math.min(Number(data.settings.weight)||207,(Number(data.settings.goal)||185)*1.05)/5)*5;
- const fat=Math.round(((Number(data.settings.weight)||207)*0.32)/5)*5;
- const carbs=Math.max(50,Math.round((calories-protein*4-fat*9)/4/5)*5);
- return {calories,protein,fat,carbs,trainingDay};
-}
-function saveMissionGoals(){
- data.mission.goalWorkouts=+goalWorkouts.value||40;
- data.mission.goalMobility=+goalMobility.value||30;
- data.mission.goalPullups=+goalPullups.value||25;
- data.mission.goal5k=+goal5k.value||28;
- save();
-}
-function saveNutritionSettings(){
- data.nutrition.height=+heightInput.value||66;
- data.nutrition.age=+ageInput.value||41;
- data.nutrition.activity=+activityInput.value||1.55;
- data.nutrition.goal=nutritionGoalInput.value||"cut";
- save();
-}
-function readinessScore(){
- const r=data.settings.readiness;
- const n=(value,fallback)=>Number.isFinite(+value)?+value:fallback;
- const sleepHours=n(r.sleepHours,7);
- const sleepQuality=n(r.sleepQuality,4);
- const energyValue=n(r.energy,4);
- const motivationValue=n(r.motivation,4);
- const stressValue=n(r.stress,3);
- const sorenessValue=n(r.soreness,3);
- const jointPainValue=n(r.jointPain,0);
- const restingHrValue=n(r.restingHr,0);
-
- const sleepHoursScore=Math.max(0,Math.min(100,((sleepHours-4)/4)*100));
- const sleepQualityScore=(sleepQuality/5)*100;
- const energyScore=(energyValue/5)*100;
- const motivationScore=(motivationValue/5)*100;
- const stressScore=((6-stressValue)/5)*100;
- const sorenessScore=((6-sorenessValue)/5)*100;
- const jointPainScore=((5-jointPainValue)/5)*100;
- const hrScore=[100,80,55,25][restingHrValue] ?? 100;
- let score=Math.round(
-   sleepHoursScore*.18 + sleepQualityScore*.14 + energyScore*.18 +
-   motivationScore*.10 + stressScore*.14 + sorenessScore*.10 +
-   jointPainScore*.10 + hrScore*.06
- );
- if(jointPainValue>=4) score=Math.min(score,49);
- if(sleepHours<4.5) score=Math.min(score,49);
- return Math.max(0,Math.min(100,score));
-}
-function readiness(){
- const score=readinessScore();
- return score>=75?"GREEN":score>=50?"YELLOW":"RED";
-}
-function currentPlan(){return data.plan.find(x=>!x.complete)||null;}
-function cardioPrescription(mission, modality){
- const map={
-  "R-1 Recovery Run":{
-   "Running":["Recovery Run","20 min easy"],
-   "Cycling":["Easy Spin","25 min easy"],
-   "Air Bike":["Recovery Ride","15–20 min easy"],
-   "Rower":["Easy Row","15–20 min easy"],
-   "Elliptical":["Easy Elliptical","20–25 min easy"],
-   "Stair Climber":["Easy Climb","15–20 min easy"]
-  },
-  "R-2 Easy Run":{
-   "Running":["Easy Run","2–3 miles"],
-   "Cycling":["Zone 2 Ride","35–45 min"],
-   "Air Bike":["Zone 2 Air Bike","25–35 min"],
-   "Rower":["Zone 2 Row","25–35 min"],
-   "Elliptical":["Zone 2 Elliptical","30–40 min"],
-   "Stair Climber":["Zone 2 Climb","20–30 min"]
-  },
-  "R-3 Tempo Run":{
-   "Running":["Tempo Run","3 × 5 min"],
-   "Cycling":["Tempo Ride","3 × 6 min"],
-   "Air Bike":["Tempo Air Bike","5 × 3 min"],
-   "Rower":["Tempo Row","4 × 4 min"],
-   "Elliptical":["Tempo Elliptical","3 × 6 min"],
-   "Stair Climber":["Tempo Climb","4 × 4 min"]
-  },
-  "R-4 Intervals":{
-   "Running":["Fast Interval","6 × 1 min"],
-   "Cycling":["Bike Interval","8 × 1 min"],
-   "Air Bike":["Air Bike Sprint","10 × 20 sec"],
-   "Rower":["Row Interval","8 × 250 m"],
-   "Elliptical":["Elliptical Interval","8 × 1 min"],
-   "Stair Climber":["Climb Interval","8 × 45 sec"]
-  },
-  "R-5 Long Run":{
-   "Running":["Long Easy Run","3–5 miles"],
-   "Cycling":["Long Zone 2 Ride","60–90 min"],
-   "Air Bike":["Long Aerobic Ride","35–50 min"],
-   "Rower":["Long Easy Row","35–50 min"],
-   "Elliptical":["Long Aerobic Session","45–60 min"],
-   "Stair Climber":["Long Easy Climb","30–45 min"]
-  }
- };
- return map[mission]?.[modality] || map[mission]?.["Running"];
-}
-function applyCardioModality(name, template){
- if(!name.startsWith("R-")) return template;
- const modality=data.settings.cardioType || "Running";
- const selected=cardioPrescription(name,modality);
- const exercises=template.exercises.map((e,i)=>{
-   if(name==="R-3 Tempo Run" && i===1) return {...e,name:selected[0],reps:selected[1]};
-   if(name==="R-4 Intervals" && i===1) return {...e,name:selected[0],reps:selected[1]};
-   if((name==="R-1 Recovery Run" || name==="R-2 Easy Run" || name==="R-5 Long Run") && i===0) return {...e,name:selected[0],reps:selected[1]};
-   return e;
- });
- return {...template,location:modality==="Running"?"Outdoors":modality,exercises,cardioType:modality};
-}
-function cardioGuidance(){
- const type=data.settings.cardioType || "Running";
- const notes={
-  "Running":"Best for rebuilding running durability. Keep easy days conversational.",
-  "Cycling":"Low-impact aerobic work. Use steady cadence and moderate resistance.",
-  "Air Bike":"Full-body conditioning. Avoid turning every session into a sprint.",
-  "Rower":"Drive with the legs first, then finish with the arms.",
-  "Elliptical":"Low-impact option that closely matches steady running effort.",
-  "Stair Climber":"Keep posture tall and avoid leaning heavily on the handles."
- };
- return notes[type];
-}
-function saveCardioType(){
- data.settings.cardioType=cardioType.value;
- save();
-}
-function roundTo5(value){
- return Math.max(5,Math.round(value/5)*5);
-}
-function recommendedWeight(exerciseName,status){
- const m=data.settings.maxes||{};
- const bodyweight=Number(data.settings.weight)||207;
- const scale=status==="GREEN"?1:status==="YELLOW"?.90:.75;
- const table={
-   "Bench Press":{base:(m.bench||315)*.72,label:"based on 72% bench 1RM"},
-   "Back Squat":{base:(m.squat||455)*.70,label:"based on 70% squat 1RM"},
-   "Trap-Bar Deadlift":{base:(m.deadlift||455)*.72,label:"based on 72% deadlift 1RM"},
-   "Push Press":{base:(m.pushPress||185)*.72,label:"based on 72% push-press 1RM"},
-   "Romanian Deadlift":{base:(m.deadlift||455)*.48,label:"based on deadlift strength"},
-   "Incline Dumbbell Press":{base:(m.bench||315)*.20,label:"per dumbbell"},
-   "Chest-Supported Row":{base:(m.bench||315)*.22,label:"per dumbbell or equivalent"},
-   "Single-Arm Dumbbell Row":{base:(m.bench||315)*.25,label:"per dumbbell"},
-   "Reverse Lunge":{base:bodyweight*.18,label:"per dumbbell"},
-   "Bulgarian Split Squat":{base:bodyweight*.16,label:"per dumbbell"},
-   "Kettlebell Swing":{base:bodyweight*.24,label:"suggested kettlebell"},
-   "Farmer Carry":{base:bodyweight*.32,label:"per hand"}
- };
- if(exerciseName==="Weighted Pull-up"){
-   const add=status==="GREEN"?25:status==="YELLOW"?10:0;
-   return {value:add,display:add?`Bodyweight + ${add} lb`:"Bodyweight",note:"Start here and adjust to leave the prescribed reps in reserve."};
- }
- if(exerciseName==="Chin-up" || exerciseName==="Push-up" || exerciseName==="Box Jump" || exerciseName==="Short Sprint" || exerciseName.includes("Battle Rope") || exerciseName.includes("Med-Ball")){
-   return {value:"",display:"Bodyweight / appropriate implement",note:"Use quality and speed rather than chasing load."};
- }
- const item=table[exerciseName];
- if(!item) return {value:"",display:"Choose by effort",note:status==="GREEN"?"Finish with 1–2 reps in reserve.":status==="YELLOW"?"Finish with about 3 reps in reserve.":"Keep effort easy and technique-focused."};
- const value=roundTo5(item.base*scale);
- return {value,display:`${value} lb`,note:`${item.label}; ${status.toLowerCase()} readiness applied.`};
-}
-function saveMaxes(){
- data.settings.maxes={
-   bench:+benchMax.value||315,
-   squat:+squatMax.value||455,
-   deadlift:+deadliftMax.value||455,
-   pushPress:+pushPressMax.value||185
- };
- save();
- alert("Training maxes saved. Weight recommendations have been updated.");
-}
-function scalingProfile(){
- const status=readiness();
- if(status==="GREEN") return {status,load:1,sets:1,conditioning:1,label:"GREEN — full prescribed workout"};
- if(status==="YELLOW") return {status,load:.90,sets:.70,conditioning:.75,label:"YELLOW — 10% lighter, about 30% fewer working sets"};
- return {status,load:.75,sets:.45,conditioning:.50,label:"RED — 25% lighter, about half the working sets, no hard conditioning"};
-}
-function scaledTemplate(name){
- let base=workoutTemplates[name];
- if(!base) return null;
- base=applyCardioModality(name,base);
- const p=scalingProfile();
- const isMobility=name.startsWith("M-");
- const isRun=name.startsWith("R-");
-
- return {
-   ...base,
-   readinessStatus:p.status,
-   duration:Math.max(10,Math.round(base.duration*(isMobility?1:(p.status==="GREEN"?1:p.status==="YELLOW"?.75:.50)))),
-   exercises:base.exercises.map(e=>{
-     const originalSets=e.sets;
-     let sets=e.sets;
-     let reps=e.reps;
-
-     if(!isMobility){
-       sets=Math.max(1,Math.floor(e.sets*(isRun?p.conditioning:p.sets)));
-       if(p.status==="GREEN") sets=originalSets;
-       if(isRun && p.status==="RED"){
-         const modality=data.settings.cardioType || "Running";
-         reps=modality==="Running"?"15–25 min easy walk or walk/jog":"15–25 min very easy";
-         sets=1;
-       }
-     }
-
-     const recommendation=recommendedWeight(e.name,p.status);
-     return {
-       ...e,
-       originalSets,
-       sets,
-       reps,
-       recommendedWeight:recommendation.value,
-       recommendationDisplay:recommendation.display,
-       recommendationNote:recommendation.note,
-       scaleNote:p.status==="GREEN"
-         ?`GREEN: ${sets} sets as written`
-         :p.status==="YELLOW"
-           ?`YELLOW: reduced from ${originalSets} to ${sets} sets; recommended load reduced 10%`
-           :`RED: reduced from ${originalSets} to ${sets} sets; recommended load reduced 25%`
-     };
-   })
- };
-}
-function render(){
- const quote=getDailyQuote();
- const rank=rankInfo(),mission=missionProgress(),macros=macroTargets();
- rankOut.textContent=rank.rank;
- levelOut.textContent=`Level ${rank.level} • ${rank.next>rank.xp?`${rank.next-rank.xp} XP to next rank`:"Top rank reached"}`;
- xpOut.textContent=`${rank.xp} XP`;
- xpBar.style.width=rank.pct+"%";
- milestoneSummary.innerHTML=
-   `<strong>${mission.workouts}/${data.mission.goalWorkouts}</strong> workouts • `+
-   `<strong>${mission.mobility}/${data.mission.goalMobility}</strong> mobility days • `+
-   `<strong>${mission.weightPct}%</strong> toward goal weight`;
- mobilityFocus.value=data.mobility.focus;
- mobilityMinutes.value=String(data.mobility.minutes);
- const resolved=resolvedMobilityFocus();
- mobilityReason.textContent=data.mobility.focus==="Auto"
-   ?`Auto-selected ${resolved} based on today's training.`
-   :`${resolved} focus selected.`;
- const key=todayKey(),doneToday=data.mobility.completedDates.includes(key),checks=data.mobility.checks[key]||{};
- mobilityList.innerHTML="";
- dailyMobilityRoutine().forEach((move,i)=>{
-   const el=document.createElement("label");
-   el.className="mobility-move";
-   el.innerHTML=`<input type="checkbox" ${checks[i]?"checked":""} onchange="toggleMobilityMove(${i},this.checked)"><div><strong>${move[0]}</strong><div class="hint">${move[1]}</div></div>`;
-   mobilityList.appendChild(el);
- });
- mobilityCompleteButton.textContent=doneToday?"Mobility Completed Today ✓":"Complete Daily Mobility";
- mobilityCompleteButton.disabled=doneToday;
- calorieOut.textContent=macros.calories;
- proteinOut.textContent=macros.protein+"g";
- carbOut.textContent=macros.carbs+"g";
- fatOut.textContent=macros.fat+"g";
- nutritionMode.textContent=`${macros.trainingDay?"Training-day":"Recovery-day"} target • ${data.nutrition.goal==="cut"?"Fat-loss":data.nutrition.goal==="gain"?"Lean-gain":"Maintenance"} mode`;
- goalWorkouts.value=data.mission.goalWorkouts;
- goalMobility.value=data.mission.goalMobility;
- goalPullups.value=data.mission.goalPullups;
- goal5k.value=data.mission.goal5k;
- heightInput.value=data.nutrition.height;
- ageInput.value=data.nutrition.age;
- activityInput.value=String(data.nutrition.activity);
- nutritionGoalInput.value=data.nutrition.goal;
- dailyQuote.textContent=`“${quote.text}”`;
- quoteAuthor.textContent=`— ${quote.author}`;
- cardioType.value=data.settings.cardioType || "Running";
- cardioModeNote.textContent=cardioGuidance();
- benchMax.value=data.settings.maxes.bench;
- squatMax.value=data.settings.maxes.squat;
- deadliftMax.value=data.settings.maxes.deadlift;
- pushPressMax.value=data.settings.maxes.pushPress;
- phaseOut.textContent=data.settings.phase;weightOut.textContent=data.settings.weight;goalOut.textContent=data.settings.goal;
- const rd=readiness(), rScore=readinessScore(), profile=scalingProfile();
- readyOut.textContent=`${rd} ${rScore}`;readyOut.className="big "+(rd==="GREEN"?"good":rd==="YELLOW"?"warn":"bad");
- data.settings.readiness.score=rScore;data.settings.readiness.status=rd;
- const next=currentPlan();missionOut.textContent=next?next.mission:"Recovery / Free Choice";
- const tpl=next?scaledTemplate(next.mission):null;missionMeta.textContent=tpl?`${tpl.location} • ${tpl.duration} min`:"All planned sessions complete";
- todayPreview.innerHTML=tpl?`<strong>${profile.label}</strong><br>`+tpl.exercises.slice(0,5).map(x=>{
-   const setChange=x.originalSets!==x.sets?`${x.originalSets}→${x.sets} sets`:`${x.sets} sets`;
-   const weight=x.recommendationDisplay?` • Suggested: ${x.recommendationDisplay}`:"";
-   return `• ${x.name}: ${setChange} × ${x.reps}${weight}`;
- }).join("<br>"):"";
- const done=data.plan.filter(x=>x.complete).length,total=data.plan.length,score=total?Math.round(done/total*100):0;
- scoreOut.textContent=score+"%";scoreBar.style.width=score+"%";scoreDetail.textContent=`${done} of ${total} planned sessions complete`;
- sleepHours.value=data.settings.readiness.sleepHours;sleepQuality.value=data.settings.readiness.sleepQuality;
- energy.value=data.settings.readiness.energy;motivation.value=data.settings.readiness.motivation;
- stress.value=data.settings.readiness.stress;soreness.value=data.settings.readiness.soreness;
- jointPain.value=data.settings.readiness.jointPain;restingHr.value=data.settings.readiness.restingHr;
- readinessExplanation.innerHTML=`Score <strong>${rScore}/100</strong> — ${profile.label}. `+
- (rd==="GREEN"?"Proceed normally.":rd==="YELLOW"?"The workout shown below is automatically reduced.":"The workout is automatically converted to a recovery-focused version.");
- phaseInput.value=data.settings.phase;weightInput.value=data.settings.weight;goalInput.value=data.settings.goal;
- planList.innerHTML="";
- data.plan.forEach((p,i)=>{const tpl=scaledTemplate(p.mission);const el=document.createElement("div");el.className="item";el.innerHTML=`<input type="checkbox" style="width:23px;height:23px" ${p.complete?"checked":""} onchange="togglePlan(${i})"><div class="grow"><strong>${p.mission}</strong><small>${tpl?tpl.location+" • "+tpl.duration+" min":""}</small></div><button style="width:auto;padding:8px 10px;margin:0" onclick="beginWorkout('${p.mission}')">Begin</button>`;planList.appendChild(el);});
- workoutList.innerHTML="";
- Object.entries(workoutTemplates).forEach(([name,tpl])=>{const el=document.createElement("div");el.className="item";el.innerHTML=`<div class="grow"><strong>${name}</strong><small>${tpl.exercises.map(e=>`${e.name} ${e.sets}×${e.reps}`).join(" • ")}</small></div><button style="width:auto;padding:8px 10px;margin:0" onclick="beginWorkout('${name}')">Begin</button>`;workoutList.appendChild(el);});
- historyList.innerHTML="";
- [...data.history].reverse().forEach(h=>{const el=document.createElement("div");el.className="item";const sets=h.exercises.reduce((a,e)=>a+e.sets.filter(s=>s.done).length,0);el.innerHTML=`<div class="grow"><strong>${h.name}</strong><small>${new Date(h.completedAt).toLocaleDateString()} • ${h.cardioType?`${h.cardioType} • `:""}${Math.round(h.elapsed/60)} min • ${sets} sets • ${h.readiness?.status||"-"} ${h.readiness?.score||""} • RPE ${h.rpe||"-"}</small></div>`;historyList.appendChild(el);});
- if(data.activeWorkout && workoutModal.classList.contains("hidden")) openWorkoutUI();
-}
-function togglePlan(i){data.plan[i].complete=!data.plan[i].complete;save();}
-function addPlan(){const names=Object.keys(workoutTemplates);const mission=prompt("Enter mission code/name:\n"+names.join("\n"),names[0]);if(mission&&workoutTemplates[mission]){data.plan.push({mission,complete:false});save();}}
-function saveReadiness(){
- data.settings.readiness={
-   sleepHours:+sleepHours.value,
-   sleepQuality:+sleepQuality.value,
-   energy:+energy.value,
-   motivation:+motivation.value,
-   stress:+stress.value,
-   soreness:+soreness.value,
-   jointPain:+jointPain.value,
-   restingHr:+restingHr.value
- };
- data.settings.readiness.score=readinessScore();
- data.settings.readiness.status=readiness();
- const key=todayKey();
- const existing=data.readinessLog.findIndex(x=>x.date===key);
- const entry={date:key,score:data.settings.readiness.score,status:data.settings.readiness.status};
- if(existing>=0)data.readinessLog[existing]=entry;else data.readinessLog.push(entry);
- save();
- const status=data.settings.readiness.status;
- const score=data.settings.readiness.score;
- alert(`Readiness updated: ${status} (${score}/100). Today's workout has been scaled automatically.`);
-}
-function saveSettings(){data.settings.phase=phaseInput.value||"Foundation";data.settings.weight=+weightInput.value||0;data.settings.goal=+goalInput.value||0;save();}
-function beginToday(){
- const p=currentPlan();
- if(p) beginWorkout(p.mission);
- else alert("All planned sessions are complete. Choose a workout from the Workouts tab.");
-}
-function beginWorkout(name){
- const tpl=scaledTemplate(name);if(!tpl)return;
- data.activeWorkout={name,startTime:Date.now(),elapsed:0,running:true,notes:"",rpe:"",readiness:{score:readinessScore(),status:readiness()},
- cardioType:name.startsWith("R-")?(data.settings.cardioType||"Running"):null,
- exercises:tpl.exercises.map(e=>({
-   name:e.name,
-   prescription:`${e.sets} × ${e.reps}`,
-   originalSets:e.originalSets,
-   cue:e.cue,
-   scaleNote:e.scaleNote,
-   recommendationDisplay:e.recommendationDisplay,
-   recommendationNote:e.recommendationNote,
-   sets:Array.from({length:e.sets},(_,i)=>({
-     set:i+1,
-     weight:typeof e.recommendedWeight==="number"?e.recommendedWeight:"",
-     reps:e.reps,
-     done:false
-   }))
- }))};
- localStorage.setItem("bellPerformanceV2",JSON.stringify(data));
- openWorkoutUI();
- startTimer();
-}
-let savedPageScroll=0;
-function openWorkoutUI(){
- const a=data.activeWorkout;if(!a)return;
- if(!document.body.classList.contains("workout-open")){
-   savedPageScroll=window.scrollY;
-   document.body.style.top=`-${savedPageScroll}px`;
-   document.body.classList.add("workout-open");
- }
- workoutModal.classList.remove("hidden");activeTitle.textContent=a.cardioType?`${a.name} • ${a.cardioType}`:a.name;
- exerciseContainer.innerHTML="";
- a.exercises.forEach((e,ei)=>{const box=document.createElement("div");box.className="exercise";box.innerHTML=`<div class="exercise-head"><div class="exercise-num">${ei+1}</div><div class="grow"><div class="exercise-name">${e.name}</div><div class="prescription">${e.prescription}</div><div class="cue">${e.cue||""}</div><div class="cue"><strong>Scaled prescription:</strong> ${e.scaleNote||"As written"}</div><div class="cue"><strong>Recommended starting weight:</strong> ${e.recommendationDisplay||"Choose by effort"}</div><div class="cue">${e.recommendationNote||""}</div></div></div><div class="set-head"><span>Set</span><span>Weight</span><span>Reps</span><span>Done</span></div><div id="sets-${ei}"></div>`;exerciseContainer.appendChild(box);
- const cont=box.querySelector(`#sets-${ei}`);
- e.sets.forEach((s,si)=>{const row=document.createElement("div");row.className="set-row";row.innerHTML=`<strong>${s.set}</strong><input type="number" inputmode="decimal" placeholder="lb" value="${s.weight}" onchange="updateSet(${ei},${si},'weight',this.value)"><input type="text" value="${s.reps}" onchange="updateSet(${ei},${si},'reps',this.value)"><input class="set-check" type="checkbox" ${s.done?"checked":""} onchange="updateSet(${ei},${si},'done',this.checked)">`;cont.appendChild(row);});
- });
- sessionRpe.value=a.rpe||"";sessionNotes.value=a.notes||"";updateWorkoutProgress();updateTimerDisplay();
-}
-function updateSet(ei,si,key,val){data.activeWorkout.exercises[ei].sets[si][key]=val;persistActive();updateWorkoutProgress();}
-function persistActive(){data.activeWorkout.rpe=sessionRpe.value;data.activeWorkout.notes=sessionNotes.value;localStorage.setItem("bellPerformanceV2",JSON.stringify(data));}
-function updateWorkoutProgress(){const a=data.activeWorkout;if(!a)return;const all=a.exercises.flatMap(e=>e.sets);const done=all.filter(s=>s.done).length;const pct=all.length?Math.round(done/all.length*100):0;activeProgress.textContent=`${done}/${all.length} sets`;activeBar.style.width=pct+"%";}
-function startTimer(){clearInterval(timerInterval);timerInterval=setInterval(()=>{if(data.activeWorkout&&data.activeWorkout.running){data.activeWorkout.elapsed=Math.floor((Date.now()-data.activeWorkout.startTime)/1000);updateTimerDisplay();}},1000);}
-function updateTimerDisplay(){const s=data.activeWorkout?data.activeWorkout.elapsed:0;workoutTimer.textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");timerButton.textContent=data.activeWorkout&&data.activeWorkout.running?"Pause":"Resume";}
-function toggleTimer(){const a=data.activeWorkout;if(!a)return;if(a.running){a.elapsed=Math.floor((Date.now()-a.startTime)/1000);a.running=false}else{a.startTime=Date.now()-a.elapsed*1000;a.running=true}persistActive();updateTimerDisplay();}
-function closeWorkout(){
- if(data.activeWorkout) persistActive();
- workoutModal.classList.add("hidden");
- clearInterval(timerInterval);
- document.body.classList.remove("workout-open");
- document.body.style.top="";
- window.scrollTo(0,savedPageScroll);
-}
-function finishWorkout(){
- const a=data.activeWorkout;if(!a)return;
- a.rpe=sessionRpe.value;a.notes=sessionNotes.value;a.completedAt=new Date().toISOString();a.elapsed=Math.max(a.elapsed,Math.floor((Date.now()-a.startTime)/1000));
- data.history.push(a);
- const p=data.plan.find(x=>x.mission===a.name&&!x.complete);if(p)p.complete=true;
- data.activeWorkout=null;
- closeWorkout();
- save();
- alert("Workout complete. +100 XP earned.");
-}
-function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bell-performance-backup.json";a.click();URL.revokeObjectURL(a.href);}
-function importData(){const f=importFile.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{data=JSON.parse(reader.result);save();alert("Backup restored.");}catch(e){alert("Invalid backup.");}};reader.readAsText(f);}
-function resetData(){if(confirm("Reset all app data?")){data=structuredClone(defaults);save();}}
-render();if(data.activeWorkout)startTimer();if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
-</script>
+<script src="./data/workouts.js"></script>
+<script src="./js/storage.js"></script>
+<script src="./js/readiness.js"></script>
+<script src="./js/mobility.js"></script>
+<script src="./js/nutrition.js"></script>
+<script src="./js/milestones.js"></script>
+<script src="./js/workouts.js"></script>
+<script src="./js/ui.js"></script>
+<script src="./js/app.js"></script>
 </body>
 </html>

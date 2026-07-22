@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance",
+  "name": "Bell Performance 2.1",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#08101d",
   "theme_color": "#0b1220",
-  "description": "Hybrid performance app with readiness scaling, daily mobility, milestones, and macro guidance."
+  "description": "Modular hybrid performance app with restored workout library, next-workout dashboard, editable max lifts, readiness scaling, mobility, missions, and macro guidance."
 }

@@ -1,144 +1,64 @@
 "use strict";
 
-function weeksUntil(dateString) {
-  if (!dateString) return 12;
-  const target = new Date(`${dateString}T12:00:00`);
-  const today = new Date();
-  const days = Math.ceil((target - today) / 86400000);
-  return Math.max(6, Math.min(20, Math.ceil(days / 7)));
-}
+const GOAL_PROFILES = {
+  "5K": {category:"endurance", defaultWeeks:10, distance:3.1069, cardioLabel:"Run", defaultTime:30},
+  "10K": {category:"endurance", defaultWeeks:12, distance:6.2137, cardioLabel:"Run", defaultTime:60},
+  "Half Marathon": {category:"endurance", defaultWeeks:16, distance:13.1094, cardioLabel:"Run", defaultTime:120},
+  "Marathon": {category:"endurance", defaultWeeks:20, distance:26.2188, cardioLabel:"Run", defaultTime:240},
+  "General Hybrid": {category:"hybrid", defaultWeeks:12, cardioLabel:"Conditioning"},
+  "Tactical Games": {category:"hybrid", defaultWeeks:12, cardioLabel:"Run / Work Capacity"},
+  "Murph": {category:"hybrid", defaultWeeks:12, cardioLabel:"Run / Calisthenics"},
+  "Powerlifting": {category:"strength", defaultWeeks:12, cardioLabel:"Aerobic Support"},
+  "General Strength": {category:"strength", defaultWeeks:10, cardioLabel:"Aerobic Support"},
+  "Fat Loss": {category:"physique", defaultWeeks:12, cardioLabel:"Conditioning"},
+  "Body Recomposition": {category:"physique", defaultWeeks:12, cardioLabel:"Conditioning"},
+  "Longevity": {category:"health", defaultWeeks:12, cardioLabel:"Aerobic Health"}
+};
 
-function blockWeek() {
-  return Math.max(1, Math.min(data.trainingBlock.lengthWeeks || 12, data.trainingBlock.currentWeek || 1));
-}
+function goalProfile(goal = data.trainingBlock.goalType) { return GOAL_PROFILES[goal] || GOAL_PROFILES["General Hybrid"]; }
+function weeksUntil(dateString) { if (!dateString) return null; const target=new Date(`${dateString}T12:00:00`); const days=Math.ceil((target-new Date())/86400000); return Math.max(6,Math.min(24,Math.ceil(days/7))); }
+function blockWeek(){return Math.max(1,Math.min(data.trainingBlock.lengthWeeks||12,data.trainingBlock.currentWeek||1));}
+function blockPhase(){const w=blockWeek(),t=data.trainingBlock.lengthWeeks||12,p=goalProfile();if(w===t)return p.category==="endurance"?"Race Week":"Test & Transition";if(w>=t-1)return"Peak & Taper";if(w%4===0)return"Recovery & Absorption";if(w<=Math.ceil(t*.3))return"Foundation";if(w<=Math.ceil(t*.7))return"Build";return"Specific Preparation";}
+function isRecoveryWeek(){return blockWeek()%4===0&&blockWeek()!==data.trainingBlock.lengthWeeks;}
+function progressRatio(){return Math.min(1,blockWeek()/Math.max(1,(data.trainingBlock.lengthWeeks||12)-2));}
+function formatMiles(n){return `${n.toFixed(n<4?1:0)} miles`;}
 
-function blockPhase() {
-  const week = blockWeek();
-  const total = data.trainingBlock.lengthWeeks || 12;
-  if (week === total) return "Race Week";
-  if (week >= total - 2) return "Peak & Taper";
-  if (week % 4 === 0) return "Recovery & Absorption";
-  if (week <= Math.ceil(total * .33)) return "Base Building";
-  if (week <= Math.ceil(total * .7)) return "Build & Threshold";
-  return "Race Specific";
-}
-
-function runPrescription(type, week = blockWeek()) {
-  const total = data.trainingBlock.lengthWeeks || 12;
-  const target = Number(data.trainingBlock.targetMinutes) || 60;
-  const targetPace = target / 6.21371;
-  const recovery = week % 4 === 0;
-  const raceWeek = week === total;
-  const progress = Math.min(1, week / Math.max(1, total - 2));
-  const easyMiles = (2.0 + progress * 2.0) * (recovery ? .75 : 1);
-  const longMiles = Math.min(7.0, 3.0 + progress * 3.5) * (recovery ? .72 : 1);
-  const intervalCount = recovery ? 4 : Math.round(4 + progress * 4);
-  const tempoMinutes = recovery ? 12 : Math.round(12 + progress * 14);
-
-  if (raceWeek) {
-    if (type === "easy") return { mission:"R-2 Easy Run", label:"Race-Week Easy Run", detail:"20–25 min very easy + 4 relaxed strides", duration:25 };
-    if (type === "quality") return { mission:"R-4 Intervals", label:"Race Sharpening", detail:"10 min easy, 4 × 1 min at 10K effort with 2 min easy, cool down", duration:28 };
-    return { mission:"R-5 Long Run", label:"10K Goal Run", detail:`10K goal effort • target ${target.toFixed(0)} minutes`, duration:Math.round(target) };
+function endurancePrescription(type){
+  const b=data.trainingBlock,p=goalProfile(),w=blockWeek(),total=b.lengthWeeks||12,target=Number(b.targetMinutes)||p.defaultTime||60,pace=target/(p.distance||6.2137),r=progressRatio(),recovery=isRecoveryWeek(),race=w===total;
+  const longCaps={"5K":6,"10K":8,"Half Marathon":13,"Marathon":22}; const starts={"5K":3,"10K":3.5,"Half Marathon":4.5,"Marathon":6};
+  const long=(starts[b.goalType]||3)+(longCaps[b.goalType]-(starts[b.goalType]||3))*r;
+  if(race){if(type==="easy")return{mission:"R-2 Easy Run",label:"Race-Week Easy Run",detail:"20–30 min very easy + 4 relaxed strides",duration:28};if(type==="quality")return{mission:"R-4 Intervals",label:"Race Sharpening",detail:"Short controlled intervals at goal effort; finish fresh",duration:32};return{mission:"R-5 Long Run",label:`${b.goalType} Goal Event`,detail:`Goal effort • target ${target} minutes`,duration:target};}
+  if(type==="easy"){const miles=(2+r*(b.goalType==="Marathon"?4:2.5))*(recovery?.75:1);return{mission:"R-2 Easy Run",label:"Easy Aerobic Run",detail:`${formatMiles(miles)} conversational pace`,duration:Math.round(miles*11.5)};}
+  if(type==="quality"){
+    if(w<=Math.ceil(total*.3)){const n=recovery?4:Math.round(5+r*3);return{mission:"R-4 Intervals",label:"Speed Development",detail:`${n} × 1 min fast / 2 min easy`,duration:32+n};}
+    if(w<=Math.ceil(total*.7)){const tm=Math.round((15+r*20)*(recovery?.7:1));return{mission:"R-3 Tempo Run",label:"Threshold Development",detail:`${tm} min tempo near ${(pace+.35).toFixed(1)} min/mi`,duration:tm+20};}
+    const reps=b.goalType==="Marathon"?3:b.goalType==="Half Marathon"?4:5;return{mission:"R-4 Intervals",label:"Goal-Pace Intervals",detail:`${reps} × 4 min near ${pace.toFixed(1)} min/mi / 2 min easy`,duration:45};
   }
-
-  if (type === "easy") return { mission:"R-2 Easy Run", label:"Easy Aerobic Run", detail:`${easyMiles.toFixed(1)} miles conversational pace`, duration:Math.round(easyMiles * 12) };
-  if (type === "quality") {
-    if (week <= Math.ceil(total * .35)) return { mission:"R-4 Intervals", label:"Speed Development", detail:`${intervalCount} × 1 min fast / 2 min easy`, duration:30 + intervalCount };
-    if (week <= Math.ceil(total * .72)) return { mission:"R-3 Tempo Run", label:"Threshold Development", detail:`${tempoMinutes} min total tempo near ${(targetPace + .5).toFixed(1)} min/mi`, duration:tempoMinutes + 18 };
-    return { mission:"R-4 Intervals", label:"10K-Specific Intervals", detail:`${Math.max(4, intervalCount-1)} × 3 min near ${targetPace.toFixed(1)} min/mi / 2 min easy`, duration:42 };
-  }
-  return { mission:"R-5 Long Run", label:"Long Aerobic Run", detail:`${longMiles.toFixed(1)} miles easy; finish controlled`, duration:Math.round(longMiles * 12) };
+  const lm=long*(recovery?.72:1);return{mission:"R-5 Long Run",label:"Progressive Long Run",detail:`${formatMiles(lm)} easy; finish controlled`,duration:Math.round(lm*11.5)};
 }
 
-function strengthProgression() {
-  const week = blockWeek();
-  const total = data.trainingBlock.lengthWeeks || 12;
-  if (week === total) return { label:"Race-week maintenance", load:0.72, setScale:0.55, note:"Keep strength crisp and leave the gym fresh." };
-  if (week % 4 === 0) return { label:"Deload", load:0.72, setScale:0.65, note:"Reduce fatigue while preserving movement quality." };
-  const cycleWeek = ((week - 1) % 4) + 1;
-  const loads = [0.76, 0.79, 0.82, 0.72];
-  return { label:`Progressive overload week ${cycleWeek}`, load:loads[cycleWeek-1], setScale:1, note:"Add 5 lb when all prescribed reps are clean with 1–2 reps in reserve." };
-}
+function hybridPrescription(type){const g=data.trainingBlock.goalType,r=progressRatio(),rec=isRecoveryWeek();if(g==="Murph"){if(type==="easy")return{mission:"R-2 Easy Run",label:"Easy Run",detail:`${(2+r*2).toFixed(1)} miles easy`,duration:35};if(type==="quality")return{mission:"R-4 Intervals",label:"Murph Density Work",detail:`${rec?4:6+Math.round(r*4)} rounds: 5 pull-ups, 10 push-ups, 15 squats; controlled pace`,duration:35};return{mission:"R-5 Long Run",label:"Murph Simulation",detail:`Run + calisthenics progression at ${Math.round(50+r*35)}% event volume`,duration:55};}
+if(g==="Tactical Games"){if(type==="easy")return{mission:"R-2 Easy Run",label:"Aerobic Base",detail:"35–50 min Zone 2 run or approved cardio",duration:45};if(type==="quality")return{mission:"R-4 Intervals",label:"Work-Capacity Intervals",detail:`${rec?4:6} rounds: 3 min hard / 2 min easy with carries or sled work`,duration:42};return{mission:"R-5 Long Run",label:"Loaded Endurance",detail:`${45+Math.round(r*30)} min run/ruck at controlled effort`,duration:60};}
+if(type==="easy")return{mission:"R-2 Easy Run",label:"Zone 2 Base",detail:"35–50 min easy cardio; rotate modalities as desired",duration:42};if(type==="quality")return{mission:"R-4 Intervals",label:"Hybrid Intervals",detail:`${rec?5:7} × 2 min hard / 2 min easy`,duration:38};return{mission:"R-5 Long Run",label:"Durability Session",detail:`${50+Math.round(r*25)} min easy run, bike, row, or mixed aerobic work`,duration:60};}
 
-function coachRecommendation() {
-  if (!data.trainingBlock.enabled) return "Build a goal-based block in More → Goal Builder. The first release uses reliable coaching rules; an online AI layer can be added later.";
-  const phase = blockPhase();
-  const readiness = readinessStatus(readinessScore());
-  const strength = strengthProgression();
-  if (readiness === "RED") return `${phase}: readiness is red. Keep only essential work, make conditioning easy, and skip optional finishers today.`;
-  if (readiness === "YELLOW") return `${phase}: use the planned session but trim one accessory set and avoid grinding. ${strength.note}`;
-  return `${phase}: you are cleared to progress. ${strength.note}`;
-}
+function generalCardioPrescription(type){const g=data.trainingBlock.goalType,r=progressRatio(),rec=isRecoveryWeek();if(type==="easy")return{mission:"R-2 Easy Run",label:"Zone 2 Cardio",detail:`${rec?25:35+Math.round(r*15)} min easy cardio`,duration:rec?25:42};if(type==="quality")return{mission:"R-4 Intervals",label:g==="Fat Loss"?"Calorie-Efficient Intervals":"Controlled Intervals",detail:`${rec?5:7} × 90 sec strong / 2 min easy`,duration:34};return{mission:"R-5 Long Run",label:"Long Aerobic Session",detail:`${rec?35:50+Math.round(r*20)} min low-impact aerobic work`,duration:55};}
+function cardioPrescriptionForBlock(type){const c=goalProfile().category;if(c==="endurance")return endurancePrescription(type);if(c==="hybrid")return hybridPrescription(type);return generalCardioPrescription(type);}
 
-function generateTrainingBlock() {
-  const targetDate = document.getElementById("blockTargetDate").value;
-  const targetMinutes = +document.getElementById("blockTargetMinutes").value || 60;
-  const length = targetDate ? weeksUntil(targetDate) : (+document.getElementById("blockLength").value || 12);
-  data.trainingBlock = {
-    ...data.trainingBlock,
-    enabled:true,
-    goalType:document.getElementById("blockGoalType").value,
-    targetDate,
-    targetMinutes,
-    lengthWeeks:length,
-    currentWeek:1,
-    runDays:+document.getElementById("blockRunDays").value || 3,
-    strengthDays:+document.getElementById("blockStrengthDays").value || 3,
-    maintainStrength:document.getElementById("blockMaintainStrength").checked,
-    startDate:todayKey(),
-    generatedAt:new Date().toISOString()
-  };
-  buildCurrentWeekPlan();
-  saveData();
-  alert(`${data.trainingBlock.goalType} block created: ${length} weeks.`);
-}
+function strengthProgression(){const w=blockWeek(),t=data.trainingBlock.lengthWeeks||12,c=goalProfile().category;if(w===t)return{label:"Test / taper week",load:c==="strength"?.88:.7,setScale:c==="strength"?.6:.5,note:"Keep fatigue low and express the fitness built during the block."};if(isRecoveryWeek())return{label:"Deload",load:.7,setScale:.62,note:"Reduce volume and keep every rep crisp."};const cw=((w-1)%4)+1,base=c==="strength"?[.77,.81,.84,.72]:c==="endurance"?[.73,.76,.79,.7]:[.75,.78,.81,.7];return{label:`Progressive overload week ${cw}`,load:base[cw-1],setScale:1,note:c==="strength"?"Add 5 lb after successful clean work; do not grind.":"Progress only when running and recovery remain on track."};}
 
-function buildCurrentWeekPlan() {
-  if (!data.trainingBlock.enabled) return;
-  const easy = runPrescription("easy");
-  const quality = runPrescription("quality");
-  const long = runPrescription("long");
-  const strength3 = data.trainingBlock.strengthDays >= 3;
-  data.settings.rotationWeek = ((blockWeek() - 1) % 4) + 1;
-  data.settings.phase = `${data.trainingBlock.goalType} • ${blockPhase()}`;
-  data.plan = [
-    {day:"Monday", mission:"S-1 Upper Strength", detail:strengthProgression().label, done:false},
-    {day:"Tuesday", mission:easy.mission, detail:easy.detail, customLabel:easy.label, done:false},
-    {day:"Wednesday", mission:"S-2 Lower Strength", detail:strengthProgression().label, done:false},
-    {day:"Thursday", mission:quality.mission, detail:quality.detail, customLabel:quality.label, done:false},
-    {day:"Friday", mission:strength3 ? "S-3 Athletic Upper" : "M-1 Daily Reset", detail:strength3 ? "Short upper-body strength + Golden Era accessories" : "Mobility and recovery", done:false},
-    {day:"Saturday", mission:long.mission, detail:long.detail, customLabel:long.label, done:false},
-    {day:"Sunday", mission:"M-1 Daily Reset", detail:"Recovery, walking, and mobility", done:false}
-  ];
-}
+function coachRecommendation(){if(!data.trainingBlock.enabled)return"Choose a goal in More → Goal Builder. Bell Performance will coordinate strength, cardio, exercise rotation, recovery weeks, and the target date.";const ready=readinessStatus(readinessScore()),phase=blockPhase(),sp=strengthProgression();if(ready==="RED")return`${phase}: readiness is red. Keep only essential work, switch hard cardio to easy Zone 2, and skip optional finishers.`;if(ready==="YELLOW")return`${phase}: complete the main work, trim one accessory set, and avoid grinding. ${sp.note}`;return`${phase}: proceed as planned. ${sp.note}`;}
 
-function advanceBlockWeek() {
-  if (!data.trainingBlock.enabled) return alert("Create a training block first.");
-  if (data.trainingBlock.currentWeek >= data.trainingBlock.lengthWeeks) return alert("This block is complete.");
-  data.trainingBlock.currentWeek += 1;
-  buildCurrentWeekPlan();
-  saveData();
-}
+function updateGoalBuilderFields(){const goal=document.getElementById("blockGoalType")?.value||"10K",p=goalProfile(goal),wrap=document.getElementById("targetTimeWrap"),hint=document.getElementById("goalBuilderHint");if(wrap)wrap.style.display=p.category==="endurance"?"block":"none";if(hint)hint.textContent=p.category==="endurance"?"Running sessions progress from base work to threshold, race-specific training, taper, and goal day.":p.category==="strength"?"Major lifts remain stable long enough to progress while secondary lifts and accessories rotate every 1–4 weeks.":"The plan balances strength, conditioning, mobility, and recovery around the selected outcome.";}
 
-function saveBlockWeek() {
-  if (!data.trainingBlock.enabled) return alert("Create a training block first.");
-  data.trainingBlock.currentWeek = Math.max(1, Math.min(data.trainingBlock.lengthWeeks, +document.getElementById("currentBlockWeekInput").value || 1));
-  buildCurrentWeekPlan();
-  saveData();
-}
+function generateTrainingBlock(){const goal=document.getElementById("blockGoalType").value,p=goalProfile(goal),targetDate=document.getElementById("blockTargetDate").value,targetMinutes=+document.getElementById("blockTargetMinutes").value||p.defaultTime||60,length=weeksUntil(targetDate)||(+document.getElementById("blockLength").value||p.defaultWeeks);data.trainingBlock={...data.trainingBlock,enabled:true,goalType:goal,targetDate,targetMinutes,lengthWeeks:length,currentWeek:1,trainingDays:+document.getElementById("blockTrainingDays").value||5,runDays:+document.getElementById("blockRunDays").value||3,strengthDays:+document.getElementById("blockStrengthDays").value||3,sessionMinutes:+document.getElementById("blockSessionMinutes").value||75,secondaryGoal:document.getElementById("blockSecondaryGoal").value,maintainStrength:document.getElementById("blockMaintainStrength").checked,startDate:todayKey(),generatedAt:new Date().toISOString()};buildCurrentWeekPlan();saveData();alert(`${goal} block created: ${length} weeks.`);}
 
-function blockRunOverride(name, base) {
-  if (!data.trainingBlock.enabled || data.trainingBlock.goalType !== "10K") return base;
-  let type = null;
-  if (name === "R-2 Easy Run") type = "easy";
-  if (name === "R-3 Tempo Run" || name === "R-4 Intervals") type = "quality";
-  if (name === "R-5 Long Run") type = "long";
-  if (!type) return base;
-  const p = runPrescription(type);
-  if (type === "easy" && (data.settings.cardioType || "Running") !== "Running") {
-    const modality = data.settings.cardioType;
-    const swap = cardioPrescription("R-2 Easy Run", modality);
-    return {...base, duration:p.duration, exercises:[{name:swap[0], block:"Aerobic Cross-Training", sets:1, reps:swap[1], rest:0, cue:`Approved easy-day substitute. Return to running for quality and long sessions to preserve 10K specificity.`}]};
-  }
-  return {...base, duration:p.duration, exercises:[{name:p.label, block:"Goal Progression", sets:1, reps:p.detail, rest:0, cue:type === "easy" ? "Conversational running builds durability for the 10K goal." : "Complete this as a run; race-specific quality cannot be fully replaced by cross-training."}]};
-}
+function strengthMissionForDay(i){const n=data.trainingBlock.strengthDays||3;const maps={2:["S-1 Upper Strength","S-2 Lower Strength"],3:["S-1 Upper Strength","S-2 Lower Strength","S-3 Athletic Upper"],4:["S-1 Upper Strength","S-2 Lower Strength","S-3 Athletic Upper","S-4 Athletic Lower"]};return(maps[n]||maps[3])[i]||"M-1 Daily Reset";}
+function buildCurrentWeekPlan(){if(!data.trainingBlock.enabled)return;const b=data.trainingBlock,p=goalProfile(),easy=cardioPrescriptionForBlock("easy"),quality=cardioPrescriptionForBlock("quality"),long=cardioPrescriptionForBlock("long"),sp=strengthProgression();data.settings.rotationWeek=((blockWeek()-1)%4)+1;data.settings.phase=`${b.goalType} • ${blockPhase()}`;
+let plan=[];
+if(p.category==="endurance"){plan=[{day:"Monday",mission:strengthMissionForDay(0),detail:sp.label},{day:"Tuesday",mission:easy.mission,detail:easy.detail,customLabel:easy.label},{day:"Wednesday",mission:strengthMissionForDay(1),detail:sp.label},{day:"Thursday",mission:quality.mission,detail:quality.detail,customLabel:quality.label},{day:"Friday",mission:b.strengthDays>=3?strengthMissionForDay(2):"M-1 Daily Reset",detail:b.strengthDays>=3?"Short strength + aesthetic accessories":"Mobility and recovery"},{day:"Saturday",mission:long.mission,detail:long.detail,customLabel:long.label},{day:"Sunday",mission:"M-1 Daily Reset",detail:"Recovery, walking, and mobility"}];}
+else if(p.category==="strength"){plan=[{day:"Monday",mission:"S-2 Lower Strength",detail:sp.label},{day:"Tuesday",mission:easy.mission,detail:easy.detail,customLabel:easy.label},{day:"Wednesday",mission:"S-1 Upper Strength",detail:sp.label},{day:"Thursday",mission:"M-1 Daily Reset",detail:"Mobility and easy walking"},{day:"Friday",mission:"S-4 Athletic Lower",detail:sp.label},{day:"Saturday",mission:"S-3 Athletic Upper",detail:sp.label},{day:"Sunday",mission:long.mission,detail:long.detail,customLabel:long.label}];if(b.strengthDays===3)plan[5]={day:"Saturday",mission:long.mission,detail:long.detail,customLabel:long.label};}
+else{plan=[{day:"Monday",mission:"S-1 Upper Strength",detail:sp.label},{day:"Tuesday",mission:easy.mission,detail:easy.detail,customLabel:easy.label},{day:"Wednesday",mission:"S-2 Lower Strength",detail:sp.label},{day:"Thursday",mission:quality.mission,detail:quality.detail,customLabel:quality.label},{day:"Friday",mission:b.strengthDays>=3?"S-3 Athletic Upper":"M-1 Daily Reset",detail:b.strengthDays>=3?sp.label:"Recovery"},{day:"Saturday",mission:long.mission,detail:long.detail,customLabel:long.label},{day:"Sunday",mission:"M-1 Daily Reset",detail:"Recovery, family activity, and mobility"}];}
+data.plan=plan.map(x=>({...x,done:false}));}
+function advanceBlockWeek(){if(!data.trainingBlock.enabled)return alert("Create a training block first.");if(data.trainingBlock.currentWeek>=data.trainingBlock.lengthWeeks)return alert("This block is complete.");data.trainingBlock.currentWeek++;buildCurrentWeekPlan();saveData();}
+function saveBlockWeek(){if(!data.trainingBlock.enabled)return alert("Create a training block first.");data.trainingBlock.currentWeek=Math.max(1,Math.min(data.trainingBlock.lengthWeeks,+document.getElementById("currentBlockWeekInput").value||1));buildCurrentWeekPlan();saveData();}
+function blockRunOverride(name,base){if(!data.trainingBlock.enabled)return base;let type=name==="R-2 Easy Run"?"easy":(name==="R-3 Tempo Run"||name==="R-4 Intervals")?"quality":name==="R-5 Long Run"?"long":null;if(!type)return base;const p=cardioPrescriptionForBlock(type),specific=goalProfile().category==="endurance"&&type!=="easy";if(!specific&&(data.settings.cardioType||"Running")!=="Running"){const modality=data.settings.cardioType,swap=cardioPrescription("R-2 Easy Run",modality);return{...base,duration:p.duration,exercises:[{name:swap[0],block:"Goal Progression",sets:1,reps:p.detail,rest:0,cue:"Approved modality rotation. Match the prescribed effort and duration."}]};}return{...base,duration:p.duration,exercises:[{name:p.label,block:"Goal Progression",sets:1,reps:p.detail,rest:0,cue:specific?"Complete as a run to preserve goal specificity.":"Use the selected cardio modality while matching effort."}]};}

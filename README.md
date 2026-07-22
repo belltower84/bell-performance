@@ -1,15 +1,19 @@
-# Bell Performance 4.0 — Coach Foundation
+# Bell Performance 5.1 — Mission Control
 
-A modular offline-first hybrid performance application.
+Bell Performance 5.1 advances the app from a workout library toward a guided personal performance coach.
 
-## New in 4.0
-- Goal Builder for a date-based 10K training block
-- Coordinated three-day running progression and strength maintenance
-- Automatic base, build, race-specific, recovery, peak, and race weeks
-- Progressive strength loading and every-fourth-week deloads
-- Four-week exercise rotation retained
-- Cardio rotation retained for easy aerobic sessions
-- Quality and long sessions remain running-specific when a 10K block is active
-- Weekly Coach Mode recommendations based on the block and readiness
+## New in 5.1
 
-This version uses deterministic coaching rules so it works offline and remains predictable. A true generative AI service would require a secure online backend and API configuration in a later release.
+- Mission Control home screen with greeting, readiness, recovery, active block, today's objective, and estimated time
+- Early Strength, Running, Recovery, and Hybrid performance scores
+- Athlete name and coaching mode settings
+- Generated ramp-up sets for the first primary strength movement
+- Automatic rest timer after completed working sets
+- Current-exercise guidance during the workout
+- Existing multi-goal block builder, workout rotation, readiness scaling, cardio rotation, mobility, nutrition guidance, history, and local backups remain intact
+
+## Deployment
+
+Copy every file and folder in this directory into the root of the existing GitHub repository, replacing older files. Commit and push through GitHub Desktop, then hard-refresh the GitHub Pages site.
+
+All app data remains stored locally in the browser. Export backups regularly.

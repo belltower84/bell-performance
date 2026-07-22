@@ -1,6 +1,8 @@
 "use strict";
 
 let timerInterval = null;
+let restInterval = null;
+let restRemaining = 0;
 let savedPageScroll = 0;
 
 function currentPlan() {
@@ -77,7 +79,7 @@ function scaledTemplate(name) {
   let base = getWorkoutTemplate(name);
   if (!base) return null;
   base = blockRunOverride(name, base);
-  if (!(data.trainingBlock?.enabled && data.trainingBlock.goalType === "10K" && name.startsWith("R-"))) base = applyCardioModality(name, base);
+  if (!(data.trainingBlock?.enabled && name.startsWith("R-"))) base = applyCardioModality(name, base);
   const profile = scalingProfile();
   const isMobility = name.startsWith("M-");
   const isRun = name.startsWith("R-");
@@ -106,10 +108,61 @@ function scaledTemplate(name) {
   };
 }
 
+function warmupSetsFor(exercise) {
+  if (!exercise || exercise.block !== "Primary Strength") return [];
+  const work = Number(exercise.recommendedWeight);
+  if (!Number.isFinite(work) || work < 45) return [];
+  const bar = exercise.name.includes("Dumbbell") ? 0 : 45;
+  const rounds = [
+    { label: "Warm-up 1", weight: Math.max(bar, roundTo5(work * .40)), reps: "8" },
+    { label: "Warm-up 2", weight: Math.max(bar, roundTo5(work * .60)), reps: "5" },
+    { label: "Warm-up 3", weight: Math.max(bar, roundTo5(work * .78)), reps: "3" }
+  ];
+  return rounds.filter((x, i, arr) => i === 0 || x.weight > arr[i-1].weight);
+}
+
+function renderWarmupPanel() {
+  const panel = document.getElementById("warmupPanel");
+  const first = data.activeWorkout?.exercises?.find(ex => ex.block === "Primary Strength");
+  const warmups = warmupSetsFor(first);
+  if (!panel || !first || !warmups.length) { if (panel) panel.classList.add("hidden"); return; }
+  panel.classList.remove("hidden");
+  panel.innerHTML = `<h3>Generated Warm-up — ${first.name}</h3><div class="hint">Complete these before the working sets. Adjust if you need more preparation.</div>${warmups.map(x => `<div class="warmup-row"><strong>${x.label}</strong><span>${x.weight} lb × ${x.reps}</span></div>`).join("")}`;
+}
+
+function beginRestTimer(seconds, exerciseName) {
+  clearInterval(restInterval);
+  restRemaining = Math.max(0, Number(seconds) || 0);
+  if (!restRemaining) return;
+  const panel = document.getElementById("restPanel");
+  if (panel) panel.classList.remove("hidden");
+  setText("currentExerciseOut", `Recover for ${exerciseName}`);
+  updateRestDisplay();
+  restInterval = setInterval(() => {
+    restRemaining -= 1;
+    updateRestDisplay();
+    if (restRemaining <= 0) {
+      clearInterval(restInterval);
+      if (navigator.vibrate) navigator.vibrate([150, 80, 150]);
+      setText("currentExerciseOut", "Rest complete — begin the next set");
+    }
+  }, 1000);
+}
+
+function updateRestDisplay() {
+  const timer = document.getElementById("restTimer");
+  if (!timer) return;
+  const m = String(Math.floor(Math.max(0, restRemaining) / 60)).padStart(2, "0");
+  const sec = String(Math.max(0, restRemaining) % 60).padStart(2, "0");
+  timer.textContent = `${m}:${sec}`;
+}
+function adjustRestTimer(delta) { restRemaining = Math.max(0, restRemaining + delta); updateRestDisplay(); }
+function skipRestTimer() { clearInterval(restInterval); restRemaining = 0; updateRestDisplay(); document.getElementById("restPanel")?.classList.add("hidden"); setText("currentExerciseOut", "Begin the next set when ready"); }
+
 function beginToday() { const plan=currentPlan(); if(plan) beginWorkout(plan.mission); else alert("All planned sessions are complete. Choose a workout from the Workouts tab."); }
 function beginWorkout(name) {
   const template=scaledTemplate(name); if(!template) return;
-  data.activeWorkout={name,label:template.label,rotationWeek:template.rotationWeek,startedAt:new Date().toISOString(),elapsed:0,rpe:"",notes:"",readiness:{score:readinessScore(),status:readinessStatus()},cardioType:name.startsWith("R-")?(data.settings.cardioType||"Running"):null,exercises:template.exercises.map(exercise=>({name:exercise.name,block:exercise.block,prescription:`${exercise.sets} × ${exercise.reps}`,originalSets:exercise.originalSets,cue:exercise.cue,scaleNote:exercise.scaleNote,recommendationDisplay:exercise.recommendationDisplay,recommendationNote:exercise.recommendationNote,sets:Array.from({length:exercise.sets},(_,index)=>({set:index+1,weight:typeof exercise.recommendedWeight==="number"?exercise.recommendedWeight:"",reps:exercise.reps,done:false}))}))};
+  data.activeWorkout={name,label:template.label,rotationWeek:template.rotationWeek,startedAt:new Date().toISOString(),elapsed:0,rpe:"",notes:"",readiness:{score:readinessScore(),status:readinessStatus()},cardioType:name.startsWith("R-")?(data.settings.cardioType||"Running"):null,exercises:template.exercises.map(exercise=>({name:exercise.name,block:exercise.block,prescription:`${exercise.sets} × ${exercise.reps}`,originalSets:exercise.originalSets,cue:exercise.cue,scaleNote:exercise.scaleNote,recommendedWeight:exercise.recommendedWeight,recommendationDisplay:exercise.recommendationDisplay,recommendationNote:exercise.recommendationNote,rest:exercise.rest||0,sets:Array.from({length:exercise.sets},(_,index)=>({set:index+1,weight:typeof exercise.recommendedWeight==="number"?exercise.recommendedWeight:"",reps:exercise.reps,done:false}))}))};
   saveData({render:false}); openWorkoutUI(); startTimer();
 }
 function openWorkoutUI() {
@@ -131,13 +184,16 @@ function renderActiveWorkout() {
     const setsContainer=card.querySelector(`#sets-${exerciseIndex}`);
     exercise.sets.forEach((set,setIndex)=>{const row=document.createElement("div");row.className="set-row";row.innerHTML=`<span>${set.set}</span><input inputmode="decimal" value="${set.weight}" oninput="updateSet(${exerciseIndex},${setIndex},'weight',this.value)"><input inputmode="text" value="${set.reps}" oninput="updateSet(${exerciseIndex},${setIndex},'reps',this.value)"><input type="checkbox" ${set.done?"checked":""} onchange="updateSet(${exerciseIndex},${setIndex},'done',this.checked)">`;setsContainer.appendChild(row);});
   });
+  renderWarmupPanel();
+  const nextExercise = active.exercises.find(exercise => exercise.sets.some(set => !set.done));
+  setText("currentExerciseOut", nextExercise ? nextExercise.name : "All working sets complete");
   document.getElementById("sessionRpe").value=active.rpe||"";document.getElementById("sessionNotes").value=active.notes||"";updateTimerDisplay();updateWorkoutProgress();
 }
-function updateSet(exerciseIndex,setIndex,field,value){data.activeWorkout.exercises[exerciseIndex].sets[setIndex][field]=value;saveData({render:false});updateWorkoutProgress();}
+function updateSet(exerciseIndex,setIndex,field,value){const exercise=data.activeWorkout.exercises[exerciseIndex];exercise.sets[setIndex][field]=value;saveData({render:false});updateWorkoutProgress();if(field==='done'&&value){const next=exercise.sets.find(set=>!set.done);if(next){beginRestTimer(exercise.rest||60,exercise.name);}else{const nextExercise=data.activeWorkout.exercises.slice(exerciseIndex+1).find(ex=>ex.sets.some(set=>!set.done));setText('currentExerciseOut',nextExercise?nextExercise.name:'All working sets complete');if(nextExercise)beginRestTimer(Math.min(90,exercise.rest||60),nextExercise.name);}}}
 function persistActive(){if(!data.activeWorkout)return;data.activeWorkout.rpe=document.getElementById("sessionRpe").value;data.activeWorkout.notes=document.getElementById("sessionNotes").value;saveData({render:false});}
 function updateWorkoutProgress(){const sets=data.activeWorkout?.exercises.flatMap(exercise=>exercise.sets)||[];const completed=sets.filter(set=>set.done).length;const pct=sets.length?Math.round((completed/sets.length)*100):0;const bar=document.getElementById("workoutProgressBar");const text=document.getElementById("workoutProgressText");if(bar)bar.style.width=`${pct}%`;if(text)text.textContent=`${completed}/${sets.length} sets complete`;}
 function startTimer(){clearInterval(timerInterval);timerInterval=setInterval(()=>{if(!data.activeWorkout)return;data.activeWorkout.elapsed=(data.activeWorkout.elapsed||0)+1;updateTimerDisplay();if(data.activeWorkout.elapsed%15===0)saveData({render:false});},1000);}
 function updateTimerDisplay(){const elapsed=data.activeWorkout?.elapsed||0;const minutes=String(Math.floor(elapsed/60)).padStart(2,"0");const seconds=String(elapsed%60).padStart(2,"0");const timer=document.getElementById("workoutTimer");if(timer)timer.textContent=`${minutes}:${seconds}`;}
-function closeWorkout(){if(data.activeWorkout)persistActive();document.getElementById("workoutModal").classList.add("hidden");clearInterval(timerInterval);document.body.classList.remove("workout-open");document.body.style.top="";window.scrollTo(0,savedPageScroll);}
+function closeWorkout(){if(data.activeWorkout)persistActive();document.getElementById("workoutModal").classList.add("hidden");clearInterval(timerInterval);clearInterval(restInterval);document.body.classList.remove("workout-open");document.body.style.top="";window.scrollTo(0,savedPageScroll);}
 function completeWorkout(){if(!data.activeWorkout)return;persistActive();const completed={...data.activeWorkout,completedAt:new Date().toISOString()};data.history.unshift(completed);const plan=data.plan.find(item=>item.mission===completed.name&&!item.done);if(plan)plan.done=true;closeWorkout();data.activeWorkout=null;saveData();alert("Workout complete. +100 XP earned.");}
 function discardWorkout(){if(!confirm("Discard this workout?"))return;closeWorkout();data.activeWorkout=null;saveData();}

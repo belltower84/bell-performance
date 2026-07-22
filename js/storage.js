@@ -3,6 +3,8 @@
 const defaults = {
   settings: {
     phase: "Foundation",
+    athleteName: "Chris",
+    athleteMode: "Hybrid Athlete",
     weight: 207,
     goal: 185,
     cardioType: "Running",
@@ -33,9 +35,9 @@ const defaults = {
   },
   nutrition: { height: 66, age: 41, activity: 1.55, goal: "cut" },
   trainingBlock: {
-    enabled: false, goalType: "10K", targetDate: "", targetMinutes: 60,
-    lengthWeeks: 12, currentWeek: 1, runDays: 3, strengthDays: 3,
-    maintainStrength: true, startDate: "", generatedAt: ""
+    enabled: false, goalType: "General Hybrid", targetDate: "", targetMinutes: 60,
+    lengthWeeks: 12, currentWeek: 1, trainingDays: 5, runDays: 3, strengthDays: 3,
+    sessionMinutes: 75, secondaryGoal: "Maintain Strength", maintainStrength: true, startDate: "", generatedAt: ""
   }
 };
 
@@ -55,6 +57,8 @@ try {
 function normalizeData() {
   data.settings = data.settings || {};
   data.settings.phase = data.settings.phase || defaults.settings.phase;
+  data.settings.athleteName = data.settings.athleteName || "Chris";
+  data.settings.athleteMode = data.settings.athleteMode || "Hybrid Athlete";
   data.settings.weight = Number(data.settings.weight) || defaults.settings.weight;
   data.settings.goal = Number(data.settings.goal) || defaults.settings.goal;
   data.settings.cardioType = data.settings.cardioType || "Running";

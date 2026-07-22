@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 4.0",
+  "name": "Bell Performance 5.0",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#08101d",
   "theme_color": "#0b1220",
-  "description": "Modular hybrid performance app with restored workout library, next-workout dashboard, editable max lifts, readiness scaling, mobility, missions, and macro guidance."
+  "description": "Adaptive multi-goal hybrid coaching app with progressive training blocks, running peaks, strength overload, exercise rotation, readiness scaling, mobility, and nutrition guidance."
 }

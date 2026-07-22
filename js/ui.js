@@ -49,6 +49,7 @@ function renderDashboard() {
   const profile = scalingProfile();
   const plan = currentPlan();
   const template = plan ? scaledTemplate(plan.mission) : null;
+  const rotationWeek = getRotationWeek();
   const rank = rankInfo();
   const mission = missionProgress();
   const macros = macroTargets();
@@ -67,18 +68,18 @@ function renderDashboard() {
     `<strong>${mission.mobility}/${data.mission.goalMobility}</strong> mobility days • ` +
     `<strong>${mission.weightPct}%</strong> toward goal weight`;
 
-  byId("todayMission").textContent = plan?.mission || "Plan complete";
-  byId("todayLocation").textContent = template?.location || "—";
+  byId("todayMission").textContent = template?.label || plan?.mission || "Plan complete";
+  byId("todayRotation").textContent = `Rotation Week ${rotationWeek}`;
   byId("todayDuration").textContent = template ? `${template.duration} min` : "—";
   byId("todayScale").textContent = profile.label;
 
   byId("todayPreview").innerHTML = template
-    ? template.exercises.slice(0, 5).map(exercise => {
+    ? template.exercises.slice(0, 7).map(exercise => {
         const setChange = exercise.originalSets !== exercise.sets
           ? `${exercise.originalSets}→${exercise.sets} sets`
           : `${exercise.sets} sets`;
         const weight = exercise.recommendationDisplay ? ` • Suggested: ${exercise.recommendationDisplay}` : "";
-        return `• ${exercise.name}: ${setChange} × ${exercise.reps}${weight}`;
+        return `<span class="preview-block">${exercise.block || "Training"}</span> ${exercise.name}: ${setChange} × ${exercise.reps}${weight}`;
       }).join("<br>")
     : "";
 
@@ -147,16 +148,19 @@ function togglePlan(index, checked) {
 function renderWorkoutLibrary() {
   const container = byId("workoutLibrary");
   container.innerHTML = "";
-  Object.entries(workoutTemplates).forEach(([name, template]) => {
+  setText("libraryRotation", `Week ${getRotationWeek()}`);
+  allWorkoutNames().forEach(name => {
     const scaled = scaledTemplate(name);
+    if (!scaled) return;
+    const blocks = [...new Set(scaled.exercises.map(exercise => exercise.block).filter(Boolean))].join(" • ");
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
       <div class="status-line">
-        <div><h3>${name}</h3><div class="sub">${scaled.location} • ${scaled.duration} min</div></div>
-        <button onclick="beginWorkout('${name.replaceAll("'", "\\'")}')">Begin</button>
+        <div><h3>${name}</h3><div class="workout-library-title">${scaled.label}</div><div class="sub">${scaled.duration} min • ${blocks}</div></div>
+        <button class="compact-button" onclick="beginWorkout('${name.replaceAll("'", "\\'")}')">Begin</button>
       </div>
-      <div class="hint">${scaled.exercises.slice(0,4).map(exercise => `${exercise.name}: ${exercise.sets} × ${exercise.reps}`).join(" • ")}</div>
+      <div class="hint">${scaled.exercises.map(exercise => `${exercise.name}: ${exercise.sets} × ${exercise.reps}`).join(" • ")}</div>
     `;
     container.appendChild(card);
   });
@@ -171,7 +175,7 @@ function renderHistory() {
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <h3>${session.name}</h3>
+      <h3>${session.label || session.name}</h3>
       <div class="sub">${new Date(session.completedAt).toLocaleDateString()} • ${session.cardioType ? `${session.cardioType} • ` : ""}${Math.round((session.elapsed || 0) / 60)} min • ${sets} sets • ${session.readiness?.status || "-"} ${session.readiness?.score || ""} • RPE ${session.rpe || "-"}</div>
       ${session.notes ? `<div class="hint" style="margin-top:8px">${session.notes}</div>` : ""}
     `;
@@ -187,6 +191,7 @@ function renderSettings() {
   byId("squatMax").value = data.settings.maxes.squat;
   byId("deadliftMax").value = data.settings.maxes.deadlift;
   byId("pushPressMax").value = data.settings.maxes.pushPress;
+  byId("rotationWeekInput").value = String(getRotationWeek());
   byId("goalWorkouts").value = data.mission.goalWorkouts;
   byId("goalMobility").value = data.mission.goalMobility;
   byId("goalPullups").value = data.mission.goalPullups;

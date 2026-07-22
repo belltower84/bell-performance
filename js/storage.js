@@ -6,6 +6,7 @@ const defaults = {
     weight: 207,
     goal: 185,
     cardioType: "Running",
+    rotationWeek: 1,
     maxes: { bench: 315, squat: 455, deadlift: 455, pushPress: 185 },
     readiness: {
       sleepHours: 7, sleepQuality: 4, energy: 4, motivation: 4,
@@ -52,6 +53,7 @@ function normalizeData() {
   data.settings.weight = Number(data.settings.weight) || defaults.settings.weight;
   data.settings.goal = Number(data.settings.goal) || defaults.settings.goal;
   data.settings.cardioType = data.settings.cardioType || "Running";
+  data.settings.rotationWeek = Math.min(4, Math.max(1, Number(data.settings.rotationWeek) || 1));
   data.settings.maxes = {
     bench: Number(data.settings.maxes?.bench) || 315,
     squat: Number(data.settings.maxes?.squat) || 455,

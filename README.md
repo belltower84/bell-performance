@@ -1,25 +1,18 @@
-# Bell Performance 2.1
+# Bell Performance 3.0
 
-## Fixed
-- Workout Library now renders when the Workouts tab is opened.
-- Bottom navigation now uses the modular screen controller.
-- The dashboard again shows the next scheduled workout, location, estimated duration, readiness scaling, exercise preview, and recommended weights.
-- Readiness display no longer references missing page elements.
-- Workout tracker element IDs now match the modular workout engine.
-- Backup import and reset controls now call the correct functions.
+Bell Performance 3.0 removes gym-location labels and introduces a four-week strength rotation with short Golden Era aesthetic finishers.
 
-## Added
-- Editable Bench Press, Back Squat, Deadlift, and Push Press maxes in Settings.
-- Saving those maxes immediately updates workout weight recommendations.
+## What changed
 
-## GitHub upload
-Upload the complete folder structure:
-- index.html
-- manifest.json
-- sw.js
-- README.md
-- css/
-- data/
-- js/
+- Removed Home Gym / Work Gym information from the dashboard and workout library.
+- Added four rotating versions of every strength workout.
+- Added shoulder, arm, rear-delt, calf, quad and abdominal finishers.
+- Kept strength sessions near 50–65 minutes by using short supersets and limited sets.
+- Yellow readiness reduces finisher volume.
+- Red readiness removes optional finishers automatically.
+- Added a Rotation Week selector under More > Settings & Data.
+- Preserves existing local workout history and settings through the same storage key.
 
-Refresh the published Safari page after the commit, then reopen the Home Screen app.
+## GitHub update
+
+Replace the files in your local `bell-performance` repository with the contents of this folder. In GitHub Desktop, commit the changes and push to origin.

@@ -8,86 +8,61 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
-  <title>Bell Performance 5.1</title>
+  <title>Bell Performance 6.4</title>
   <link rel="stylesheet" href="./css/app.css">
 </head>
 <body>
-<header><h1>Bell Performance</h1><div class="sub">Train for Life.</div></header>
+<header class="brand-header">
+  <div class="brand-lockup"><img src="./assets/logo-shield.svg" alt="Bell Performance shield"><div><h1>BELL <span>PERFORMANCE</span></h1><div class="brand-tagline">TRAIN FOR LIFE</div></div></div>
+  <div class="header-actions"><button aria-label="Notifications">●<span>3</span></button><button aria-label="Profile">◎</button></div>
+</header>
 <main>
 <section id="home" class="screen active">
-  <div class="mission-control card">
-    <div class="mission-kicker" id="greetingOut">Good Morning, Chris</div>
-    <div class="mission-grid">
-      <div><span class="metric-label">Readiness</span><strong id="missionReadiness">78%</strong></div>
-      <div><span class="metric-label">Recovery</span><strong id="recoveryOut">Good</strong></div>
-      <div><span class="metric-label">Current Block</span><strong id="missionBlock">Foundation</strong></div>
-      <div><span class="metric-label">Week</span><strong id="missionWeek">—</strong></div>
-    </div>
-    <div class="mission-objective">
-      <span class="metric-label">Today's Mission</span>
-      <div class="mission-title" id="todayMission">Next workout</div>
-      <div class="hint" id="missionPurpose">Build useful strength, aerobic capacity, and long-term durability.</div>
-    </div>
-    <div class="mission-footer">
-      <div><span class="metric-label">Estimated Time</span><strong id="todayDuration">—</strong></div>
-      <div class="pill" id="todayScale">Loading readiness scale…</div>
-    </div>
-    <div id="todayPreview" class="hint mission-preview"></div>
-    <button class="mission-start" onclick="beginToday()">Start Training</button>
+  <div class="dashboard-greeting"><div><div class="mission-title" id="greetingOut">Good Morning</div><div class="hint">Discipline today. Freedom tomorrow.</div></div><div class="streak-chip">🔥 <strong>9</strong> DAY STREAK</div></div>
+
+  <div class="mission-status-card green" id="trainingStatusCard">
+    <div class="status-emblem"><div class="status-shield">✓</div></div>
+    <div class="status-copy"><span class="metric-label">Mission Status</span><strong id="trainingStatusOut">Ready to Train</strong><p id="missionPurpose">You are recovered and cleared for a full training day.</p><button class="ghost-button" onclick="document.getElementById('readinessDetailPanel').classList.toggle('hidden')">Why am I here? ›</button></div>
+    <div class="readiness-summary"><span class="metric-label">Today's Readiness</span><div class="readiness-line"><span>☾ Sleep</span><b id="dashSleep">Good</b><i></i></div><div class="readiness-line"><span>♨ Soreness</span><b id="dashSoreness">Low</b><i></i></div><div class="readiness-line"><span>ϟ Energy</span><b id="dashEnergy">High</b><i></i></div><div class="readiness-line"><span>🔥 Motivation</span><b id="dashMotivation">High</b><i></i></div><div class="readiness-line"><span>◷ Time</span><b id="dashTime">60–75 min</b><i></i></div></div>
+  </div>
+  <div id="readinessDetailPanel" class="card hidden"><div class="hint" id="readinessExplanation">Your readiness details will appear here.</div></div>
+
+  <div class="section-heading"><h2>Today's Training</h2><button onclick="showScreen('plan')">View Full Schedule ›</button></div>
+  <div class="training-pair">
+    <article class="training-card strength-card"><img id="strengthArtwork" src="./assets/athlete-male.svg" alt="Strength athlete"><div class="training-overlay"><div class="training-type">🏋 <span>STRENGTH</span></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
+    <article class="training-card engine-card"><img id="engineArtwork" src="./assets/engine-run.svg" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
+  </div>
+  <div id="todayPreview" class="hidden"></div>
+
+  <div class="coach-strip" id="coachMessageCard"><div class="coach-icon">◌</div><div><span class="metric-label">Coach's Message</span><blockquote id="coachMessageOut">“Consistency beats perfection. Win today.”</blockquote><div class="message-source" id="coachMessageSource"></div></div><div class="coach-signature">Coach Bell</div></div>
+
+  <div class="recovery-prescription-card"><div class="recovery-icon">♿</div><div><span class="metric-label">Today's Recovery Prescription</span><strong id="mobilityDashboardTitle">10 min Mobility Flow</strong><div class="hint" id="mobilityDashboardDetail">Matched to today's training • Complete morning or evening</div></div><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">›</button></div>
+
+  <div class="quick-actions"><button onclick="document.getElementById('nutritionMode').scrollIntoView({behavior:'smooth'})"><span>🍴</span><strong>Nutrition</strong><small>Fuel the mission</small></button><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})"><span>♡</span><strong>Recovery</strong><small>Rest. Recover. Rebuild.</small></button><button onclick="showScreen('history')"><span>▥</span><strong>Progress</strong><small>Track results</small></button><button onclick="showScreen('more')"><span>◎</span><strong>Habits</strong><small>Build consistency</small></button></div>
+
+  <div class="dashboard-grid">
+    <div class="card weekly-readiness-card"><div class="card-title-row"><h3>Weekly Readiness</h3><span>Rolling 7-Day</span></div><div class="readiness-visual"><div class="readiness-ring"><strong id="weeklyReadinessOut">—</strong><small id="weeklyReadinessLabel">Building</small></div><div class="trend-bars" id="readinessTrendBars"><i style="height:48%"></i><i style="height:70%"></i><i class="yellow" style="height:58%"></i><i style="height:78%"></i><i class="red" style="height:35%"></i><i style="height:90%"></i><i style="height:72%"></i></div></div><div class="hint" id="weeklyReadinessDetail">Daily check-ins and post-session feedback</div></div>
+    <div class="card training-balance"><div class="card-title-row"><h3>Training Balance</h3><span>This Week</span></div><div class="balance-row"><strong>🏋 Strength</strong><b>4 sessions</b></div><div class="balance-track"><i style="width:80%"></i></div><div class="balance-row engine"><strong>ϟ Engine</strong><b>4 sessions</b></div><div class="balance-track engine"><i style="width:80%"></i></div><div class="balance-status">✓ Optimal balance</div></div>
   </div>
 
-  <div class="score-grid">
-    <div class="score-card"><span>Strength</span><strong id="strengthScoreOut">—</strong><small id="strengthTrendOut">Build history</small></div>
-    <div class="score-card"><span>Running</span><strong id="runningScoreOut">—</strong><small id="runningTrendOut">Build history</small></div>
-    <div class="score-card"><span>Recovery</span><strong id="recoveryScoreOut">—</strong><small>Today</small></div>
-    <div class="score-card featured"><span>Hybrid Score</span><strong id="hybridScoreOut">—</strong><small>Balanced performance</small></div>
+  <div class="card compact-location-card"><div class="status-line"><div><span class="metric-label">Training At</span><strong id="activeLocationLabel">Equipment-aware workouts</strong></div><select id="activeLocationQuick" onchange="switchEquipmentLocation(this.value)"></select></div><div class="hint" id="equipmentSummary"></div></div>
+
+  <div class="card readiness-input-card">
+    <h3>Daily Readiness Check-In</h3><div class="hint">Five quick ratings. The Coach Engine adjusts today's work and your rolling readiness.</div>
+    <div class="quick-check-grid"><label>Sleep<select id="sleepQuality"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select><small>Poor → Excellent</small></label><label>Soreness<select id="soreness"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select><small>Fresh → Very sore</small></label><label>Energy<select id="energy"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select><small>Exhausted → Energized</small></label><label>Motivation<select id="motivation"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select><small>Low → High</small></label><label>Time available<select id="timeAvailability"><option value="1">20–30 min</option><option value="2">30–45 min</option><option value="3" selected>45–60 min</option><option value="4">60–75 min</option><option value="5">75–90+ min</option></select><small>Today's schedule</small></label></div><button class="secondary" onclick="saveReadiness()">Save Today's Check-In</button>
   </div>
 
-  <div class="card">
-    <h3>Current Training Block</h3>
-    <div class="status-line"><div><div class="mission-title" id="blockTitle">No active block</div><div class="sub" id="blockStatus">Build a goal-based plan in More.</div></div><div class="pill" id="blockWeekPill">—</div></div>
-    <div class="mini-progress"><div id="blockProgressBar"></div></div>
-    <div class="hint" id="blockRunSummary" style="margin-top:10px"></div>
-    <button class="secondary" id="advanceBlockButton" onclick="advanceBlockWeek()">Complete Week & Build Next</button>
-  </div>
-  <div class="card">
-    <h3>Coach Mode</h3>
-    <div class="mission-title" id="coachHeadline">Today's guidance</div>
-    <div class="hint" id="coachRecommendation" style="margin-top:8px"></div>
-  </div>
-  <div class="card">
-    <h3>Cardio Mode</h3>
-    <label for="cardioType">Choose today's cardio equipment</label>
-    <select id="cardioType" onchange="saveCardioType()">
-      <option value="Running">Running / Walking</option><option value="Cycling">Outdoor / Stationary Bike</option><option value="Air Bike">Air Bike</option><option value="Rower">Rower</option><option value="Elliptical">Elliptical</option><option value="Stair Climber">Stair Climber</option>
-    </select>
-    <div class="hint" id="cardioModeNote" style="margin-top:8px"></div>
-  </div>
-  <div class="card">
-    <h3>Performance Mission</h3>
-    <div class="status-line"><div><div class="mission-title" id="rankOut">Foundation Athlete</div><div class="sub" id="levelOut">Level 1</div></div><div class="pill" id="xpOut">0 XP</div></div>
-    <div class="mini-progress"><div id="xpBar"></div></div>
-    <div class="hint" id="milestoneSummary" style="margin-top:10px"></div>
-  </div>
-  <div class="card">
-    <h3>Daily Mobility</h3>
-    <div class="row"><div><label>Focus area</label><select id="mobilityFocus" onchange="saveMobilityFocus()"><option value="Auto">Auto — match today's training</option><option value="Full Body">Full Body</option><option value="Hips">Hips</option><option value="Shoulders">Shoulders</option><option value="Low Back">Low Back</option><option value="Ankles">Ankles</option></select></div><div><label>Time</label><select id="mobilityMinutes" onchange="saveMobilityFocus()"><option value="6">6 minutes</option><option value="10" selected>10 minutes</option><option value="15">15 minutes</option></select></div></div>
-    <div class="hint" id="mobilityReason"></div><div id="mobilityList" class="mobility-list"></div><button class="good" id="mobilityCompleteButton" onclick="completeMobility()">Complete Daily Mobility</button>
-  </div>
-  <div class="card">
-    <h3>Nutrition Guide — Beta</h3><div class="hint" id="nutritionMode"></div><div class="macro-grid"><div class="macro-box"><strong id="calorieOut">—</strong><small>Calories</small></div><div class="macro-box"><strong id="proteinOut">—</strong><small>Protein</small></div><div class="macro-box"><strong id="carbOut">—</strong><small>Carbs</small></div><div class="macro-box"><strong id="fatOut">—</strong><small>Fat</small></div></div><div class="hint" style="margin-top:9px">Early guidance only—not yet a food logger. Targets change for training and recovery days.</div>
-  </div>
-  <div class="card"><h3>Weekly Score</h3><div class="big" id="scoreOut">0%</div><div class="scorebar"><div id="scoreBar"></div></div><div class="hint" id="scoreDetail"></div></div>
-  <div class="card">
-    <h3>Daily Readiness Check</h3>
-    <div class="row"><div><label>Sleep hours</label><input id="sleepHours" type="number" min="0" max="12" step="0.25" value="7"></div><div><label>Sleep quality (1–5)</label><select id="sleepQuality"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></div><div><label>Energy (1–5)</label><select id="energy"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></div><div><label>Motivation (1–5)</label><select id="motivation"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></div><div><label>Stress (1 low–5 high)</label><select id="stress"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></div><div><label>Muscle soreness (1–5)</label><select id="soreness"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></div><div><label>Joint pain (0–5)</label><select id="jointPain"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><div><label>Resting HR vs normal</label><select id="restingHr"><option value="0" selected>Normal</option><option value="1">+1–5 bpm</option><option value="2">+6–10 bpm</option><option value="3">+11+ bpm</option></select></div></div>
-    <button class="secondary" onclick="saveReadiness()">Calculate & Scale Workout</button><div class="hint" id="readinessExplanation" style="margin-top:10px"></div>
-  </div>
+  <div class="card"><h3>Current Training Block</h3><div class="status-line"><div><div class="mission-title" id="blockTitle">No active block</div><div class="sub" id="blockStatus">Build a goal-based plan in More.</div></div><div class="pill" id="blockWeekPill">—</div></div><div class="mini-progress"><div id="blockProgressBar"></div></div><div class="hint" id="blockRunSummary"></div><button class="secondary" id="advanceBlockButton" onclick="advanceBlockWeek()">Complete Week & Build Next</button></div>
+  <div class="card"><h3>Coach Guidance</h3><div class="mission-title" id="coachHeadline">Today's guidance</div><div class="hint" id="coachRecommendation"></div></div>
+  <div class="card"><h3>Engine Mode</h3><label for="cardioType">Choose today's Engine modality</label><select id="cardioType" onchange="saveCardioType()"><option value="Running">Running / Walking</option><option value="Cycling">Outdoor / Stationary Bike</option><option value="Air Bike">Air Bike</option><option value="Rower">Rower</option><option value="Elliptical">Elliptical</option><option value="Stair Climber">Stair Climber</option></select><div class="hint" id="cardioModeNote"></div></div>
+  <div class="card"><h3>Daily Mobility</h3><div class="row"><div><label>Focus area</label><select id="mobilityFocus" onchange="saveMobilityFocus()"><option value="Auto">Auto — match today's training</option><option value="Full Body">Full Body</option><option value="Hips">Hips</option><option value="Shoulders">Shoulders</option><option value="Low Back">Low Back</option><option value="Ankles">Ankles</option></select></div><div><label>Time</label><select id="mobilityMinutes" onchange="saveMobilityFocus()"><option value="6">6 minutes</option><option value="10" selected>10 minutes</option><option value="15">15 minutes</option></select></div></div><div class="hint" id="mobilityReason"></div><div id="mobilityList" class="mobility-list"></div><button class="good" id="mobilityCompleteButton" onclick="completeMobility()">Complete Daily Mobility</button></div>
+  <div class="card"><h3>Nutrition Guide — Beta</h3><div class="hint" id="nutritionMode"></div><div class="macro-grid"><div class="macro-box"><strong id="calorieOut">—</strong><small>Calories</small></div><div class="macro-box"><strong id="proteinOut">—</strong><small>Protein</small></div><div class="macro-box"><strong id="carbOut">—</strong><small>Carbs</small></div><div class="macro-box"><strong id="fatOut">—</strong><small>Fat</small></div></div></div>
+  <div class="card"><h3>Weekly Progress</h3><div class="big" id="scoreOut">0%</div><div class="scorebar"><div id="scoreBar"></div></div><div class="hint" id="scoreDetail"></div></div>
 </section>
 
 <section id="plan" class="screen"><h2 class="section-title">Weekly Plan</h2><div id="planList" class="list"></div></section>
 
-<section id="workouts" class="screen"><h2 class="section-title">Workout Library</h2><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div id="workoutLibrary" class="list"></div></section>
+<section id="workouts" class="screen"><h2 class="section-title">Strength & Engine Library</h2><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div id="workoutLibrary" class="list"></div></section>
 
 <section id="history" class="screen"><h2 class="section-title">Training History</h2><div id="historyList" class="list"></div></section>
 
@@ -95,13 +70,21 @@
   <h2 class="section-title">Settings & Data</h2>
   <div class="card">
     <h3>Athlete Profile</h3>
-    <div class="row"><div><label>First name</label><input id="athleteNameInput"></div><div><label>Coaching mode</label><select id="athleteModeInput"><option value="Hybrid Athlete">Hybrid Athlete</option><option value="Tactical Athlete">Tactical Athlete</option><option value="Strength Athlete">Strength Athlete</option><option value="Endurance Athlete">Endurance Athlete</option><option value="Masters Athlete">Masters Athlete</option><option value="Youth Athlete">Youth Athlete</option></select></div></div>
+    <div class="row"><div><label>First name</label><input id="athleteNameInput"></div><div><label>Programming profile</label><select id="sexInput"><option value="Male">Male</option><option value="Female">Female</option><option value="Prefer not to say">Prefer not to say</option></select></div><div><label>Coaching mode</label><select id="athleteModeInput"><option value="Hybrid Athlete">Hybrid Athlete</option><option value="Tactical Athlete">Tactical Athlete</option><option value="Strength Athlete">Strength Athlete</option><option value="Endurance Athlete">Endurance Athlete</option><option value="Masters Athlete">Masters Athlete</option><option value="Youth Athlete">Youth Athlete</option></select></div></div>
     <label>Current Phase</label><input id="phaseInput">
     <div class="row">
       <div><label>Current Weight</label><input type="number" id="weightInput"></div>
       <div><label>Goal Weight</label><input type="number" id="goalInput"></div>
     </div>
     <button onclick="saveProfile()">Save Profile</button>
+  </div>
+
+  <div class="card">
+    <h3>Training Locations & Equipment</h3>
+    <div class="hint">Save multiple setups. Bell Performance will preserve the workout's training purpose while substituting unavailable exercises.</div>
+    <div class="row"><div><label>Active location</label><select id="activeLocationInput" onchange="loadEquipmentLocation()"></select></div><div><label>Location name</label><input id="equipmentLocationName" placeholder="Home Gym"></div><div><label>Environment</label><select id="equipmentEnvironment" onchange="applyEquipmentPreset('equipment',this.value)"><option value="commercial">Commercial gym</option><option value="home">Home gym</option><option value="minimal">Minimal equipment</option><option value="bodyweight">Bodyweight only</option><option value="travel">Travel</option><option value="custom">Custom</option></select></div></div>
+    <div class="equipment-grid" id="equipmentGrid"></div>
+    <div class="row three"><button onclick="saveEquipmentLocation()">Save Location</button><button class="secondary" onclick="addEquipmentLocation()">Add Location</button><button class="danger" onclick="deleteEquipmentLocation()">Delete Location</button></div>
   </div>
 
   <div class="card">
@@ -119,7 +102,7 @@
         <option value="Powerlifting">Powerlifting</option><option value="General Strength">General Strength</option>
       </optgroup>
       <optgroup label="Physique & Health">
-        <option value="Fat Loss">Fat Loss</option><option value="Body Recomposition">Body Recomposition</option><option value="Longevity">Health & Longevity</option>
+        <option value="Bodybuilding">Bodybuilding</option><option value="Fat Loss">Fat Loss</option><option value="Body Recomposition">Body Recomposition</option><option value="Longevity">Health & Longevity</option>
       </optgroup>
     </select>
     <div class="row">
@@ -131,6 +114,8 @@
       <div><label>Strength days/week</label><select id="blockStrengthDays"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div>
       <div><label>Session limit</label><select id="blockSessionMinutes"><option value="45">45 minutes</option><option value="60">60 minutes</option><option value="75" selected>75 minutes</option><option value="90">90 minutes</option></select></div>
       <div><label>Secondary priority</label><select id="blockSecondaryGoal"><option value="Maintain Strength">Maintain Strength</option><option value="Improve Running">Improve Running</option><option value="Build Muscle">Build Muscle</option><option value="Fat Loss">Fat Loss</option><option value="Mobility">Mobility</option></select></div>
+      <div id="bodybuildingFocusWrap" style="display:none"><label>Bodybuilding emphasis</label><select id="blockBodybuildingFocus"><option value="Balanced">Balanced Development</option><option value="Shoulders & Arms">Shoulders & Arms</option><option value="Chest & Back">Chest & Back</option><option value="Legs">Legs</option><option value="Glutes & Hamstrings">Glutes & Hamstrings</option></select></div>
+      <div id="bodybuildingPhaseWrap" style="display:none"><label>Physique phase</label><select id="blockBodybuildingPhase"><option value="Lean Gain">Lean Gain</option><option value="Recomposition" selected>Recomposition</option><option value="Cut">Cut</option></select></div>
     </div>
     <label class="checkbox-line"><input id="blockMaintainStrength" type="checkbox" checked> Preserve major-lift strength during the block</label>
     <button onclick="generateTrainingBlock()">Build Training Block</button>
@@ -185,33 +170,48 @@
     </div>
     <button class="secondary" onclick="saveNutritionSettings()">Update Macro Guide</button>
   </div>
+  <div class="card">
+    <h3>Coach's Message Preferences</h3>
+    <label>Message style</label>
+    <select id="coachMessageStyle" onchange="document.getElementById('scriptureFrequencyWrap').style.display=['Faith-Based','Mixed'].includes(this.value)?'block':'none'"><option value="Performance">Performance</option><option value="Stoic">Stoic</option><option value="Faith-Based">Faith-Based</option><option value="Mixed">Mixed</option><option value="Off">Off</option></select>
+    <div id="scriptureFrequencyWrap"><label>Scripture frequency</label><select id="scriptureFrequency"><option value="Occasionally">Occasionally</option><option value="Several">A few times per week</option><option value="Daily">Daily</option></select></div>
+    <button class="secondary" onclick="saveCoachMessagePreferences()">Save Message Preferences</button>
+    <div class="hint">Faith-based messages are always optional and can be changed here at any time.</div>
+  </div>
   <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input type="file" id="importFile" accept="application/json" onchange="importData(event)"><button class="danger" onclick="resetApp()">Reset App</button></div>
   <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
 </section>
 </main>
 
+<div id="onboardingModal" class="modal hidden"><div class="modal-box onboarding-box"><div class="card"><h2>Welcome to Bell Performance</h2><p class="sub">Set up your athlete profile. These choices create your starting program and can be changed later in Settings.</p><div class="row"><div><label>First name</label><input id="onboardingAthleteName" placeholder="First name"></div><div><label>Programming profile</label><select id="onboardingSex"><option value="Male">Male</option><option value="Female">Female</option><option value="Prefer not to say">Prefer not to say</option></select></div></div><div class="hint" style="margin-bottom:12px">This adjusts starting exercise selection and muscle-group emphasis. It never limits strength, goals, or exercise choices.</div><h3>Your Training Setup</h3><label>Where will you train most often?</label><select id="onboardingEnvironment" onchange="applyEquipmentPreset('onboardingEquipment',this.value)"><option value="commercial">Commercial gym</option><option value="home">Home gym</option><option value="minimal">Minimal equipment</option><option value="bodyweight">Bodyweight only</option><option value="travel">Travel setup</option></select><div class="equipment-grid onboarding-equipment" id="onboardingEquipmentGrid"></div><label>What kind of coaching messages would you like?</label><select id="onboardingMessageStyle" onchange="document.getElementById('onboardingScriptureWrap').style.display=['Faith-Based','Mixed'].includes(this.value)?'block':'none'"><option value="Performance">Performance</option><option value="Stoic">Stoic</option><option value="Faith-Based">Faith-Based</option><option value="Mixed">Mixed performance + faith</option><option value="Off">No coach messages</option></select><div id="onboardingScriptureWrap"><label>How often should Scripture appear?</label><select id="onboardingScriptureFrequency"><option value="Occasionally">Occasionally</option><option value="Several">A few times per week</option><option value="Daily">Daily</option></select></div><button onclick="completeOnboarding()">Save & Continue</button></div></div></div>
+
+<div id="dailyReadinessModal" class="modal hidden"><div class="modal-box onboarding-box"><div class="card"><span class="metric-label">First Check-In Today</span><h2>How are you showing up?</h2><p class="sub">Five quick answers set today's Mission Status and help regulate your weekly training load.</p><div class="quick-check-grid"><label>Sleep<select id="promptsleepQuality"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Poor → Excellent</small></label><label>Soreness<select id="promptsoreness"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Fresh → Very sore</small></label><label>Energy<select id="promptenergy"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Exhausted → Energized</small></label><label>Motivation<select id="promptmotivation"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Low → High</small></label><label>Time available<select id="prompttimeAvailability"><option value="1">20–30 min</option><option value="2">30–45 min</option><option value="3">45–60 min</option><option value="4">60–75 min</option><option value="5">75–90+ min</option></select><small>Today's schedule</small></label></div><button class="good" onclick="saveDailyReadinessPrompt()">Set Today's Mission Status</button></div></div></div>
+
+<div id="sessionFeedbackModal" class="modal hidden"><div class="modal-box onboarding-box"><div class="card"><span class="metric-label">Training Debrief</span><h2>How did that session land?</h2><p class="sub">This feedback becomes part of your rolling seven-day readiness and helps the Coach Engine prevent unnecessary fatigue.</p><div class="feedback-grid"><label>How did the training feel?<select id="feedbackSessionQuality"><option value="1">1 — Poor</option><option value="2">2 — Below average</option><option value="3" selected>3 — Solid</option><option value="4">4 — Very good</option><option value="5">5 — Excellent</option></select></label><label>Energy afterward<select id="feedbackPostEnergy"><option value="1">1 — Drained</option><option value="2">2 — Low</option><option value="3" selected>3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Energized</option></select></label><label>How do you feel overall?<select id="feedbackOverallFeeling"><option value="1">1 — Rough</option><option value="2">2 — Below normal</option><option value="3" selected>3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Great</option></select></label><label>Muscle/joint strain<select id="feedbackStrain"><option value="1">1 — None</option><option value="2">2 — Mild</option><option value="3" selected>3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Concerning</option></select></label></div><label>Anything the coach should remember?</label><textarea id="feedbackNotes" placeholder="Example: legs felt unusually heavy, shoulder felt good, intervals were easier than expected"></textarea><button class="good" onclick="saveSessionFeedback()">Save Training Debrief</button><button class="secondary" onclick="skipSessionFeedback()">Skip for Now</button><div class="hint" style="margin-top:10px">Sharp pain, dizziness, chest pain, or other concerning symptoms should not be treated as a readiness score—stop training and seek appropriate medical guidance.</div></div></div></div>
+
 <div id="workoutModal" class="modal hidden">
   <div class="modal-box">
     <div class="workout-top">
-      <div class="progress-label"><span id="activeTitle"></span><span id="workoutProgressText"></span></div>
-      <div class="scorebar"><div id="workoutProgressBar"></div></div>
+      <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
+      <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
     </div>
+    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/athlete-male.svg" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
     <div class="card workout-control-card">
-      <h3>Workout Timer</h3><div class="timer" id="workoutTimer">00:00</div>
+      <h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
       <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
       <div class="rest-panel hidden" id="restPanel"><span class="metric-label">Rest Timer</span><div class="rest-time" id="restTimer">00:00</div><div class="row three"><button class="secondary" onclick="adjustRestTimer(-30)">−30 sec</button><button class="secondary" onclick="adjustRestTimer(30)">+30 sec</button><button class="danger" onclick="skipRestTimer()">Skip</button></div></div>
       <div class="row"><button class="secondary" onclick="closeWorkout()">Save & Exit</button><button class="danger" onclick="discardWorkout()">Discard</button></div>
     </div>
     <div id="warmupPanel" class="card hidden"></div>
     <div id="activeExercises"></div>
-    <div class="card"><label>Session RPE</label><input type="number" min="1" max="10" id="sessionRpe"><label>Workout Notes</label><textarea id="sessionNotes"></textarea><button class="good" onclick="completeWorkout()">Finish Workout</button></div>
+    <div class="card"><label>Session RPE</label><input type="number" min="1" max="10" id="sessionRpe"><label>Training Notes</label><textarea id="sessionNotes"></textarea><button class="good" onclick="completeWorkout()">Finish Training</button></div>
   </div>
 </div>
 
 <nav>
 <button class="active" data-screen="home"><span class="icon">⌂</span>Home</button>
 <button data-screen="plan"><span class="icon">☷</span>Plan</button>
-<button data-screen="workouts"><span class="icon">⚒</span>Workouts</button>
+<button data-screen="workouts"><span class="icon">⚒</span>Strength</button>
 <button data-screen="history"><span class="icon">◷</span>History</button>
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
@@ -219,6 +219,8 @@
 <script src="./data/workouts.js"></script>
 <script src="./js/storage.js"></script>
 <script src="./js/readiness.js"></script>
+<script src="./js/equipment.js"></script>
+<script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment");applyEquipmentPreset("onboardingEquipment","commercial");</script>
 <script src="./js/training-blocks.js"></script>
 <script src="./js/mobility.js"></script>
 <script src="./js/nutrition.js"></script>

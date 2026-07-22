@@ -5,16 +5,15 @@ const defaults = {
     phase: "Foundation",
     athleteName: "Chris",
     athleteMode: "Hybrid Athlete",
+    sex: "Male",
     weight: 207,
     goal: 185,
     cardioType: "Running",
     rotationWeek: 1,
     maxes: { bench: 315, squat: 455, deadlift: 455, pushPress: 185 },
-    readiness: {
-      sleepHours: 7, sleepQuality: 4, energy: 4, motivation: 4,
-      stress: 3, soreness: 3, jointPain: 0, restingHr: 0,
-      score: 78, status: "GREEN"
-    }
+    readiness: { sleepQuality:4, energy:4, motivation:4, soreness:3, timeAvailability:3, score:80, status:"GREEN", lastPromptDate:"" },
+    coachMessages: { setupComplete:false, style:"Performance", scriptureFrequency:"Occasionally" },
+    equipmentSetup: { locations:[{id:"default",name:"My Gym",environment:"commercial",equipment:["barbell","rack","bench","dumbbells","cables","machines","smith","kettlebells","bands","pullupBar","dipStation","plyoBox","treadmill","bike","rower","skiErg","sled","airBike","jumpRope","outdoor"]}], activeLocationId:"default" }
   },
   plan: [
     { day: "Monday", mission: "S-1 Upper Strength", done: false },
@@ -29,6 +28,8 @@ const defaults = {
   activeWorkout: null,
   mobility: { focus: "Auto", minutes: 10, completedDates: [], checks: {} },
   readinessLog: [],
+  sessionFeedbackLog: [],
+  pendingFeedbackSessionId: null,
   mission: {
     goalWorkouts: 40, goalMobility: 30, goalPullups: 25, goal5k: 28,
     currentPullups: 20, current5k: null
@@ -37,7 +38,7 @@ const defaults = {
   trainingBlock: {
     enabled: false, goalType: "General Hybrid", targetDate: "", targetMinutes: 60,
     lengthWeeks: 12, currentWeek: 1, trainingDays: 5, runDays: 3, strengthDays: 3,
-    sessionMinutes: 75, secondaryGoal: "Maintain Strength", maintainStrength: true, startDate: "", generatedAt: ""
+    sessionMinutes: 75, secondaryGoal: "Maintain Strength", maintainStrength: true, bodybuildingFocus: "Balanced", bodybuildingPhase: "Recomposition", startDate: "", generatedAt: ""
   }
 };
 
@@ -59,6 +60,7 @@ function normalizeData() {
   data.settings.phase = data.settings.phase || defaults.settings.phase;
   data.settings.athleteName = data.settings.athleteName || "Chris";
   data.settings.athleteMode = data.settings.athleteMode || "Hybrid Athlete";
+  data.settings.sex = ["Male", "Female", "Prefer not to say"].includes(data.settings.sex) ? data.settings.sex : "Male";
   data.settings.weight = Number(data.settings.weight) || defaults.settings.weight;
   data.settings.goal = Number(data.settings.goal) || defaults.settings.goal;
   data.settings.cardioType = data.settings.cardioType || "Running";
@@ -72,17 +74,17 @@ function normalizeData() {
 
   const old = data.settings.readiness || {};
   data.settings.readiness = {
-    sleepHours: Number.isFinite(+old.sleepHours) ? +old.sleepHours : 7,
     sleepQuality: Number.isFinite(+old.sleepQuality) ? +old.sleepQuality : (Number.isFinite(+old.sleep) ? +old.sleep : 4),
     energy: Number.isFinite(+old.energy) ? +old.energy : 4,
     motivation: Number.isFinite(+old.motivation) ? +old.motivation : 4,
-    stress: Number.isFinite(+old.stress) ? +old.stress : 3,
     soreness: Number.isFinite(+old.soreness) ? +old.soreness : 3,
-    jointPain: Number.isFinite(+old.jointPain) ? +old.jointPain : 0,
-    restingHr: Number.isFinite(+old.restingHr) ? +old.restingHr : 0,
-    score: Number.isFinite(+old.score) ? +old.score : 78,
-    status: old.status || "GREEN"
+    timeAvailability: Number.isFinite(+old.timeAvailability) ? +old.timeAvailability : 3,
+    score: Number.isFinite(+old.score) ? +old.score : 80,
+    status: old.status || "GREEN",
+    lastPromptDate: old.lastPromptDate || ""
   };
+  data.settings.coachMessages = { ...defaults.settings.coachMessages, ...(data.settings.coachMessages || {}) };
+  if (typeof normalizeEquipmentSettings === "function") normalizeEquipmentSettings();
 
   data.plan = Array.isArray(data.plan) ? data.plan : cloneDefaults().plan;
   data.history = Array.isArray(data.history) ? data.history : [];
@@ -90,6 +92,8 @@ function normalizeData() {
   data.mobility.completedDates = Array.isArray(data.mobility.completedDates) ? data.mobility.completedDates : [];
   data.mobility.checks = data.mobility.checks || {};
   data.readinessLog = Array.isArray(data.readinessLog) ? data.readinessLog : [];
+  data.sessionFeedbackLog = Array.isArray(data.sessionFeedbackLog) ? data.sessionFeedbackLog : [];
+  data.pendingFeedbackSessionId = data.pendingFeedbackSessionId || null;
   data.mission = { ...defaults.mission, ...(data.mission || {}) };
   data.nutrition = { ...defaults.nutrition, ...(data.nutrition || {}) };
   data.trainingBlock = { ...defaults.trainingBlock, ...(data.trainingBlock || {}) };

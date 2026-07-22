@@ -79,6 +79,7 @@ function scaledTemplate(name) {
   let base = getWorkoutTemplate(name);
   if (!base) return null;
   base = blockRunOverride(name, base);
+  if (typeof applyEquipmentToTemplate === "function") base = applyEquipmentToTemplate(base);
   if (!(data.trainingBlock?.enabled && name.startsWith("R-"))) base = applyCardioModality(name, base);
   const profile = scalingProfile();
   const isMobility = name.startsWith("M-");
@@ -88,8 +89,9 @@ function scaledTemplate(name) {
     name,
     label:getWorkoutLabel(name),
     rotationWeek:getRotationWeek(),
+    equipmentLocation:base.equipmentLocation || (typeof activeEquipmentLocation === "function" ? activeEquipmentLocation().name : ""),
     readinessStatus:profile.status,
-    duration:Math.max(10, Math.round(base.duration * (isMobility ? 1 : profile.status === "GREEN" ? 1 : profile.status === "YELLOW" ? 0.82 : 0.58))),
+    duration:Math.max(10, Math.min(profile.timeMinutes, Math.round(base.duration * (isMobility ? 1 : profile.status === "GREEN" ? 1 : profile.status === "YELLOW" ? 0.82 : 0.58)))) ,
     exercises:base.exercises.map(exercise => {
       const originalSets = exercise.sets;
       let sets = exercise.sets;
@@ -104,12 +106,19 @@ function scaledTemplate(name) {
       }
       const recommendation = recommendedWeight(exercise.name, profile.status);
       return {...exercise,originalSets,sets,reps,recommendedWeight:recommendation.value,recommendationDisplay:recommendation.display,recommendationNote:recommendation.note,scaleNote:sets===0?"RED: optional finisher removed to protect recovery":profile.status === "GREEN"?`GREEN: ${sets} sets as written`:profile.status === "YELLOW"?`YELLOW: scaled to ${sets} sets and reduced load`: `RED: scaled to ${sets} sets and technique-focused load`};
-    }).filter(exercise => exercise.sets > 0)
+    }).filter(exercise => exercise.sets > 0).filter((exercise, index) => {
+      if (isMobility) return true;
+      const cap = profile.timeMinutes;
+      if (cap <= 30) return index < 3 && exercise.block !== "Golden Era Finisher";
+      if (cap <= 45) return index < 4;
+      if (cap <= 60) return index < 6;
+      return true;
+    })
   };
 }
 
 function warmupSetsFor(exercise) {
-  if (!exercise || exercise.block !== "Primary Strength") return [];
+  if (!exercise || !['Primary Strength','Primary Hypertrophy'].includes(exercise.block)) return [];
   const work = Number(exercise.recommendedWeight);
   if (!Number.isFinite(work) || work < 45) return [];
   const bar = exercise.name.includes("Dumbbell") ? 0 : 45;
@@ -123,7 +132,7 @@ function warmupSetsFor(exercise) {
 
 function renderWarmupPanel() {
   const panel = document.getElementById("warmupPanel");
-  const first = data.activeWorkout?.exercises?.find(ex => ex.block === "Primary Strength");
+  const first = data.activeWorkout?.exercises?.find(ex => ["Primary Strength","Primary Hypertrophy"].includes(ex.block));
   const warmups = warmupSetsFor(first);
   if (!panel || !first || !warmups.length) { if (panel) panel.classList.add("hidden"); return; }
   panel.classList.remove("hidden");
@@ -162,14 +171,27 @@ function skipRestTimer() { clearInterval(restInterval); restRemaining = 0; updat
 function beginToday() { const plan=currentPlan(); if(plan) beginWorkout(plan.mission); else alert("All planned sessions are complete. Choose a workout from the Workouts tab."); }
 function beginWorkout(name) {
   const template=scaledTemplate(name); if(!template) return;
-  data.activeWorkout={name,label:template.label,rotationWeek:template.rotationWeek,startedAt:new Date().toISOString(),elapsed:0,rpe:"",notes:"",readiness:{score:readinessScore(),status:readinessStatus()},cardioType:name.startsWith("R-")?(data.settings.cardioType||"Running"):null,exercises:template.exercises.map(exercise=>({name:exercise.name,block:exercise.block,prescription:`${exercise.sets} × ${exercise.reps}`,originalSets:exercise.originalSets,cue:exercise.cue,scaleNote:exercise.scaleNote,recommendedWeight:exercise.recommendedWeight,recommendationDisplay:exercise.recommendationDisplay,recommendationNote:exercise.recommendationNote,rest:exercise.rest||0,sets:Array.from({length:exercise.sets},(_,index)=>({set:index+1,weight:typeof exercise.recommendedWeight==="number"?exercise.recommendedWeight:"",reps:exercise.reps,done:false}))}))};
+  data.activeWorkout={name,label:template.label,rotationWeek:template.rotationWeek,startedAt:new Date().toISOString(),elapsed:0,rpe:"",notes:"",readiness:{score:readinessScore(),status:readinessStatus()},cardioType:name.startsWith("R-")?(data.settings.cardioType||"Running"):null,exercises:template.exercises.map(exercise=>({name:exercise.name,block:exercise.block,prescription:`${exercise.sets} × ${exercise.reps}`,originalSets:exercise.originalSets,cue:exercise.cue,equipmentAdjusted:exercise.equipmentAdjusted,originalExercise:exercise.originalExercise,scaleNote:exercise.scaleNote,recommendedWeight:exercise.recommendedWeight,recommendationDisplay:exercise.recommendationDisplay,recommendationNote:exercise.recommendationNote,rest:exercise.rest||0,sets:Array.from({length:exercise.sets},(_,index)=>({set:index+1,weight:typeof exercise.recommendedWeight==="number"?exercise.recommendedWeight:"",reps:exercise.reps,done:false}))}))};
   saveData({render:false}); openWorkoutUI(); startTimer();
 }
 function openWorkoutUI() {
   const active=data.activeWorkout; if(!active) return;
   if(!document.body.classList.contains("workout-open")){savedPageScroll=window.scrollY;document.body.style.top=`-${savedPageScroll}px`;document.body.classList.add("workout-open");}
   document.getElementById("workoutModal").classList.remove("hidden");
-  document.getElementById("activeTitle").textContent=active.cardioType?`${active.label||active.name} • ${active.cardioType}`:(active.label||active.name);
+  const isEngine = Boolean(active.cardioType) || String(active.name||"").startsWith("R-");
+  const female = (data.settings.sex || "Male") === "Female";
+  document.body.classList.toggle("engine-session", isEngine);
+  document.body.classList.toggle("female-session", female);
+  const title = active.cardioType?`${active.label||active.name} • ${active.cardioType}`:(active.label||active.name);
+  document.getElementById("activeTitle").textContent=title;
+  setText("activeTrainingType", isEngine ? "Engine Training" : "Strength Training");
+  setText("workoutHeroTitle", active.label || active.name);
+  setText("workoutHeroFocus", isEngine ? "Build sustainable capacity with controlled effort." : "Execute quality sets with strong technique.");
+  setText("workoutHeroDuration", `${Math.max(10, Math.round((active.exercises?.length || 4) * (isEngine ? 6 : 11)))} min`);
+  setText("workoutHeroStatus", `${active.readiness?.status || readinessStatus()} Zone`);
+  setText("workoutZoneLabel", trainingStatusText(active.readiness?.status || readinessStatus()));
+  const art = document.getElementById("workoutHeroArt");
+  if (art) art.src = isEngine ? ((active.cardioType || data.settings.cardioType) === "Cycling" ? "./assets/engine-cycle.svg" : "./assets/engine-run.svg") : (female ? "./assets/athlete-female.svg" : "./assets/athlete-male.svg");
   renderActiveWorkout();
 }
 function renderActiveWorkout() {
@@ -194,6 +216,6 @@ function persistActive(){if(!data.activeWorkout)return;data.activeWorkout.rpe=do
 function updateWorkoutProgress(){const sets=data.activeWorkout?.exercises.flatMap(exercise=>exercise.sets)||[];const completed=sets.filter(set=>set.done).length;const pct=sets.length?Math.round((completed/sets.length)*100):0;const bar=document.getElementById("workoutProgressBar");const text=document.getElementById("workoutProgressText");if(bar)bar.style.width=`${pct}%`;if(text)text.textContent=`${completed}/${sets.length} sets complete`;}
 function startTimer(){clearInterval(timerInterval);timerInterval=setInterval(()=>{if(!data.activeWorkout)return;data.activeWorkout.elapsed=(data.activeWorkout.elapsed||0)+1;updateTimerDisplay();if(data.activeWorkout.elapsed%15===0)saveData({render:false});},1000);}
 function updateTimerDisplay(){const elapsed=data.activeWorkout?.elapsed||0;const minutes=String(Math.floor(elapsed/60)).padStart(2,"0");const seconds=String(elapsed%60).padStart(2,"0");const timer=document.getElementById("workoutTimer");if(timer)timer.textContent=`${minutes}:${seconds}`;}
-function closeWorkout(){if(data.activeWorkout)persistActive();document.getElementById("workoutModal").classList.add("hidden");clearInterval(timerInterval);clearInterval(restInterval);document.body.classList.remove("workout-open");document.body.style.top="";window.scrollTo(0,savedPageScroll);}
-function completeWorkout(){if(!data.activeWorkout)return;persistActive();const completed={...data.activeWorkout,completedAt:new Date().toISOString()};data.history.unshift(completed);const plan=data.plan.find(item=>item.mission===completed.name&&!item.done);if(plan)plan.done=true;closeWorkout();data.activeWorkout=null;saveData();alert("Workout complete. +100 XP earned.");}
+function closeWorkout(){if(data.activeWorkout)persistActive();document.getElementById("workoutModal").classList.add("hidden");clearInterval(timerInterval);clearInterval(restInterval);document.body.classList.remove("workout-open","engine-session","female-session");document.body.style.top="";window.scrollTo(0,savedPageScroll);}
+function completeWorkout(){if(!data.activeWorkout)return;persistActive();const completed={...data.activeWorkout,completedAt:new Date().toISOString()};data.history.unshift(completed);const plan=data.plan.find(item=>item.mission===completed.name&&!item.done);if(plan)plan.done=true;closeWorkout();data.activeWorkout=null;data.pendingFeedbackSessionId=completed.completedAt;saveData();openPendingSessionFeedback();}
 function discardWorkout(){if(!confirm("Discard this workout?"))return;closeWorkout();data.activeWorkout=null;saveData();}

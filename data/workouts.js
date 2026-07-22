@@ -204,6 +204,71 @@ const strengthRotations = {
   }
 };
 
+const bodybuildingVariations = {
+  "B-1 Chest & Back": [
+    ["Bench Press","Weighted Pull-up","Incline Dumbbell Press","Chest-Supported Row","Cable Fly","Straight-Arm Pulldown"],
+    ["Incline Barbell Press","Pendlay Row","Flat Dumbbell Press","Neutral-Grip Lat Pulldown","Pec Deck","Single-Arm Cable Row"],
+    ["Paused Bench Press","T-Bar Row","Low-Incline Dumbbell Press","Chin-up","Cable Crossover","Dumbbell Pullover"],
+    ["Machine Chest Press","Wide-Grip Pulldown","Incline Smith Press","Single-Arm Dumbbell Row","Push-up","Face Pull"]
+  ],
+  "B-2 Legs": [
+    ["Back Squat","Romanian Deadlift","Leg Press","Hamstring Curl","Leg Extension","Standing Calf Raise"],
+    ["Front Squat","Good Morning","Bulgarian Split Squat","Seated Leg Curl","Leg Extension","Seated Calf Raise"],
+    ["Hack Squat","Romanian Deadlift","Reverse Smith Lunge","Hamstring Curl","Leg Extension","Standing Calf Raise"],
+    ["Narrow-Stance Squat","Hip Thrust","Walking Lunge","Seated Leg Curl","Leg Extension","Tibialis Raise"]
+  ],
+  "B-3 Shoulders & Arms": [
+    ["Seated Dumbbell Press","Dumbbell Lateral Raise","Rear-Delt Fly","EZ-Bar Curl","Incline Dumbbell Curl","Rope Pressdown","Overhead Triceps Extension"],
+    ["Arnold Press","Cable Lateral Raise","Face Pull","Preacher Curl","Hammer Curl","Close-Grip Bench Press","Rope Pressdown"],
+    ["Strict Overhead Press","Machine Lateral Raise","Reverse Pec Deck","Barbell Curl","Bayesian Cable Curl","Skull Crusher","Single-Arm Pressdown"],
+    ["Machine Shoulder Press","Mechanical Drop-Set Lateral Raise","Rear-Delt Cable Fly","Alternating Dumbbell Curl","Cable Curl","Dips","Overhead Cable Extension"]
+  ],
+  "B-4 Back & Posterior": [
+    ["Deadlift","Neutral-Grip Pull-up","Chest-Supported Row","Single-Leg Romanian Deadlift","Hamstring Curl","Farmer Carry"],
+    ["Trap-Bar Deadlift","Wide-Grip Lat Pulldown","Single-Arm Dumbbell Row","Hip Thrust","Seated Leg Curl","Back Extension"],
+    ["Romanian Deadlift","Chin-up","T-Bar Row","Reverse Lunge","Hamstring Curl","Face Pull"],
+    ["Rack Pull","Neutral-Grip Lat Pulldown","Cable Row","Good Morning","Glute Bridge","Rear-Delt Fly"]
+  ]
+};
+
+const femaleBodybuildingVariations = {
+  "B-1 Chest & Back": [
+    ["Incline Dumbbell Press","Neutral-Grip Lat Pulldown","Machine Chest Press","Chest-Supported Row","Cable Lateral Raise","Face Pull"],
+    ["Incline Barbell Press","Assisted Pull-up","Flat Dumbbell Press","Single-Arm Cable Row","Cable Fly","Rear-Delt Fly"],
+    ["Low-Incline Dumbbell Press","Wide-Grip Lat Pulldown","Machine Chest Press","T-Bar Row","Cable Lateral Raise","Straight-Arm Pulldown"],
+    ["Incline Smith Press","Neutral-Grip Pulldown","Push-up","Single-Arm Dumbbell Row","Pec Deck","Face Pull"]
+  ],
+  "B-2 Legs": [
+    ["Back Squat","Hip Thrust","Leg Press","Romanian Deadlift","Leg Extension","Cable Hip Abduction","Standing Calf Raise"],
+    ["Front Squat","Barbell Glute Bridge","Bulgarian Split Squat","Seated Leg Curl","Leg Extension","Cable Hip Abduction","Seated Calf Raise"],
+    ["Hack Squat","Hip Thrust","Reverse Smith Lunge","Romanian Deadlift","Leg Extension","Machine Hip Abduction","Standing Calf Raise"],
+    ["Narrow-Stance Squat","Romanian Deadlift","Walking Lunge","Seated Leg Curl","Leg Extension","Machine Hip Abduction","Tibialis Raise"]
+  ],
+  "B-3 Shoulders & Arms": [
+    ["Seated Dumbbell Press","Dumbbell Lateral Raise","Rear-Delt Fly","EZ-Bar Curl","Incline Dumbbell Curl","Rope Pressdown","Overhead Triceps Extension"],
+    ["Arnold Press","Cable Lateral Raise","Face Pull","Preacher Curl","Hammer Curl","Close-Grip Push-up","Rope Pressdown"],
+    ["Machine Shoulder Press","Machine Lateral Raise","Reverse Pec Deck","Barbell Curl","Bayesian Cable Curl","Skull Crusher","Single-Arm Pressdown"],
+    ["Seated Dumbbell Press","Mechanical Drop-Set Lateral Raise","Rear-Delt Cable Fly","Alternating Dumbbell Curl","Cable Curl","Bench Dip","Overhead Cable Extension"]
+  ],
+  "B-4 Back & Posterior": [
+    ["Romanian Deadlift","Hip Thrust","Neutral-Grip Pull-up","Chest-Supported Row","Seated Leg Curl","Cable Kickback","Farmer Carry"],
+    ["Trap-Bar Deadlift","Barbell Glute Bridge","Wide-Grip Lat Pulldown","Single-Arm Dumbbell Row","Seated Leg Curl","Back Extension","Cable Hip Abduction"],
+    ["Romanian Deadlift","Reverse Lunge","Chin-up","T-Bar Row","Hamstring Curl","Cable Kickback","Face Pull"],
+    ["Good Morning","Hip Thrust","Neutral-Grip Lat Pulldown","Cable Row","Glute Bridge","Rear-Delt Fly","Machine Hip Abduction"]
+  ]
+};
+
+function getBodybuildingTemplate(name, rotationWeek = getRotationWeek()) {
+  const sex=data?.settings?.sex||"Prefer not to say"; const library=sex==="Female"?femaleBodybuildingVariations:bodybuildingVariations; const options=library[name]||bodybuildingVariations[name]; if(!options)return null; const ex=options[Math.max(0,Math.min(3,rotationWeek-1))];
+  const focus=data?.trainingBlock?.bodybuildingFocus||"Balanced"; const phase=data?.trainingBlock?.bodybuildingPhase||"Recomposition";
+  const profileLabel=sex==="Female"?"Female Profile":sex==="Male"?"Male Profile":"Individual Profile";
+  return {label:`${name.replace(/^B-\d\s*/,"")} — ${focus} Focus • ${profileLabel}`,duration:name.includes("Shoulders")?68:72,exercises:ex.map((exercise,i)=>{
+    const compound=i<2, armDay=name.includes("Shoulders"), gluteExercise=/Hip Thrust|Glute|Kickback|Abduction|Romanian|Lunge/.test(exercise), focusBoost=(focus==="Shoulders & Arms"&&armDay)||(focus==="Chest & Back"&&name.includes("Chest"))||(focus==="Legs"&&name.includes("Legs"))||(focus==="Glutes & Hamstrings"&&gluteExercise);
+    const sets=compound?4:(focusBoost&&i>=2?4:3); const reps=compound?(phase==="Lean Gain"?"6–10":"8–12"):(i>=ex.length-2?"12–20":"10–15");
+    return{name:exercise,block:compound?"Primary Hypertrophy":"Accessory Hypertrophy",sets,reps,rest:compound?105:45,cue:compound?"Control the eccentric and stop with 1–2 reps in reserve.":"Use full range and constant tension. Add load only after reaching the top of the rep range."};
+  })};
+}
+
 const conditioningTemplates = {
   "R-1 Recovery Run": {duration:20, exercises:[{name:"Recovery Run", block:"Conditioning", sets:1, reps:"20 min easy", rest:0, cue:"Very easy pace. Nasal breathing when possible."}]},
   "R-2 Easy Run": {duration:30, exercises:[{name:"Easy Run", block:"Conditioning", sets:1, reps:"2–3 miles", rest:0, cue:"Conversational pace."}]},
@@ -218,8 +283,25 @@ function getRotationWeek() {
   return Math.min(4, Math.max(1, week));
 }
 
+function applyAthleteProfile(template, name) {
+  if (!template) return null;
+  const sex=data?.settings?.sex||"Prefer not to say";
+  if (sex!=="Female" || !name.startsWith("S-")) return template;
+  const copy={...template,exercises:template.exercises.map(x=>({...x}))};
+  if (name.includes("Lower")) {
+    const preferred=copy.exercises.find(x=>/Lunge|Split Squat|Romanian|Hip Thrust|Glute|Hamstring/.test(x.name));
+    if (preferred) { preferred.sets=Math.min(4,(preferred.sets||3)+1); preferred.cue=`${preferred.cue||""} Female profile: extra lower-body accessory volume while maintaining the same primary strength work.`.trim(); }
+  }
+  if (name.includes("Upper")) {
+    const preferred=copy.exercises.find(x=>/Row|Pull|Rear|Face Pull|Lateral/.test(x.name));
+    if (preferred) { preferred.sets=Math.min(4,(preferred.sets||3)+1); preferred.cue=`${preferred.cue||""} Female profile: extra upper-back or shoulder volume for balanced development.`.trim(); }
+  }
+  return copy;
+}
+
 function getWorkoutTemplate(name, rotationWeek = getRotationWeek()) {
-  if (name.startsWith("S-")) return strengthRotations[rotationWeek]?.[name] || strengthRotations[1][name];
+  if (name.startsWith("S-")) return applyAthleteProfile(strengthRotations[rotationWeek]?.[name] || strengthRotations[1][name],name);
+  if (name.startsWith("B-")) return getBodybuildingTemplate(name, rotationWeek);
   return conditioningTemplates[name] || null;
 }
 
@@ -228,7 +310,7 @@ function getWorkoutLabel(name, rotationWeek = getRotationWeek()) {
 }
 
 function allWorkoutNames() {
-  return ["S-1 Upper Strength", "S-2 Lower Strength", "S-3 Athletic Upper", "S-4 Athletic Lower", "R-1 Recovery Run", "R-2 Easy Run", "R-3 Tempo Run", "R-4 Intervals", "R-5 Long Run", "M-1 Daily Reset"];
+  return ["S-1 Upper Strength", "S-2 Lower Strength", "S-3 Athletic Upper", "S-4 Athletic Lower", "B-1 Chest & Back", "B-2 Legs", "B-3 Shoulders & Arms", "B-4 Back & Posterior", "R-1 Recovery Run", "R-2 Easy Run", "R-3 Tempo Run", "R-4 Intervals", "R-5 Long Run", "M-1 Daily Reset"];
 }
 
 const motivationalQuotes=[

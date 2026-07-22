@@ -25,19 +25,17 @@ function showScreen(name) {
 function renderReadiness() {
   const score = readinessScore();
   const status = readinessStatus(score);
-  const ready = byId("readyOut");
-  if (ready) {
-    ready.textContent = `${status} ${score}`;
-    ready.className = `big ${status === "GREEN" ? "good" : status === "YELLOW" ? "accent" : "bad"}`;
-  }
-
   const explanation = byId("readinessExplanation");
   if (explanation) {
     explanation.textContent = scalingProfile().label;
   }
 
   const r = data.settings.readiness;
-  ["sleepHours", "sleepQuality", "energy", "motivation", "stress", "soreness", "jointPain", "restingHr"]
+  const weekly = weeklyReadinessSummary();
+  setText("weeklyReadinessOut", `${weekly.score}%`);
+  setText("weeklyReadinessLabel", weekly.trend === "BUILDING_WELL" ? "Training load is being absorbed well" : weekly.trend === "MANAGE_LOAD" ? "Manage volume and protect recovery" : weekly.trend === "ACCUMULATING_FATIGUE" ? "Fatigue is accumulating — volume is capped" : "Recovery emphasis recommended");
+  setText("weeklyReadinessDetail", `${weekly.checkIns} daily check-ins • ${weekly.feedbackCount} post-session reports`);
+  ["sleepQuality", "energy", "motivation", "soreness", "timeAvailability"]
     .forEach(id => {
       const element = byId(id);
       if (element) element.value = r[id];
@@ -79,6 +77,35 @@ function performanceScores() {
   return { strength, running, recovery: readiness, hybrid, strengthSessions, runSessions };
 }
 
+
+function readinessWord(value, reverse=false) {
+  const v = Number(value) || 3;
+  if (reverse) return v <= 2 ? "Low" : v === 3 ? "Moderate" : "High";
+  return v >= 4 ? "High" : v === 3 ? "Moderate" : "Low";
+}
+function timeAvailabilityLabel(value) {
+  return ({1:"20–30 min",2:"30–45 min",3:"45–60 min",4:"60–75 min",5:"75–90+ min"})[Number(value)] || "45–60 min";
+}
+function renderVisualProfile(template, status) {
+  const sex = data.settings.sex || "Male";
+  const female = sex === "Female";
+  const cardio = data.settings.cardioType || "Running";
+  const strengthArt = byId("strengthArtwork");
+  const engineArt = byId("engineArtwork");
+  if (strengthArt) strengthArt.src = female ? "./assets/athlete-female.svg" : "./assets/athlete-male.svg";
+  if (engineArt) engineArt.src = cardio === "Cycling" ? "./assets/engine-cycle.svg" : "./assets/engine-run.svg";
+  const r = data.settings.readiness || {};
+  setText("dashSleep", readinessWord(r.sleepQuality));
+  setText("dashSoreness", readinessWord(r.soreness, true));
+  setText("dashEnergy", readinessWord(r.energy));
+  setText("dashMotivation", readinessWord(r.motivation));
+  setText("dashTime", timeAvailabilityLabel(r.timeAvailability));
+  setText("engineSessionTitle", cardio === "Cycling" ? "Zone 2 Cycle" : cardio === "Air Bike" ? "Zone 2 Air Bike" : cardio === "Rower" ? "Zone 2 Row" : "Zone 2 Run");
+  setText("engineSessionPurpose", status === "RED" ? "Easy recovery work only." : status === "YELLOW" ? "Controlled aerobic work. Keep it easy." : "Build your base. Fuel your engine.");
+  setText("mobilityDashboardTitle", `${data.mobility.minutes || 10} min ${resolvedMobilityFocus()} Mobility`);
+  setText("mobilityDashboardDetail", `Matched to today's training • ${data.mobility.completedDates.includes(todayKey()) ? "Completed today ✓" : "Complete morning or evening"}`);
+}
+
 function renderDashboard() {
   const profile = scalingProfile();
   const plan = currentPlan();
@@ -91,30 +118,26 @@ function renderDashboard() {
   const athleteName = data.settings.athleteName || "Chris";
 
   setText("greetingOut", `${timeGreeting()}, ${athleteName}`);
-  setText("missionReadiness", `${readinessScore()}%`);
-  setText("recoveryOut", readinessScore() >= 85 ? "Excellent" : readinessScore() >= 72 ? "Good" : readinessScore() >= 58 ? "Limited" : "Recovery Day");
+  const status = readinessStatus();
+  setText("trainingStatusOut", trainingStatusText(status));
+  const statusCard = byId("trainingStatusCard");
+  if (statusCard) statusCard.className = `training-status ${status.toLowerCase()}`;
   setText("missionBlock", block.enabled ? `${block.goalType} • ${blockPhase()}` : data.settings.phase);
   setText("missionWeek", block.enabled ? `${blockWeek()} of ${block.lengthWeeks}` : "Open plan");
   setText("todayMission", template?.label || plan?.mission || "Plan complete");
   setText("missionPurpose", missionPurpose(template));
   setText("todayDuration", template ? `${template.duration} minutes` : "—");
-  setText("todayScale", profile.label);
+  setText("todayFocusOut", status === "GREEN" ? "Progress with clean, controlled work" : status === "YELLOW" ? "Protect quality and trim extra volume" : "Restore, move, and prepare for tomorrow");
+  renderVisualProfile(template, status);
   byId("todayPreview").innerHTML = template
     ? template.exercises.slice(0, 5).map(exercise => `<span class="preview-block">${exercise.block || "Training"}</span> ${exercise.name}: ${exercise.sets} × ${exercise.reps}`).join("<br>")
     : "";
+  const message = selectedCoachMessage();
+  const messageCard = byId("coachMessageCard");
+  if (messageCard) messageCard.classList.toggle("hidden", !message);
+  if (message) { setText("coachMessageOut", `“${message[0]}”`); setText("coachMessageSource", message[1] || "Bell Performance Coach"); }
 
-  setText("strengthScoreOut", scores.strength);
-  setText("runningScoreOut", scores.running);
-  setText("recoveryScoreOut", scores.recovery);
-  setText("hybridScoreOut", scores.hybrid);
-  setText("strengthTrendOut", scores.strengthSessions ? `${scores.strengthSessions} recent sessions` : "Log strength work");
-  setText("runningTrendOut", scores.runSessions ? `${scores.runSessions} recent sessions` : "Log conditioning");
 
-  byId("rankOut").textContent = rank.rank;
-  byId("levelOut").textContent = `Level ${rank.level} • ${rank.next > rank.xp ? `${rank.next - rank.xp} XP to next rank` : "Top rank reached"}`;
-  byId("xpOut").textContent = `${rank.xp} XP`;
-  byId("xpBar").style.width = `${rank.pct}%`;
-  byId("milestoneSummary").innerHTML = `<strong>${mission.workouts}/${data.mission.goalWorkouts}</strong> workouts • <strong>${mission.mobility}/${data.mission.goalMobility}</strong> mobility days • <strong>${mission.weightPct}%</strong> toward goal weight`;
 
   if (block.enabled) {
     const week = blockWeek(); const total = block.lengthWeeks; const pct = Math.round((week / total) * 100);
@@ -194,7 +217,7 @@ function renderWorkoutLibrary() {
 
 function renderHistory() {
   const container = byId("historyList");
-  container.innerHTML = data.history.length ? "" : '<div class="card"><div class="hint">No completed workouts yet.</div></div>';
+  container.innerHTML = data.history.length ? "" : '<div class="card"><div class="hint">No completed training sessions yet.</div></div>';
 
   data.history.forEach(session => {
     const sets = session.exercises?.flatMap(exercise => exercise.sets).filter(set => set.done).length || 0;
@@ -202,7 +225,7 @@ function renderHistory() {
     card.className = "card";
     card.innerHTML = `
       <h3>${session.label || session.name}</h3>
-      <div class="sub">${new Date(session.completedAt).toLocaleDateString()} • ${session.cardioType ? `${session.cardioType} • ` : ""}${Math.round((session.elapsed || 0) / 60)} min • ${sets} sets • ${session.readiness?.status || "-"} ${session.readiness?.score || ""} • RPE ${session.rpe || "-"}</div>
+      <div class="sub">${new Date(session.completedAt).toLocaleDateString()} • ${session.cardioType ? `${session.cardioType} • ` : ""}${Math.round((session.elapsed || 0) / 60)} min • ${sets} sets • ${session.readiness?.status ? trainingStatusText(session.readiness.status) : "-"} • RPE ${session.rpe || "-"}${session.feedback ? ` • Post-session ${feedbackRecoveryScore(session.feedback)}%` : ""}</div>
       ${session.notes ? `<div class="hint" style="margin-top:8px">${session.notes}</div>` : ""}
     `;
     container.appendChild(card);
@@ -212,6 +235,7 @@ function renderHistory() {
 function renderSettings() {
   setValue("athleteNameInput", data.settings.athleteName || "Chris");
   setValue("athleteModeInput", data.settings.athleteMode || "Hybrid Athlete");
+  setValue("sexInput", data.settings.sex || "Male");
   setValue("phaseInput", data.settings.phase);
   byId("weightInput").value = data.settings.weight;
   byId("goalInput").value = data.settings.goal;
@@ -229,6 +253,8 @@ function renderSettings() {
   byId("activityInput").value = String(data.nutrition.activity);
   byId("nutritionGoalInput").value = data.nutrition.goal;
   byId("blockGoalType").value = data.trainingBlock.goalType || "General Hybrid";
+  if (byId("blockBodybuildingFocus")) byId("blockBodybuildingFocus").value = data.trainingBlock.bodybuildingFocus || "Balanced";
+  if (byId("blockBodybuildingPhase")) byId("blockBodybuildingPhase").value = data.trainingBlock.bodybuildingPhase || "Recomposition";
   byId("blockTargetDate").value = data.trainingBlock.targetDate || "";
   byId("blockTargetMinutes").value = data.trainingBlock.targetMinutes || 60;
   byId("blockLength").value = String(data.trainingBlock.lengthWeeks || 12);
@@ -241,11 +267,17 @@ function renderSettings() {
   updateGoalBuilderFields();
   byId("currentBlockWeekInput").value = data.trainingBlock.currentWeek || 1;
   byId("currentBlockWeekInput").max = data.trainingBlock.lengthWeeks || 12;
+  byId("coachMessageStyle").value = data.settings.coachMessages?.style || "Performance";
+  byId("scriptureFrequency").value = data.settings.coachMessages?.scriptureFrequency || "Occasionally";
+  byId("scriptureFrequencyWrap").style.display = ["Faith-Based","Mixed"].includes(byId("coachMessageStyle").value) ? "block" : "none";
+  if (typeof renderEquipmentSettings === "function") renderEquipmentSettings();
 }
+
 
 function saveProfile() {
   data.settings.athleteName = byId("athleteNameInput").value.trim() || "Chris";
   data.settings.athleteMode = byId("athleteModeInput").value || "Hybrid Athlete";
+  data.settings.sex = byId("sexInput").value || "Prefer not to say";
   data.settings.phase = byId("phaseInput").value.trim() || data.settings.phase;
   data.settings.weight = +byId("weightInput").value || data.settings.weight;
   data.settings.goal = +byId("goalInput").value || data.settings.goal;
@@ -261,7 +293,76 @@ function renderApp() {
   renderHistory();
   renderSettings();
 
+  if (!data.settings.coachMessages?.setupComplete) byId("onboardingModal")?.classList.remove("hidden");
   if (data.activeWorkout && byId("workoutModal").classList.contains("hidden")) {
     openWorkoutUI();
   }
+}
+
+const coachMessageLibrary = {
+  Performance: [
+    ["Consistency beats perfection. Win today.", ""],
+    ["Execute the plan. Let the results follow.", ""],
+    ["You do not need a perfect day. You need the next right action.", ""],
+    ["Trust the work. Attack the session with control.", ""]
+  ],
+  Stoic: [
+    ["Control the effort. Release the outcome.", ""],
+    ["The obstacle becomes part of the training.", ""],
+    ["Discipline is freedom from the mood of the moment.", ""]
+  ],
+  Faith: [
+    ["Whatever you do, work at it with all your heart.", "Colossians 3:23"],
+    ["Let us not become weary in doing good.", "Galatians 6:9"],
+    ["Run in such a way as to get the prize.", "1 Corinthians 9:24"],
+    ["Those who hope in the Lord will renew their strength.", "Isaiah 40:31"]
+  ]
+};
+
+function dailyIndex(length, offset = 0) {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  return (Math.floor((now - start) / 86400000) + offset) % length;
+}
+
+function shouldUseFaithToday(pref) {
+  if (pref.style === "Faith-Based") return true;
+  if (pref.style !== "Mixed") return false;
+  if (pref.scriptureFrequency === "Daily") return true;
+  const day = dailyIndex(7);
+  return pref.scriptureFrequency === "Several" ? [1,3,5].includes(day) : day === 0;
+}
+
+function selectedCoachMessage() {
+  const pref = data.settings.coachMessages || {};
+  if (pref.style === "Off") return null;
+  let type = pref.style;
+  if (shouldUseFaithToday(pref)) type = "Faith";
+  if (type === "Mixed") type = dailyIndex(2) ? "Performance" : "Stoic";
+  const list = coachMessageLibrary[type] || coachMessageLibrary.Performance;
+  return list[dailyIndex(list.length, readinessStatus() === "RED" ? 1 : 0)];
+}
+
+function saveCoachMessagePreferences() {
+  data.settings.coachMessages = {
+    setupComplete:true,
+    style:byId("coachMessageStyle").value,
+    scriptureFrequency:byId("scriptureFrequency").value
+  };
+  saveData();
+  alert("Coach's Message preferences saved.");
+}
+
+function completeOnboarding() {
+  data.settings.athleteName = byId("onboardingAthleteName").value.trim() || data.settings.athleteName || "Athlete";
+  data.settings.sex = byId("onboardingSex").value || "Prefer not to say";
+  if (typeof saveOnboardingEquipment === "function") saveOnboardingEquipment();
+  data.settings.coachMessages = {
+    setupComplete:true,
+    style:byId("onboardingMessageStyle").value,
+    scriptureFrequency:byId("onboardingScriptureFrequency").value
+  };
+  saveData({render:false});
+  byId("onboardingModal").classList.add("hidden");
+  renderApp();
 }

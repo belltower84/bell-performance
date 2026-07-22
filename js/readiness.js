@@ -1,85 +1,155 @@
 "use strict";
 
-function readinessScore() {
-  const r = data.settings.readiness;
+function rawDailyReadinessScore(readiness = data.settings.readiness || {}) {
   const n = (value, fallback) => Number.isFinite(+value) ? +value : fallback;
+  const sleep = n(readiness.sleepQuality, 4);
+  const energy = n(readiness.energy, 4);
+  const motivation = n(readiness.motivation, 4);
+  const sorenessRecovery = 6 - n(readiness.soreness, 3);
+  return Math.max(0, Math.min(100, Math.round((sleep * .32 + energy * .30 + motivation * .18 + sorenessRecovery * .20) * 20)));
+}
 
-  const sleepHours = n(r.sleepHours, 7);
-  const sleepQuality = n(r.sleepQuality, 4);
-  const energyValue = n(r.energy, 4);
-  const motivationValue = n(r.motivation, 4);
-  const stressValue = n(r.stress, 3);
-  const sorenessValue = n(r.soreness, 3);
-  const jointPainValue = n(r.jointPain, 0);
-  const restingHrValue = n(r.restingHr, 0);
+function feedbackRecoveryScore(entry) {
+  if (!entry) return null;
+  const n = (value, fallback) => Number.isFinite(+value) ? +value : fallback;
+  const sessionQuality = n(entry.sessionQuality, 3);
+  const postEnergy = n(entry.postEnergy, 3);
+  const overallFeeling = n(entry.overallFeeling, 3);
+  const strainRecovery = 6 - n(entry.strain, 3);
+  return Math.round((sessionQuality * .25 + postEnergy * .30 + overallFeeling * .25 + strainRecovery * .20) * 20);
+}
 
-  const sleepHoursScore = Math.max(0, Math.min(100, ((sleepHours - 4) / 4) * 100));
-  const sleepQualityScore = (sleepQuality / 5) * 100;
-  const energyScore = (energyValue / 5) * 100;
-  const motivationScore = (motivationValue / 5) * 100;
-  const stressScore = ((6 - stressValue) / 5) * 100;
-  const sorenessScore = ((6 - sorenessValue) / 5) * 100;
-  const jointPainScore = ((5 - jointPainValue) / 5) * 100;
-  const hrScore = [100, 80, 55, 25][restingHrValue] ?? 100;
+function lastSevenDaysKeys() {
+  const keys = [];
+  const date = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(date.getFullYear(), date.getMonth(), date.getDate() - i);
+    keys.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`);
+  }
+  return keys;
+}
 
-  let score =
-    sleepHoursScore * 0.20 +
-    sleepQualityScore * 0.15 +
-    energyScore * 0.20 +
-    motivationScore * 0.10 +
-    stressScore * 0.15 +
-    sorenessScore * 0.10 +
-    jointPainScore * 0.05 +
-    hrScore * 0.05;
+function weeklyReadinessSummary() {
+  const keys = new Set(lastSevenDaysKeys());
+  const daily = (data.readinessLog || []).filter(x => keys.has(x.date)).map(x => Number(x.score)).filter(Number.isFinite);
+  const feedback = (data.sessionFeedbackLog || []).filter(x => keys.has(x.date)).map(feedbackRecoveryScore).filter(Number.isFinite);
+  const dailyAverage = daily.length ? Math.round(daily.reduce((a,b)=>a+b,0) / daily.length) : rawDailyReadinessScore();
+  const feedbackAverage = feedback.length ? Math.round(feedback.reduce((a,b)=>a+b,0) / feedback.length) : dailyAverage;
+  const score = Math.round(dailyAverage * .65 + feedbackAverage * .35);
+  const lowFeedbackCount = feedback.filter(x => x < 52).length;
+  const trend = lowFeedbackCount >= 2 ? "ACCUMULATING_FATIGUE" : score >= 75 ? "BUILDING_WELL" : score >= 55 ? "MANAGE_LOAD" : "RECOVERY_NEEDED";
+  return { score, dailyAverage, feedbackAverage, checkIns:daily.length, feedbackCount:feedback.length, lowFeedbackCount, trend };
+}
 
-  if (jointPainValue >= 4) score = Math.min(score, 49);
-  if (sleepHours < 4.5) score = Math.min(score, 49);
-
-  return Math.max(0, Math.min(100, Math.round(score)));
+function readinessScore() {
+  const today = rawDailyReadinessScore();
+  const weekly = weeklyReadinessSummary();
+  let adjusted = Math.round(today * .72 + weekly.score * .28);
+  if (weekly.lowFeedbackCount >= 2) adjusted = Math.min(adjusted, 68);
+  if (weekly.lowFeedbackCount >= 3) adjusted = Math.min(adjusted, 50);
+  return Math.max(0, Math.min(100, adjusted));
 }
 
 function readinessStatus(score = readinessScore()) {
   if (score >= 75) return "GREEN";
-  if (score >= 50) return "YELLOW";
+  if (score >= 52) return "YELLOW";
   return "RED";
+}
+
+function trainingStatusText(status = readinessStatus()) {
+  if (status === "GREEN") return "Ready to Train";
+  if (status === "YELLOW") return "Train Smart";
+  return "Recover to Grow";
+}
+
+function timeCapacityMinutes() {
+  return ({1:30, 2:45, 3:60, 4:75, 5:90})[Number(data.settings.readiness?.timeAvailability) || 3];
 }
 
 function scalingProfile() {
   const status = readinessStatus();
-  if (status === "GREEN") {
-    return { status, load: 1, sets: 1, conditioning: 1, label: "GREEN — full prescribed workout" };
-  }
-  if (status === "YELLOW") {
-    return { status, load: 0.90, sets: 0.70, conditioning: 0.75, label: "YELLOW — 10% lighter, about 30% fewer working sets" };
-  }
-  return { status, load: 0.75, sets: 0.45, conditioning: 0.50, label: "RED — 25% lighter, about half the working sets, no hard conditioning" };
+  const timeMinutes = timeCapacityMinutes();
+  const weekly = weeklyReadinessSummary();
+  if (status === "GREEN") return { status, load:1, sets:1, conditioning:1, timeMinutes, label:"You're ready for quality work. Today's Strength and Engine plan will fit the time you have.", weekly };
+  if (status === "YELLOW") return { status, load:.90, sets:.72, conditioning:.65, timeMinutes, label:"Train smart today. Keep the primary work, reduce accessory volume, and make Engine work easy or optional.", weekly };
+  return { status, load:.75, sets:.45, conditioning:.35, timeMinutes, label:"Recovery is the priority. Bell Performance has reduced today's demand and shifted Engine work toward easy recovery.", weekly };
+}
+
+function hasTodayReadiness() {
+  return (data.readinessLog || []).some(x => x.date === todayKey());
+}
+
+function collectReadinessFrom(prefix = "") {
+  const id = name => document.getElementById(`${prefix}${name}`);
+  return {
+    sleepQuality:+id("sleepQuality").value,
+    soreness:+id("soreness").value,
+    energy:+id("energy").value,
+    motivation:+id("motivation").value,
+    timeAvailability:+id("timeAvailability").value
+  };
+}
+
+function commitReadiness(values) {
+  data.settings.readiness = { ...data.settings.readiness, ...values, lastPromptDate:todayKey() };
+  const rawScore = rawDailyReadinessScore(data.settings.readiness);
+  const entry = { date:todayKey(), score:rawScore, status:readinessStatus(rawScore), ...values };
+  const index = data.readinessLog.findIndex(x => x.date === entry.date);
+  if (index >= 0) data.readinessLog[index] = entry; else data.readinessLog.push(entry);
+  data.settings.readiness.score = readinessScore();
+  data.settings.readiness.status = readinessStatus();
 }
 
 function saveReadiness() {
-  data.settings.readiness = {
-    sleepHours: +document.getElementById("sleepHours").value,
-    sleepQuality: +document.getElementById("sleepQuality").value,
-    energy: +document.getElementById("energy").value,
-    motivation: +document.getElementById("motivation").value,
-    stress: +document.getElementById("stress").value,
-    soreness: +document.getElementById("soreness").value,
-    jointPain: +document.getElementById("jointPain").value,
-    restingHr: +document.getElementById("restingHr").value
-  };
-
-  data.settings.readiness.score = readinessScore();
-  data.settings.readiness.status = readinessStatus(data.settings.readiness.score);
-
-  const key = todayKey();
-  const index = data.readinessLog.findIndex(entry => entry.date === key);
-  const entry = {
-    date: key,
-    score: data.settings.readiness.score,
-    status: data.settings.readiness.status
-  };
-  if (index >= 0) data.readinessLog[index] = entry;
-  else data.readinessLog.push(entry);
-
+  commitReadiness(collectReadinessFrom(""));
   saveData();
-  alert(`Readiness updated: ${entry.status} (${entry.score}/100). Today's workout has been scaled automatically.`);
+  alert(`Check-in saved. Mission Status: ${trainingStatusText()}.`);
+}
+
+function saveDailyReadinessPrompt() {
+  commitReadiness(collectReadinessFrom("prompt"));
+  document.getElementById("dailyReadinessModal")?.classList.add("hidden");
+  saveData();
+}
+
+function maybePromptDailyReadiness() {
+  if (!data.settings.coachMessages?.setupComplete || hasTodayReadiness()) return;
+  const modal = document.getElementById("dailyReadinessModal");
+  if (!modal) return;
+  const r = data.settings.readiness || {};
+  ["sleepQuality","soreness","energy","motivation","timeAvailability"].forEach(name => {
+    const el = document.getElementById(`prompt${name}`);
+    if (el) el.value = r[name] || (name === "soreness" || name === "timeAvailability" ? 3 : 4);
+  });
+  modal.classList.remove("hidden");
+}
+
+function saveSessionFeedback() {
+  const sessionId = data.pendingFeedbackSessionId;
+  const session = (data.history || []).find(x => x.completedAt === sessionId);
+  const entry = {
+    sessionId,
+    date:todayKey(),
+    sessionQuality:+document.getElementById("feedbackSessionQuality").value,
+    postEnergy:+document.getElementById("feedbackPostEnergy").value,
+    overallFeeling:+document.getElementById("feedbackOverallFeeling").value,
+    strain:+document.getElementById("feedbackStrain").value,
+    notes:document.getElementById("feedbackNotes").value.trim()
+  };
+  if (session) session.feedback = entry;
+  const existing = data.sessionFeedbackLog.findIndex(x => x.sessionId === sessionId);
+  if (existing >= 0) data.sessionFeedbackLog[existing] = entry; else data.sessionFeedbackLog.push(entry);
+  data.pendingFeedbackSessionId = null;
+  document.getElementById("sessionFeedbackModal")?.classList.add("hidden");
+  saveData();
+}
+
+function skipSessionFeedback() {
+  data.pendingFeedbackSessionId = null;
+  document.getElementById("sessionFeedbackModal")?.classList.add("hidden");
+  saveData();
+}
+
+function openPendingSessionFeedback() {
+  if (data.pendingFeedbackSessionId) document.getElementById("sessionFeedbackModal")?.classList.remove("hidden");
 }

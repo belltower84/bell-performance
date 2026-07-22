@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 5.0",
+  "name": "Bell Performance 6.4",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#08101d",
-  "theme_color": "#0b1220",
-  "description": "Adaptive multi-goal hybrid coaching app with progressive training blocks, running peaks, strength overload, exercise rotation, readiness scaling, mobility, and nutrition guidance."
+  "background_color": "#050709",
+  "theme_color": "#050709",
+  "description": "Equipment-aware Strength and Engine coaching with daily readiness prompts, post-session training debriefs, and rolling seven-day autoregulation."
 }

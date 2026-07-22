@@ -1,4 +1,4 @@
-const CACHE='bell-performance-2-1-v1';
+const CACHE='bell-performance-2-1-1-v1';
 const ASSETS=[
   './','./index.html','./manifest.json','./css/app.css',
   './data/workouts.js','./js/storage.js','./js/readiness.js',

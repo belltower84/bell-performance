@@ -15,8 +15,8 @@ function setValue(id, value) {
 }
 
 function showScreen(name) {
-  document.querySelectorAll(".screen").forEach(screen => screen.classList.add("hidden"));
-  byId(name)?.classList.remove("hidden");
+  document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
+  byId(name)?.classList.add("active");
   document.querySelectorAll("nav button").forEach(button => button.classList.remove("active"));
   document.querySelector(`nav button[data-screen="${name}"]`)?.classList.add("active");
   window.scrollTo(0, 0);

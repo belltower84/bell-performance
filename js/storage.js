@@ -31,7 +31,12 @@ const defaults = {
     goalWorkouts: 40, goalMobility: 30, goalPullups: 25, goal5k: 28,
     currentPullups: 20, current5k: null
   },
-  nutrition: { height: 66, age: 41, activity: 1.55, goal: "cut" }
+  nutrition: { height: 66, age: 41, activity: 1.55, goal: "cut" },
+  trainingBlock: {
+    enabled: false, goalType: "10K", targetDate: "", targetMinutes: 60,
+    lengthWeeks: 12, currentWeek: 1, runDays: 3, strengthDays: 3,
+    maintainStrength: true, startDate: "", generatedAt: ""
+  }
 };
 
 const STORAGE_KEY = "bellPerformanceV2";
@@ -83,6 +88,8 @@ function normalizeData() {
   data.readinessLog = Array.isArray(data.readinessLog) ? data.readinessLog : [];
   data.mission = { ...defaults.mission, ...(data.mission || {}) };
   data.nutrition = { ...defaults.nutrition, ...(data.nutrition || {}) };
+  data.trainingBlock = { ...defaults.trainingBlock, ...(data.trainingBlock || {}) };
+  data.trainingBlock.currentWeek = Math.max(1, Math.min(Number(data.trainingBlock.lengthWeeks) || 12, Number(data.trainingBlock.currentWeek) || 1));
 
   if (data.activeWorkout && !Array.isArray(data.activeWorkout.exercises)) {
     data.activeWorkout = null;

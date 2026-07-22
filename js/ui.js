@@ -53,6 +53,7 @@ function renderDashboard() {
   const rank = rankInfo();
   const mission = missionProgress();
   const macros = macroTargets();
+  const block = data.trainingBlock;
 
   setText("phaseOut", data.settings.phase);
   setText("weightOut", data.settings.weight);
@@ -67,6 +68,25 @@ function renderDashboard() {
     `<strong>${mission.workouts}/${data.mission.goalWorkouts}</strong> workouts • ` +
     `<strong>${mission.mobility}/${data.mission.goalMobility}</strong> mobility days • ` +
     `<strong>${mission.weightPct}%</strong> toward goal weight`;
+
+  if (block.enabled) {
+    const week = blockWeek();
+    const total = block.lengthWeeks;
+    const pct = Math.round((week / total) * 100);
+    setText("blockTitle", `${block.goalType} Goal • ${blockPhase()}`);
+    setText("blockStatus", block.targetDate ? `Target ${new Date(`${block.targetDate}T12:00:00`).toLocaleDateString()} • ${block.targetMinutes} min goal` : `${block.targetMinutes} min goal`);
+    setText("blockWeekPill", `Week ${week}/${total}`);
+    byId("blockProgressBar").style.width = `${pct}%`;
+    const easy = runPrescription("easy"); const quality = runPrescription("quality"); const long = runPrescription("long");
+    setText("blockRunSummary", `This week: ${easy.detail} • ${quality.detail} • ${long.detail}`);
+    byId("advanceBlockButton").disabled = week >= total;
+  } else {
+    setText("blockTitle", "No active block"); setText("blockStatus", "Build a goal-based plan in More."); setText("blockWeekPill", "—");
+    byId("blockProgressBar").style.width = "0%"; setText("blockRunSummary", "Strength rotation and cardio selection remain available without a block.");
+    byId("advanceBlockButton").disabled = true;
+  }
+  setText("coachHeadline", block.enabled ? `${blockPhase()} guidance` : "Coach setup");
+  setText("coachRecommendation", coachRecommendation());
 
   byId("todayMission").textContent = template?.label || plan?.mission || "Plan complete";
   byId("todayRotation").textContent = `Rotation Week ${rotationWeek}`;
@@ -133,7 +153,7 @@ function renderPlan() {
     const row = document.createElement("div");
     row.className = "plan-row";
     row.innerHTML = `
-      <div><strong>${item.day}</strong><div class="sub">${item.mission}</div></div>
+      <div><strong>${item.day}</strong><div class="sub">${item.customLabel || item.mission}</div>${item.detail ? `<div class="hint">${item.detail}</div>` : ""}</div>
       <label><input type="checkbox" ${item.done ? "checked" : ""} onchange="togglePlan(${index},this.checked)"> Done</label>
     `;
     container.appendChild(row);
@@ -200,6 +220,15 @@ function renderSettings() {
   byId("ageInput").value = data.nutrition.age;
   byId("activityInput").value = String(data.nutrition.activity);
   byId("nutritionGoalInput").value = data.nutrition.goal;
+  byId("blockGoalType").value = data.trainingBlock.goalType || "10K";
+  byId("blockTargetDate").value = data.trainingBlock.targetDate || "";
+  byId("blockTargetMinutes").value = data.trainingBlock.targetMinutes || 60;
+  byId("blockLength").value = String(data.trainingBlock.lengthWeeks || 12);
+  byId("blockRunDays").value = String(data.trainingBlock.runDays || 3);
+  byId("blockStrengthDays").value = String(data.trainingBlock.strengthDays || 3);
+  byId("blockMaintainStrength").checked = data.trainingBlock.maintainStrength !== false;
+  byId("currentBlockWeekInput").value = data.trainingBlock.currentWeek || 1;
+  byId("currentBlockWeekInput").max = data.trainingBlock.lengthWeeks || 12;
 }
 
 function saveProfile() {

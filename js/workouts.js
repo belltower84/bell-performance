@@ -41,6 +41,7 @@ function recommendedWeight(exerciseName, status) {
   const m = data.settings.maxes || {};
   const bodyweight = Number(data.settings.weight) || 207;
   const scale = status === "GREEN" ? 1 : status === "YELLOW" ? 0.90 : 0.75;
+  const blockLoadFactor = data.trainingBlock?.enabled ? (strengthProgression().load / 0.76) : 1;
   const table = {
     "Bench Press":{base:(m.bench||315)*0.70,label:"based on bench strength"},"Paused Bench Press":{base:(m.bench||315)*0.74,label:"based on bench strength"},"Close-Grip Bench Press":{base:(m.bench||315)*0.62,label:"based on bench strength"},"Incline Barbell Press":{base:(m.bench||315)*0.58,label:"based on bench strength"},
     "Back Squat":{base:(m.squat||455)*0.68,label:"based on squat strength"},"Tempo Back Squat":{base:(m.squat||455)*0.58,label:"based on squat strength"},"Speed Back Squat":{base:(m.squat||455)*0.50,label:"move explosively"},"Front Squat":{base:(m.squat||455)*0.52,label:"based on squat strength"},"Narrow-Stance Squat":{base:(m.squat||455)*0.55,label:"based on squat strength"},
@@ -58,7 +59,7 @@ function recommendedWeight(exerciseName, status) {
   if (/Pull-up|Chin-up|Push-up|Jump|Sprint|Plank|Raise|Curl|Pressdown|Extension|Fly|Face Pull|Crunch|Ab Wheel|Hamstring Curl|Leg Extension/.test(exerciseName)) return {value:"",display:"Choose by effort",note:"Use clean reps and stop before technique breaks."};
   const item = table[exerciseName];
   if (!item) return {value:"",display:"Choose by effort",note:status === "GREEN" ? "Finish with 1–2 reps in reserve." : status === "YELLOW" ? "Finish with about 3 reps in reserve." : "Keep effort easy and technique-focused."};
-  const value = roundTo5(item.base * scale);
+  const value = roundTo5(item.base * scale * blockLoadFactor);
   return {value,display:`${value} lb`,note:`${item.label}; ${status.toLowerCase()} readiness applied.`};
 }
 
@@ -75,7 +76,8 @@ function saveRotationWeek() {
 function scaledTemplate(name) {
   let base = getWorkoutTemplate(name);
   if (!base) return null;
-  base = applyCardioModality(name, base);
+  base = blockRunOverride(name, base);
+  if (!(data.trainingBlock?.enabled && data.trainingBlock.goalType === "10K" && name.startsWith("R-"))) base = applyCardioModality(name, base);
   const profile = scalingProfile();
   const isMobility = name.startsWith("M-");
   const isRun = name.startsWith("R-");
@@ -93,6 +95,7 @@ function scaledTemplate(name) {
       if (!isMobility) {
         sets = Math.max(1, Math.floor(exercise.sets * (isRun ? profile.conditioning : profile.sets)));
         if (profile.status === "GREEN") sets = originalSets;
+        if (!isRun && !isMobility && data.trainingBlock?.enabled) sets = Math.max(1, Math.floor(sets * strengthProgression().setScale));
         if (profile.status === "YELLOW" && exercise.block === "Golden Era Finisher") sets = Math.min(2, sets);
         if (profile.status === "RED" && exercise.block === "Golden Era Finisher") sets = 0;
         if (isRun && profile.status === "RED") { reps = (data.settings.cardioType||"Running") === "Running" ? "15–25 min easy walk or walk/jog" : "15–25 min very easy"; sets = 1; }

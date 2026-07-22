@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
-  <title>Bell Performance 3.0</title>
+  <title>Bell Performance 4.0</title>
   <link rel="stylesheet" href="./css/app.css">
 </head>
 <body>
@@ -20,6 +20,19 @@
     <div class="card"><h3>Weight</h3><div class="big"><span id="weightOut">207</span><small> lb</small></div></div>
     <div class="card"><h3>Goal</h3><div class="big"><span id="goalOut">185</span><small> lb</small></div></div>
     <div class="card"><h3>Readiness</h3><div class="big good" id="readyOut">GREEN</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Current Training Block</h3>
+    <div class="status-line"><div><div class="mission-title" id="blockTitle">No active block</div><div class="sub" id="blockStatus">Build a goal-based plan in More.</div></div><div class="pill" id="blockWeekPill">—</div></div>
+    <div class="mini-progress"><div id="blockProgressBar"></div></div>
+    <div class="hint" id="blockRunSummary" style="margin-top:10px"></div>
+    <button class="secondary" id="advanceBlockButton" onclick="advanceBlockWeek()">Complete Week & Build Next</button>
+  </div>
+  <div class="card">
+    <h3>Coach Mode</h3>
+    <div class="mission-title" id="coachHeadline">Today's guidance</div>
+    <div class="hint" id="coachRecommendation" style="margin-top:8px"></div>
   </div>
   <div class="card">
     <h3>Daily Motivation</h3>
@@ -127,6 +140,27 @@
     </div>
     <button onclick="saveProfile()">Save Profile</button>
   </div>
+
+  <div class="card">
+    <h3>Goal Builder — Coach Foundation</h3>
+    <div class="hint" style="margin-bottom:10px">Creates a coordinated strength and running block. This release uses transparent progression rules; future versions can add an online AI coaching service.</div>
+    <div class="row">
+      <div><label>Primary goal</label><select id="blockGoalType"><option value="10K">10K Run</option></select></div>
+      <div><label>Target date</label><input id="blockTargetDate" type="date"></div>
+      <div><label>Target time (minutes)</label><input id="blockTargetMinutes" type="number" min="30" max="120" step="1"></div>
+      <div><label>Block length if no date</label><select id="blockLength"><option value="8">8 weeks</option><option value="10">10 weeks</option><option value="12" selected>12 weeks</option><option value="16">16 weeks</option></select></div>
+      <div><label>Run days/week</label><select id="blockRunDays"><option value="3" selected>3</option></select></div>
+      <div><label>Strength days/week</label><select id="blockStrengthDays"><option value="2">2</option><option value="3" selected>3</option></select></div>
+    </div>
+    <label class="checkbox-line"><input id="blockMaintainStrength" type="checkbox" checked> Maintain strength while peaking for the run</label>
+    <button onclick="generateTrainingBlock()">Build Training Block</button>
+  </div>
+  <div class="card">
+    <h3>Active Block Control</h3>
+    <div class="row"><div><label>Current week</label><input id="currentBlockWeekInput" type="number" min="1"></div></div>
+    <button class="secondary" onclick="saveBlockWeek()">Load Selected Week</button>
+    <div class="hint">Exercise rotation changes automatically with the block week. Every fourth week reduces volume.</div>
+  </div>
   <div class="card">
     <h3>Training Rotation</h3>
     <label>Current workout variety week</label>
@@ -201,6 +235,7 @@
 <script src="./data/workouts.js"></script>
 <script src="./js/storage.js"></script>
 <script src="./js/readiness.js"></script>
+<script src="./js/training-blocks.js"></script>
 <script src="./js/mobility.js"></script>
 <script src="./js/nutrition.js"></script>
 <script src="./js/milestones.js"></script>

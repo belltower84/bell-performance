@@ -45,7 +45,7 @@ const defaults = {
     goalWorkouts: null, goalMobility: null, goalPullups: null, goal5k: null,
     currentPullups: null, current5k: null
   },
-  nutrition: { height: null, age: null, activity: 1.55, goal: "maintain" },
+  nutrition: { height: null, age: null, activity: 1.55, goal: "maintain", manualGoal: "maintain", goalMode: "auto" },
   trainingBlock: {
     enabled: false, goalType: "General Hybrid", targetDate: "", targetMinutes: 60,
     lengthWeeks: 12, currentWeek: 1, trainingDays: 5, runDays: 3, strengthDays: 3,
@@ -129,6 +129,8 @@ function normalizeData() {
   data.performanceReviews.milestones = Array.isArray(data.performanceReviews.milestones) ? data.performanceReviews.milestones : [];
   data.mission = { ...defaults.mission, ...(data.mission || {}) };
   data.nutrition = { ...defaults.nutrition, ...(data.nutrition || {}) };
+  data.nutrition.goalMode = data.nutrition.goalMode === "manual" ? "manual" : "auto";
+  data.nutrition.manualGoal = ["cut","maintain","gain"].includes(data.nutrition.manualGoal) ? data.nutrition.manualGoal : (data.nutrition.goal || "maintain");
   data.trainingBlock = { ...defaults.trainingBlock, ...(data.trainingBlock || {}) };
   data.trainingBlock.currentWeek = Math.max(1, Math.min(Number(data.trainingBlock.lengthWeeks) || 12, Number(data.trainingBlock.currentWeek) || 1));
 

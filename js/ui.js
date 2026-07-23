@@ -281,8 +281,9 @@ function renderDashboard() {
   const doneToday = data.mobility.completedDates.includes(key);
   byId("mobilityCompleteButton").textContent = doneToday ? "Mobility Completed Today ✓" : "Complete Daily Mobility"; byId("mobilityCompleteButton").disabled = doneToday;
 
-  byId("calorieOut").textContent = macros.calories; byId("proteinOut").textContent = `${macros.protein}g`; byId("carbOut").textContent = `${macros.carbs}g`; byId("fatOut").textContent = `${macros.fat}g`;
-  byId("nutritionMode").textContent = `${macros.trainingDay ? "Training-day" : "Recovery-day"} target • ${data.nutrition.goal === "cut" ? "Fat-loss" : data.nutrition.goal === "gain" ? "Lean-gain" : "Maintenance"} mode`;
+  byId("calorieOut").textContent = macros.calories; byId("proteinOut").textContent = macros.protein === "—" ? "—" : `${macros.protein}g`; byId("carbOut").textContent = macros.carbs === "—" ? "—" : `${macros.carbs}g`; byId("fatOut").textContent = macros.fat === "—" ? "—" : `${macros.fat}g`;
+  byId("nutritionMode").textContent = macros.detail;
+  const nutritionFocus=byId("nutritionFocus"); if(nutritionFocus) nutritionFocus.textContent=macros.focus||"";
   const completed = data.plan.filter(item => item.done).length; const accountable = data.plan.filter(item => item.status!=="replaced" || item.done).length; const weeklyPct = Math.round((completed / Math.max(1,accountable)) * 100);
   byId("scoreOut").textContent = `${weeklyPct}%`; byId("scoreBar").style.width = `${weeklyPct}%`; byId("scoreDetail").textContent = `${completed} completed • ${data.plan.filter(item=>item.status==="rescheduled").length} rescheduled • ${data.plan.filter(item=>item.status==="skipped").length} skipped`;
 }
@@ -395,7 +396,7 @@ function renderSettings() {
   byId("heightInput").value = data.nutrition.height;
   byId("ageInput").value = data.nutrition.age;
   byId("activityInput").value = String(data.nutrition.activity);
-  byId("nutritionGoalInput").value = data.nutrition.goal;
+  byId("nutritionGoalInput").value = data.nutrition.manualGoal || data.nutrition.goal;
   byId("blockGoalType").value = data.trainingBlock.goalType || "General Hybrid";
   if (byId("blockBodybuildingFocus")) byId("blockBodybuildingFocus").value = data.trainingBlock.bodybuildingFocus || "Balanced";
   if (byId("blockBodybuildingPhase")) byId("blockBodybuildingPhase").value = data.trainingBlock.bodybuildingPhase || "Recomposition";

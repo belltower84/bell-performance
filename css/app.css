@@ -129,7 +129,7 @@ nav{grid-template-columns:repeat(5,1fr);background:rgba(7,9,11,.97);border-top-c
 .readiness-access-note button{width:auto;min-width:132px;margin:0}
 @media(max-width:640px){.readiness-summary-header{align-items:flex-start}.readiness-checkin-button{font-size:9px;padding:6px 8px}.readiness-access-note{display:none}}
 
-/* 6.6.2 — premium, profile-neutral artwork refresh */
+/* 6.6.3 — premium, profile-neutral artwork refresh */
 .training-card img,.workout-hero img{object-position:center;filter:saturate(.92) contrast(1.04)}
 .training-card:after{background:linear-gradient(90deg,rgba(5,7,9,.98) 0%,rgba(5,7,9,.76) 43%,rgba(5,7,9,.12) 100%)}
 .strength-card{border-color:rgba(215,165,46,.42)}

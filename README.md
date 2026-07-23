@@ -1,15 +1,9 @@
-# Bell Performance 6.6.2 — Discipline Progression Engine
+# Bell Performance 6.6.3 — Classic Art Update
 
-This build adds a readiness-first dashboard, a polished weekly readiness chart, exercise-level effort feedback, persistent next-load recommendations, and distinct progression logic for Powerlifting, Olympic Lifting, Athlete, Hybrid, and Bodybuilding goals.
+This build replaces the prior generic artwork with original, profile-neutral visuals:
 
-## Exercise feedback
-After the final set, select Too Easy, Just Right, Too Heavy, or Pain / Technique. The result is stored locally and used to calculate the next prescription for that exercise.
+- Strength: an original classical bodybuilding-inspired bronze illustration, not based on any real athlete or copyrighted likeness.
+- Engine: an original mountain-running trail landscape with a generic runner silhouette.
+- Updated cache version to prevent older artwork from persisting after deployment.
 
-## GitHub Pages
-Replace the repository contents with this folder, commit, push, then perform a hard refresh.
-
-
-## 6.6.2 update
-- Daily Readiness is now accessible from the Mission Status card at the top of the dashboard.
-- The full check-in opens in a focused modal instead of occupying the bottom of the dashboard.
-- Mobile users no longer need to scroll to update readiness.
+Deploy the contents of this folder to the root of your GitHub Pages repository, then perform a hard refresh (`Ctrl + Shift + R`).

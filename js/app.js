@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   if ("caches" in window) {
     caches.keys().then(keys => Promise.all(
-      keys.filter(key => key.startsWith("bell-performance-") && key !== "bell-performance-7.0.9")
+      keys.filter(key => key.startsWith("bell-performance-") && key !== "bell-performance-7.0.12")
           .map(key => caches.delete(key))
     )).catch(() => {});
   }

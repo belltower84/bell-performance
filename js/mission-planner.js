@@ -5,6 +5,7 @@ const EVENT_MISSION_PROFILES = {
   "CrossFit Competition": {strengthGoal:"Olympic Lifting",engineMode:"General Conditioning",engineGoal:"crossfit",strengthDays:4,engineDays:3,minimumWeeks:8,idealWeeks:14,strengthFocus:"Olympic-lift skill, absolute strength, gymnastics strength, and mixed-modal durability",engineFocus:"Repeated high-output intervals, aerobic recovery, and event-style mixed conditioning"},
   "Powerlifting Meet": {strengthGoal:"Powerlifting",engineMode:"None / Recovery Only",engineGoal:"recovery-only",strengthDays:4,engineDays:2,minimumWeeks:8,idealWeeks:16,strengthFocus:"Competition squat, bench press, and deadlift strength with meet-specific peaking",engineFocus:"Low-fatigue aerobic recovery that supports heavy lifting without interference"},
   "Strongman Competition": {strengthGoal:"Powerlifting",engineMode:"General Conditioning",engineGoal:"strongman",strengthDays:4,engineDays:3,minimumWeeks:10,idealWeeks:16,strengthFocus:"Maximum strength, overhead power, carries, loading, grip, and event-specific implements",engineFocus:"Heavy work capacity, repeated event efforts, and recovery between implements"},
+  "Bodybuilding / Physique Competition": {strengthGoal:"Bodybuilding",engineMode:"General Conditioning",engineGoal:"physique-stage",strengthDays:5,engineDays:4,minimumWeeks:12,idealWeeks:20,strengthFocus:"Preserve and refine muscle, symmetry, weak-point development, posing endurance, and presentation while managing fatigue through contest preparation",engineFocus:"Low-impact aerobic conditioning and recoverable energy-expenditure work that supports fat loss without compromising muscle retention"},
   "Combat Sports Tournament": {strengthGoal:"Athlete",engineMode:"Sprint / Field",engineGoal:"combat",strengthDays:3,engineDays:4,minimumWeeks:8,idealWeeks:14,strengthFocus:"Relative strength, rotational power, grip, neck, trunk stability, and muscular endurance",engineFocus:"Round-specific intervals, repeated high-intensity efforts, and aerobic recovery between exchanges"},
   "Marathon": {strengthGoal:"Athlete",engineMode:"Running",engineGoal:"marathon",strengthDays:2,engineDays:5,minimumWeeks:12,idealWeeks:20,strengthFocus:"Single-leg durability, calf capacity, posterior-chain strength, and trunk stability",engineFocus:"Mileage progression, long runs, threshold work, marathon pace, fueling practice, and taper"},
   "Half Marathon": {strengthGoal:"Athlete",engineMode:"Running",engineGoal:"half",strengthDays:2,engineDays:4,minimumWeeks:10,idealWeeks:16,strengthFocus:"Running durability, single-leg strength, calf capacity, and trunk stability",engineFocus:"Aerobic volume, long runs, threshold development, race pace, and taper"},
@@ -36,6 +37,7 @@ function addMissionEngineGoal(mode, profile) {
   ["Running",{id:"hyrox",label:"HYROX Compromised Running",weeks:16,level:"specialist",description:"Repeated 1 km running efforts paired with race stations and threshold control."}],
   ["General Conditioning",{id:"crossfit",label:"CrossFit Competition Conditioning",weeks:14,level:"specialist",description:"Mixed-modal intervals, repeatability, pacing, and competition simulation."}],
   ["General Conditioning",{id:"strongman",label:"Strongman Event Capacity",weeks:16,level:"specialist",description:"Repeated heavy event work, carries, loading, and recovery between implements."}],
+  ["General Conditioning",{id:"physique-stage",label:"Bodybuilding Stage Preparation",weeks:20,level:"specialist",description:"Progressive low-impact conditioning, posing practice, muscle retention, and contest-prep fatigue management."}],
   ["Sprint / Field",{id:"combat",label:"Combat Sports Round Conditioning",weeks:14,level:"specialist",description:"Round-specific intervals, repeat efforts, and aerobic recovery."}],
   ["Swimming",{id:"triathlon",label:"Triathlon Preparation",weeks:20,level:"specialist",description:"Coordinated swim-bike-run development, bricks, transitions, and taper."}],
   ["Running",{id:"ocr",label:"Obstacle Course Race Preparation",weeks:16,level:"specialist",description:"Trail running, hills, compromised efforts, and obstacle transitions."}],
@@ -67,9 +69,17 @@ function selectedMissionProfile(){
 function missionAvailability(profile){
   const days=Number(byId("onboardingTrainingDays")?.value)||5;
   const maxSessions=Math.max(3,Math.min(10,days*2));
-  let strengthDays=profile.strengthDays,engineDays=profile.engineDays;
-  while(strengthDays+engineDays>maxSessions){if(engineDays>strengthDays)engineDays--;else strengthDays--;}
-  return {strengthDays:Math.max(2,strengthDays),engineDays:Math.max(1,engineDays),trainingDays:days,sessionMinutes:Number(byId("onboardingSessionMinutes")?.value)||75};
+  let strengthDays=profile.strengthDays,engineDays=profile.engineDays,combinedSessions=0;
+  const developmentGoal=byId("onboardingDevelopmentGoal")?.value;
+  const isGeneralHybrid=onboardingMissionPath()==="development"&&developmentGoal==="General Hybrid Fitness";
+  if(isGeneralHybrid){
+    const hybridSplit={3:[2,2,1],4:[3,2,1],5:[3,3,1],6:[4,3,1],7:[4,3,0]}[days]||[3,3,1];
+    [strengthDays,engineDays,combinedSessions]=hybridSplit;
+  }else{
+    while(strengthDays+engineDays>maxSessions){if(engineDays>strengthDays)engineDays--;else strengthDays--;}
+    combinedSessions=Math.max(0,strengthDays+engineDays-days);
+  }
+  return {strengthDays:Math.max(2,strengthDays),engineDays:Math.max(1,engineDays),combinedSessions,trainingDays:days,sessionMinutes:Number(byId("onboardingSessionMinutes")?.value)||75};
 }
 function updateOnboardingMissionPreview(){
   const box=byId("onboardingMissionPreview");if(!box)return;
@@ -79,10 +89,10 @@ function updateOnboardingMissionPreview(){
     const start=byId("onboardingBlockStart")?.value==="nextMonday"?nextMondayKey():todayKey();
     const weeks=date?eventWeeksFrom(start,date):profile.idealWeeks;
     const timing=date?(daysBetweenKeys(start,date)<profile.minimumWeeks*7?`Compressed ${weeks}-week preparation. The timeline is shorter than the recommended ${profile.minimumWeeks}+ weeks.`:`${weeks}-week preparation leading into peak and taper.`):`Recommended preparation: approximately ${profile.idealWeeks} weeks.`;
-    box.innerHTML=`<strong>${escapeHtml(type)} mission</strong><span><b>Derived Strength:</b> ${escapeHtml(profile.strengthFocus)}</span><span><b>Derived Engine:</b> ${escapeHtml(profile.engineFocus)}</span><span>${escapeHtml(timing)} ${availability.strengthDays} Strength + ${availability.engineDays} Engine sessions across ${availability.trainingDays} training days.</span>`;
+    box.innerHTML=`<strong>${escapeHtml(type)} mission</strong><span><b>Derived Strength:</b> ${escapeHtml(profile.strengthFocus)}</span><span><b>Derived Engine:</b> ${escapeHtml(profile.engineFocus)}</span><span>${escapeHtml(timing)} ${availability.strengthDays} Strength exposures + ${availability.engineDays} Engine exposures across ${availability.trainingDays} training days${availability.combinedSessions?`, including ${availability.combinedSessions} blended session${availability.combinedSessions===1?"":"s"}`:""}.</span>`;
   }else{
     const goal=byId("onboardingDevelopmentGoal")?.value||"General Hybrid Fitness",sport=goal==="Sport-Specific Performance"?(byId("onboardingSportGoal")?.value.trim()||"your sport"):"";
-    box.innerHTML=`<strong>${escapeHtml(goal)}${sport?` • ${escapeHtml(sport)}`:""}</strong><span><b>Derived Strength:</b> ${escapeHtml(profile.strengthFocus)}</span><span><b>Derived Engine:</b> ${escapeHtml(profile.engineFocus)}</span><span>${availability.strengthDays} Strength + ${availability.engineDays} Engine sessions across ${availability.trainingDays} training days, followed by an end-of-block review.</span>`;
+    box.innerHTML=`<strong>${escapeHtml(goal)}${sport?` • ${escapeHtml(sport)}`:""}</strong><span><b>Derived Strength:</b> ${escapeHtml(profile.strengthFocus)}</span><span><b>Derived Engine:</b> ${escapeHtml(profile.engineFocus)}</span><span>${availability.strengthDays} Strength exposures + ${availability.engineDays} Engine exposures across ${availability.trainingDays} training days${availability.combinedSessions?`, including ${availability.combinedSessions} blended session${availability.combinedSessions===1?"":"s"}`:""}, followed by an end-of-block review.</span>`;
   }
 }
 
@@ -121,7 +131,7 @@ function saveOnboardingDualGoals(buildPlan=true){
     lengthWeeks=Number(byId("onboardingDevelopmentWeeks").value)||12;
     mission={path,developmentGoal:goal,sport:byId("onboardingSportGoal").value.trim(),priority:byId("onboardingDevelopmentPriority").value,strengthFocus:profile.strengthFocus,engineFocus:profile.engineFocus};
   }
-  data.trainingBlock={...data.trainingBlock,enabled:true,goalType:profile.strengthGoal,lengthWeeks,currentWeek:1,trainingDays:availability.trainingDays,strengthDays:availability.strengthDays,runDays:availability.engineDays,sessionMinutes:availability.sessionMinutes,targetDate:mission.eventDate||"",mission,dualGoals:{strengthGoal:profile.strengthGoal,engineMode:profile.engineMode,engineGoal:profile.engineGoal,trainingCoordination:"Coach Decides",engineSessions:availability.engineDays,targetValue:0}};
+  data.trainingBlock={...data.trainingBlock,enabled:true,goalType:profile.strengthGoal,lengthWeeks,currentWeek:1,trainingDays:availability.trainingDays,strengthDays:availability.strengthDays,runDays:availability.engineDays,sessionMinutes:availability.sessionMinutes,hybridCombinedSessions:availability.combinedSessions,targetDate:mission.eventDate||"",mission,dualGoals:{strengthGoal:profile.strengthGoal,engineMode:profile.engineMode,engineGoal:profile.engineGoal,trainingCoordination:"Coach Decides",engineSessions:availability.engineDays,targetValue:0}};
   data.settings.cardioType=profile.engineMode==="General Conditioning"?"Air Bike":profile.engineMode==="None / Recovery Only"?"Walking":profile.engineMode;
   if(buildPlan&&typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();
   return true;
@@ -145,7 +155,7 @@ function renderOnboardingReview(){
   const injurySummary=injuryProfileSummaryText(),primary=onboardingLocations.find(x=>x.id===onboardingActiveLocationId)||onboardingLocations[0],height=Number(data.nutrition.height)||66,p=selectedMissionProfile(),r=recommendedFirstBlockSettings(),start=byId("onboardingBlockStart")?.value==="nextMonday"?"Next Monday":"Today";
   const missionTitle=onboardingMissionPath()==="event"?(byId("onboardingEventName")?.value.trim()||byId("onboardingEventType")?.value||"Event Mission"):(byId("onboardingDevelopmentGoal")?.value||"Development Mission");
   const missionDetail=onboardingMissionPath()==="event"?`${byId("onboardingEventDate")?.value||"Date required"} • ${r.lengthWeeks}-week event build`:`${r.lengthWeeks}-week development block`;
-  byId("onboardingReview").innerHTML=`<div><span>Athlete</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>${escapeHtml(byId("onboardingAthleteMode").value)} • Age ${escapeHtml(data.nutrition.age)} • ${escapeHtml(data.settings.weight)} lb • ${Math.floor(height/12)}′${height%12}″</small></div><div><span>Movement limitations</span><strong>${escapeHtml(injurySummary.title)}</strong><small>${escapeHtml(injurySummary.detail)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Mission</span><strong>${escapeHtml(missionTitle)}</strong><small>${escapeHtml(missionDetail)}</small></div><div><span>Derived training priorities</span><strong>${escapeHtml(p.strengthGoal)} + ${escapeHtml(p.engineMode)}</strong><small>${r.strengthDays} Strength • ${r.engineDays} Engine • peak/deload logic included</small></div><div><span>Block launch</span><strong>${selectedOnboardingBlockMode()==="recommended"?"Recommended structure":"Mission-based structure"}</strong><small>Week 1 begins ${escapeHtml(start.toLowerCase())}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>Preference saved</small></div>`;
+  byId("onboardingReview").innerHTML=`<div><span>Athlete</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>${escapeHtml(byId("onboardingAthleteMode").value)} • Age ${escapeHtml(data.nutrition.age)} • ${escapeHtml(data.settings.weight)} lb • ${Math.floor(height/12)}′${height%12}″</small></div><div><span>Movement limitations</span><strong>${escapeHtml(injurySummary.title)}</strong><small>${escapeHtml(injurySummary.detail)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Mission</span><strong>${escapeHtml(missionTitle)}</strong><small>${escapeHtml(missionDetail)}</small></div><div><span>Derived training priorities</span><strong>${escapeHtml(p.strengthGoal)} + ${escapeHtml(p.engineMode)}</strong><small>${r.strengthDays} Strength exposures • ${r.engineDays} Engine exposures${r.combinedSessions?` • ${r.combinedSessions} blended`:""} • peak/deload logic included</small></div><div><span>Block launch</span><strong>${selectedOnboardingBlockMode()==="recommended"?"Recommended structure":"Mission-based structure"}</strong><small>Week 1 begins ${escapeHtml(start.toLowerCase())}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>Preference saved</small></div>`;
 }
 
 function completeOnboarding(){
@@ -186,10 +196,11 @@ engineWeekPrescription=function(kind){
   const base=baseEngineWeekPrescription(kind),mission=data.trainingBlock?.mission;
   if(!mission||mission.path!=="event")return base;
   const event=mission.eventType,phase=dualBlockPhase(),taper=["Peak & Taper","Event Week"].includes(phase);
-  const labels={"HYROX":"HYROX","CrossFit Competition":"Competition WOD","Powerlifting Meet":"Recovery","Strongman Competition":"Strongman","Combat Sports Tournament":"Round","Triathlon":"Triathlon","Obstacle Course Race":"OCR","Tactical Games":"Tactical","Military / Law-Enforcement Fitness Test":"Fitness Test"};
+  const labels={"HYROX":"HYROX","CrossFit Competition":"Competition WOD","Powerlifting Meet":"Recovery","Strongman Competition":"Strongman","Bodybuilding / Physique Competition":"Physique Prep","Combat Sports Tournament":"Round","Triathlon":"Triathlon","Obstacle Course Race":"OCR","Tactical Games":"Tactical","Military / Law-Enforcement Fitness Test":"Fitness Test"};
   const prefix=labels[event]||event;
   if(event==="HYROX")return kind==="quality"?{...base,label:`${prefix} Compromised Intervals`,detail:taper?"Short 1 km race-pace repeats with reduced station volume; finish fresh":"Repeated 1 km efforts alternated with sled, carry, lunge, or erg stations",duration:taper?38:55}:{...base,label:kind==="long"?"HYROX Simulation":"HYROX Aerobic Base",detail:kind==="long"?(taper?"Reduced-volume race rehearsal":"Progressive run-station simulation with controlled pacing"):"Easy running or ergs at conversational effort"};
   if(event==="Powerlifting Meet")return {...base,label:"Recovery Aerobic Support",detail:taper?"15–20 min very easy movement only":"20–35 min low-impact Zone 2; stop before leg fatigue",duration:taper?18:30};
+  if(event==="Bodybuilding / Physique Competition")return {...base,label:kind==="quality"?"Posing, Mobility & Recovery":"Contest Prep Cardio",detail:kind==="quality"?(taper?"Brief posing rehearsal, transitions, and mobility; avoid fatigue":"Posing rounds, transitions, vacuum or presentation practice, and mobility"):taper?"Short, easy low-impact cardio only; preserve fullness and recovery":"Low-impact Zone 2 using incline walking, bike, elliptical, or stepmill; progress only when recovery and muscle retention remain stable",duration:kind==="quality"?(taper?15:25):(taper?20:35)};
   if(event==="Combat Sports Tournament")return {...base,label:kind==="quality"?"Competition Rounds":"Fight Camp Aerobic Base",detail:kind==="quality"?(taper?"Short sharp rounds at low total volume":"Event-length rounds with sport-specific work-to-rest intervals"):"Easy aerobic work to improve recovery between rounds"};
   if(event==="CrossFit Competition"||event==="Strongman Competition"||event==="Tactical Games")return {...base,label:`${prefix} ${kind==="quality"?"Intervals":kind==="long"?"Simulation":"Base"}`,detail:taper?"Competition-specific sharpening with reduced total volume":base.detail};
   if(event==="Triathlon")return {...base,label:kind==="long"?"Long Brick Session":kind==="quality"?"Race-Pace Brick":"Easy Swim / Bike / Run",detail:taper?"Reduced-volume race-specific work and transition rehearsal":kind==="long"?"Progressive bike-run brick with fueling and transition practice":base.detail};
@@ -202,6 +213,8 @@ strengthProgression=function(){
   const p=baseStrengthProgression(),mission=data.trainingBlock?.mission,phase=dualBlockPhase();
   if(!mission||mission.path!=="event")return p;
   if(phase==="Event Week")return {...p,label:"Event-week taper",load:.62,setScale:.38,note:"Express fitness, do not create fatigue. Use only brief technique work and event-specific primers."};
+  if(mission.eventType==="Bodybuilding / Physique Competition"&&phase==="Event Week")return {...p,label:"Peak week and stage readiness",load:.55,setScale:.32,note:"Use brief pump and posing sessions only. Avoid failure, soreness, dehydration tactics, or unqualified peak-week manipulation."};
+  if(mission.eventType==="Bodybuilding / Physique Competition"&&phase==="Peak & Taper")return {...p,label:"Physique peak and fatigue reduction",load:.65,setScale:.48,note:"Maintain muscle stimulus with low soreness, increase posing quality, and reduce fatigue. Nutrition and fluid changes should follow qualified professional guidance."};
   if(phase==="Peak & Taper")return {...p,label:"Peak and taper",load:.75,setScale:.55,note:"Retain intensity where useful, reduce volume, and eliminate unnecessary soreness before the event."};
   if(phase==="Event Specificity")return {...p,label:"Event-specific strength",note:`Prioritize ${mission.strengthFocus.toLowerCase()}. Keep accessory work subordinate to event performance.`};
   return p;
@@ -217,4 +230,17 @@ renderDualGoals=function(){
   const phase=byId("dualMissionPhase");if(phase)phase.textContent=`${dualBlockPhase()} • ${detail}`;
 };
 
-document.addEventListener("DOMContentLoaded",()=>{toggleOnboardingMissionPath();["onboardingTrainingDays","onboardingSessionMinutes","onboardingBlockStart"].forEach(id=>byId(id)?.addEventListener("change",updateOnboardingMissionPreview));});
+function updateEventContextFields(){
+  const type=byId("onboardingEventType")?.value,field=byId("onboardingEventDivision");if(!field)return;
+  const placeholders={
+    "Bodybuilding / Physique Competition":"Division: Bodybuilding, Classic Physique, Men’s Physique, Bikini, Figure, Wellness...",
+    "Powerlifting Meet":"Federation and weight class",
+    "Combat Sports Tournament":"Sport, belt or experience division, and weight class",
+    "Marathon":"Race distance or target time",
+    "Half Marathon":"Race distance or target time",
+    "Triathlon":"Sprint, Olympic, 70.3, or full distance"
+  };
+  field.placeholder=placeholders[type]||"Optional — division, class, or distance";
+}
+
+document.addEventListener("DOMContentLoaded",()=>{toggleOnboardingMissionPath();updateEventContextFields();["onboardingTrainingDays","onboardingSessionMinutes","onboardingBlockStart"].forEach(id=>byId(id)?.addEventListener("change",updateOnboardingMissionPreview));});

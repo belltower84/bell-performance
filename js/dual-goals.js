@@ -3,9 +3,9 @@
 const STRENGTH_GOALS = {
   "Powerlifting": { description:"Peak the squat, bench press, and deadlift while protecting recovery for heavy barbell work.", defaultStrengthDays:4, engineCap:2, recommendedModes:["General Conditioning","Cycling","Rowing","None / Recovery Only"], phaseNames:["Base Volume","Strength Development","Competition Specificity","Peak & Taper"] },
   "Olympic Lifting": { description:"Develop the snatch, clean & jerk, technical consistency, speed-strength, and mobility.", defaultStrengthDays:4, engineCap:3, recommendedModes:["Cycling","Rowing","General Conditioning","Sprint / Field"], phaseNames:["Technique Base","Volume & Positions","Intensity & Complexes","Peak & Taper"] },
-  "Athlete": { description:"Build usable strength, speed, power, agility, and resilience for field, court, or ice performance.", defaultStrengthDays:3, engineCap:4, recommendedModes:["Sprint / Field","Running","Cycling","Rowing","Swimming"], phaseNames:["Movement Base","Strength & Power","Sport Specificity","Performance Peak"] },
-  "Hybrid": { description:"Develop strength and endurance concurrently without allowing either quality to collapse.", defaultStrengthDays:3, engineCap:5, recommendedModes:["Running","Rowing","Cycling","Hiking / Rucking","Swimming"], phaseNames:["Concurrent Base","Capacity Build","Specific Development","Peak & Consolidate"] },
-  "Bodybuilding": { description:"Maximize hypertrophy, symmetry, and weak-point development while using Engine work to support health, recovery, or fat loss.", defaultStrengthDays:4, engineCap:5, recommendedModes:["General Conditioning","Cycling","Walking","Rowing","None / Recovery Only"], phaseNames:["Volume Accumulation","Progressive Overload","Specialization","Deload & Review"] }
+  "Athlete": { description:"Build usable strength, speed, power, agility, and resilience for field, court, or ice performance.", defaultStrengthDays:4, engineCap:4, recommendedModes:["Sprint / Field","Running","Cycling","Rowing","Swimming"], phaseNames:["Movement Base","Strength & Power","Sport Specificity","Performance Peak"] },
+  "Hybrid": { description:"Develop strength and endurance concurrently without allowing either quality to collapse.", defaultStrengthDays:4, engineCap:5, recommendedModes:["Running","Rowing","Cycling","Hiking / Rucking","Swimming"], phaseNames:["Concurrent Base","Capacity Build","Specific Development","Peak & Consolidate"] },
+  "Bodybuilding": { description:"Maximize hypertrophy, symmetry, and weak-point development while using Engine work to support health, recovery, or fat loss.", defaultStrengthDays:5, engineCap:5, recommendedModes:["General Conditioning","Cycling","Walking","Rowing","None / Recovery Only"], phaseNames:["Volume Accumulation","Progressive Overload","Specialization","Deload & Review"] }
 };
 
 const ENGINE_GOALS = {
@@ -110,7 +110,26 @@ function updateEngineGoalDetails(){
   const target=document.getElementById("engineTargetFields"); if(target)target.innerHTML=e.target?`<label>Goal ${e.target}</label><input id="engineTargetValue" type="number" min="1" step="0.1" placeholder="Optional">`:'';
   const info=compatibilityInfo(strength,mode,id), box=document.getElementById("goalCompatibilityMessage"); if(box){box.className=`compatibility-callout ${info.cls}`;box.innerHTML=`<strong>${info.status}</strong><span>${info.note}</span>`;}
   const hint=document.getElementById("goalBuilderHint"); if(hint)hint.textContent=`Recommended starting block: ${e.weeks} weeks. Weekly volume progresses through base, build, specific preparation, and taper/review phases.`;
+  applyHybridScheduleRecommendation();
 }
+
+function applyHybridScheduleRecommendation(){
+  const strength=document.getElementById("strengthGoal")?.value||"Hybrid";
+  const mode=document.getElementById("engineMode")?.value||"Running";
+  const goal=document.getElementById("engineGoal")?.value||"";
+  const days=Number(document.getElementById("blockTrainingDays")?.value)||5;
+  const coord=document.getElementById("trainingCoordination")?.value||"Coach Decides";
+  const strengthDays=document.getElementById("blockStrengthDays");
+  const engineDays=document.getElementById("blockRunDays");
+  const isGeneralHybrid=strength==="Hybrid"&&mode==="General Conditioning"&&goal==="work-capacity"&&coord==="Coach Decides";
+  if(!isGeneralHybrid)return;
+  const split={3:[3,1],4:[4,1],5:[4,2],6:[4,3],7:[4,3]}[days]||[4,2];
+  if(strengthDays&&!strengthDays.dataset.touched)strengthDays.value=String(split[0]);
+  if(engineDays&&!engineDays.dataset.touched)engineDays.value=String(split[1]);
+  const box=document.getElementById("goalCompatibilityMessage");
+  if(box&&days===6){box.className="compatibility-callout good";box.innerHTML="<strong>Six-day hybrid structure</strong><span>4 Strength exposures + 3 Engine exposures across 6 days. One shorter Strength session is blended with easy aerobic work, and one full recovery day remains.</span>";}
+}
+
 function updateGoalBuilderFields(){ updateDualGoalBuilder(); }
 
 function dualBlockPhase(){ const b=data.trainingBlock,w=blockWeek(),t=b.lengthWeeks||12,s=strengthGoalProfile(),names=s.phaseNames;if(w===t)return names[3]; const r=w/t;if(w%4===0)return"Recovery & Absorption";if(r<=.3)return names[0];if(r<=.7)return names[1];return names[2]; }
@@ -135,22 +154,35 @@ function strengthMissionsForGoal(goal){
     "Olympic Lifting":["S-4 Athletic Lower","S-3 Athletic Upper","S-2 Lower Strength","S-1 Upper Strength"],
     "Athlete":["S-2 Lower Strength","S-3 Athletic Upper","S-4 Athletic Lower","S-1 Upper Strength"],
     "Hybrid":["S-1 Upper Strength","S-2 Lower Strength","S-3 Athletic Upper","S-4 Athletic Lower"],
-    "Bodybuilding":["B-1 Chest & Back","B-2 Legs","B-3 Shoulders & Arms","B-4 Back & Posterior"]
+    "Bodybuilding":["B-1 Chest & Back","B-2 Legs","B-3 Shoulders & Arms","B-4 Back & Posterior","B-3 Shoulders & Arms","B-1 Chest & Back"]
   }[goal]||["S-1 Upper Strength","S-2 Lower Strength","S-3 Athletic Upper"];
 }
 function generateTrainingBlock(){
+  applyHybridScheduleRecommendation();
   const strength=document.getElementById("strengthGoal").value, mode=document.getElementById("engineMode").value, engineGoal=document.getElementById("engineGoal").value, e=engineGoalProfile(mode,engineGoal), targetDate=document.getElementById("blockTargetDate").value;
   const length=weeksUntil(targetDate)||(+document.getElementById("blockLength").value||e.weeks); const engineSessions=+document.getElementById("blockRunDays").value||0;
-  data.trainingBlock={...data.trainingBlock,enabled:true,goalType:strength,targetDate,targetMinutes:+document.getElementById("engineTargetValue")?.value||0,lengthWeeks:length,currentWeek:1,trainingDays:+document.getElementById("blockTrainingDays").value||5,runDays:engineSessions,strengthDays:+document.getElementById("blockStrengthDays").value||3,sessionMinutes:+document.getElementById("blockSessionMinutes").value||75,bodybuildingFocus:document.getElementById("dualBodybuildingFocus")?.value||"Balanced",bodybuildingPhase:document.getElementById("dualPhysiquePhase")?.value||"Recomposition",startDate:todayKey(),generatedAt:new Date().toISOString(),dualGoals:{strengthGoal:strength,engineMode:mode,engineGoal,trainingCoordination:document.getElementById("trainingCoordination").value,targetValue:+document.getElementById("engineTargetValue")?.value||0,engineSessions}};
+  data.trainingBlock={...data.trainingBlock,enabled:true,goalType:strength,targetDate,targetMinutes:+document.getElementById("engineTargetValue")?.value||0,lengthWeeks:length,currentWeek:1,trainingDays:+document.getElementById("blockTrainingDays").value||5,runDays:engineSessions,strengthDays:+document.getElementById("blockStrengthDays").value||4,sessionMinutes:+document.getElementById("blockSessionMinutes").value||75,bodybuildingFocus:document.getElementById("dualBodybuildingFocus")?.value||"Balanced",bodybuildingPhase:document.getElementById("dualPhysiquePhase")?.value||"Recomposition",startDate:todayKey(),generatedAt:new Date().toISOString(),dualGoals:{strengthGoal:strength,engineMode:mode,engineGoal,trainingCoordination:document.getElementById("trainingCoordination").value,targetValue:+document.getElementById("engineTargetValue")?.value||0,engineSessions}};
   data.settings.cardioType=mode==="General Conditioning"?"Air Bike":mode==="None / Recovery Only"?"Running":mode;
   buildCurrentWeekPlan();saveData();alert(`${strength} + ${e.label} block created: ${length} weeks.`);
 }
 function buildCurrentWeekPlan(){
-  if(!data.trainingBlock.enabled)return; normalizeDualGoals(); const b=data.trainingBlock,s=b.dualGoals.strengthGoal,e=engineGoalProfile(),strengthMissions=strengthMissionsForGoal(s),sd=Math.min(strengthMissions.length,b.strengthDays||3),ed=Math.min(6,b.runDays||0),coord=b.dualGoals.trainingCoordination||"Coach Decides",sp=strengthProgression();
+  if(!data.trainingBlock.enabled)return; normalizeDualGoals(); const b=data.trainingBlock,s=b.dualGoals.strengthGoal,e=engineGoalProfile(),strengthMissions=strengthMissionsForGoal(s),sd=Math.min(strengthMissions.length,b.strengthDays||4),ed=Math.min(6,b.runDays||0),coord=b.dualGoals.trainingCoordination||"Coach Decides",sp=strengthProgression();
   data.settings.rotationWeek=((blockWeek()-1)%4)+1;data.settings.phase=`${s} + ${e.label} • ${dualBlockPhase()}`;
   const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], plan=days.map(day=>({day,mission:"M-1 Daily Reset",detail:"Daily mobility and recovery",done:false}));
-  const strengthSlots=sd>=5?[0,1,3,4,5]:sd===4?[0,1,3,5]:sd===3?[0,2,4]:[0,3]; strengthSlots.slice(0,sd).forEach((idx,i)=>{plan[idx]={day:days[idx],mission:strengthMissions[i%strengthMissions.length],detail:`${s} • ${sp.label}`,done:false};});
-  if(ed>0){const engineKinds=ed===1?["easy"]:ed===2?["easy","long"]:ed===3?["easy","quality","long"]:ed===4?["easy","easy","quality","long"]:["easy","easy","quality","easy","long","easy"].slice(0,ed); const preferred=[1,3,5,2,6,4];engineKinds.forEach((kind,i)=>{const idx=preferred[i],p=engineWeekPrescription(kind),engine={mission:kind==="quality"?"R-4 Intervals":kind==="long"?"R-5 Long Run":"R-2 Easy Run",detail:p.detail,customLabel:p.label};if(plan[idx].mission==="M-1 Daily Reset"||coord==="Alternate Days")plan[idx]={day:days[idx],...engine,done:false};else{plan[idx].secondaryMission=engine.mission;plan[idx].secondaryLabel=p.label;plan[idx].secondaryDetail=p.detail;plan[idx].detail+=` • PM: ${p.label}`;}});}
+  const isSixDayGeneralHybrid=s==="Hybrid"&&b.trainingDays===6&&e&&e.id==="work-capacity"&&coord==="Coach Decides";
+  if(isSixDayGeneralHybrid){
+    const quality=engineWeekPrescription("quality"),easy=engineWeekPrescription("easy"),long=engineWeekPrescription("long");
+    plan[0]={day:days[0],mission:strengthMissions[0],detail:`${s} • ${sp.label} • Primary upper-body strength`,done:false};
+    plan[1]={day:days[1],mission:"R-4 Intervals",detail:quality.detail,customLabel:quality.label,done:false};
+    plan[2]={day:days[2],mission:strengthMissions[1],detail:`${s} • ${sp.label} • Primary lower-body strength`,done:false};
+    plan[3]={day:days[3],mission:strengthMissions[2],detail:`${s} • ${sp.label} • Short power and durability emphasis`,done:false,secondaryMission:"R-2 Easy Run",secondaryLabel:easy.label,secondaryDetail:`20–30 min easy aerobic support after strength or in a separate session. ${easy.detail}`};
+    plan[4]={day:days[4],mission:strengthMissions[3],detail:`${s} • ${sp.label} • Secondary strength exposure; keep 1–3 reps in reserve`,done:false};
+    plan[5]={day:days[5],mission:"R-5 Long Run",detail:long.detail,customLabel:long.label,done:false};
+    plan[6]={day:days[6],mission:"M-1 Daily Reset",detail:"Full recovery day: mobility, walking, and readiness review",done:false};
+  }else{
+    const strengthSlots=sd>=5?[0,1,3,4,5]:sd===4?[0,1,3,5]:sd===3?[0,2,4]:[0,3]; strengthSlots.slice(0,sd).forEach((idx,i)=>{plan[idx]={day:days[idx],mission:strengthMissions[i%strengthMissions.length],detail:`${s} • ${sp.label}`,done:false};});
+    if(ed>0){const engineKinds=ed===1?["easy"]:ed===2?["easy","long"]:ed===3?["easy","quality","long"]:ed===4?["easy","easy","quality","long"]:["easy","easy","quality","easy","long","easy"].slice(0,ed); const preferred=[1,3,5,2,6,4];engineKinds.forEach((kind,i)=>{const idx=preferred[i],p=engineWeekPrescription(kind),engine={mission:kind==="quality"?"R-4 Intervals":kind==="long"?"R-5 Long Run":"R-2 Easy Run",detail:p.detail,customLabel:p.label};if(plan[idx].mission==="M-1 Daily Reset"||coord==="Alternate Days")plan[idx]={day:days[idx],...engine,done:false};else{plan[idx].secondaryMission=engine.mission;plan[idx].secondaryLabel=p.label;plan[idx].secondaryDetail=p.detail;plan[idx].detail+=` • PM: ${p.label}`;}});}
+  }
   data.plan=plan;
 }
 function coachRecommendation(){ if(!data.trainingBlock.enabled)return"Choose a Strength goal and a compatible Engine goal in More. The Coach Engine will coordinate both progressions."; const status=readinessStatus(readinessScore()),e=engineGoalProfile(),compat=compatibilityInfo(data.trainingBlock.dualGoals.strengthGoal,data.trainingBlock.dualGoals.engineMode,e.id); if(status==="RED")return`${dualBlockPhase()}: recovery is the mission. Keep mobility, remove hard Engine work, and retain only essential technique or easy strength work.`;if(status==="YELLOW")return`${dualBlockPhase()}: preserve the main Strength work, trim accessory volume, and convert hard Engine work to easy aerobic support. ${compat.note}`;return`${dualBlockPhase()}: execute both progressions as scheduled. ${compat.note}`; }
@@ -178,4 +210,4 @@ function openAthleteProfile(){showScreen("more");setTimeout(()=>document.getElem
 const originalRenderApp=renderApp;
 renderApp=function(){originalRenderApp();renderDualGoals();const planList=document.getElementById("planList");if(planList){[...planList.children].forEach((row,i)=>{const item=data.plan[i];if(item?.secondaryLabel){const target=row.querySelector(".hint")||row.querySelector(".sub");target?.insertAdjacentHTML("afterend",`<div class="two-a-day-tag">PM ENGINE • ${item.secondaryLabel}<br><small>${item.secondaryDetail}</small></div>`);}});}};
 
-document.addEventListener("DOMContentLoaded",()=>{document.getElementById("blockStrengthDays")?.addEventListener("change",e=>e.target.dataset.touched="1");setTimeout(()=>{updateDualGoalBuilder();renderDualGoals();},80);});
+document.addEventListener("DOMContentLoaded",()=>{document.getElementById("blockStrengthDays")?.addEventListener("change",e=>e.target.dataset.touched="1");document.getElementById("blockRunDays")?.addEventListener("change",e=>e.target.dataset.touched="1");["blockTrainingDays","trainingCoordination"].forEach(id=>document.getElementById(id)?.addEventListener("change",applyHybridScheduleRecommendation));setTimeout(()=>{updateDualGoalBuilder();renderDualGoals();applyHybridScheduleRecommendation();},80);});

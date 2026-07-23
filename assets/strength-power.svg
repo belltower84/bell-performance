@@ -1,0 +1,40 @@
+<svg viewBox="0 0 720 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#171c21"/><stop offset=".55" stop-color="#0b0f12"/><stop offset="1" stop-color="#050709"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="75%" cy="38%" r="55%">
+      <stop stop-color="#d5a72f" stop-opacity=".26"/><stop offset="1" stop-color="#d5a72f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="metal" x1="0" x2="1">
+      <stop stop-color="#7f8991"/><stop offset=".5" stop-color="#d4d9dc"/><stop offset="1" stop-color="#687179"/>
+    </linearGradient>
+    <pattern id="grid" width="52" height="52" patternUnits="userSpaceOnUse">
+      <path d="M52 0H0V52" fill="none" stroke="#fff" stroke-opacity=".035"/>
+    </pattern>
+  </defs>
+  <rect width="720" height="420" fill="url(#bg)"/>
+  <rect width="720" height="420" fill="url(#grid)"/>
+  <rect width="720" height="420" fill="url(#glow)"/>
+  <path d="M430 0h290v420H325z" fill="#d7a52e" opacity=".035"/>
+  <g transform="translate(340 155)">
+    <rect x="0" y="45" width="320" height="14" rx="7" fill="url(#metal)"/>
+    <g fill="#171c20" stroke="#657079" stroke-width="4">
+      <rect x="20" y="12" width="26" height="80" rx="6"/>
+      <rect x="52" y="4" width="35" height="96" rx="7"/>
+      <rect x="233" y="4" width="35" height="96" rx="7"/>
+      <rect x="274" y="12" width="26" height="80" rx="6"/>
+    </g>
+    <g stroke="#d5a72f" stroke-width="3" opacity=".75">
+      <path d="M104 20v65M116 12v81M204 12v81M216 20v65"/>
+    </g>
+  </g>
+  <g transform="translate(455 65)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M45 8 73 31 61 68 24 68 12 31Z" stroke="#d6aa3b" stroke-width="4" opacity=".9"/>
+    <path d="m30 44 10 10 19-24" stroke="#e1e5e7" stroke-width="5"/>
+  </g>
+  <g opacity=".22" fill="#fff" font-family="Arial, sans-serif" font-weight="800">
+    <text x="395" y="330" font-size="86">STRENGTH</text>
+    <text x="510" y="365" font-size="22" letter-spacing="7">BUILD • ADAPT</text>
+  </g>
+</svg>

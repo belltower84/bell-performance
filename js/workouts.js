@@ -193,7 +193,7 @@ function openWorkoutUI() {
   setText("workoutHeroStatus", `${active.readiness?.status || readinessStatus()} Zone`);
   setText("workoutZoneLabel", trainingStatusText(active.readiness?.status || readinessStatus()));
   const art = document.getElementById("workoutHeroArt");
-  if (art) art.src = isEngine ? ((active.cardioType || data.settings.cardioType) === "Cycling" ? "./assets/engine-cycle.svg" : "./assets/engine-run.svg") : (female ? "./assets/athlete-female.svg" : "./assets/athlete-male.svg");
+  if (art) art.src = isEngine ? ((active.cardioType || data.settings.cardioType) === "Cycling" ? "./assets/engine-route.svg?v=662" : "./assets/engine-route.svg?v=662") : (female ? "./assets/strength-power.svg?v=662" : "./assets/strength-power.svg?v=662");
   renderActiveWorkout();
 }
 function renderActiveWorkout() {

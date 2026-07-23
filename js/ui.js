@@ -92,8 +92,9 @@ function renderVisualProfile(template, status) {
   const cardio = data.settings.cardioType || "Running";
   const strengthArt = byId("strengthArtwork");
   const engineArt = byId("engineArtwork");
-  if (strengthArt) strengthArt.src = female ? "./assets/athlete-female.svg" : "./assets/athlete-male.svg";
-  if (engineArt) engineArt.src = cardio === "Cycling" ? "./assets/engine-cycle.svg" : "./assets/engine-run.svg";
+  document.body.classList.toggle("female-profile", female);
+  if (strengthArt) strengthArt.src = "./assets/strength-power.svg?v=662";
+  if (engineArt) engineArt.src = cardio === "Cycling" ? "./assets/engine-route.svg?v=662" : "./assets/engine-route.svg?v=662";
   const r = data.settings.readiness || {};
   setText("dashSleep", readinessWord(r.sleepQuality));
   setText("dashSoreness", readinessWord(r.soreness, true));

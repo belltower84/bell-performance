@@ -1,14 +1,14 @@
 "use strict";
-const CACHE_NAME = "bell-performance-6-6-1-readiness-661";
+const CACHE_NAME = "bell-performance-6-6-1-readiness-662";
 const CORE = [
-  "./", "./index.html", "./manifest.json", "./css/app.css?v=661",
-  "./assets/logo-shield.svg?v=661", "./assets/athlete-male.svg?v=661",
-  "./assets/athlete-female.svg?v=661", "./assets/engine-run.svg?v=661",
-  "./assets/engine-cycle.svg?v=661", "./data/workouts.js?v=661",
-  "./js/storage.js?v=661", "./js/readiness.js?v=661", "./js/equipment.js?v=661",
-  "./js/training-blocks.js?v=661", "./js/mobility.js?v=661", "./js/nutrition.js?v=661",
-  "./js/milestones.js?v=661", "./js/workouts.js?v=661", "./js/ui.js?v=661",
-  "./js/dual-goals.js?v=661", "./js/app.js?v=661"
+  "./", "./index.html", "./manifest.json", "./css/app.css?v=662",
+  "./assets/logo-shield.svg?v=662", "./assets/strength-power.svg?v=662",
+  "./assets/strength-power.svg?v=662", "./assets/engine-route.svg?v=662",
+  "./assets/engine-route.svg?v=662", "./data/workouts.js?v=662",
+  "./js/storage.js?v=662", "./js/readiness.js?v=662", "./js/equipment.js?v=662",
+  "./js/training-blocks.js?v=662", "./js/mobility.js?v=662", "./js/nutrition.js?v=662",
+  "./js/milestones.js?v=662", "./js/workouts.js?v=662", "./js/ui.js?v=662",
+  "./js/dual-goals.js?v=662", "./js/app.js?v=662"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
-  <title>Bell Performance 7.0.22 — Workout Discipline Cleanup</title>
-  <link rel="stylesheet" href="./css/app.css?v=7022">
+  <title>Bell Performance 7.0.27 — Exercise Intelligence Library</title>
+  <link rel="stylesheet" href="./css/app.css?v=7027">
 
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -25,7 +25,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-  <div class="brand-lockup"><img src="./assets/logo-shield.svg?v=7022" alt="Bell Performance shield"><div><h1>BELL <span>PERFORMANCE</span></h1><div class="brand-tagline">TRAIN FOR LIFE</div></div></div>
+  <div class="brand-lockup"><img src="./assets/logo-shield.svg?v=7027" alt="Bell Performance shield"><div><h1>BELL <span>PERFORMANCE</span></h1><div class="brand-tagline">TRAIN FOR LIFE</div></div></div>
   <div class="header-actions"><button id="notificationButton" aria-label="Open notifications" onclick="openNotificationCenter()">♢<span id="notificationBadge">0</span></button><button id="profileButton" aria-label="Open athlete profile" onclick="openAthleteProfile()">◎</button></div>
 </header>
 <main>
@@ -74,8 +74,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
   <div class="section-heading"><h2>Today's Mission</h2><button onclick="showScreen('plan')">View Full Schedule ›</button></div>
   <div class="training-pair">
-    <article id="strengthTrainingCard" class="training-card strength-card"><img id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=7022" alt="Strength athlete"><div class="training-overlay"><div class="training-card-topline"><div class="training-type">🏋 <span>STRENGTH</span></div><label class="strength-location-control" title="Change the equipment location used for strength substitutions"><span>Training at</span><select id="activeLocationQuick" onchange="switchEquipmentLocation(this.value);renderApp()" aria-label="Strength workout location"></select></label></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
-    <article id="engineTrainingCard" class="training-card engine-card"><img id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=7022" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
+    <article id="strengthTrainingCard" class="training-card strength-card"><img id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=7027" alt="Strength athlete"><div class="training-overlay"><div class="training-card-topline"><div class="training-type">🏋 <span>STRENGTH</span></div><label class="strength-location-control" title="Change the equipment location used for strength substitutions"><span>Training at</span><select id="activeLocationQuick" onchange="switchEquipmentLocation(this.value);renderApp()" aria-label="Strength workout location"></select></label></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
+    <article id="engineTrainingCard" class="training-card engine-card"><img id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=7027" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
   </div>
   <div id="singleSessionOption" class="card single-session-option hidden"></div>
   <div id="todayPreview" class="hidden"></div>
@@ -97,8 +97,19 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
 <section id="plan" class="screen"><h2 class="section-title">Weekly Plan</h2><div id="planList" class="list"></div></section>
 
-<section id="workouts" class="screen"><h2 class="section-title">Training Library</h2><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div id="workoutLibrary" class="list"></div></section>
+<section id="workouts" class="screen"><div class="section-heading"><h2 class="section-title">Training Library</h2><button type="button" onclick="openExerciseLibrary()">Exercise Library ›</button></div><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div id="workoutLibrary" class="list"></div></section>
 
+
+
+<section id="exerciseLibrary" class="screen">
+  <div class="section-heading"><div><span class="metric-label">Movement Education & Substitution</span><h2 class="section-title">Exercise Intelligence Library</h2></div><button type="button" onclick="showScreen('more')">Settings ›</button></div>
+  <div class="card exercise-library-intro"><div><h3>Understand it. Perform it. Replace it intelligently.</h3><p class="sub">Search every movement currently used by Bell Performance. Open an exercise for setup, execution, muscles trained, common mistakes, and purpose-matched alternatives.</p></div><div class="library-count"><strong id="exerciseLibraryCount">0</strong><span>movements</span></div></div>
+  <div class="card exercise-library-controls">
+    <label class="library-search">Search exercises<input id="exerciseLibrarySearch" type="search" placeholder="Try squat, chest, dumbbell, running…" oninput="renderExerciseLibrary()"></label>
+    <div class="library-filter-grid"><label>Movement pattern<select id="exercisePatternFilter" onchange="renderExerciseLibrary()"><option value="all">All patterns</option></select></label><label>Equipment<select id="exerciseEquipmentFilter" onchange="renderExerciseLibrary()"><option value="all">All equipment</option></select></label><label>Training role<select id="exerciseRoleFilter" onchange="renderExerciseLibrary()"><option value="all">All roles</option><option value="strength">Strength</option><option value="hypertrophy">Hypertrophy</option><option value="power">Power</option><option value="conditioning">Conditioning</option><option value="mobility">Mobility</option></select></label></div>
+  </div>
+  <div id="exerciseLibraryGrid" class="exercise-library-grid"></div>
+</section>
 
 <section id="habits" class="screen">
   <div class="section-heading"><div><span class="metric-label">Daily Consistency</span><h2 class="section-title">Habits</h2></div><button type="button" onclick="addCustomHabit()">+ Add Habit</button></div>
@@ -139,6 +150,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
     </div>
     <div class="how-to-preview" aria-hidden="true"><span>1</span><span>2</span><span>3</span><b>▶</b></div>
   </div>
+  <div class="card exercise-intelligence-entry"><div><span class="metric-label">Training Reference</span><h3>Exercise Intelligence Library</h3><p class="sub">Learn every prescribed movement or choose a purpose-matched replacement when equipment, comfort, preference, or another constraint calls for a change.</p></div><button type="button" onclick="openExerciseLibrary()">Open Exercise Library</button></div>
   <div class="settings-section-heading"><span class="metric-label">Preferences</span><h3>Athlete Settings</h3></div>
   <div class="card">
     <h3>Athlete Profile</h3>
@@ -285,7 +297,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
   <div class="modal-box first-flight-box">
     <div class="first-flight-shell">
       <header class="first-flight-header">
-        <div><span class="metric-label">Bell Performance 7.0.14</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
+        <div><span class="metric-label" id="onboardingVersion">Bell Performance 7.0.27</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
         <div class="first-flight-step-badge"><strong id="onboardingStepNumber">1</strong><span>of 6</span></div>
       </header>
       <div class="first-flight-progress"><i id="onboardingProgress"></i></div>
@@ -356,7 +368,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
           <div id="onboardingDevelopmentMissionPanel" class="mission-builder-panel hidden">
             <div class="onboarding-dual-goal-grid">
               <div class="onboarding-goal-card"><span class="metric-label">Primary Outcome</span><label>Goal</label><select id="onboardingDevelopmentGoal" onchange="toggleSportGoalField();updateOnboardingMissionPreview()"><option>Fat Loss</option><option>Muscle Building</option><option>Body Recomposition</option><option>Mobility & Longevity</option><option>Sport-Specific Performance</option><option>General Hybrid Fitness</option><option>Strength Development</option><option>Endurance Development</option></select><div id="onboardingSportGoalWrap" class="hidden"><label>Sport or activity</label><input id="onboardingSportGoal" placeholder="Hockey, lacrosse, golf, wrestling..." oninput="updateOnboardingMissionPreview()"></div><label>Priority</label><select id="onboardingDevelopmentPriority" onchange="updateOnboardingMissionPreview()"><option value="balanced" selected>Balanced and sustainable</option><option value="aggressive">Faster progress with more training demand</option><option value="minimum">Minimum effective dose</option></select></div>
-              <div class="onboarding-goal-card"><span class="metric-label">Planning Horizon</span><label>Initial block length</label><select id="onboardingDevelopmentWeeks" onchange="updateOnboardingMissionPreview()"><option value="8">8 weeks</option><option value="12" selected>12 weeks</option><option value="16">16 weeks</option><option value="20">20 weeks</option><option value="24">24 weeks</option></select><p class="hint">Open-ended goals use repeatable development blocks with scheduled deloads and end-of-block reviews.</p></div>
+              <div class="onboarding-goal-card"><span class="metric-label">Secondary Performance Goal</span><label class="active-location-control"><span><input id="onboardingSecondaryEnabled" type="checkbox" onchange="toggleSecondaryGoalFields();updateOnboardingMissionPreview()"> Add a secondary dated goal</span></label><div id="onboardingSecondaryGoalWrap" class="hidden"><label>Secondary goal</label><select id="onboardingSecondaryGoal" onchange="updateOnboardingMissionPreview()"><option value="5K Race">Run a 5K</option><option value="10K Race">Run a 10K</option><option value="Half Marathon">Complete a half marathon</option><option value="Marathon">Complete a marathon</option><option value="Strength Benchmark">Reach a strength benchmark</option><option value="Mobility Standard">Reach a mobility standard</option><option value="Sport Performance">Improve sport performance</option><option value="Custom">Custom performance target</option></select><label>Target date</label><input id="onboardingSecondaryDate" type="date" onchange="updateOnboardingMissionPreview()"><label>Target or details</label><input id="onboardingSecondaryTarget" placeholder="Example: sub-30-minute 5K" oninput="updateOnboardingMissionPreview()"></div><label>Initial block length</label><select id="onboardingDevelopmentWeeks" onchange="updateOnboardingMissionPreview()"><option value="8">8 weeks</option><option value="12" selected>12 weeks</option><option value="16">16 weeks</option><option value="20">20 weeks</option><option value="24">24 weeks</option></select><p class="hint">The primary goal drives the program. A secondary dated goal adds the minimum effective specific work and a short peak without replacing the primary mission.</p></div>
             </div>
           </div>
           <div class="coordination-panel"><h4>Training Availability</h4><div class="row"><div><label>Weekly training days</label><select id="onboardingTrainingDays"><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option><option value="6">6</option><option value="7">7</option></select></div><div><label>Session limit</label><select id="onboardingSessionMinutes"><option value="45">45 minutes</option><option value="60">60 minutes</option><option value="75" selected>75 minutes</option><option value="90">90 minutes</option></select></div></div></div>
@@ -403,13 +415,16 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div id="historyEditModal" class="modal hidden"><div class="modal-box onboarding-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Training History</span><h2>Edit Workout Record</h2></div><button class="modal-close" onclick="closeHistoryEditor()">×</button></div><input type="hidden" id="historyEditIndex"><div class="feedback-grid"><label>Workout name<input id="historyEditLabel"></label><label>Completed date<input id="historyEditDate" type="datetime-local"></label><label>Official time<input id="historyEditTime" placeholder="HH:MM:SS or MM:SS"></label><label>Distance<input id="historyEditDistance" type="number" min="0" step="0.01"></label><label>Distance unit<select id="historyEditDistanceUnit"><option value="mi">Miles</option><option value="km">Kilometers</option><option value="m">Meters</option><option value="yd">Yards</option></select></label><label>Average heart rate<input id="historyEditHeartRate" type="number" min="0" max="240"></label><label>Elevation gain<input id="historyEditElevation" type="number" min="0" step="1"></label><label>Session RPE<input id="historyEditRpe" type="number" min="1" max="10"></label></div><label>Training notes<textarea id="historyEditNotes"></textarea></label><div class="row"><button class="good" onclick="saveHistoryEdit()">Save Changes</button><button class="secondary" onclick="closeHistoryEditor()">Cancel</button></div><button class="danger" onclick="deleteHistoryRecord()">Delete Workout Record</button><div class="hint" style="margin-top:10px">Changes immediately update weekly reviews, milestones, mileage, pace, and block summaries.</div></div></div></div>
 <div id="notificationModal" class="modal hidden"><div class="modal-box notification-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Bell Performance</span><h2>Coach Notifications</h2></div><button class="modal-close" onclick="closeNotificationCenter()">×</button></div><div id="notificationList" class="notification-list"></div><button class="secondary" onclick="markNotificationsReviewed()">Mark Reviewed</button></div></div></div>
 
+
+<div id="exerciseDetailModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="exerciseDetailTitle"><div class="modal-box exercise-detail-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Exercise Intelligence</span><h2 id="exerciseDetailTitle">Exercise</h2></div><button class="modal-close" onclick="closeExerciseDetail()">×</button></div><div id="exerciseDetailContent"></div></div></div></div>
+<div id="exerciseSwapModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="exerciseSwapTitle"><div class="modal-box exercise-swap-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Purpose-Matched Replacement</span><h2 id="exerciseSwapTitle">Replace Exercise</h2></div><button class="modal-close" onclick="closeExerciseSwap()">×</button></div><div id="exerciseSwapOriginal" class="performance-callout"></div><div class="feedback-grid"><label>Why are you replacing it?<select id="exerciseSwapReason" onchange="renderExerciseSwapOptions()"><option value="preference">Exercise preference</option><option value="equipment">Equipment unavailable</option><option value="pain">Pain or discomfort</option><option value="crowded">Gym is crowded</option><option value="setup">Need a faster setup</option><option value="space">Limited space</option><option value="noise">Need a quieter option</option><option value="skill">Need a simpler variation</option><option value="other">Other constraint</option></select></label><label>Apply replacement to<select id="exerciseSwapScope"><option value="today">Today’s workout only</option><option value="block">Current training block</option><option value="always">All future workouts</option></select></label></div><div id="exerciseSwapOptions" class="exercise-swap-options"></div><div class="hint">Pain-based swaps should remain pain-free and are not a diagnosis or medical clearance.</div></div></div></div>
 <div id="workoutModal" class="modal hidden">
   <div class="modal-box">
     <div class="workout-top">
       <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
       <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
     </div>
-    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=7022" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
+    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=7027" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
     <div class="card workout-control-card">
       <h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
       <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
@@ -443,26 +458,28 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 
-<script src="./data/workouts.js?v=7022"></script>
-<script src="./js/storage.js?v=7022"></script>
-<script src="./js/readiness.js?v=7022"></script>
-<script src="./js/equipment.js?v=7022"></script>
+<script>window.BELL_APP_VERSION = "7.0.27";</script>
+<script src="./data/workouts.js?v=7027"></script>
+<script src="./js/exercise-library.js?v=7027"></script>
+<script src="./js/storage.js?v=7027"></script>
+<script src="./js/readiness.js?v=7027"></script>
+<script src="./js/equipment.js?v=7027"></script>
 <script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");</script>
-<script src="./js/training-blocks.js?v=7022"></script>
-<script src="./js/mobility.js?v=7022"></script>
-<script src="./js/nutrition.js?v=7022"></script>
-<script src="./js/milestones.js?v=7022"></script>
-<script src="./js/progression.js?v=7022"></script>
-<script src="./js/workouts.js?v=7022"></script>
-<script src="./js/missed-sessions.js?v=7022"></script>
-<script src="./js/performance-review.js?v=7022"></script>
-<script src="./js/artwork.js?v=7022"></script>
-<script src="./js/quote-cache.js?v=7022"></script>
-<script src="./js/ui.js?v=7022"></script>
-<script src="./js/habits.js?v=7022"></script>
-<script src="./js/dual-goals.js?v=7022"></script>
-<script src="./js/mission-planner.js?v=7022"></script>
-<script src="./js/how-to.js?v=7022"></script>
-<script src="./js/app.js?v=7022"></script>
+<script src="./js/training-blocks.js?v=7027"></script>
+<script src="./js/mobility.js?v=7027"></script>
+<script src="./js/nutrition.js?v=7027"></script>
+<script src="./js/milestones.js?v=7027"></script>
+<script src="./js/progression.js?v=7027"></script>
+<script src="./js/workouts.js?v=7027"></script>
+<script src="./js/missed-sessions.js?v=7027"></script>
+<script src="./js/performance-review.js?v=7027"></script>
+<script src="./js/artwork.js?v=7027"></script>
+<script src="./js/quote-cache.js?v=7027"></script>
+<script src="./js/ui.js?v=7027"></script>
+<script src="./js/habits.js?v=7027"></script>
+<script src="./js/dual-goals.js?v=7027"></script>
+<script src="./js/mission-planner.js?v=7027"></script>
+<script src="./js/how-to.js?v=7027"></script>
+<script src="./js/app.js?v=7027"></script>
 </body>
 </html>

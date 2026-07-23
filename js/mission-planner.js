@@ -29,6 +29,17 @@ const DEVELOPMENT_MISSION_PROFILES = {
   "Endurance Development": {strengthGoal:"Athlete",engineMode:"Running",engineGoal:"general-run",strengthDays:2,engineDays:4,strengthFocus:"Maintain durable total-body strength and injury resistance",engineFocus:"Progress aerobic volume, threshold ability, and long-duration capacity"}
 };
 
+const SECONDARY_MISSION_PROFILES = {
+  "5K Race": {engineMode:"Running",engineGoal:"5k-time",minimumEngineDays:3,label:"5K",focus:"Aerobic development, threshold speed, race-pace intervals, and a short taper"},
+  "10K Race": {engineMode:"Running",engineGoal:"10k-time",minimumEngineDays:3,label:"10K",focus:"Aerobic volume, threshold durability, goal-pace work, and race sharpening"},
+  "Half Marathon": {engineMode:"Running",engineGoal:"half",minimumEngineDays:4,label:"Half Marathon",focus:"Long-run progression, threshold development, race pace, and taper"},
+  "Marathon": {engineMode:"Running",engineGoal:"marathon",minimumEngineDays:4,label:"Marathon",focus:"Mileage progression, long runs, marathon pace, fueling practice, and taper"},
+  "Strength Benchmark": {engineMode:null,engineGoal:null,minimumEngineDays:0,label:"Strength Benchmark",focus:"A dated strength benchmark layered onto the primary program"},
+  "Mobility Standard": {engineMode:null,engineGoal:null,minimumEngineDays:0,label:"Mobility Standard",focus:"Progressive mobility practice and movement-quality checkpoints"},
+  "Sport Performance": {engineMode:"Sprint / Field",engineGoal:"repeat-sprint",minimumEngineDays:2,label:"Sport Performance",focus:"Sport-specific conditioning and repeat-effort development"},
+  "Custom": {engineMode:null,engineGoal:null,minimumEngineDays:0,label:"Custom Target",focus:"A dated secondary outcome supported without displacing the primary goal"}
+};
+
 function addMissionEngineGoal(mode, profile) {
   if (!ENGINE_GOALS[mode] || ENGINE_GOALS[mode].some(item => item.id === profile.id)) return;
   ENGINE_GOALS[mode].push(profile);
@@ -57,6 +68,14 @@ function toggleSportGoalField(){
   const sport=byId("onboardingDevelopmentGoal")?.value==="Sport-Specific Performance";
   byId("onboardingSportGoalWrap")?.classList.toggle("hidden",!sport);
 }
+function toggleSecondaryGoalFields(){
+  const enabled=!!byId("onboardingSecondaryEnabled")?.checked;
+  byId("onboardingSecondaryGoalWrap")?.classList.toggle("hidden",!enabled);
+}
+function selectedSecondaryProfile(){
+  if(onboardingMissionPath()!=="development"||!byId("onboardingSecondaryEnabled")?.checked)return null;
+  return SECONDARY_MISSION_PROFILES[byId("onboardingSecondaryGoal")?.value]||SECONDARY_MISSION_PROFILES.Custom;
+}
 function daysBetweenKeys(startKey,endKey){
   const start=new Date(`${startKey}T12:00:00`),end=new Date(`${endKey}T12:00:00`);
   return Math.ceil((end-start)/86400000);
@@ -64,7 +83,14 @@ function daysBetweenKeys(startKey,endKey){
 function eventWeeksFrom(startKey,eventDate){return Math.max(2,Math.min(52,Math.ceil(daysBetweenKeys(startKey,eventDate)/7)));}
 function selectedMissionProfile(){
   if(onboardingMissionPath()==="event") return EVENT_MISSION_PROFILES[byId("onboardingEventType")?.value] || EVENT_MISSION_PROFILES["Custom Sport Event"];
-  return DEVELOPMENT_MISSION_PROFILES[byId("onboardingDevelopmentGoal")?.value] || DEVELOPMENT_MISSION_PROFILES["General Hybrid Fitness"];
+  const primary={...(DEVELOPMENT_MISSION_PROFILES[byId("onboardingDevelopmentGoal")?.value] || DEVELOPMENT_MISSION_PROFILES["General Hybrid Fitness"])};
+  const secondary=selectedSecondaryProfile();
+  if(secondary){
+    if(secondary.engineMode){primary.engineMode=secondary.engineMode;primary.engineGoal=secondary.engineGoal;}
+    primary.engineDays=Math.max(primary.engineDays,secondary.minimumEngineDays||0);
+    primary.engineFocus=`${primary.engineFocus}. Secondary target: ${secondary.focus}`;
+  }
+  return primary;
 }
 function missionAvailability(profile){
   const days=Number(byId("onboardingTrainingDays")?.value)||5;
@@ -92,7 +118,9 @@ function updateOnboardingMissionPreview(){
     box.innerHTML=`<strong>${escapeHtml(type)} mission</strong><span><b>Derived Strength:</b> ${escapeHtml(profile.strengthFocus)}</span><span><b>Derived Engine:</b> ${escapeHtml(profile.engineFocus)}</span><span>${escapeHtml(timing)} ${availability.strengthDays} Strength exposures + ${availability.engineDays} Engine exposures across ${availability.trainingDays} training days${availability.combinedSessions?`, including ${availability.combinedSessions} blended session${availability.combinedSessions===1?"":"s"}`:""}.</span>`;
   }else{
     const goal=byId("onboardingDevelopmentGoal")?.value||"General Hybrid Fitness",sport=goal==="Sport-Specific Performance"?(byId("onboardingSportGoal")?.value.trim()||"your sport"):"";
-    box.innerHTML=`<strong>${escapeHtml(goal)}${sport?` • ${escapeHtml(sport)}`:""}</strong><span><b>Derived Strength:</b> ${escapeHtml(profile.strengthFocus)}</span><span><b>Derived Engine:</b> ${escapeHtml(profile.engineFocus)}</span><span>${availability.strengthDays} Strength exposures + ${availability.engineDays} Engine exposures across ${availability.trainingDays} training days${availability.combinedSessions?`, including ${availability.combinedSessions} blended session${availability.combinedSessions===1?"":"s"}`:""}, followed by an end-of-block review.</span>`;
+    const secondary=selectedSecondaryProfile(),secondaryType=byId("onboardingSecondaryGoal")?.value,secondaryDate=byId("onboardingSecondaryDate")?.value,secondaryTarget=byId("onboardingSecondaryTarget")?.value.trim();
+    const secondaryLine=secondary?`<span><b>Secondary target:</b> ${escapeHtml(secondaryType)}${secondaryTarget?` • ${escapeHtml(secondaryTarget)}`:""}${secondaryDate?` • ${escapeHtml(secondaryDate)}`:""}. The primary goal remains the programming priority.</span>`:"";
+    box.innerHTML=`<strong>${escapeHtml(goal)}${sport?` • ${escapeHtml(sport)}`:""}</strong><span><b>Derived Strength:</b> ${escapeHtml(profile.strengthFocus)}</span><span><b>Derived Engine:</b> ${escapeHtml(profile.engineFocus)}</span>${secondaryLine}<span>${availability.strengthDays} Strength exposures + ${availability.engineDays} Engine exposures across ${availability.trainingDays} training days${availability.combinedSessions?`, including ${availability.combinedSessions} blended session${availability.combinedSessions===1?"":"s"}`:""}, followed by an end-of-block review.</span>`;
   }
 }
 
@@ -109,10 +137,14 @@ function loadOnboardingDualGoals(){
   if(mission.developmentGoal&&byId("onboardingDevelopmentGoal"))byId("onboardingDevelopmentGoal").value=mission.developmentGoal;
   if(byId("onboardingSportGoal"))byId("onboardingSportGoal").value=mission.sport||"";
   if(byId("onboardingDevelopmentPriority"))byId("onboardingDevelopmentPriority").value=mission.priority||"balanced";
+  if(byId("onboardingSecondaryEnabled"))byId("onboardingSecondaryEnabled").checked=!!mission.secondaryGoal;
+  if(byId("onboardingSecondaryGoal")&&mission.secondaryGoal)byId("onboardingSecondaryGoal").value=mission.secondaryGoal.type||"5K Race";
+  if(byId("onboardingSecondaryDate"))byId("onboardingSecondaryDate").value=mission.secondaryGoal?.targetDate||"";
+  if(byId("onboardingSecondaryTarget"))byId("onboardingSecondaryTarget").value=mission.secondaryGoal?.target||"";
   if(byId("onboardingDevelopmentWeeks"))byId("onboardingDevelopmentWeeks").value=String(data.trainingBlock?.lengthWeeks||12);
   if(byId("onboardingTrainingDays"))byId("onboardingTrainingDays").value=String(data.trainingBlock?.trainingDays||5);
   if(byId("onboardingSessionMinutes"))byId("onboardingSessionMinutes").value=String(data.trainingBlock?.sessionMinutes||75);
-  toggleOnboardingMissionPath();
+  toggleOnboardingMissionPath();toggleSecondaryGoalFields();
 }
 
 function saveOnboardingDualGoals(buildPlan=true){
@@ -129,9 +161,18 @@ function saveOnboardingDualGoals(buildPlan=true){
     const goal=byId("onboardingDevelopmentGoal").value;
     if(goal==="Sport-Specific Performance"&&!byId("onboardingSportGoal").value.trim()){byId("onboardingSportGoal").focus();alert("Enter the sport or activity you want the program to prepare for.");return false;}
     lengthWeeks=Number(byId("onboardingDevelopmentWeeks").value)||12;
-    mission={path,developmentGoal:goal,sport:byId("onboardingSportGoal").value.trim(),priority:byId("onboardingDevelopmentPriority").value,strengthFocus:profile.strengthFocus,engineFocus:profile.engineFocus};
+    let secondaryGoal=null;
+    if(byId("onboardingSecondaryEnabled")?.checked){
+      const type=byId("onboardingSecondaryGoal").value,targetDate=byId("onboardingSecondaryDate").value,target=byId("onboardingSecondaryTarget").value.trim();
+      if(!targetDate){byId("onboardingSecondaryDate").focus();alert("Choose a target date for the secondary goal.");return false;}
+      const start=byId("onboardingBlockStart")?.value==="nextMonday"?nextMondayKey():todayKey();
+      if(daysBetweenKeys(start,targetDate)<14){byId("onboardingSecondaryDate").focus();alert("Choose a secondary target date at least two weeks after the block start.");return false;}
+      secondaryGoal={type,targetDate,target,focus:(SECONDARY_MISSION_PROFILES[type]||SECONDARY_MISSION_PROFILES.Custom).focus};
+      lengthWeeks=Math.max(lengthWeeks,eventWeeksFrom(start,targetDate));
+    }
+    mission={path,developmentGoal:goal,sport:byId("onboardingSportGoal").value.trim(),priority:byId("onboardingDevelopmentPriority").value,strengthFocus:profile.strengthFocus,engineFocus:profile.engineFocus,secondaryGoal};
   }
-  data.trainingBlock={...data.trainingBlock,enabled:true,goalType:profile.strengthGoal,lengthWeeks,currentWeek:1,trainingDays:availability.trainingDays,strengthDays:availability.strengthDays,runDays:availability.engineDays,sessionMinutes:availability.sessionMinutes,hybridCombinedSessions:availability.combinedSessions,targetDate:mission.eventDate||"",mission,dualGoals:{strengthGoal:profile.strengthGoal,engineMode:profile.engineMode,engineGoal:profile.engineGoal,trainingCoordination:"Coach Decides",engineSessions:availability.engineDays,targetValue:0}};
+  data.trainingBlock={...data.trainingBlock,enabled:true,goalType:profile.strengthGoal,lengthWeeks,currentWeek:1,trainingDays:availability.trainingDays,strengthDays:availability.strengthDays,runDays:availability.engineDays,sessionMinutes:availability.sessionMinutes,hybridCombinedSessions:availability.combinedSessions,targetDate:mission.eventDate||mission.secondaryGoal?.targetDate||"",mission,dualGoals:{strengthGoal:profile.strengthGoal,engineMode:profile.engineMode,engineGoal:profile.engineGoal,trainingCoordination:"Coach Decides",engineSessions:availability.engineDays,targetValue:0}};
   data.settings.cardioType=profile.engineMode==="General Conditioning"?"Air Bike":profile.engineMode==="None / Recovery Only"?"Walking":profile.engineMode;
   if(buildPlan&&typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();
   return true;
@@ -140,6 +181,10 @@ function saveOnboardingDualGoals(buildPlan=true){
 function recommendedFirstBlockSettings(){
   const p=selectedMissionProfile(),a=missionAvailability(p);
   let lengthWeeks=onboardingMissionPath()==="event"?(byId("onboardingEventDate")?.value?eventWeeksFrom(byId("onboardingBlockStart")?.value==="nextMonday"?nextMondayKey():todayKey(),byId("onboardingEventDate").value):p.idealWeeks):(Number(byId("onboardingDevelopmentWeeks")?.value)||12);
+  if(onboardingMissionPath()==="development"&&byId("onboardingSecondaryEnabled")?.checked&&byId("onboardingSecondaryDate")?.value){
+    const start=byId("onboardingBlockStart")?.value==="nextMonday"?nextMondayKey():todayKey();
+    lengthWeeks=Math.max(lengthWeeks,eventWeeksFrom(start,byId("onboardingSecondaryDate").value));
+  }
   return {...a,lengthWeeks,strength:p.strengthGoal,mode:p.engineMode,goal:p.engineGoal};
 }
 function applyRecommendedFirstBlock(){
@@ -154,7 +199,8 @@ function renderOnboardingReview(){
   if(typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();
   const injurySummary=injuryProfileSummaryText(),primary=onboardingLocations.find(x=>x.id===onboardingActiveLocationId)||onboardingLocations[0],height=Number(data.nutrition.height)||66,p=selectedMissionProfile(),r=recommendedFirstBlockSettings(),start=byId("onboardingBlockStart")?.value==="nextMonday"?"Next Monday":"Today";
   const missionTitle=onboardingMissionPath()==="event"?(byId("onboardingEventName")?.value.trim()||byId("onboardingEventType")?.value||"Event Mission"):(byId("onboardingDevelopmentGoal")?.value||"Development Mission");
-  const missionDetail=onboardingMissionPath()==="event"?`${byId("onboardingEventDate")?.value||"Date required"} • ${r.lengthWeeks}-week event build`:`${r.lengthWeeks}-week development block`;
+  const secondaryReview=byId("onboardingSecondaryEnabled")?.checked?` • Secondary: ${byId("onboardingSecondaryGoal")?.value}${byId("onboardingSecondaryDate")?.value?` by ${byId("onboardingSecondaryDate").value}`:""}`:"";
+  const missionDetail=onboardingMissionPath()==="event"?`${byId("onboardingEventDate")?.value||"Date required"} • ${r.lengthWeeks}-week event build`:`${r.lengthWeeks}-week development block${secondaryReview}`;
   byId("onboardingReview").innerHTML=`<div><span>Athlete</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>${escapeHtml(byId("onboardingAthleteMode").value)} • Age ${escapeHtml(data.nutrition.age)} • ${escapeHtml(data.settings.weight)} lb • ${Math.floor(height/12)}′${height%12}″</small></div><div><span>Movement limitations</span><strong>${escapeHtml(injurySummary.title)}</strong><small>${escapeHtml(injurySummary.detail)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Mission</span><strong>${escapeHtml(missionTitle)}</strong><small>${escapeHtml(missionDetail)}</small></div><div><span>Derived training priorities</span><strong>${escapeHtml(p.strengthGoal)} + ${escapeHtml(p.engineMode)}</strong><small>${r.strengthDays} Strength exposures • ${r.engineDays} Engine exposures${r.combinedSessions?` • ${r.combinedSessions} blended`:""} • peak/deload logic included</small></div><div><span>Block launch</span><strong>${selectedOnboardingBlockMode()==="recommended"?"Recommended structure":"Mission-based structure"}</strong><small>Week 1 begins ${escapeHtml(start.toLowerCase())}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>Preference saved</small></div>`;
 }
 
@@ -178,6 +224,11 @@ const baseDualBlockPhase=dualBlockPhase;
 dualBlockPhase=function(){
   const mission=data.trainingBlock?.mission,w=blockWeek(),t=data.trainingBlock.lengthWeeks||12;
   if(!mission)return baseDualBlockPhase();
+  if(mission.path==="development"&&mission.secondaryGoal){
+    if(w===t)return "Secondary Goal Week";
+    if(w===t-1)return "Secondary Goal Peak & Taper";
+    if(w>=t-3)return "Secondary Goal Specificity";
+  }
   if(mission.path==="event"){
     if(w===t)return "Event Week";
     if(w===t-1)return "Peak & Taper";
@@ -225,7 +276,8 @@ renderDualGoals=function(){
   baseRenderDualGoalsForMission();
   const mission=data.trainingBlock?.mission;if(!mission)return;
   const title=mission.path==="event"?(mission.eventName||mission.eventType):(mission.developmentGoal||"Development Mission");
-  const detail=mission.path==="event"?`${mission.eventType} • ${mission.eventDate}`:(mission.sport?`${mission.developmentGoal} • ${mission.sport}`:mission.developmentGoal);
+  const secondaryDetail=mission.secondaryGoal?` • ${mission.secondaryGoal.type} by ${mission.secondaryGoal.targetDate}`:"";
+  const detail=mission.path==="event"?`${mission.eventType} • ${mission.eventDate}`:`${mission.sport?`${mission.developmentGoal} • ${mission.sport}`:mission.developmentGoal}${secondaryDetail}`;
   setText("missionBlock",title);setText("dualMissionHeadline",title);
   const phase=byId("dualMissionPhase");if(phase)phase.textContent=`${dualBlockPhase()} • ${detail}`;
 };
@@ -243,4 +295,4 @@ function updateEventContextFields(){
   field.placeholder=placeholders[type]||"Optional — division, class, or distance";
 }
 
-document.addEventListener("DOMContentLoaded",()=>{toggleOnboardingMissionPath();updateEventContextFields();["onboardingTrainingDays","onboardingSessionMinutes","onboardingBlockStart"].forEach(id=>byId(id)?.addEventListener("change",updateOnboardingMissionPreview));});
+document.addEventListener("DOMContentLoaded",()=>{toggleOnboardingMissionPath();toggleSecondaryGoalFields();updateEventContextFields();["onboardingTrainingDays","onboardingSessionMinutes","onboardingBlockStart"].forEach(id=>byId(id)?.addEventListener("change",updateOnboardingMissionPreview));});

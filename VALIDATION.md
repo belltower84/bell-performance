@@ -1,9 +1,9 @@
-7.0.22 validation
+# Validation
 
-- Bell Hypertrophy phase logic added.
-- Advanced techniques restricted to eligible accessory movements.
-- Techniques disabled during reduced-readiness, deload, recovery, taper, and event-week states.
-- Technique metadata persists into active workout records.
-- Workout cards render technique badges and instructions.
-- JavaScript syntax validation completed.
-- Local asset and ZIP integrity checks completed.
+- Exercise catalog built from live workout templates plus curated movement metadata.
+- Search and filters for pattern, equipment, and training role.
+- Exercise detail modal with setup, execution, coaching cues, errors, and simple start/finish diagram.
+- Workout Learn and Replace controls integrated.
+- Replacement reason and scope persisted for today, current block, or future workouts.
+- Backward-compatible exerciseIntelligence data normalization.
+- JavaScript syntax and ZIP integrity checked.

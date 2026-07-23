@@ -21,6 +21,7 @@ const defaults = {
   plan: [],
   history: [],
   exerciseProgression: {},
+  exerciseIntelligence: { replacements: [], personalConstraints: [] },
   activeWorkout: null,
   mobility: { focus: "Auto", minutes: 10, completedDates: [], checks: {} },
   readinessLog: [],
@@ -113,6 +114,9 @@ function normalizeData() {
   data.habits.targets.customized=Boolean(data.habits.targets.customized);
   data.habits.completions=data.habits.completions&&typeof data.habits.completions==="object"?data.habits.completions:{};
   data.exerciseProgression = data.exerciseProgression && typeof data.exerciseProgression === "object" ? data.exerciseProgression : {};
+  data.exerciseIntelligence = data.exerciseIntelligence && typeof data.exerciseIntelligence === "object" ? data.exerciseIntelligence : {replacements:[],personalConstraints:[]};
+  data.exerciseIntelligence.replacements = Array.isArray(data.exerciseIntelligence.replacements) ? data.exerciseIntelligence.replacements : [];
+  data.exerciseIntelligence.personalConstraints = Array.isArray(data.exerciseIntelligence.personalConstraints) ? data.exerciseIntelligence.personalConstraints : [];
   data.mobility = { ...defaults.mobility, ...(data.mobility || {}) };
   data.mobility.completedDates = Array.isArray(data.mobility.completedDates) ? data.mobility.completedDates : [];
   data.mobility.checks = data.mobility.checks || {};

@@ -1,5 +1,15 @@
 "use strict";
 
+const BELL_APP_VERSION = window.BELL_APP_VERSION || "7.0.27";
+
+function renderAppVersion() {
+  document.querySelectorAll("[data-app-version]").forEach(element => {
+    element.textContent = `Bell Performance ${BELL_APP_VERSION}`;
+  });
+  const onboardingVersion = document.getElementById("onboardingVersion");
+  if (onboardingVersion) onboardingVersion.textContent = `Bell Performance ${BELL_APP_VERSION}`;
+}
+
 function todayKey() {
   const date = new Date();
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -17,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", () => showScreen(button.dataset.screen));
   });
 
+  renderAppVersion();
   renderApp();
   setTimeout(() => { maybePromptDailyReadiness(); openPendingSessionFeedback(); }, 250);
 
@@ -40,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   if ("caches" in window) {
     caches.keys().then(keys => Promise.all(
-      keys.filter(key => key.startsWith("bell-performance-") && key !== "bell-performance-7.0.15")
+      keys.filter(key => key.startsWith("bell-performance-") && key !== `bell-performance-${BELL_APP_VERSION}`)
           .map(key => caches.delete(key))
     )).catch(() => {});
   }

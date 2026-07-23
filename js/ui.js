@@ -380,18 +380,19 @@ function openFirstFlight(startStep=null){
   toggleOnboardingScripture();
   loadOnboardingInjuryProfile();
   if(typeof initializeOnboardingLocationEditor==="function")initializeOnboardingLocationEditor();
+  loadOnboardingDualGoals();
   const resolvedStep=startStep===null?(data.settings.firstFlightStage==="configure"?2:0):Number(startStep);
-  onboardingStep=Math.max(0,Math.min(4,resolvedStep));renderOnboardingStep();modal.classList.remove("hidden");document.body.classList.add("modal-open");
+  onboardingStep=Math.max(0,Math.min(5,resolvedStep));renderOnboardingStep();modal.classList.remove("hidden");document.body.classList.add("modal-open");
 }
 function renderOnboardingStep(){
   document.querySelectorAll("[data-onboarding-step]").forEach((step,index)=>step.classList.toggle("active",index===onboardingStep));
   byId("onboardingStepNumber").textContent=String(onboardingStep+1);
-  byId("onboardingProgress").style.width=`${((onboardingStep+1)/5)*100}%`;
+  byId("onboardingProgress").style.width=`${((onboardingStep+1)/6)*100}%`;
   byId("onboardingBack").disabled=onboardingStep===0;
-  byId("onboardingNext").textContent=onboardingStep===1&&!data.settings.firstFlightTourComplete?"Save Limitations & Start Tour":onboardingStep===4?"Launch Bell Performance":"Continue";
-  const subtitles=["Enter the athlete details that personalize Bell Performance.","Identify movement patterns that require modification or avoidance.","Map the equipment available everywhere you train.","Choose how the coach communicates with you.","Confirm the flight plan before launch."];
+  byId("onboardingNext").textContent=onboardingStep===1&&!data.settings.firstFlightTourComplete?"Save Limitations & Start Tour":onboardingStep===5?"Start First Training Block":"Continue";
+  const subtitles=["Enter the athlete details that personalize Bell Performance.","Identify movement patterns that require modification or avoidance.","Map the equipment available everywhere you train.","Choose the Strength and Engine goals for your first coordinated block.","Choose how the coach communicates with you.","Confirm the flight plan before launch."];
   byId("onboardingStepSubtitle").textContent=subtitles[onboardingStep];
-  if(onboardingStep===4)renderOnboardingReview();
+  if(onboardingStep===5)renderOnboardingReview();
 }
 function saveFirstFlightProfile(){
   const name=byId("onboardingAthleteName").value.trim();
@@ -441,6 +442,7 @@ function validateOnboardingStep(){
     const invalid=onboardingLocations.find(location=>!location.name.trim());if(invalid){editOnboardingLocation(invalid.id);byId("onboardingLocationName").focus();alert("Give every workout location a name.");return false;}
     const empty=onboardingLocations.find(location=>!location.equipment.length);if(empty&&!confirm(`${empty.name} has no equipment selected. Continue with bodyweight-only substitutions?`))return false;
   }
+  if(onboardingStep===3)return saveOnboardingDualGoals(false);
   return true;
 }
 function nextOnboardingStep(){
@@ -452,23 +454,52 @@ function nextOnboardingStep(){
     if(typeof launchFirstFlightTour==="function")window.setTimeout(launchFirstFlightTour,250);
     return;
   }
-  if(onboardingStep<4){onboardingStep++;renderOnboardingStep();return;}completeOnboarding();
+  if(onboardingStep<5){onboardingStep++;renderOnboardingStep();return;}completeOnboarding();
 }
 function previousOnboardingStep(){if(onboardingStep>0){if(onboardingStep===2&&typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();onboardingStep--;renderOnboardingStep();}}
 function toggleOnboardingScripture(){const style=byId("onboardingMessageStyle").value;byId("onboardingScriptureWrap").style.display=["Faith-Based","Mixed"].includes(style)?"block":"none";}
+function selectedOnboardingBlockMode(){return document.querySelector('input[name="onboardingBlockMode"]:checked')?.value||"selected";}
+function nextMondayKey(){const d=new Date();d.setHours(0,0,0,0);const days=(8-d.getDay())%7||7;d.setDate(d.getDate()+days);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
+function recommendedFirstBlockSettings(){
+  const mode=byId("onboardingEngineMode")?.value||"Running",goal=byId("onboardingEngineGoal")?.value||"General Aerobic Fitness",strength=byId("onboardingStrengthGoal")?.value||"Hybrid",athlete=byId("onboardingAthleteMode")?.value||"Hybrid Athlete";
+  let strengthDays=strength==="Bodybuilding"?4:strength==="Powerlifting"?3:3,engineDays=mode==="None / Recovery Only"?1:["Half Marathon","Marathon","Century Ride","10 Mile Ruck"].includes(goal)?4:3,trainingDays=5,sessionMinutes=75,lengthWeeks=["Marathon","Century Ride"].includes(goal)?20:["Half Marathon","10 Mile Ruck"].includes(goal)?16:12;
+  if(athlete==="Endurance Athlete"){engineDays=Math.max(engineDays,4);strengthDays=Math.min(strengthDays,2);trainingDays=6;}
+  if(athlete==="Strength Athlete"){strengthDays=Math.max(strengthDays,4);engineDays=Math.min(engineDays,2);trainingDays=5;}
+  if(athlete==="Masters Athlete"){trainingDays=Math.min(trainingDays,5);sessionMinutes=60;}
+  if(athlete==="Youth Athlete"){strengthDays=Math.min(strengthDays,3);engineDays=Math.min(engineDays,3);sessionMinutes=60;lengthWeeks=Math.min(lengthWeeks,12);}
+  return {strengthDays,engineDays,trainingDays,sessionMinutes,lengthWeeks,strength,mode,goal};
+}
+function applyRecommendedFirstBlock(){const r=recommendedFirstBlockSettings();byId("onboardingStrengthDays").value=String(r.strengthDays);byId("onboardingEngineDays").value=String(r.engineDays);byId("onboardingTrainingDays").value=String(r.trainingDays);byId("onboardingSessionMinutes").value=String(r.sessionMinutes);byId("onboardingBlockLength").value=String(r.lengthWeeks);return r;}
 function renderOnboardingReview(){
   if(typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();
   const injurySummary=injuryProfileSummaryText();
   const primary=onboardingLocations.find(x=>x.id===onboardingActiveLocationId)||onboardingLocations[0];
   const height=Number(data.nutrition.height)||66;
-  byId("onboardingReview").innerHTML=`<div><span>Athlete</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>${escapeHtml(byId("onboardingAthleteMode").value)} • Age ${escapeHtml(data.nutrition.age)} • ${escapeHtml(data.settings.weight)} lb • ${Math.floor(height/12)}′${height%12}″</small></div><div><span>Movement limitations</span><strong>${escapeHtml(injurySummary.title)}</strong><small>${escapeHtml(injurySummary.detail)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>${["Faith-Based","Mixed"].includes(byId("onboardingMessageStyle").value)?escapeHtml(byId("onboardingScriptureFrequency").value+" Scripture"):"Message preference saved"}</small></div>`;
+  const dual=data.trainingBlock?.dualGoals||{};
+  const recommended=selectedOnboardingBlockMode()==="recommended",r=recommended?recommendedFirstBlockSettings():null;
+  const strengthDays=recommended?r.strengthDays:(data.trainingBlock?.strengthDays||3),engineDays=recommended?r.engineDays:(data.trainingBlock?.runDays||3),lengthWeeks=recommended?r.lengthWeeks:(data.trainingBlock?.lengthWeeks||12),start=byId("onboardingBlockStart")?.value==="nextMonday"?"Next Monday":"Today";
+  byId("onboardingReview").innerHTML=`<div><span>Athlete</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>${escapeHtml(byId("onboardingAthleteMode").value)} • Age ${escapeHtml(data.nutrition.age)} • ${escapeHtml(data.settings.weight)} lb • ${Math.floor(height/12)}′${height%12}″</small></div><div><span>Movement limitations</span><strong>${escapeHtml(injurySummary.title)}</strong><small>${escapeHtml(injurySummary.detail)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Dual Mission</span><strong>${escapeHtml(dual.strengthGoal||"Hybrid")} + ${escapeHtml(dual.engineGoal||"Aerobic Base")}</strong><small>${escapeHtml(String(strengthDays))} strength • ${escapeHtml(String(engineDays))} engine • ${escapeHtml(String(lengthWeeks))}-week block</small></div><div><span>Block launch</span><strong>${recommended?"Recommended default":"Your selected setup"}</strong><small>Week 1 begins ${escapeHtml(start.toLowerCase())}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>${["Faith-Based","Mixed"].includes(byId("onboardingMessageStyle").value)?escapeHtml(byId("onboardingScriptureFrequency").value+" Scripture"):"Message preference saved"}</small></div>`;
 }
+
+function onboardingEngineGoalOptions(mode){
+  const options={"Running":["General Aerobic Fitness","5K","10K","Half Marathon","Marathon"],"Cycling":["General Aerobic Fitness","20K Time Trial","40K Time Trial","Century Ride"],"Rower":["General Aerobic Fitness","2K Row","5K Row"],"Swimming":["General Aerobic Fitness","500m Swim","1500m Swim"],"Hiking / Rucking":["General Aerobic Fitness","5 Mile Ruck","10 Mile Ruck"],"Sprint / Field":["Speed Development","Field Conditioning"],"General Conditioning":["General Aerobic Fitness","Work Capacity"],"None / Recovery Only":["Recovery and Mobility"]};
+  return options[mode]||options.Running;
+}
+function populateOnboardingEngineGoals(){const el=byId("onboardingEngineGoal"),mode=byId("onboardingEngineMode")?.value||"Running",current=el?.value;if(!el)return;el.innerHTML=onboardingEngineGoalOptions(mode).map(x=>`<option>${x}</option>`).join("");if(onboardingEngineGoalOptions(mode).includes(current))el.value=current;}
+function loadOnboardingDualGoals(){const b=data.trainingBlock||{},d=b.dualGoals||{};byId("onboardingStrengthGoal").value=d.strengthGoal||"Hybrid";byId("onboardingStrengthDays").value=String(b.strengthDays||3);byId("onboardingEngineMode").value=d.engineMode||"Running";populateOnboardingEngineGoals();const goals=onboardingEngineGoalOptions(byId("onboardingEngineMode").value);byId("onboardingEngineGoal").value=goals.includes(d.engineGoal)?d.engineGoal:goals[0];byId("onboardingEngineDays").value=String(b.runDays||3);byId("onboardingTrainingDays").value=String(b.trainingDays||5);byId("onboardingSessionMinutes").value=String(b.sessionMinutes||75);byId("onboardingBlockLength").value=String(b.lengthWeeks||12);}
+function saveOnboardingDualGoals(buildPlan=true){const strengthDays=+byId("onboardingStrengthDays").value,engineDays=+byId("onboardingEngineDays").value,trainingDays=+byId("onboardingTrainingDays").value;if(strengthDays+engineDays>trainingDays*2){alert("Reduce weekly sessions or increase available training days so the plan remains practical.");return false;}const strength=byId("onboardingStrengthGoal").value,mode=byId("onboardingEngineMode").value,goal=byId("onboardingEngineGoal").value;data.trainingBlock={...data.trainingBlock,enabled:true,lengthWeeks:+byId("onboardingBlockLength").value||12,currentWeek:1,trainingDays,strengthDays,runDays:engineDays,sessionMinutes:+byId("onboardingSessionMinutes").value||75,startDate:data.trainingBlock?.startDate||todayKey(),generatedAt:new Date().toISOString(),dualGoals:{...(data.trainingBlock?.dualGoals||{}),strengthGoal:strength,engineMode:mode,engineGoal:goal,trainingCoordination:"Coach Decides",engineSessions:engineDays,targetValue:0}};data.settings.cardioType=mode==="General Conditioning"?"Air Bike":mode==="None / Recovery Only"?"Running":mode;if(buildPlan&&typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();return true;}
 function completeOnboarding() {
+  if(selectedOnboardingBlockMode()==="recommended")applyRecommendedFirstBlock();
+  if(!saveOnboardingDualGoals(false))return;
   saveFirstFlightProfile();
   saveOnboardingInjuryProfile();
   if (typeof saveOnboardingEquipment === "function") saveOnboardingEquipment();
+  data.trainingBlock.startDate=byId("onboardingBlockStart")?.value==="nextMonday"?nextMondayKey():todayKey();
+  data.trainingBlock.currentWeek=1;data.trainingBlock.enabled=true;data.trainingBlock.generatedAt=new Date().toISOString();
+  if(typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();
   data.settings.coachMessages = {setupComplete:true,style:byId("onboardingMessageStyle").value,scriptureFrequency:byId("onboardingScriptureFrequency").value};
-  data.settings.firstFlightStage="complete";data.settings.firstFlightTourComplete=true;
+  data.settings.firstFlightStage="complete";data.settings.firstFlightTourComplete=true;data.settings.firstBlockLaunchMode=selectedOnboardingBlockMode();
   saveData({render:false});
   byId("onboardingModal").classList.add("hidden");document.body.classList.remove("modal-open");renderApp();showScreen("home");
+  alert(`First training block created. Week 1 begins ${data.trainingBlock.startDate}.`);
 }

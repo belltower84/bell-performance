@@ -25,6 +25,7 @@ const defaults = {
     { day: "Sunday", mission: "S-4 Athletic Lower", done: false }
   ],
   history: [],
+  exerciseProgression: {},
   activeWorkout: null,
   mobility: { focus: "Auto", minutes: 10, completedDates: [], checks: {} },
   readinessLog: [],
@@ -88,6 +89,7 @@ function normalizeData() {
 
   data.plan = Array.isArray(data.plan) ? data.plan : cloneDefaults().plan;
   data.history = Array.isArray(data.history) ? data.history : [];
+  data.exerciseProgression = data.exerciseProgression && typeof data.exerciseProgression === "object" ? data.exerciseProgression : {};
   data.mobility = { ...defaults.mobility, ...(data.mobility || {}) };
   data.mobility.completedDates = Array.isArray(data.mobility.completedDates) ? data.mobility.completedDates : [];
   data.mobility.checks = data.mobility.checks || {};

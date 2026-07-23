@@ -41,16 +41,16 @@ function roundTo5(value) { return Math.max(5, Math.round(value / 5) * 5); }
 
 function recommendedWeight(exerciseName, status) {
   const m = data.settings.maxes || {};
-  const bodyweight = Number(data.settings.weight) || 207;
+  const bodyweight = Number(data.settings.weight) || null;
   const scale = status === "GREEN" ? 1 : status === "YELLOW" ? 0.90 : 0.75;
   const blockLoadFactor = data.trainingBlock?.enabled ? (strengthProgression().load / 0.76) : 1;
   const table = {
-    "Bench Press":{base:(m.bench||315)*0.70,label:"based on bench strength"},"Paused Bench Press":{base:(m.bench||315)*0.74,label:"based on bench strength"},"Close-Grip Bench Press":{base:(m.bench||315)*0.62,label:"based on bench strength"},"Incline Barbell Press":{base:(m.bench||315)*0.58,label:"based on bench strength"},
-    "Back Squat":{base:(m.squat||455)*0.68,label:"based on squat strength"},"Tempo Back Squat":{base:(m.squat||455)*0.58,label:"based on squat strength"},"Speed Back Squat":{base:(m.squat||455)*0.50,label:"move explosively"},"Front Squat":{base:(m.squat||455)*0.52,label:"based on squat strength"},"Narrow-Stance Squat":{base:(m.squat||455)*0.55,label:"based on squat strength"},
-    "Deadlift":{base:(m.deadlift||455)*0.68,label:"based on deadlift strength"},"Trap-Bar Deadlift":{base:(m.deadlift||455)*0.68,label:"based on deadlift strength"},"Romanian Deadlift":{base:(m.deadlift||455)*0.45,label:"based on deadlift strength"},"Good Morning":{base:(m.squat||455)*0.28,label:"start conservatively"},
-    "Push Press":{base:(m.pushPress||185)*0.70,label:"based on push-press strength"},"Strict Overhead Press":{base:(m.pushPress||185)*0.58,label:"based on overhead strength"},
-    "Incline Dumbbell Press":{base:(m.bench||315)*0.18,label:"per dumbbell"},"Flat Dumbbell Press":{base:(m.bench||315)*0.20,label:"per dumbbell"},"Arnold Press":{base:(m.pushPress||185)*0.20,label:"per dumbbell"},"Dumbbell Floor Press":{base:(m.bench||315)*0.20,label:"per dumbbell"},
-    "Single-Arm Dumbbell Row":{base:(m.bench||315)*0.24,label:"per dumbbell"},"Chest-Supported Row":{base:(m.bench||315)*0.21,label:"per dumbbell or equivalent"},
+    "Bench Press":{base:m.bench*0.70,label:"based on bench strength"},"Paused Bench Press":{base:m.bench*0.74,label:"based on bench strength"},"Close-Grip Bench Press":{base:m.bench*0.62,label:"based on bench strength"},"Incline Barbell Press":{base:m.bench*0.58,label:"based on bench strength"},
+    "Back Squat":{base:m.squat*0.68,label:"based on squat strength"},"Tempo Back Squat":{base:m.squat*0.58,label:"based on squat strength"},"Speed Back Squat":{base:m.squat*0.50,label:"move explosively"},"Front Squat":{base:m.squat*0.52,label:"based on squat strength"},"Narrow-Stance Squat":{base:m.squat*0.55,label:"based on squat strength"},
+    "Deadlift":{base:m.deadlift*0.68,label:"based on deadlift strength"},"Trap-Bar Deadlift":{base:m.deadlift*0.68,label:"based on deadlift strength"},"Romanian Deadlift":{base:m.deadlift*0.45,label:"based on deadlift strength"},"Good Morning":{base:m.squat*0.28,label:"start conservatively"},
+    "Push Press":{base:m.pushPress*0.70,label:"based on push-press strength"},"Strict Overhead Press":{base:m.pushPress*0.58,label:"based on overhead strength"},
+    "Incline Dumbbell Press":{base:m.bench*0.18,label:"per dumbbell"},"Flat Dumbbell Press":{base:m.bench*0.20,label:"per dumbbell"},"Arnold Press":{base:m.pushPress*0.20,label:"per dumbbell"},"Dumbbell Floor Press":{base:m.bench*0.20,label:"per dumbbell"},
+    "Single-Arm Dumbbell Row":{base:m.bench*0.24,label:"per dumbbell"},"Chest-Supported Row":{base:m.bench*0.21,label:"per dumbbell or equivalent"},
     "Reverse Lunge":{base:bodyweight*0.16,label:"per dumbbell"},"Bulgarian Split Squat":{base:bodyweight*0.15,label:"per dumbbell"},"Step-up":{base:bodyweight*0.14,label:"per dumbbell"},"Walking Lunge":{base:bodyweight*0.13,label:"per dumbbell"},
     "Kettlebell Swing":{base:bodyweight*0.24,label:"suggested kettlebell"},"Farmer Carry":{base:bodyweight*0.32,label:"per hand"},"Goblet Squat":{base:bodyweight*0.25,label:"suggested dumbbell or kettlebell"}
   };
@@ -60,7 +60,7 @@ function recommendedWeight(exerciseName, status) {
   }
   if (/Pull-up|Chin-up|Push-up|Jump|Sprint|Plank|Raise|Curl|Pressdown|Extension|Fly|Face Pull|Crunch|Ab Wheel|Hamstring Curl|Leg Extension/.test(exerciseName)) return {value:"",display:"Choose by effort",note:"Use clean reps and stop before technique breaks."};
   const item = table[exerciseName];
-  if (!item) return {value:"",display:"Choose by effort",note:status === "GREEN" ? "Finish with 1–2 reps in reserve." : status === "YELLOW" ? "Finish with about 3 reps in reserve." : "Keep effort easy and technique-focused."};
+  if (!item || !Number.isFinite(Number(item.base)) || Number(item.base) <= 0) return {value:"",display:"Choose by effort",note:"Enter your current max lifts in Athlete Settings for calculated starting weights. Until then, use clean reps and the prescribed RIR."};
   const baseline = roundTo5(item.base * scale * blockLoadFactor);
   const value = typeof prescribedWeightForExercise === "function" ? prescribedWeightForExercise(exerciseName, baseline) : baseline;
   const progress = typeof exerciseProgressionSummary === "function" ? exerciseProgressionSummary(exerciseName) : null;
@@ -68,8 +68,9 @@ function recommendedWeight(exerciseName, status) {
 }
 
 function saveMaxes() {
-  data.settings.maxes = {bench:+document.getElementById("benchMax").value||315,squat:+document.getElementById("squatMax").value||455,deadlift:+document.getElementById("deadliftMax").value||455,pushPress:+document.getElementById("pushPressMax").value||185};
-  saveData(); alert("Training maxes saved. Weight recommendations have been updated.");
+  const read=id=>{const raw=document.getElementById(id)?.value;const value=Number(raw);return raw!==""&&Number.isFinite(value)&&value>0?value:null;};
+  data.settings.maxes = {bench:read("benchMax"),squat:read("squatMax"),deadlift:read("deadliftMax"),pushPress:read("pushPressMax")};
+  saveData(); alert("Training maxes saved. Blank fields remain unset.");
 }
 
 function saveRotationWeek() {

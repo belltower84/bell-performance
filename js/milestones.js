@@ -44,15 +44,16 @@ function missionProgress() {
     workouts,
     mobility,
     weightPct,
-    workoutPct: Math.min(100, Math.round((workouts / data.mission.goalWorkouts) * 100)),
-    mobilityPct: Math.min(100, Math.round((mobility / data.mission.goalMobility) * 100))
+    workoutPct: Math.min(100, Math.round((workouts / Math.max(1, Number(data.mission.goalWorkouts)||40)) * 100)),
+    mobilityPct: Math.min(100, Math.round((mobility / Math.max(1, Number(data.mission.goalMobility)||30)) * 100))
   };
 }
 
 function saveMissionGoals() {
-  data.mission.goalWorkouts = +document.getElementById("goalWorkouts").value || 40;
-  data.mission.goalMobility = +document.getElementById("goalMobility").value || 30;
-  data.mission.goalPullups = +document.getElementById("goalPullups").value || 25;
-  data.mission.goal5k = +document.getElementById("goal5k").value || 28;
+  const readGoal=id=>{const raw=document.getElementById(id)?.value;const value=Number(raw);return raw!==""&&Number.isFinite(value)&&value>0?value:null;};
+  data.mission.goalWorkouts = readGoal("goalWorkouts");
+  data.mission.goalMobility = readGoal("goalMobility");
+  data.mission.goalPullups = readGoal("goalPullups");
+  data.mission.goal5k = readGoal("goal5k");
   saveData();
 }

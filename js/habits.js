@@ -72,6 +72,8 @@ function renderDashboardHabits(items,done,count,pct){
   const list=byId("dashboardHabitList");if(!list)return;
   setText("dashboardHabitScore",`${count} of ${items.length}`);setText("dashboardHabitPercent",`${pct}%`);setText("dashboardHabitMessage",habitProgressMessage(pct));
   const bar=byId("dashboardHabitProgressBar");if(bar)bar.style.width=`${pct}%`;
+  const t=ensureHabitTargets(),targets=byId("dashboardDailyTargets");
+  if(targets)targets.innerHTML=`<div><span>Protein</span><strong>${t.proteinGrams} g</strong></div><div><span>Water</span><strong>${t.hydrationOz} oz</strong></div><div><span>Steps</span><strong>${Number(t.steps).toLocaleString()}</strong></div><div><span>Sleep</span><strong>${t.sleepHours} hr</strong></div><div><span>Mobility</span><strong>${t.mobilityMinutes} min</strong></div>`;
   list.innerHTML=items.map(item=>{const copy=habitDisplay(item);return `<button type="button" class="dashboard-habit-chip ${done.has(item.id)?"complete":""}" onclick="toggleHabit('${escapeHtml(item.id)}')" aria-pressed="${done.has(item.id)}"><span>${done.has(item.id)?"✓":escapeHtml(item.icon)}</span><b>${escapeHtml(copy.title)}</b></button>`;}).join("");
 }
 function renderHabits(){

@@ -42,8 +42,8 @@ const defaults = {
     completions: {}
   },
   mission: {
-    goalWorkouts: 40, goalMobility: 30, goalPullups: 25, goal5k: 28,
-    currentPullups: 20, current5k: null
+    goalWorkouts: null, goalMobility: null, goalPullups: null, goal5k: null,
+    currentPullups: null, current5k: null
   },
   nutrition: { height: null, age: null, activity: 1.55, goal: "maintain" },
   trainingBlock: {
@@ -171,8 +171,19 @@ function importData(event) {
 
 function resetApp() {
   if (!confirm("Reset all Bell Performance data on this device?")) return;
+  localStorage.removeItem(STORAGE_KEY);
   data = cloneDefaults();
-  saveData();
+  delete data.missionPlan;
+  data.settings.maxes = { bench:null, squat:null, deadlift:null, pushPress:null };
+  data.mission = { goalWorkouts:null, goalMobility:null, goalPullups:null, goal5k:null, currentPullups:null, current5k:null };
+  data.trainingBlock = cloneDefaults().trainingBlock;
+  data.plan = [];
+  data.history = [];
+  data.exerciseProgression = {};
+  data.exerciseIntelligence = { replacements:[], personalConstraints:[] };
+  data.habits.targets = {proteinGrams:0,hydrationOz:0,steps:0,sleepHours:0,mobilityMinutes:0,customized:false};
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  window.location.reload();
 }
 
 normalizeData();

@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
-  <title>Bell Performance 7.0.0 — First Flight</title>
-  <link rel="stylesheet" href="./css/app.css?v=700">
+  <title>Bell Performance 7.0.1 — First Flight</title>
+  <link rel="stylesheet" href="./css/app.css?v=701">
 
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -25,7 +25,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-  <div class="brand-lockup"><img src="./assets/logo-shield.svg?v=700" alt="Bell Performance shield"><div><h1>BELL <span>PERFORMANCE</span></h1><div class="brand-tagline">TRAIN FOR LIFE</div></div></div>
+  <div class="brand-lockup"><img src="./assets/logo-shield.svg?v=701" alt="Bell Performance shield"><div><h1>BELL <span>PERFORMANCE</span></h1><div class="brand-tagline">TRAIN FOR LIFE</div></div></div>
   <div class="header-actions"><button id="notificationButton" aria-label="Open notifications" onclick="openNotificationCenter()">♢<span id="notificationBadge">0</span></button><button id="profileButton" aria-label="Open athlete profile" onclick="openAthleteProfile()">◎</button></div>
 </header>
 <main>
@@ -54,12 +54,12 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
   <div class="section-heading"><h2>Today's Mission</h2><button onclick="showScreen('plan')">View Full Schedule ›</button></div>
   <div class="training-pair">
-    <article class="training-card strength-card"><img id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=700" alt="Strength athlete"><div class="training-overlay"><div class="training-type">🏋 <span>STRENGTH</span></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
-    <article class="training-card engine-card"><img id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=700" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
+    <article class="training-card strength-card"><img id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=701" alt="Strength athlete"><div class="training-overlay"><div class="training-type">🏋 <span>STRENGTH</span></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
+    <article class="training-card engine-card"><img id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=701" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
   </div>
   <div id="todayPreview" class="hidden"></div>
 
-  <div class="recovery-prescription-card"><div class="recovery-icon">♿</div><div><span class="metric-label">Today's Recovery Prescription</span><strong id="mobilityDashboardTitle">10 min Mobility Flow</strong><div class="hint" id="mobilityDashboardDetail">Matched to today's training • Complete morning or evening</div></div><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">›</button></div>
+  <div class="recovery-prescription-card" id="recoveryPrescriptionCard"><div class="recovery-icon">♿</div><div><span class="metric-label">Today's Recovery Prescription</span><strong id="mobilityDashboardTitle">10 min Mobility Flow</strong><div class="hint" id="mobilityDashboardDetail">Matched to today's training • Complete morning or evening</div></div><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">›</button></div>
 
   <div class="quick-actions"><button onclick="document.getElementById('nutritionMode').scrollIntoView({behavior:'smooth'})"><span>🍴</span><strong>Nutrition</strong><small>Fuel the mission</small></button><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})"><span>♡</span><strong>Recovery</strong><small>Rest. Recover. Rebuild.</small></button><button onclick="showScreen('history')"><span>▥</span><strong>Progress</strong><small>Track results</small></button><button onclick="showScreen('more')"><span>◎</span><strong>Habits</strong><small>Build consistency</small></button></div>
 
@@ -70,7 +70,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
   <div class="card"><h3>Current Training Block</h3><div class="status-line"><div><div class="mission-title" id="blockTitle">No active block</div><div class="sub" id="blockStatus">Build a goal-based plan in More.</div></div><div class="pill" id="blockWeekPill">—</div></div><div class="mini-progress"><div id="blockProgressBar"></div></div><div class="hint" id="blockRunSummary"></div><button class="secondary" id="advanceBlockButton" onclick="advanceBlockWeek()">Complete Week & Build Next</button></div>
   <div class="card"><h3>Coach Guidance</h3><div class="mission-title" id="coachHeadline">Today's guidance</div><div class="hint" id="coachRecommendation"></div></div>
   <div class="card"><h3>Engine Mode</h3><label for="cardioType">Choose today's Engine modality</label><select id="cardioType" onchange="saveCardioType()"><option value="Running">Running / Walking</option><option value="Cycling">Outdoor / Stationary Bike</option><option value="Rower">Rower</option><option value="Swimming">Swimming</option><option value="Hiking / Rucking">Hiking / Rucking</option><option value="Sprint / Field">Sprint / Field</option><option value="Air Bike">Air Bike</option><option value="Elliptical">Elliptical</option><option value="Stair Climber">Stair Climber</option></select><div class="hint" id="cardioModeNote"></div></div>
-  <div class="card"><h3>Daily Mobility</h3><div class="row"><div><label>Focus area</label><select id="mobilityFocus" onchange="saveMobilityFocus()"><option value="Auto">Auto — match today's training</option><option value="Full Body">Full Body</option><option value="Hips">Hips</option><option value="Shoulders">Shoulders</option><option value="Low Back">Low Back</option><option value="Ankles">Ankles</option></select></div><div><label>Time</label><select id="mobilityMinutes" onchange="saveMobilityFocus()"><option value="6">6 minutes</option><option value="10" selected>10 minutes</option><option value="15">15 minutes</option></select></div></div><div class="hint" id="mobilityReason"></div><div id="mobilityList" class="mobility-list"></div><button class="good" id="mobilityCompleteButton" onclick="completeMobility()">Complete Daily Mobility</button></div>
+  <div class="card" id="dailyMobilityCard"><h3>Daily Mobility</h3><div class="row"><div><label>Focus area</label><select id="mobilityFocus" onchange="saveMobilityFocus()"><option value="Auto">Auto — match today's training</option><option value="Full Body">Full Body</option><option value="Hips">Hips</option><option value="Shoulders">Shoulders</option><option value="Low Back">Low Back</option><option value="Ankles">Ankles</option></select></div><div><label>Time</label><select id="mobilityMinutes" onchange="saveMobilityFocus()"><option value="6">6 minutes</option><option value="10" selected>10 minutes</option><option value="15">15 minutes</option></select></div></div><div class="hint" id="mobilityReason"></div><div id="mobilityList" class="mobility-list"></div><button class="good" id="mobilityCompleteButton" onclick="completeMobility()">Complete Daily Mobility</button></div>
   <div class="card"><h3>Nutrition Guide — Beta</h3><div class="hint" id="nutritionMode"></div><div class="macro-grid"><div class="macro-box"><strong id="calorieOut">—</strong><small>Calories</small></div><div class="macro-box"><strong id="proteinOut">—</strong><small>Protein</small></div><div class="macro-box"><strong id="carbOut">—</strong><small>Carbs</small></div><div class="macro-box"><strong id="fatOut">—</strong><small>Fat</small></div></div></div>
   <div class="card"><h3>Weekly Progress</h3><div class="big" id="scoreOut">0%</div><div class="scorebar"><div id="scoreBar"></div></div><div class="hint" id="scoreDetail"></div></div>
 </section>
@@ -225,16 +225,19 @@ main{display:block}.screen{display:none}.screen.active{display:block}
   <div class="modal-box first-flight-box">
     <div class="first-flight-shell">
       <header class="first-flight-header">
-        <div><span class="metric-label">Bell Performance 7.0.0</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
+        <div><span class="metric-label">Bell Performance 7.0.1</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
         <div class="first-flight-step-badge"><strong id="onboardingStepNumber">1</strong><span>of 4</span></div>
       </header>
       <div class="first-flight-progress"><i id="onboardingProgress"></i></div>
       <div class="first-flight-body">
         <section class="onboarding-step active" data-onboarding-step="0">
           <span class="first-flight-kicker">Flight Check 01</span><h3>Identify the athlete</h3>
-          <p class="sub">Your name and programming profile personalize coaching without limiting exercise or goal choices.</p>
-          <div class="row"><div><label>First name</label><input id="onboardingAthleteName" placeholder="First name" autocomplete="given-name"></div><div><label>Programming profile</label><select id="onboardingSex"><option value="Male">Male</option><option value="Female">Female</option><option value="Prefer not to say">Prefer not to say</option></select></div></div>
-          <label>Coaching mode</label><select id="onboardingAthleteMode"><option value="Hybrid Athlete">Hybrid Athlete</option><option value="Tactical Athlete">Tactical Athlete</option><option value="Strength Athlete">Strength Athlete</option><option value="Endurance Athlete">Endurance Athlete</option><option value="Masters Athlete">Masters Athlete</option><option value="Youth Athlete">Youth Athlete</option></select>
+          <p class="sub">Enter the athlete details that shape readiness, nutrition guidance, and programming. Next, the guided tour will teach the dashboard before First Flight continues.</p>
+          <div class="row"><div><label>First name</label><input id="onboardingAthleteName" placeholder="First name" autocomplete="given-name"></div><div><label>Age</label><input id="onboardingAge" type="number" min="8" max="100" inputmode="numeric" placeholder="Age"></div></div>
+          <div class="row"><div><label>Programming profile</label><select id="onboardingSex"><option value="Male">Male</option><option value="Female">Female</option><option value="Prefer not to say">Prefer not to say</option></select></div><div><label>Athlete type</label><select id="onboardingAthleteMode"><option value="Hybrid Athlete">Hybrid Athlete</option><option value="Tactical Athlete">Tactical Athlete</option><option value="Strength Athlete">Strength Athlete</option><option value="Endurance Athlete">Endurance Athlete</option><option value="Masters Athlete">Masters Athlete</option><option value="Youth Athlete">Youth Athlete</option></select></div></div>
+          <div class="row"><div><label>Bodyweight (lb)</label><input id="onboardingBodyweight" type="number" min="50" max="700" step="0.1" inputmode="decimal" placeholder="Current weight"></div><div><label>Height</label><div class="height-inputs"><input id="onboardingHeightFeet" type="number" min="3" max="7" inputmode="numeric" placeholder="ft"><input id="onboardingHeightInches" type="number" min="0" max="11" inputmode="numeric" placeholder="in"></div></div></div>
+          <label>Target bodyweight (lb) <span class="optional-label">optional</span></label><input id="onboardingGoalWeight" type="number" min="50" max="700" step="0.1" inputmode="decimal" placeholder="Performance or body-composition target">
+          <div class="first-flight-callout"><strong>Next: Guided Tour</strong><span>You will land on the main dashboard and learn readiness, Daily Mobility, Training, goals, and recovery before completing the rest of First Flight.</span></div>
         </section>
         <section class="onboarding-step" data-onboarding-step="1">
           <span class="first-flight-kicker">Flight Check 02</span><h3>Build your Workout Location Editor</h3>
@@ -259,9 +262,9 @@ main{display:block}.screen{display:none}.screen.active{display:block}
         </section>
         <section class="onboarding-step" data-onboarding-step="3">
           <span class="first-flight-kicker">Ready for Takeoff</span><h3>Review your setup</h3>
-          <p class="sub">Confirm the essentials. Your full guided tour will launch after setup.</p>
+          <p class="sub">Confirm the essentials. The guided tour is complete and your personalized setup is ready to launch.</p>
           <div id="onboardingReview" class="onboarding-review"></div>
-          <div class="first-flight-callout"><strong>First move after launch</strong><span>Complete today’s readiness check-in, then use the active Workout Location selector before starting your mission.</span></div>
+          <div class="first-flight-callout"><strong>First move after launch</strong><span>Use Update Check-In inside Mission Status, confirm your active Workout Location, and complete the Daily Mobility prescription when it fits your day.</span></div>
         </section>
       </div>
       <footer class="first-flight-footer"><button type="button" id="onboardingBack" class="secondary" onclick="previousOnboardingStep()">Back</button><button type="button" id="onboardingNext" onclick="nextOnboardingStep()">Continue</button></footer>
@@ -281,7 +284,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
       <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
       <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
     </div>
-    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=700" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
+    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=701" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
     <div class="card workout-control-card">
       <h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
       <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
@@ -302,22 +305,22 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 
-<script src="./data/workouts.js?v=700"></script>
-<script src="./js/storage.js?v=700"></script>
-<script src="./js/readiness.js?v=700"></script>
-<script src="./js/equipment.js?v=700"></script>
+<script src="./data/workouts.js?v=701"></script>
+<script src="./js/storage.js?v=701"></script>
+<script src="./js/readiness.js?v=701"></script>
+<script src="./js/equipment.js?v=701"></script>
 <script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");</script>
-<script src="./js/training-blocks.js?v=700"></script>
-<script src="./js/mobility.js?v=700"></script>
-<script src="./js/nutrition.js?v=700"></script>
-<script src="./js/milestones.js?v=700"></script>
-<script src="./js/progression.js?v=700"></script>
-<script src="./js/workouts.js?v=700"></script>
-<script src="./js/artwork.js?v=700"></script>
-<script src="./js/quote-cache.js?v=700"></script>
-<script src="./js/ui.js?v=700"></script>
-<script src="./js/dual-goals.js?v=700"></script>
-<script src="./js/how-to.js?v=700"></script>
-<script src="./js/app.js?v=700"></script>
+<script src="./js/training-blocks.js?v=701"></script>
+<script src="./js/mobility.js?v=701"></script>
+<script src="./js/nutrition.js?v=701"></script>
+<script src="./js/milestones.js?v=701"></script>
+<script src="./js/progression.js?v=701"></script>
+<script src="./js/workouts.js?v=701"></script>
+<script src="./js/artwork.js?v=701"></script>
+<script src="./js/quote-cache.js?v=701"></script>
+<script src="./js/ui.js?v=701"></script>
+<script src="./js/dual-goals.js?v=701"></script>
+<script src="./js/how-to.js?v=701"></script>
+<script src="./js/app.js?v=701"></script>
 </body>
 </html>

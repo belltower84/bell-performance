@@ -298,7 +298,7 @@ function renderApp() {
   renderHistory();
   renderSettings();
 
-  if (!data.settings.coachMessages?.setupComplete) openFirstFlight();
+  if (!data.settings.coachMessages?.setupComplete && data.settings.firstFlightStage !== "tour") openFirstFlight();
   if (data.activeWorkout && byId("workoutModal").classList.contains("hidden")) {
     openWorkoutUI();
   }
@@ -360,29 +360,56 @@ function saveCoachMessagePreferences() {
 }
 
 let onboardingStep=0;
-function openFirstFlight(){
+function openFirstFlight(startStep=null){
   const modal=byId("onboardingModal"); if(!modal||!modal.classList.contains("hidden"))return;
-  byId("onboardingAthleteName").value=data.settings.athleteName==="Chris"?"":(data.settings.athleteName||"");
+  byId("onboardingAthleteName").value=data.settings.athleteName==="Chris"&&!data.settings.firstFlightTourComplete?"":(data.settings.athleteName||"");
   byId("onboardingSex").value=data.settings.sex||"Prefer not to say";
   byId("onboardingAthleteMode").value=data.settings.athleteMode||"Hybrid Athlete";
+  byId("onboardingAge").value=data.nutrition.age||"";
+  byId("onboardingBodyweight").value=data.settings.weight||"";
+  const totalHeight=Number(data.nutrition.height)||66;
+  byId("onboardingHeightFeet").value=Math.floor(totalHeight/12);
+  byId("onboardingHeightInches").value=totalHeight%12;
+  byId("onboardingGoalWeight").value=data.settings.goal||"";
   byId("onboardingMessageStyle").value=data.settings.coachMessages?.style||"Performance";
   byId("onboardingScriptureFrequency").value=data.settings.coachMessages?.scriptureFrequency||"Occasionally";
   toggleOnboardingScripture();
   if(typeof initializeOnboardingLocationEditor==="function")initializeOnboardingLocationEditor();
-  onboardingStep=0;renderOnboardingStep();modal.classList.remove("hidden");document.body.classList.add("modal-open");
+  const resolvedStep=startStep===null?(data.settings.firstFlightStage==="configure"?1:0):Number(startStep);
+  onboardingStep=Math.max(0,Math.min(3,resolvedStep));renderOnboardingStep();modal.classList.remove("hidden");document.body.classList.add("modal-open");
 }
 function renderOnboardingStep(){
   document.querySelectorAll("[data-onboarding-step]").forEach((step,index)=>step.classList.toggle("active",index===onboardingStep));
   byId("onboardingStepNumber").textContent=String(onboardingStep+1);
   byId("onboardingProgress").style.width=`${((onboardingStep+1)/4)*100}%`;
   byId("onboardingBack").disabled=onboardingStep===0;
-  byId("onboardingNext").textContent=onboardingStep===3?"Launch Bell Performance":"Continue";
-  const subtitles=["Build your athlete profile and training environment.","Map the equipment available everywhere you train.","Choose how the coach communicates with you.","Confirm the flight plan before launch."];
+  byId("onboardingNext").textContent=onboardingStep===0&&!data.settings.firstFlightTourComplete?"Save Profile & Start Tour":onboardingStep===3?"Launch Bell Performance":"Continue";
+  const subtitles=["Enter the athlete details that personalize Bell Performance.","Map the equipment available everywhere you train.","Choose how the coach communicates with you.","Confirm the flight plan before launch."];
   byId("onboardingStepSubtitle").textContent=subtitles[onboardingStep];
   if(onboardingStep===3)renderOnboardingReview();
 }
+function saveFirstFlightProfile(){
+  const name=byId("onboardingAthleteName").value.trim();
+  const age=Number(byId("onboardingAge").value);
+  const weight=Number(byId("onboardingBodyweight").value);
+  const feet=Number(byId("onboardingHeightFeet").value);
+  const inches=Number(byId("onboardingHeightInches").value);
+  const goal=Number(byId("onboardingGoalWeight").value);
+  if(!name){byId("onboardingAthleteName").focus();alert("Enter the athlete's first name to continue.");return false;}
+  if(!Number.isFinite(age)||age<8||age>100){byId("onboardingAge").focus();alert("Enter an age from 8 to 100.");return false;}
+  if(!Number.isFinite(weight)||weight<50||weight>700){byId("onboardingBodyweight").focus();alert("Enter a bodyweight from 50 to 700 lb.");return false;}
+  if(!Number.isFinite(feet)||feet<3||feet>7||!Number.isFinite(inches)||inches<0||inches>11){byId("onboardingHeightFeet").focus();alert("Enter a valid height in feet and inches.");return false;}
+  data.settings.athleteName=name;
+  data.settings.sex=byId("onboardingSex").value||"Prefer not to say";
+  data.settings.athleteMode=byId("onboardingAthleteMode").value||"Hybrid Athlete";
+  data.settings.weight=weight;
+  if(Number.isFinite(goal)&&goal>=50&&goal<=700)data.settings.goal=goal;
+  data.nutrition.age=age;
+  data.nutrition.height=feet*12+inches;
+  return true;
+}
 function validateOnboardingStep(){
-  if(onboardingStep===0&&!byId("onboardingAthleteName").value.trim()){byId("onboardingAthleteName").focus();alert("Enter the athlete's first name to continue.");return false;}
+  if(onboardingStep===0)return saveFirstFlightProfile();
   if(onboardingStep===1){
     if(typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();
     const invalid=onboardingLocations.find(location=>!location.name.trim());if(invalid){editOnboardingLocation(invalid.id);byId("onboardingLocationName").focus();alert("Give every workout location a name.");return false;}
@@ -390,21 +417,30 @@ function validateOnboardingStep(){
   }
   return true;
 }
-function nextOnboardingStep(){if(!validateOnboardingStep())return;if(onboardingStep<3){onboardingStep++;renderOnboardingStep();return;}completeOnboarding();}
+function nextOnboardingStep(){
+  if(!validateOnboardingStep())return;
+  if(onboardingStep===0&&!data.settings.firstFlightTourComplete){
+    data.settings.firstFlightStage="tour";saveData({render:false});
+    byId("onboardingModal").classList.add("hidden");document.body.classList.remove("modal-open");
+    renderApp();showScreen("home");window.scrollTo(0,0);
+    if(typeof launchFirstFlightTour==="function")window.setTimeout(launchFirstFlightTour,250);
+    return;
+  }
+  if(onboardingStep<3){onboardingStep++;renderOnboardingStep();return;}completeOnboarding();
+}
 function previousOnboardingStep(){if(onboardingStep>0){if(onboardingStep===2&&typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();onboardingStep--;renderOnboardingStep();}}
 function toggleOnboardingScripture(){const style=byId("onboardingMessageStyle").value;byId("onboardingScriptureWrap").style.display=["Faith-Based","Mixed"].includes(style)?"block":"none";}
 function renderOnboardingReview(){
   if(typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();
   const primary=onboardingLocations.find(x=>x.id===onboardingActiveLocationId)||onboardingLocations[0];
-  byId("onboardingReview").innerHTML=`<div><span>Athlete</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>${escapeHtml(byId("onboardingAthleteMode").value)} • ${escapeHtml(byId("onboardingSex").value)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>${["Faith-Based","Mixed"].includes(byId("onboardingMessageStyle").value)?escapeHtml(byId("onboardingScriptureFrequency").value+" Scripture"):"Message preference saved"}</small></div>`;
+  const height=Number(data.nutrition.height)||66;
+  byId("onboardingReview").innerHTML=`<div><span>Athlete</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>${escapeHtml(byId("onboardingAthleteMode").value)} • Age ${escapeHtml(data.nutrition.age)} • ${escapeHtml(data.settings.weight)} lb • ${Math.floor(height/12)}′${height%12}″</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>${["Faith-Based","Mixed"].includes(byId("onboardingMessageStyle").value)?escapeHtml(byId("onboardingScriptureFrequency").value+" Scripture"):"Message preference saved"}</small></div>`;
 }
 function completeOnboarding() {
-  data.settings.athleteName = byId("onboardingAthleteName").value.trim() || "Athlete";
-  data.settings.sex = byId("onboardingSex").value || "Prefer not to say";
-  data.settings.athleteMode = byId("onboardingAthleteMode").value || "Hybrid Athlete";
+  saveFirstFlightProfile();
   if (typeof saveOnboardingEquipment === "function") saveOnboardingEquipment();
   data.settings.coachMessages = {setupComplete:true,style:byId("onboardingMessageStyle").value,scriptureFrequency:byId("onboardingScriptureFrequency").value};
+  data.settings.firstFlightStage="complete";data.settings.firstFlightTourComplete=true;
   saveData({render:false});
-  byId("onboardingModal").classList.add("hidden");document.body.classList.remove("modal-open");renderApp();
-  if (typeof maybeShowHowToGuideAfterProfileSetup === "function") maybeShowHowToGuideAfterProfileSetup();
+  byId("onboardingModal").classList.add("hidden");document.body.classList.remove("modal-open");renderApp();showScreen("home");
 }

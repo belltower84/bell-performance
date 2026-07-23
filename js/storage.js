@@ -13,6 +13,8 @@ const defaults = {
     maxes: { bench: 315, squat: 455, deadlift: 455, pushPress: 185 },
     readiness: { sleepQuality:4, energy:4, motivation:4, soreness:3, timeAvailability:3, score:80, status:"GREEN", lastPromptDate:"" },
     coachMessages: { setupComplete:false, style:"Performance", scriptureFrequency:"Occasionally" },
+    firstFlightStage: "profile",
+    firstFlightTourComplete: false,
     equipmentSetup: { locations:[{id:"default",name:"My Gym",environment:"commercial",equipment:["barbell","rack","bench","dumbbells","cables","machines","smith","kettlebells","bands","pullupBar","dipStation","plyoBox","treadmill","bike","rower","skiErg","sled","airBike","jumpRope","outdoor"]}], activeLocationId:"default" }
   },
   plan: [
@@ -85,6 +87,8 @@ function normalizeData() {
     lastPromptDate: old.lastPromptDate || ""
   };
   data.settings.coachMessages = { ...defaults.settings.coachMessages, ...(data.settings.coachMessages || {}) };
+  data.settings.firstFlightStage = data.settings.firstFlightStage || (data.settings.coachMessages.setupComplete ? "complete" : "profile");
+  data.settings.firstFlightTourComplete = Boolean(data.settings.firstFlightTourComplete || data.settings.coachMessages.setupComplete);
   if (typeof normalizeEquipmentSettings === "function") normalizeEquipmentSettings();
 
   data.plan = Array.isArray(data.plan) ? data.plan : cloneDefaults().plan;

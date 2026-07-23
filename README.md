@@ -1,4 +1,4 @@
-# Bell Performance 7.0.0 — First Flight
+# Bell Performance 7.0.1 — First Flight
 
 - Adds a four-step interactive onboarding flow.
 - Introduces the Workout Location Editor during setup, including multiple locations, presets, custom equipment, and primary-location selection.
@@ -28,3 +28,7 @@ This maintenance release fixes the dashboard unexpectedly opening a large slides
 - Slideshow playback only begins after the user presses **Play Slideshow**.
 - Updated service-worker and asset cache versions.
 - Corrected old-cache cleanup logic.
+
+
+## 7.0.1 First Flight sequence
+Athlete specifics are collected first. The app then opens a live, spotlight-guided dashboard tour before resuming Workout Location and coaching-preference setup.

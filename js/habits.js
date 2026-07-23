@@ -5,12 +5,14 @@ function habitCompletedIds(key=habitDateKey()){const value=data.habits?.completi
 function roundTo(value,step=5){return Math.max(step,Math.round(value/step)*step);}
 function habitGoalName(){return String(data.missionPlan?.label||data.missionPlan?.eventType||data.trainingBlock?.goalType||data.settings?.athleteMode||"").toLowerCase();}
 function recommendedHabitTargets(){
-  const weight=Math.max(90,Number(data.settings?.weight)||180),goalWeight=Math.max(90,Number(data.settings?.goal)||weight),goal=habitGoalName();
+  const weight=Math.max(90,Number(data.settings?.weight)||180),goal=habitGoalName();
   const physique=/fat loss|bodybuilding|physique|muscle|hypertrophy|recomposition/.test(goal), endurance=/marathon|half marathon|10k|5k|triathlon|endurance|running|cycling/.test(goal), mobility=/mobility|longevity|recovery/.test(goal);
-  const proteinBase=physique?Math.max(goalWeight,weight*.9):endurance?weight*.8:weight*.85;
+  const nutrition=typeof macroTargets==="function"?macroTargets():null;
+  const nutritionProtein=Number(nutrition?.protein);
+  const nutritionHydration=Number(nutrition?.hydration);
   return {
-    proteinGrams:roundTo(proteinBase,5),
-    hydrationOz:roundTo(Math.max(80,weight*.5+(endurance?15:physique?5:0)),5),
+    proteinGrams:Number.isFinite(nutritionProtein)&&nutritionProtein>0?nutritionProtein:roundTo(weight*.85,5),
+    hydrationOz:Number.isFinite(nutritionHydration)&&nutritionHydration>0?nutritionHydration:roundTo(Math.max(80,weight*.5+(endurance?15:physique?5:0)),5),
     steps:roundTo(physique&&/fat loss|recomposition/.test(goal)?10000:endurance?9000:physique?7500:8000,500),
     sleepHours:physique||endurance?8:7.5,
     mobilityMinutes:mobility?20:endurance?12:10,
@@ -20,7 +22,7 @@ function recommendedHabitTargets(){
 function ensureHabitTargets(force=false){
   data.habits=data.habits||{items:[],completions:{}};
   const current=data.habits.targets||{},missing=!current.proteinGrams||!current.hydrationOz||!current.steps||!current.sleepHours||!current.mobilityMinutes;
-  if(force||(!current.customized&&missing)) data.habits.targets={...recommendedHabitTargets(),customized:Boolean(force?false:current.customized)};
+  if(force||!current.customized||missing) data.habits.targets={...recommendedHabitTargets(),customized:false};
   return data.habits.targets;
 }
 function habitDisplay(item){

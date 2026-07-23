@@ -18,6 +18,23 @@ function setValue(id, value) {
   if (element) element.value = value;
 }
 
+
+const ATHLETE_TYPE_DESCRIPTIONS = {
+  "Hybrid Athlete": "Balances Strength and Engine training for broad, all-around performance.",
+  "Tactical Athlete": "Built for police, fire, military, and other demanding occupations requiring strength, work capacity, durability, and readiness.",
+  "Strength Athlete": "Prioritizes maximal strength and powerful compound lifting while using Engine work to support conditioning and recovery.",
+  "Endurance Athlete": "Prioritizes running, cycling, rowing, or similar Engine goals while Strength work supports durability and performance.",
+  "Masters Athlete": "Generally intended for athletes age 40+ or those competing in a masters age division, with added emphasis on recovery and sustainable progression.",
+  "Youth Athlete": "For developing athletes, using age-appropriate technique, movement quality, conservative loading, and appropriate supervision."
+};
+
+function renderAthleteTypeDescription(selectId, targetId) {
+  const select = byId(selectId);
+  const target = byId(targetId);
+  if (!select || !target) return;
+  target.textContent = ATHLETE_TYPE_DESCRIPTIONS[select.value] || ATHLETE_TYPE_DESCRIPTIONS["Hybrid Athlete"];
+}
+
 function showScreen(name) {
   document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
   byId(name)?.classList.add("active");
@@ -380,6 +397,7 @@ function renderTodayTrainingCards(){const sessions=dashboardSessionsForToday(),s
 function renderSettings() {
   setValue("athleteNameInput", data.settings.athleteName || "");
   setValue("athleteModeInput", data.settings.athleteMode || "Hybrid Athlete");
+  renderAthleteTypeDescription("athleteModeInput", "athleteModeDescription");
   setValue("sexInput", data.settings.sex || "Male");
   setValue("phaseInput", data.settings.phase);
   byId("weightInput").value = data.settings.weight;
@@ -545,6 +563,7 @@ function openFirstFlight(startStep=null){
   byId("onboardingAthleteName").value=data.settings.athleteName||"";
   byId("onboardingSex").value=data.settings.sex||"Prefer not to say";
   byId("onboardingAthleteMode").value=data.settings.athleteMode||"Hybrid Athlete";
+  renderAthleteTypeDescription("onboardingAthleteMode", "onboardingAthleteModeDescription");
   byId("onboardingAge").value=data.nutrition.age||"";
   byId("onboardingBodyweight").value=data.settings.weight||"";
   const totalHeight=Number(data.nutrition.height)||0;
@@ -651,6 +670,7 @@ function recommendedFirstBlockSettings(){
   let strengthDays=strength==="Bodybuilding"?5:4,engineDays=mode==="None / Recovery Only"?1:["Half Marathon","Marathon","Century Ride","10 Mile Ruck"].includes(goal)?4:3,trainingDays=5,sessionMinutes=75,lengthWeeks=["Marathon","Century Ride"].includes(goal)?20:["Half Marathon","10 Mile Ruck"].includes(goal)?16:12;
   if(athlete==="Endurance Athlete"){engineDays=Math.max(engineDays,4);strengthDays=Math.min(strengthDays,2);trainingDays=6;}
   if(athlete==="Strength Athlete"){strengthDays=Math.max(strengthDays,4);engineDays=Math.min(engineDays,2);trainingDays=5;}
+  if(athlete==="Functional Fitness Athlete"){strengthDays=Math.max(strengthDays,4);engineDays=Math.max(engineDays,3);trainingDays=Math.max(trainingDays,5);sessionMinutes=Math.max(sessionMinutes,60);}
   if(athlete==="Masters Athlete"){trainingDays=Math.min(trainingDays,5);sessionMinutes=60;}
   if(athlete==="Youth Athlete"){strengthDays=Math.min(strengthDays,3);engineDays=Math.min(engineDays,3);sessionMinutes=60;lengthWeeks=Math.min(lengthWeeks,12);}
   return {strengthDays,engineDays,trainingDays,sessionMinutes,lengthWeeks,strength,mode,goal};

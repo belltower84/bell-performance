@@ -1,3 +1,7 @@
+# Bell Performance 6.9 — Contextual Quote Rotation
+
+Adds a rotating offline quote cache matched to the athlete’s active Strength and Engine goals. The dashboard alternates Strength and Engine emphasis by day, while existing Faith-Based, Mixed, Stoic, and Off preferences remain supported. Scripture uses the King James Version.
+
 # Bell Performance 6.8.2 — Help & Guided Tour
 
 - Fixes the non-responsive guided-tour buttons.

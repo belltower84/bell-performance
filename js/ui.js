@@ -335,6 +335,7 @@ function shouldUseFaithToday(pref) {
 }
 
 function selectedCoachMessage() {
+  if (typeof BellQuoteCache !== "undefined") return BellQuoteCache.selected();
   const pref = data.settings.coachMessages || {};
   if (pref.style === "Off") return null;
   let type = pref.style;

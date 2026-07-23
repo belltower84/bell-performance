@@ -1,6 +1,6 @@
 "use strict";
 
-const HOW_TO_KEY = "bellPerformanceHowToSeenV2";
+const HOW_TO_KEY = "bellPerformanceHowToSeenV3";
 const howToSlides = [
   {
     kicker:"Start here", title:"Your daily coaching briefing",
@@ -81,5 +81,11 @@ function goToHowToSlide(i){howToIndex=i;renderHowToSlide();}
 function toggleHowToAutoplay(){howToTimer?stopHowToAutoplay():startHowToAutoplay();}
 function startHowToAutoplay(){document.getElementById("howToAutoPlay").textContent="Ⅱ Pause Slideshow";howToTimer=setInterval(()=>{if(howToIndex===howToSlides.length-1){stopHowToAutoplay();return;}howToIndex++;renderHowToSlide();},5500);}
 function stopHowToAutoplay(){if(howToTimer)clearInterval(howToTimer);howToTimer=null;const b=document.getElementById("howToAutoPlay");if(b)b.textContent="▶ Play Slideshow";}
-function maybeShowHowToGuide(){ return false; }
+function hasSeenHowToGuide(){
+  return localStorage.getItem(HOW_TO_KEY) === "1";
+}
+function maybeShowHowToGuideAfterProfileSetup(){
+  if (hasSeenHowToGuide()) return;
+  window.setTimeout(() => openHowToGuide(0), 350);
+}
 window.addEventListener("keydown",e=>{if(document.getElementById("howToModal")?.classList.contains("hidden"))return;if(e.key==="Escape")closeHowToGuide();if(e.key==="ArrowRight")nextHowToSlide();if(e.key==="ArrowLeft")previousHowToSlide();});

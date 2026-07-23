@@ -366,4 +366,9 @@ function completeOnboarding() {
   saveData({render:false});
   byId("onboardingModal").classList.add("hidden");
   renderApp();
+  // The tour launches only after a brand-new athlete finishes profile setup.
+  // It never auto-opens on ordinary dashboard visits.
+  if (typeof maybeShowHowToGuideAfterProfileSetup === "function") {
+    maybeShowHowToGuideAfterProfileSetup();
+  }
 }

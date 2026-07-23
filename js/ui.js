@@ -550,6 +550,11 @@ function openFirstFlight(startStep=null){
   byId("onboardingHeightFeet").value=totalHeight?Math.floor(totalHeight/12):"";
   byId("onboardingHeightInches").value=totalHeight?totalHeight%12:"";
   byId("onboardingGoalWeight").value=data.settings.goal||"";
+  const onboardingMaxes=data.settings.maxes||{};
+  byId("onboardingBenchMax").value=onboardingMaxes.bench??"";
+  byId("onboardingSquatMax").value=onboardingMaxes.squat??"";
+  byId("onboardingDeadliftMax").value=onboardingMaxes.deadlift??"";
+  byId("onboardingPushPressMax").value=onboardingMaxes.pushPress??"";
   byId("onboardingMessageStyle").value=data.settings.coachMessages?.style||"Performance";
   byId("onboardingScriptureFrequency").value=data.settings.coachMessages?.scriptureFrequency||"Occasionally";
   toggleOnboardingScripture();
@@ -576,15 +581,20 @@ function saveFirstFlightProfile(){
   const feet=Number(byId("onboardingHeightFeet").value);
   const inches=Number(byId("onboardingHeightInches").value);
   const goal=Number(byId("onboardingGoalWeight").value);
+  const readOptionalMax=id=>{const raw=byId(id).value.trim();if(!raw)return null;const value=Number(raw);return Number.isFinite(value)&&value>0?value:NaN;};
+  const onboardingMaxes={bench:readOptionalMax("onboardingBenchMax"),squat:readOptionalMax("onboardingSquatMax"),deadlift:readOptionalMax("onboardingDeadliftMax"),pushPress:readOptionalMax("onboardingPushPressMax")};
   if(!name){byId("onboardingAthleteName").focus();alert("Enter the athlete's first name to continue.");return false;}
   if(!Number.isFinite(age)||age<8||age>100){byId("onboardingAge").focus();alert("Enter an age from 8 to 100.");return false;}
   if(!Number.isFinite(weight)||weight<50||weight>700){byId("onboardingBodyweight").focus();alert("Enter a bodyweight from 50 to 700 lb.");return false;}
   if(!Number.isFinite(feet)||feet<3||feet>7||!Number.isFinite(inches)||inches<0||inches>11){byId("onboardingHeightFeet").focus();alert("Enter a valid height in feet and inches.");return false;}
+  const invalidMax=Object.entries(onboardingMaxes).find(([,value])=>Number.isNaN(value));
+  if(invalidMax){const id={bench:"onboardingBenchMax",squat:"onboardingSquatMax",deadlift:"onboardingDeadliftMax",pushPress:"onboardingPushPressMax"}[invalidMax[0]];byId(id).focus();alert("Enter a positive max lift or leave the field blank.");return false;}
   data.settings.athleteName=name;
   data.settings.sex=byId("onboardingSex").value||"Prefer not to say";
   data.settings.athleteMode=byId("onboardingAthleteMode").value||"Hybrid Athlete";
   data.settings.weight=weight;
   if(Number.isFinite(goal)&&goal>=50&&goal<=700)data.settings.goal=goal;
+  data.settings.maxes={bench:onboardingMaxes.bench,squat:onboardingMaxes.squat,deadlift:onboardingMaxes.deadlift,pushPress:onboardingMaxes.pushPress};
   data.nutrition.age=age;
   data.nutrition.height=feet*12+inches;
   return true;

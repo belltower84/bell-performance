@@ -256,3 +256,7 @@ body.female-profile .strength-card:before,body.female-session .workout-hero:befo
 
 /* 7.0.28 Daily numeric target strip */
 .dashboard-daily-targets{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:12px 0 10px}.dashboard-daily-targets>div{padding:9px 6px;border:1px solid rgba(255,255,255,.10);border-radius:10px;background:rgba(255,255,255,.035);text-align:center}.dashboard-daily-targets span{display:block;font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;opacity:.65}.dashboard-daily-targets strong{display:block;margin-top:3px;font-size:.86rem}@media(max-width:520px){.dashboard-daily-targets{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* 7.0.29 First Flight strength baseline */
+.first-flight-baseline-card{margin-top:16px;padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.035)}
+.first-flight-baseline-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px}.first-flight-baseline-heading h4{margin:2px 0 0}.first-flight-baseline-card .hint{display:block;margin-top:8px}

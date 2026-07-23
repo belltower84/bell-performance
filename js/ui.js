@@ -4,6 +4,10 @@ function byId(id) {
   return document.getElementById(id);
 }
 
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[character]));
+}
+
 function setText(id, value) {
   const element = byId(id);
   if (element) element.textContent = value;
@@ -294,7 +298,7 @@ function renderApp() {
   renderHistory();
   renderSettings();
 
-  if (!data.settings.coachMessages?.setupComplete) byId("onboardingModal")?.classList.remove("hidden");
+  if (!data.settings.coachMessages?.setupComplete) openFirstFlight();
   if (data.activeWorkout && byId("workoutModal").classList.contains("hidden")) {
     openWorkoutUI();
   }
@@ -355,21 +359,52 @@ function saveCoachMessagePreferences() {
   alert("Coach's Message preferences saved.");
 }
 
-function completeOnboarding() {
-  data.settings.athleteName = byId("onboardingAthleteName").value.trim() || data.settings.athleteName || "Athlete";
-  data.settings.sex = byId("onboardingSex").value || "Prefer not to say";
-  if (typeof saveOnboardingEquipment === "function") saveOnboardingEquipment();
-  data.settings.coachMessages = {
-    setupComplete:true,
-    style:byId("onboardingMessageStyle").value,
-    scriptureFrequency:byId("onboardingScriptureFrequency").value
-  };
-  saveData({render:false});
-  byId("onboardingModal").classList.add("hidden");
-  renderApp();
-  // The tour launches only after a brand-new athlete finishes profile setup.
-  // It never auto-opens on ordinary dashboard visits.
-  if (typeof maybeShowHowToGuideAfterProfileSetup === "function") {
-    maybeShowHowToGuideAfterProfileSetup();
+let onboardingStep=0;
+function openFirstFlight(){
+  const modal=byId("onboardingModal"); if(!modal||!modal.classList.contains("hidden"))return;
+  byId("onboardingAthleteName").value=data.settings.athleteName==="Chris"?"":(data.settings.athleteName||"");
+  byId("onboardingSex").value=data.settings.sex||"Prefer not to say";
+  byId("onboardingAthleteMode").value=data.settings.athleteMode||"Hybrid Athlete";
+  byId("onboardingMessageStyle").value=data.settings.coachMessages?.style||"Performance";
+  byId("onboardingScriptureFrequency").value=data.settings.coachMessages?.scriptureFrequency||"Occasionally";
+  toggleOnboardingScripture();
+  if(typeof initializeOnboardingLocationEditor==="function")initializeOnboardingLocationEditor();
+  onboardingStep=0;renderOnboardingStep();modal.classList.remove("hidden");document.body.classList.add("modal-open");
+}
+function renderOnboardingStep(){
+  document.querySelectorAll("[data-onboarding-step]").forEach((step,index)=>step.classList.toggle("active",index===onboardingStep));
+  byId("onboardingStepNumber").textContent=String(onboardingStep+1);
+  byId("onboardingProgress").style.width=`${((onboardingStep+1)/4)*100}%`;
+  byId("onboardingBack").disabled=onboardingStep===0;
+  byId("onboardingNext").textContent=onboardingStep===3?"Launch Bell Performance":"Continue";
+  const subtitles=["Build your athlete profile and training environment.","Map the equipment available everywhere you train.","Choose how the coach communicates with you.","Confirm the flight plan before launch."];
+  byId("onboardingStepSubtitle").textContent=subtitles[onboardingStep];
+  if(onboardingStep===3)renderOnboardingReview();
+}
+function validateOnboardingStep(){
+  if(onboardingStep===0&&!byId("onboardingAthleteName").value.trim()){byId("onboardingAthleteName").focus();alert("Enter the athlete's first name to continue.");return false;}
+  if(onboardingStep===1){
+    if(typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();
+    const invalid=onboardingLocations.find(location=>!location.name.trim());if(invalid){editOnboardingLocation(invalid.id);byId("onboardingLocationName").focus();alert("Give every workout location a name.");return false;}
+    const empty=onboardingLocations.find(location=>!location.equipment.length);if(empty&&!confirm(`${empty.name} has no equipment selected. Continue with bodyweight-only substitutions?`))return false;
   }
+  return true;
+}
+function nextOnboardingStep(){if(!validateOnboardingStep())return;if(onboardingStep<3){onboardingStep++;renderOnboardingStep();return;}completeOnboarding();}
+function previousOnboardingStep(){if(onboardingStep>0){if(onboardingStep===2&&typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();onboardingStep--;renderOnboardingStep();}}
+function toggleOnboardingScripture(){const style=byId("onboardingMessageStyle").value;byId("onboardingScriptureWrap").style.display=["Faith-Based","Mixed"].includes(style)?"block":"none";}
+function renderOnboardingReview(){
+  if(typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();
+  const primary=onboardingLocations.find(x=>x.id===onboardingActiveLocationId)||onboardingLocations[0];
+  byId("onboardingReview").innerHTML=`<div><span>Athlete</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>${escapeHtml(byId("onboardingAthleteMode").value)} • ${escapeHtml(byId("onboardingSex").value)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>${["Faith-Based","Mixed"].includes(byId("onboardingMessageStyle").value)?escapeHtml(byId("onboardingScriptureFrequency").value+" Scripture"):"Message preference saved"}</small></div>`;
+}
+function completeOnboarding() {
+  data.settings.athleteName = byId("onboardingAthleteName").value.trim() || "Athlete";
+  data.settings.sex = byId("onboardingSex").value || "Prefer not to say";
+  data.settings.athleteMode = byId("onboardingAthleteMode").value || "Hybrid Athlete";
+  if (typeof saveOnboardingEquipment === "function") saveOnboardingEquipment();
+  data.settings.coachMessages = {setupComplete:true,style:byId("onboardingMessageStyle").value,scriptureFrequency:byId("onboardingScriptureFrequency").value};
+  saveData({render:false});
+  byId("onboardingModal").classList.add("hidden");document.body.classList.remove("modal-open");renderApp();
+  if (typeof maybeShowHowToGuideAfterProfileSetup === "function") maybeShowHowToGuideAfterProfileSetup();
 }

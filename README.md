@@ -1,3 +1,10 @@
+# Bell Performance 7.0.0 — First Flight
+
+- Adds a four-step interactive onboarding flow.
+- Introduces the Workout Location Editor during setup, including multiple locations, presets, custom equipment, and primary-location selection.
+- Preserves existing training, progression, readiness, quotes, history, backup, and PWA functionality.
+- Launches the existing guided tour after First Flight is completed.
+
 # Bell Performance 6.9 — Contextual Quote Rotation
 
 Adds a rotating offline quote cache matched to the athlete’s active Strength and Engine goals. The dashboard alternates Strength and Engine emphasis by day, while existing Faith-Based, Mixed, Stoic, and Off preferences remain supported. Scripture uses the King James Version.

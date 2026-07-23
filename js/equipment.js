@@ -75,7 +75,7 @@ function adaptExerciseToEquipment(exercise){
   return {...exercise,name:pick[1],cue:`Substituted for ${exercise.name} at ${activeEquipmentLocation().name}. ${exercise.cue||""}`,equipmentAdjusted:true,originalExercise:exercise.name};
 }
 function applyEquipmentToTemplate(template){return {...template,equipmentLocation:activeEquipmentLocation().name,exercises:template.exercises.map(adaptExerciseToEquipment)};}
-function equipmentCheckboxesHtml(prefix){return EQUIPMENT_OPTIONS.map(([id,label])=>`<label class="equipment-option"><input type="checkbox" id="${prefix}-${id}" value="${id}"> <span>${label}</span></label>`).join("");}
+function equipmentCheckboxesHtml(prefix,onchange=""){const change=onchange?` onchange="${onchange}"`:"";return EQUIPMENT_OPTIONS.map(([id,label])=>`<label class="equipment-option"><input type="checkbox" id="${prefix}-${id}" value="${id}"${change}> <span>${label}</span></label>`).join("");}
 function setEquipmentChecks(prefix,items){EQUIPMENT_OPTIONS.forEach(([id])=>{const el=document.getElementById(`${prefix}-${id}`);if(el)el.checked=items.includes(id);});}
 function readEquipmentChecks(prefix){return EQUIPMENT_OPTIONS.map(([id])=>id).filter(id=>document.getElementById(`${prefix}-${id}`)?.checked);}
 function applyEquipmentPreset(prefix,value){setEquipmentChecks(prefix,EQUIPMENT_PRESETS[value]||[]);}
@@ -99,6 +99,59 @@ function addEquipmentLocation(){
 }
 function deleteEquipmentLocation(){normalizeEquipmentSettings();if(data.settings.equipmentSetup.locations.length<=1){alert("Keep at least one training location.");return;}const active=activeEquipmentLocation();if(!confirm(`Delete ${active.name}?`))return;data.settings.equipmentSetup.locations=data.settings.equipmentSetup.locations.filter(x=>x.id!==active.id);data.settings.equipmentSetup.activeLocationId=data.settings.equipmentSetup.locations[0].id;saveData();}
 function saveOnboardingEquipment(){
-  const env=document.getElementById("onboardingEnvironment").value;const equipment=readEquipmentChecks("onboardingEquipment");
-  data.settings.equipmentSetup={locations:[{id:"default",name:env==="commercial"?"Commercial Gym":env==="home"?"Home Gym":env==="bodyweight"?"Bodyweight / Outdoors":"My Training Setup",environment:env,equipment}],activeLocationId:"default"};
+  if(!onboardingLocations.length) initializeOnboardingLocationEditor();
+  data.settings.equipmentSetup={
+    locations:onboardingLocations.map(location=>({id:location.id,name:location.name,environment:location.environment,equipment:[...location.equipment]})),
+    activeLocationId:onboardingActiveLocationId||onboardingLocations[0].id
+  };
+  normalizeEquipmentSettings();
 }
+
+let onboardingLocations=[];
+let onboardingEditingLocationId="";
+let onboardingActiveLocationId="";
+
+function uniqueLocationId(){return `location-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;}
+function defaultLocationName(environment){return environment==="commercial"?"Commercial Gym":environment==="home"?"Home Gym":environment==="minimal"?"Minimal Setup":environment==="bodyweight"?"Bodyweight / Outdoors":environment==="travel"?"Travel Setup":"Training Location";}
+function currentOnboardingLocation(){return onboardingLocations.find(x=>x.id===onboardingEditingLocationId)||onboardingLocations[0];}
+function initializeOnboardingLocationEditor(){
+  normalizeEquipmentSettings();
+  onboardingLocations=data.settings.equipmentSetup.locations.map(x=>({id:x.id||uniqueLocationId(),name:x.name||"Training Location",environment:x.environment||"custom",equipment:[...(x.equipment||[])]}));
+  if(!onboardingLocations.length)onboardingLocations=[{id:"default",name:"Commercial Gym",environment:"commercial",equipment:[...EQUIPMENT_PRESETS.commercial]}];
+  onboardingActiveLocationId=data.settings.equipmentSetup.activeLocationId||onboardingLocations[0].id;
+  onboardingEditingLocationId=onboardingActiveLocationId;
+  renderOnboardingLocationEditor();
+}
+function renderOnboardingLocationEditor(){
+  const list=document.getElementById("onboardingLocationList"); if(!list)return;
+  list.innerHTML=onboardingLocations.map(location=>`<button type="button" class="onboarding-location-item ${location.id===onboardingEditingLocationId?"active":""}" onclick="editOnboardingLocation('${location.id}')"><span>${escapeHtml(location.name||"Unnamed Location")}</span><small>${location.id===onboardingActiveLocationId?"Primary • ":""}${location.equipment.length} items</small></button>`).join("");
+  const location=currentOnboardingLocation(); if(!location)return;
+  document.getElementById("onboardingLocationName").value=location.name;
+  document.getElementById("onboardingEnvironment").value=location.environment||"custom";
+  document.getElementById("onboardingActiveLocation").checked=location.id===onboardingActiveLocationId;
+  setEquipmentChecks("onboardingEquipment",location.equipment);
+  document.getElementById("onboardingEquipmentCount").textContent=`${location.equipment.length} selected`;
+  document.getElementById("removeOnboardingLocationButton").disabled=onboardingLocations.length<=1;
+}
+function editOnboardingLocation(id){syncOnboardingEquipmentFromChecks();onboardingEditingLocationId=id;renderOnboardingLocationEditor();}
+function addOnboardingLocation(){
+  syncOnboardingEquipmentFromChecks();
+  const id=uniqueLocationId(); onboardingLocations.push({id,name:`Location ${onboardingLocations.length+1}`,environment:"minimal",equipment:[...EQUIPMENT_PRESETS.minimal]});
+  onboardingEditingLocationId=id; renderOnboardingLocationEditor();
+  document.getElementById("onboardingLocationName")?.focus();
+}
+function removeOnboardingLocation(){
+  if(onboardingLocations.length<=1)return;
+  const location=currentOnboardingLocation();
+  onboardingLocations=onboardingLocations.filter(x=>x.id!==location.id);
+  if(onboardingActiveLocationId===location.id)onboardingActiveLocationId=onboardingLocations[0].id;
+  onboardingEditingLocationId=onboardingLocations[0].id;renderOnboardingLocationEditor();
+}
+function updateOnboardingLocationName(value){const location=currentOnboardingLocation();if(!location)return;location.name=value.trimStart();renderOnboardingLocationListOnly();}
+function renderOnboardingLocationListOnly(){const list=document.getElementById("onboardingLocationList");if(!list)return;list.innerHTML=onboardingLocations.map(location=>`<button type="button" class="onboarding-location-item ${location.id===onboardingEditingLocationId?"active":""}" onclick="editOnboardingLocation('${location.id}')"><span>${escapeHtml(location.name||"Unnamed Location")}</span><small>${location.id===onboardingActiveLocationId?"Primary • ":""}${location.equipment.length} items</small></button>`).join("");}
+function applyOnboardingEnvironment(value){const location=currentOnboardingLocation();if(!location)return;location.environment=value;if(value!=="custom")location.equipment=[...(EQUIPMENT_PRESETS[value]||[])];if(!location.name||/^Location \d+$|Training Location|Commercial Gym|Home Gym|Minimal Setup|Bodyweight \/ Outdoors|Travel Setup$/.test(location.name))location.name=defaultLocationName(value);renderOnboardingLocationEditor();}
+function syncOnboardingEquipmentFromChecks(){const location=currentOnboardingLocation();if(!location)return;location.equipment=readEquipmentChecks("onboardingEquipment");if(document.getElementById("onboardingEnvironment")?.value)location.environment=document.getElementById("onboardingEnvironment").value;document.getElementById("onboardingEquipmentCount").textContent=`${location.equipment.length} selected`;renderOnboardingLocationListOnly();}
+function setOnboardingActiveLocation(){const location=currentOnboardingLocation();if(!location)return;onboardingActiveLocationId=location.id;renderOnboardingLocationEditor();}
+function selectAllOnboardingEquipment(){setEquipmentChecks("onboardingEquipment",EQUIPMENT_OPTIONS.map(([id])=>id));syncOnboardingEquipmentFromChecks();}
+function clearOnboardingEquipment(){setEquipmentChecks("onboardingEquipment",[]);syncOnboardingEquipmentFromChecks();}
+

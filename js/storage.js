@@ -15,7 +15,7 @@ const defaults = {
     coachMessages: { setupComplete:false, style:"Performance", scriptureFrequency:"Occasionally" },
     firstFlightStage: "profile",
     firstFlightTourComplete: false,
-    injuryProfile: { hasLimitations:false, restrictedPatterns:[], affectedAreas:[], notes:"", medicalClearance:false, updatedAt:"" },
+    injuryProfile: { hasLimitations:false, restrictedPatterns:[], affectedAreas:[], notes:"", medicalClearance:false, updatedAt:"", startedAt:"", recoveryHistory:[] },
     equipmentSetup: { locations:[{id:"default",name:"My Gym",environment:"commercial",equipment:["barbell","rack","bench","dumbbells","cables","machines","smith","kettlebells","bands","pullupBar","dipStation","plyoBox","treadmill","bike","rower","skiErg","sled","airBike","jumpRope","outdoor"]}], activeLocationId:"default" }
   },
   plan: [
@@ -36,6 +36,17 @@ const defaults = {
   pendingFeedbackSessionId: null,
   performanceReviews: { weeklySeen:[], blockReviews:[], milestones:[] },
   missedSessionLog: [],
+  habits: {
+    items: [
+      {id:"training",label:"Complete prescribed training",icon:"⚒",custom:false},
+      {id:"mobility",label:"Complete mobility or recovery work",icon:"♡",custom:false},
+      {id:"protein",label:"Hit daily protein target",icon:"P",custom:false},
+      {id:"hydration",label:"Meet hydration target",icon:"◉",custom:false},
+      {id:"steps",label:"Complete daily movement / steps",icon:"↟",custom:false},
+      {id:"sleep",label:"Protect tonight’s sleep routine",icon:"☾",custom:false}
+    ],
+    completions: {}
+  },
   mission: {
     goalWorkouts: 40, goalMobility: 30, goalPullups: 25, goal5k: 28,
     currentPullups: 20, current5k: null
@@ -93,13 +104,18 @@ function normalizeData() {
   data.settings.firstFlightStage = data.settings.firstFlightStage || (data.settings.coachMessages.setupComplete ? "complete" : "profile");
   data.settings.firstFlightTourComplete = Boolean(data.settings.firstFlightTourComplete || data.settings.coachMessages.setupComplete);
   const injury=data.settings.injuryProfile||{};
-  data.settings.injuryProfile={...defaults.settings.injuryProfile,...injury,restrictedPatterns:Array.isArray(injury.restrictedPatterns)?injury.restrictedPatterns:[],affectedAreas:Array.isArray(injury.affectedAreas)?injury.affectedAreas:[]};
+  data.settings.injuryProfile={...defaults.settings.injuryProfile,...injury,restrictedPatterns:Array.isArray(injury.restrictedPatterns)?injury.restrictedPatterns:[],affectedAreas:Array.isArray(injury.affectedAreas)?injury.affectedAreas:[],recoveryHistory:Array.isArray(injury.recoveryHistory)?injury.recoveryHistory:[]};
   if (typeof normalizeEquipmentSettings === "function") normalizeEquipmentSettings();
 
   data.plan = Array.isArray(data.plan) ? data.plan : cloneDefaults().plan;
   data.plan = data.plan.map((item,index)=>({...item,id:item.id||`plan-${index}-${String(item.day||"day").toLowerCase()}`,status:item.status||(item.done?"completed":"planned"),done:Boolean(item.done||item.status==="completed")}));
   data.history = Array.isArray(data.history) ? data.history : [];
   data.missedSessionLog = Array.isArray(data.missedSessionLog) ? data.missedSessionLog : [];
+  const habitDefaults=cloneDefaults().habits;
+  data.habits=data.habits&&typeof data.habits==="object"?data.habits:habitDefaults;
+  data.habits.items=Array.isArray(data.habits.items)&&data.habits.items.length?data.habits.items:habitDefaults.items;
+  data.habits.items=data.habits.items.map((item,index)=>({id:item.id||`habit-${index}`,label:item.label||"Daily habit",icon:item.icon||"✓",custom:Boolean(item.custom)}));
+  data.habits.completions=data.habits.completions&&typeof data.habits.completions==="object"?data.habits.completions:{};
   data.exerciseProgression = data.exerciseProgression && typeof data.exerciseProgression === "object" ? data.exerciseProgression : {};
   data.mobility = { ...defaults.mobility, ...(data.mobility || {}) };
   data.mobility.completedDates = Array.isArray(data.mobility.completedDates) ? data.mobility.completedDates : [];

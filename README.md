@@ -1,3 +1,3 @@
-# Bell Performance 7.0.13 — Context-Aware Training Dashboard
+# Bell Performance 7.0.15 — Mission & Recovery Management
 
-Adds conditioning-specific segment feedback, editable workout history, and a dashboard that displays only the sessions prescribed for the current day. Single-session days include an appropriate optional support choice.
+Adds non-destructive active mission/block editing and injury recovery clearance. Users can revise or restart programming without resetting workout history, habits, milestones, equipment, readiness, or profile data. Active movement limitations can be archived as recovered, with optional one-week gradual return volume.

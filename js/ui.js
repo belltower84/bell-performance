@@ -305,6 +305,42 @@ function saveProfile() {
   alert("Profile settings saved.");
 }
 
+
+function missionManagementText(){
+  const b=data.trainingBlock||{},m=b.mission,d=b.dualGoals||{};
+  if(!b.enabled)return {title:"No active block",detail:"Choose Edit Mission / Event to create a training mission."};
+  const title=m?(m.path==="event"?(m.eventName||m.eventType):(m.developmentGoal||"Development Mission")):`${d.strengthGoal||b.goalType||"Strength"} + ${d.engineGoal||"Engine"}`;
+  const detail=`Week ${b.currentWeek||1} of ${b.lengthWeeks||12} • ${b.strengthDays||0} Strength • ${b.runDays||0} Engine${m?.eventDate?` • Event ${m.eventDate}`:""}`;
+  return {title,detail};
+}
+function openMissionEditor(){missionEditorActive=true;openFirstFlight(3);}
+function focusBlockEditor(){showScreen("more");window.setTimeout(()=>document.querySelector(".dual-goal-builder")?.scrollIntoView({behavior:"smooth",block:"start"}),80);}
+function startFreshBlockFromCurrentMission(){
+  if(!data.trainingBlock?.enabled){openMissionEditor();return;}
+  if(!confirm("Restart the active mission at Week 1? Workout history and all other app data will be preserved."))return;
+  data.trainingBlock.currentWeek=1;data.trainingBlock.startDate=todayKey();data.trainingBlock.generatedAt=new Date().toISOString();
+  if(typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();saveData();alert("The active block was restarted at Week 1. Prior workout history was preserved.");
+}
+function openRecoveryClearance(){
+  const p=data.settings.injuryProfile||{};if(!p.hasLimitations){alert("There are no active movement limitations to clear.");return;}
+  byId("recoveryClearanceDate").value=todayKey();byId("recoveryClearanceType").value="self";byId("recoveryClearanceNotes").value="";byId("recoveryGradualReturn").checked=true;
+  byId("recoveryClearanceModal").classList.remove("hidden");document.body.classList.add("modal-open");
+}
+function closeRecoveryClearance(){byId("recoveryClearanceModal")?.classList.add("hidden");document.body.classList.remove("modal-open");}
+function confirmRecoveryClearance(){
+  const p=data.settings.injuryProfile||{};if(!p.hasLimitations)return closeRecoveryClearance();
+  const record={recoveredAt:byId("recoveryClearanceDate").value||todayKey(),clearanceType:byId("recoveryClearanceType").value,notes:byId("recoveryClearanceNotes").value.trim(),gradualReturn:byId("recoveryGradualReturn").checked,restrictedPatterns:[...(p.restrictedPatterns||[])],affectedAreas:[...(p.affectedAreas||[])],originalNotes:p.notes||"",startedAt:p.startedAt||p.updatedAt||""};
+  data.settings.injuryProfile={...p,hasLimitations:false,restrictedPatterns:[],affectedAreas:[],notes:"",medicalClearance:record.clearanceType==="clinician",updatedAt:new Date().toISOString(),startedAt:"",recoveryHistory:[...(p.recoveryHistory||[]),record]};
+  if(record.gradualReturn)data.settings.returnToTraining={active:true,startDate:record.recoveredAt,endDate:(()=>{const d=new Date(record.recoveredAt+"T12:00:00");d.setDate(d.getDate()+7);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;})(),volumeScale:.75};
+  else data.settings.returnToTraining={active:false};
+  if(typeof buildCurrentWeekPlan==="function"&&data.trainingBlock?.enabled)buildCurrentWeekPlan();closeRecoveryClearance();saveData();alert(record.gradualReturn?"Restrictions cleared. Normal exercise selection is restored with a one-week gradual return.":"Restrictions cleared. Normal exercise selection is restored.");
+}
+function renderMissionAndRecoveryManagement(){
+  const mt=missionManagementText();setText("activeMissionManagementSummary",mt.title);setText("activeMissionManagementDetail",mt.detail);
+  const p=data.settings.injuryProfile||{},btn=byId("markRecoveredButton");if(btn)btn.classList.toggle("hidden",!p.hasLimitations);
+  const h=p.recoveryHistory||[],el=byId("injuryRecoveryHistorySummary");if(el)el.textContent=h.length?`${h.length} recovered limitation record${h.length===1?"":"s"} archived. Most recent: ${h[h.length-1].recoveredAt}.`:"No recovered injury records archived yet.";
+}
+
 function renderApp() {
   const injurySummaryEl=byId("injuryProfileSummary");if(injurySummaryEl){const x=injuryProfileSummaryText();injurySummaryEl.innerHTML=`<strong>${escapeHtml(x.title)}</strong><br>${escapeHtml(x.detail)}`;}
   renderReadiness();
@@ -312,7 +348,9 @@ function renderApp() {
   renderPlan();
   renderWorkoutLibrary();
   renderHistory();
+  if (typeof renderHabits === "function") renderHabits();
   renderSettings();
+  renderMissionAndRecoveryManagement();
 
   if (!data.settings.coachMessages?.setupComplete && data.settings.firstFlightStage !== "tour") openFirstFlight();
   if (data.activeWorkout && byId("workoutModal").classList.contains("hidden")) {
@@ -376,6 +414,7 @@ function saveCoachMessagePreferences() {
 }
 
 let onboardingStep=0;
+let missionEditorActive=false;
 function openFirstFlight(startStep=null){
   const modal=byId("onboardingModal"); if(!modal||!modal.classList.contains("hidden"))return;
   byId("onboardingAthleteName").value=data.settings.athleteName==="Chris"&&!data.settings.firstFlightTourComplete?"":(data.settings.athleteName||"");
@@ -401,7 +440,7 @@ function renderOnboardingStep(){
   byId("onboardingStepNumber").textContent=String(onboardingStep+1);
   byId("onboardingProgress").style.width=`${((onboardingStep+1)/6)*100}%`;
   byId("onboardingBack").disabled=onboardingStep===0;
-  byId("onboardingNext").textContent=onboardingStep===1&&!data.settings.firstFlightTourComplete?"Save Limitations & Start Tour":onboardingStep===5?"Start First Training Block":"Continue";
+  byId("onboardingNext").textContent=onboardingStep===1&&!data.settings.firstFlightTourComplete?"Save Limitations & Start Tour":onboardingStep===5?(missionEditorActive?"Apply Mission & Rebuild Block":"Start First Training Block"):"Continue";
   const subtitles=["Enter the athlete details that personalize Bell Performance.","Identify movement patterns that require modification or avoidance.","Map the equipment available everywhere you train.","Choose the Strength and Engine goals for your first coordinated block.","Choose how the coach communicates with you.","Confirm the flight plan before launch."];
   byId("onboardingStepSubtitle").textContent=subtitles[onboardingStep];
   if(onboardingStep===5)renderOnboardingReview();
@@ -438,7 +477,7 @@ function loadOnboardingInjuryProfile(){
 function saveOnboardingInjuryProfile(){
   const has=byId("onboardingHasLimitations").checked,restricted=has?checkedValues("onboardingLimitationGrid"):[],areas=has?checkedValues("onboardingInjuryAreaGrid"):[];
   if(has&&!restricted.length&&!byId("onboardingInjuryNotes").value.trim()){alert("Select at least one restricted movement pattern or add a short coach note.");return false;}
-  data.settings.injuryProfile={hasLimitations:has,restrictedPatterns:restricted,affectedAreas:areas,notes:has?byId("onboardingInjuryNotes").value.trim():"",medicalClearance:has?byId("onboardingMedicalClearance").checked:false,updatedAt:new Date().toISOString()};
+  data.settings.injuryProfile={hasLimitations:has,restrictedPatterns:restricted,affectedAreas:areas,notes:has?byId("onboardingInjuryNotes").value.trim():"",medicalClearance:has?byId("onboardingMedicalClearance").checked:false,updatedAt:new Date().toISOString(),startedAt:has?(data.settings.injuryProfile?.startedAt||new Date().toISOString()):"",recoveryHistory:data.settings.injuryProfile?.recoveryHistory||[]};
   return true;
 }
 function injuryProfileSummaryText(){
@@ -513,5 +552,5 @@ function completeOnboarding() {
   data.settings.firstFlightStage="complete";data.settings.firstFlightTourComplete=true;data.settings.firstBlockLaunchMode=selectedOnboardingBlockMode();
   saveData({render:false});
   byId("onboardingModal").classList.add("hidden");document.body.classList.remove("modal-open");renderApp();showScreen("home");
-  alert(`First training block created. Week 1 begins ${data.trainingBlock.startDate}.`);
+  alert(missionEditorActive?`Mission updated. A revised block begins ${data.trainingBlock.startDate}; all prior app history was preserved.`:`First training block created. Week 1 begins ${data.trainingBlock.startDate}.`);missionEditorActive=false;
 }

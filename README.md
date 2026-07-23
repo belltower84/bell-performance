@@ -1,4 +1,4 @@
-# Bell Performance 7.0.1 — First Flight
+# Bell Performance 7.0.3 — First Flight
 
 - Adds a four-step interactive onboarding flow.
 - Introduces the Workout Location Editor during setup, including multiple locations, presets, custom equipment, and primary-location selection.
@@ -30,5 +30,15 @@ This maintenance release fixes the dashboard unexpectedly opening a large slides
 - Corrected old-cache cleanup logic.
 
 
-## 7.0.1 First Flight sequence
+## 7.0.3 First Flight sequence
 Athlete specifics are collected first. The app then opens a live, spotlight-guided dashboard tour before resuming Workout Location and coaching-preference setup.
+
+
+### 7.0.3 tour repair
+- Corrected the tour layer order so the written instruction panel always stays above dashboard highlights.
+- Clarified that the guide is text-based and does not require audio.
+- Renamed slideshow controls to Auto-Advance.
+
+
+## 7.0.3 Movement Limitations
+First Flight now captures injury history and restricted movement patterns. Workout generation applies conservative injury-aware substitutions after equipment substitutions. Users can review the profile later under Athlete Settings. This feature is not medical diagnosis or treatment.

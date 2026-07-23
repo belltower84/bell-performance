@@ -66,6 +66,40 @@ const EXERCISE_SWAPS={
   "Kettlebell Swing":[["dumbbells","Dumbbell Swing"],["bands","Band Hip Hinge"],["bodyweight","Broad Jump"]]
 };
 function modalityKeyAvailable(key){if(key==="bodyweight")return true;return hasEquipment(key);}
+const INJURY_PATTERN_LABELS={overheadPress:"overhead pressing",horizontalPress:"horizontal pressing",pulling:"pulling or hanging",squat:"squatting",lunge:"lunging or single-leg work",hinge:"hinging or deadlifting",running:"running or impact",jumping:"jumping or landing"};
+function exerciseMovementPatterns(name){
+  const patterns=[];
+  if(/Push Press|Overhead Press|Arnold Press|Landmine Press|Overhead Triceps|Shoulder Press/.test(name))patterns.push("overheadPress");
+  if(/Bench Press|Dumbbell Press|Barbell Press|Push-up|Pec Deck|Chest Press/.test(name)&&!/Overhead/.test(name))patterns.push("horizontalPress");
+  if(/Pull-up|Chin-up|Pulldown|Row|Pullover|Face Pull|Hanging/.test(name))patterns.push("pulling");
+  if(/Squat|Leg Extension|Reverse Nordic/.test(name))patterns.push("squat");
+  if(/Lunge|Split Squat|Step-up|Single-Leg/.test(name))patterns.push("lunge");
+  if(/Deadlift|Romanian|Good Morning|Hip Hinge|Swing|Rack Pull/.test(name))patterns.push("hinge");
+  if(/Run|Sprint|Jog|Hill Repeat/.test(name))patterns.push("running");
+  if(/Jump|Bound|Plyo/.test(name))patterns.push("jumping");
+  return [...new Set(patterns)];
+}
+function restrictedMovementPatterns(){const p=data.settings.injuryProfile||{};return p.hasLimitations?new Set(p.restrictedPatterns||[]):new Set();}
+function injuryFallbackCandidates(pattern){
+  const map={
+    overheadPress:[["horizontalPress","Neutral-Grip Dumbbell Floor Press","dumbbells"],["horizontalPress","Incline Push-up","bodyweight"],["pulling","Chest-Supported Row","dumbbells"]],
+    horizontalPress:[["overheadPress","Half-Kneeling Landmine Press","barbell"],["pulling","Chest-Supported Row","dumbbells"]],
+    pulling:[["horizontalPress","Neutral-Grip Dumbbell Floor Press","dumbbells"],["overheadPress","Half-Kneeling Landmine Press","barbell"]],
+    squat:[["hinge","Glute Bridge","bodyweight"],["hinge","Hip Thrust","barbell"]],
+    lunge:[["squat","Box Squat","bodyweight"],["hinge","Glute Bridge","bodyweight"]],
+    hinge:[["squat","Box Squat","bodyweight"],["lunge","Supported Split Squat","bodyweight"]],
+    running:[["conditioning","Stationary Bike","bike"],["conditioning","Air Bike","airBike"],["conditioning","Rower","rower"]],
+    jumping:[["conditioning","Bike Sprint","bike"],["conditioning","Sled Push","sled"],["squat","Fast Box Squat","bodyweight"]]
+  };return map[pattern]||[];
+}
+function adaptExerciseToInjuries(exercise){
+  const restricted=restrictedMovementPatterns();if(!restricted.size)return {...exercise,injuryAdjusted:false};
+  const hit=exerciseMovementPatterns(exercise.name).find(x=>restricted.has(x));if(!hit)return {...exercise,injuryAdjusted:false};
+  const pick=injuryFallbackCandidates(hit).find(([candidatePattern,,equipment])=>!restricted.has(candidatePattern)&&modalityKeyAvailable(equipment));
+  const original=exercise.originalExercise||exercise.name;
+  if(!pick)return {...exercise,name:"Coach Review — Movement Omitted",sets:0,reps:"—",cue:`${original} was removed because ${INJURY_PATTERN_LABELS[hit]} is restricted. Use only a clinician-approved, pain-free alternative.`,injuryAdjusted:true,originalExercise:original,restrictedPattern:hit};
+  return {...exercise,name:pick[1],cue:`Adjusted for your ${INJURY_PATTERN_LABELS[hit]} restriction. Stop if symptoms appear. ${exercise.cue||""}`,injuryAdjusted:true,originalExercise:original,restrictedPattern:hit};
+}
 function adaptExerciseToEquipment(exercise){
   const req=exerciseRequirements(exercise.name);
   if(!req.length||hasAnyEquipment(req))return {...exercise,equipmentAdjusted:false};
@@ -74,7 +108,7 @@ function adaptExerciseToEquipment(exercise){
   if(!pick)return {...exercise,name:`Bodyweight ${exercise.name}`,reps:exercise.reps,cue:`Equipment-aware fallback. Use controlled tempo and train close to technical failure. ${exercise.cue||""}`,equipmentAdjusted:true,originalExercise:exercise.name};
   return {...exercise,name:pick[1],cue:`Substituted for ${exercise.name} at ${activeEquipmentLocation().name}. ${exercise.cue||""}`,equipmentAdjusted:true,originalExercise:exercise.name};
 }
-function applyEquipmentToTemplate(template){return {...template,equipmentLocation:activeEquipmentLocation().name,exercises:template.exercises.map(adaptExerciseToEquipment)};}
+function applyEquipmentToTemplate(template){return {...template,equipmentLocation:activeEquipmentLocation().name,exercises:template.exercises.map(adaptExerciseToEquipment).map(adaptExerciseToInjuries)};}
 function equipmentCheckboxesHtml(prefix,onchange=""){const change=onchange?` onchange="${onchange}"`:"";return EQUIPMENT_OPTIONS.map(([id,label])=>`<label class="equipment-option"><input type="checkbox" id="${prefix}-${id}" value="${id}"${change}> <span>${label}</span></label>`).join("");}
 function setEquipmentChecks(prefix,items){EQUIPMENT_OPTIONS.forEach(([id])=>{const el=document.getElementById(`${prefix}-${id}`);if(el)el.checked=items.includes(id);});}
 function readEquipmentChecks(prefix){return EQUIPMENT_OPTIONS.map(([id])=>id).filter(id=>document.getElementById(`${prefix}-${id}`)?.checked);}

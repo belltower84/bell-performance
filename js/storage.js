@@ -15,6 +15,7 @@ const defaults = {
     coachMessages: { setupComplete:false, style:"Performance", scriptureFrequency:"Occasionally" },
     firstFlightStage: "profile",
     firstFlightTourComplete: false,
+    injuryProfile: { hasLimitations:false, restrictedPatterns:[], affectedAreas:[], notes:"", medicalClearance:false, updatedAt:"" },
     equipmentSetup: { locations:[{id:"default",name:"My Gym",environment:"commercial",equipment:["barbell","rack","bench","dumbbells","cables","machines","smith","kettlebells","bands","pullupBar","dipStation","plyoBox","treadmill","bike","rower","skiErg","sled","airBike","jumpRope","outdoor"]}], activeLocationId:"default" }
   },
   plan: [
@@ -89,6 +90,8 @@ function normalizeData() {
   data.settings.coachMessages = { ...defaults.settings.coachMessages, ...(data.settings.coachMessages || {}) };
   data.settings.firstFlightStage = data.settings.firstFlightStage || (data.settings.coachMessages.setupComplete ? "complete" : "profile");
   data.settings.firstFlightTourComplete = Boolean(data.settings.firstFlightTourComplete || data.settings.coachMessages.setupComplete);
+  const injury=data.settings.injuryProfile||{};
+  data.settings.injuryProfile={...defaults.settings.injuryProfile,...injury,restrictedPatterns:Array.isArray(injury.restrictedPatterns)?injury.restrictedPatterns:[],affectedAreas:Array.isArray(injury.affectedAreas)?injury.affectedAreas:[]};
   if (typeof normalizeEquipmentSettings === "function") normalizeEquipmentSettings();
 
   data.plan = Array.isArray(data.plan) ? data.plan : cloneDefaults().plan;

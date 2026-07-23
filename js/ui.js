@@ -93,8 +93,8 @@ function renderVisualProfile(template, status) {
   const strengthArt = byId("strengthArtwork");
   const engineArt = byId("engineArtwork");
   document.body.classList.toggle("female-profile", female);
-  if (strengthArt) strengthArt.src = "./assets/strength-classic-bg.jpg?v=665";
-  if (engineArt) engineArt.src = cardio === "Cycling" ? "./assets/engine-mountain-trail-bg.jpg?v=665" : "./assets/engine-mountain-trail-bg.jpg?v=665";
+  if (strengthArt) strengthArt.src = typeof chooseArtwork === "function" ? chooseArtwork("strength", "dashboard") : "./assets/artwork/strength/powerlifting.jpg?v=670";
+  if (engineArt) engineArt.src = typeof chooseArtwork === "function" ? chooseArtwork("engine", "dashboard") : "./assets/artwork/engine/mountain-trail.jpg?v=670";
   const r = data.settings.readiness || {};
   setText("dashSleep", readinessWord(r.sleepQuality));
   setText("dashSoreness", readinessWord(r.soreness, true));

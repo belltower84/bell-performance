@@ -1,15 +1,39 @@
 "use strict";
-const CACHE_NAME = "bell-performance-6-6-5";
+const CACHE_NAME = "bell-performance-6.7.1";
 const CORE = [
-  "./", "./index.html", "./manifest.json", "./css/app.css?v=665",
-  "./assets/logo-shield.svg?v=665",
-  "./assets/strength-classic-bg.jpg?v=665",
-  "./assets/engine-mountain-trail-bg.jpg?v=665",
-  "./data/workouts.js?v=665",
-  "./js/storage.js?v=665", "./js/readiness.js?v=665", "./js/equipment.js?v=665",
-  "./js/training-blocks.js?v=665", "./js/mobility.js?v=665", "./js/nutrition.js?v=665",
-  "./js/milestones.js?v=665", "./js/workouts.js?v=665", "./js/ui.js?v=665",
-  "./js/dual-goals.js?v=665", "./js/app.js?v=665"
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./css/app.css?v=671",
+  "./assets/logo-shield.svg?v=671",
+  "./assets/artwork/strength/powerlifting.jpg?v=671",
+  "./assets/artwork/strength/strength-building.jpg?v=671",
+  "./assets/artwork/strength/upper-body.jpg?v=671",
+  "./assets/artwork/strength/power-performance.jpg?v=671",
+  "./assets/artwork/strength/bodybuilding.jpg?v=671",
+  "./assets/artwork/strength/strength-size.jpg?v=671",
+  "./assets/artwork/strength/gym-conditioning.jpg?v=671",
+  "./assets/artwork/engine/mountain-trail.jpg?v=671",
+  "./assets/artwork/engine/forest-trail.jpg?v=671",
+  "./assets/artwork/engine/ridge-run.jpg?v=671",
+  "./assets/artwork/engine/alpine-lake.jpg?v=671",
+  "./assets/artwork/engine/desert-trail.jpg?v=671",
+  "./assets/artwork/engine/winter-trail.jpg?v=671",
+  "./assets/artwork/engine/hill-country.jpg?v=671",
+  "./data/workouts.js?v=671",
+  "./js/storage.js?v=671",
+  "./js/readiness.js?v=671",
+  "./js/equipment.js?v=671",
+  "./js/training-blocks.js?v=671",
+  "./js/mobility.js?v=671",
+  "./js/nutrition.js?v=671",
+  "./js/milestones.js?v=671",
+  "./js/progression.js?v=671",
+  "./js/workouts.js?v=671",
+  "./js/artwork.js?v=671",
+  "./js/ui.js?v=671",
+  "./js/dual-goals.js?v=671",
+  "./js/app.js?v=671"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

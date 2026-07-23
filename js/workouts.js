@@ -193,7 +193,7 @@ function openWorkoutUI() {
   setText("workoutHeroStatus", `${active.readiness?.status || readinessStatus()} Zone`);
   setText("workoutZoneLabel", trainingStatusText(active.readiness?.status || readinessStatus()));
   const art = document.getElementById("workoutHeroArt");
-  if (art) art.src = isEngine ? ((active.cardioType || data.settings.cardioType) === "Cycling" ? "./assets/engine-mountain-trail-bg.jpg?v=665" : "./assets/engine-mountain-trail-bg.jpg?v=665") : (female ? "./assets/strength-classic-bg.jpg?v=665" : "./assets/strength-classic-bg.jpg?v=665");
+  if (art) art.src = typeof chooseArtwork === "function" ? chooseArtwork(isEngine ? "engine" : "strength", `workout-${active.name || "session"}`) : (isEngine ? "./assets/artwork/engine/mountain-trail.jpg?v=670" : "./assets/artwork/strength/powerlifting.jpg?v=670");
   renderActiveWorkout();
 }
 function renderActiveWorkout() {

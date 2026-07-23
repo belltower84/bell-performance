@@ -1,15 +1,17 @@
-# Bell Performance 6.4 — Visual Experience
+# Bell Performance 6.5 — Dual Mission Coach
 
-Premium UI implementation of the approved Bell Performance visual direction.
+This build adds two concurrent training goals: one concise Strength goal and one mode-specific Engine goal.
 
-## Highlights
-- Branded shield logo with smoked American flag treatment
-- Mission Status dashboard with green/yellow/red readiness zones
-- Separate Strength and Engine training cards
-- Male and female profile-specific athlete artwork
-- Running/cycling Engine artwork based on selected modality
-- Recovery Prescription, Coach Message, readiness trend, and training balance cards
-- Redesigned Strength and Engine session player
-- All 6.3 readiness, equipment, training-block, mobility, nutrition, and debrief functionality retained
+## Added
+- Strength goals: Powerlifting, Olympic Lifting, Athlete, Hybrid, Bodybuilding
+- Engine modes: Running, Rowing, Hiking/Rucking, Cycling, Sprint/Field, Swimming, General Conditioning, or Recovery Only
+- Realistic event, performance, health, aesthetics, and sport-specific goals for each Engine mode
+- Compatibility coaching that limits interference between goals
+- Progressive weekly Engine prescriptions through base, build, specificity, recovery, and taper phases
+- Readiness-aware coordination of Strength and Engine sessions
+- Optional AM/PM two-a-day scheduling
+- Current Mission dashboard card showing both goals and block week
+- Coach's Message moved near the top of the dashboard
+- Functional notification center and profile shortcut in the header
 
-Open `index.html` or deploy the folder through GitHub Pages.
+The notification badge now reflects actual pending actions: readiness check-in, post-training debrief, mobility prescription, and active-block guidance.

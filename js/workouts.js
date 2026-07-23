@@ -11,11 +11,11 @@ function currentPlan() {
 
 function cardioPrescription(mission, modality) {
   const map = {
-    "R-1 Recovery Run": {"Running":["Recovery Run","20 min easy"],"Cycling":["Easy Spin","25 min easy"],"Air Bike":["Recovery Ride","15–20 min easy"],"Rower":["Easy Row","15–20 min easy"],"Elliptical":["Easy Elliptical","20–25 min easy"],"Stair Climber":["Easy Climb","15–20 min easy"]},
-    "R-2 Easy Run": {"Running":["Easy Run","2–3 miles"],"Cycling":["Zone 2 Ride","35–45 min"],"Air Bike":["Zone 2 Air Bike","25–35 min"],"Rower":["Zone 2 Row","25–35 min"],"Elliptical":["Zone 2 Elliptical","30–40 min"],"Stair Climber":["Zone 2 Climb","20–30 min"]},
-    "R-3 Tempo Run": {"Running":["Tempo Run","3 × 5 min"],"Cycling":["Tempo Ride","3 × 6 min"],"Air Bike":["Tempo Air Bike","5 × 3 min"],"Rower":["Tempo Row","4 × 4 min"],"Elliptical":["Tempo Elliptical","3 × 6 min"],"Stair Climber":["Tempo Climb","4 × 4 min"]},
-    "R-4 Intervals": {"Running":["Fast Interval","6 × 1 min"],"Cycling":["Bike Interval","8 × 1 min"],"Air Bike":["Air Bike Sprint","10 × 20 sec"],"Rower":["Row Interval","8 × 250 m"],"Elliptical":["Elliptical Interval","8 × 1 min"],"Stair Climber":["Climb Interval","8 × 45 sec"]},
-    "R-5 Long Run": {"Running":["Long Easy Run","3–5 miles"],"Cycling":["Long Zone 2 Ride","60–90 min"],"Air Bike":["Long Aerobic Ride","35–50 min"],"Rower":["Long Easy Row","35–50 min"],"Elliptical":["Long Aerobic Session","45–60 min"],"Stair Climber":["Long Easy Climb","30–45 min"]}
+    "R-1 Recovery Run": {"Running":["Recovery Run","20 min easy"],"Cycling":["Easy Spin","25 min easy"],"Air Bike":["Recovery Ride","15–20 min easy"],"Rower":["Easy Row","15–20 min easy"],"Elliptical":["Easy Elliptical","20–25 min easy"],"Stair Climber":["Easy Climb","15–20 min easy"],"Swimming":["Easy Technique Swim","20–30 min easy"],"Hiking / Rucking":["Easy Hike / Ruck","25–35 min easy"],"Sprint / Field":["Movement & Tempo","20 min easy"]},
+    "R-2 Easy Run": {"Running":["Easy Run","2–3 miles"],"Cycling":["Zone 2 Ride","35–45 min"],"Air Bike":["Zone 2 Air Bike","25–35 min"],"Rower":["Zone 2 Row","25–35 min"],"Elliptical":["Zone 2 Elliptical","30–40 min"],"Stair Climber":["Zone 2 Climb","20–30 min"],"Swimming":["Aerobic Swim","25–40 min"],"Hiking / Rucking":["Zone 2 Hike / Ruck","35–50 min"],"Sprint / Field":["Tempo Conditioning","20–30 min"]},
+    "R-3 Tempo Run": {"Running":["Tempo Run","3 × 5 min"],"Cycling":["Tempo Ride","3 × 6 min"],"Air Bike":["Tempo Air Bike","5 × 3 min"],"Rower":["Tempo Row","4 × 4 min"],"Elliptical":["Tempo Elliptical","3 × 6 min"],"Stair Climber":["Tempo Climb","4 × 4 min"],"Swimming":["Threshold Swim","6 × 100 m"],"Hiking / Rucking":["Uphill Tempo Ruck","3 × 8 min"],"Sprint / Field":["Repeat Speed","6 × 20 sec"]},
+    "R-4 Intervals": {"Running":["Fast Interval","6 × 1 min"],"Cycling":["Bike Interval","8 × 1 min"],"Air Bike":["Air Bike Sprint","10 × 20 sec"],"Rower":["Row Interval","8 × 250 m"],"Elliptical":["Elliptical Interval","8 × 1 min"],"Stair Climber":["Climb Interval","8 × 45 sec"],"Swimming":["Swim Interval","10 × 50 m"],"Hiking / Rucking":["Hill Ruck Interval","8 × 2 min"],"Sprint / Field":["Quality Sprint","6–10 reps"]},
+    "R-5 Long Run": {"Running":["Long Easy Run","3–5 miles"],"Cycling":["Long Zone 2 Ride","60–90 min"],"Air Bike":["Long Aerobic Ride","35–50 min"],"Rower":["Long Easy Row","35–50 min"],"Elliptical":["Long Aerobic Session","45–60 min"],"Stair Climber":["Long Easy Climb","30–45 min"],"Swimming":["Long Aerobic Swim","40–60 min"],"Hiking / Rucking":["Long Hike / Ruck","60–120 min"],"Sprint / Field":["Extensive Tempo","30–40 min"]}
   };
   return map[mission]?.[modality] || map[mission]?.Running;
 }
@@ -32,7 +32,7 @@ function applyCardioModality(name, template) {
 }
 
 function cardioGuidance() {
-  const notes = {"Running":"Best for rebuilding running durability. Keep easy days conversational.","Cycling":"Low-impact aerobic work. Use steady cadence and moderate resistance.","Air Bike":"Full-body conditioning. Avoid turning every session into a sprint.","Rower":"Drive with the legs first, then finish with the arms.","Elliptical":"Low-impact option that closely matches steady running effort.","Stair Climber":"Keep posture tall and avoid leaning heavily on the handles."};
+  const notes = {"Running":"Best for rebuilding running durability. Keep easy days conversational.","Cycling":"Low-impact aerobic work. Use steady cadence and moderate resistance.","Air Bike":"Full-body conditioning. Avoid turning every session into a sprint.","Rower":"Drive with the legs first, then finish with the arms.","Elliptical":"Low-impact option that closely matches steady running effort.","Stair Climber":"Keep posture tall and avoid leaning heavily on the handles.","Swimming":"Prioritize relaxed breathing and efficient strokes before adding intensity.","Hiking / Rucking":"Progress time, terrain, and load gradually. Do not increase all three at once.","Sprint / Field":"Quality beats fatigue. Use full recovery for true speed work."};
   return notes[data.settings.cardioType || "Running"];
 }
 

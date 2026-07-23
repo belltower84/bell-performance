@@ -26,3 +26,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// 6.4 rebuilt: keep artwork failures isolated instead of allowing a broken asset
+// or stale cache to disrupt the entire page.
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("img").forEach(image => {
+    image.addEventListener("error", () => {
+      if (image.closest(".brand-lockup")) return;
+      image.style.display = "none";
+      const card = image.closest(".training-card, .workout-hero");
+      if (card) card.classList.add("artwork-unavailable");
+    }, { once: true });
+  });
+  if ("caches" in window) {
+    caches.keys().then(keys => Promise.all(
+      keys.filter(key => key.startsWith("bell-performance-") && key !== "bell-performance-6-4-rebuilt-641")
+          .map(key => caches.delete(key))
+    )).catch(() => {});
+  }
+});

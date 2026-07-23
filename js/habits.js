@@ -22,11 +22,19 @@ function removeCustomHabit(id){
   Object.keys(data.habits.completions).forEach(key=>data.habits.completions[key]=habitCompletedIds(key).filter(x=>x!==id));
   saveData({render:false});renderHabits();
 }
+function habitProgressMessage(pct){return pct===100?"Daily standard complete. Recover and repeat.":pct>=60?"Strong progress. Finish the remaining essentials.":"Build momentum with the next useful action.";}
+function renderDashboardHabits(items,done,count,pct){
+  const list=byId("dashboardHabitList");if(!list)return;
+  setText("dashboardHabitScore",`${count} of ${items.length}`);setText("dashboardHabitPercent",`${pct}%`);setText("dashboardHabitMessage",habitProgressMessage(pct));
+  const bar=byId("dashboardHabitProgressBar");if(bar)bar.style.width=`${pct}%`;
+  list.innerHTML=items.map(item=>`<button type="button" class="dashboard-habit-chip ${done.has(item.id)?"complete":""}" onclick="toggleHabit('${escapeHtml(item.id)}')" aria-pressed="${done.has(item.id)}"><span>${done.has(item.id)?"✓":escapeHtml(item.icon)}</span><b>${escapeHtml(item.label)}</b></button>`).join("");
+}
 function renderHabits(){
-  const list=byId("habitList");if(!list)return;
   const items=data.habits?.items||[],done=new Set(habitCompletedIds()),count=items.filter(x=>done.has(x.id)).length,pct=items.length?Math.round(count/items.length*100):0;
+  renderDashboardHabits(items,done,count,pct);
+  const list=byId("habitList");if(!list)return;
   setText("habitTodayScore",`${count} of ${items.length} complete`);setText("habitRing",`${pct}%`);
-  setText("habitTodayMessage",pct===100?"Daily standard complete. Recover and repeat.":pct>=60?"Strong progress. Finish the remaining essentials.":"Build momentum with the next useful action.");
+  setText("habitTodayMessage",habitProgressMessage(pct));
   const bar=byId("habitProgressBar");if(bar)bar.style.width=`${pct}%`;
   list.innerHTML=items.map(item=>`<div class="card habit-row ${done.has(item.id)?"habit-complete":""}"><button type="button" class="habit-check" onclick="toggleHabit('${escapeHtml(item.id)}')" aria-label="Toggle ${escapeHtml(item.label)}">${done.has(item.id)?"✓":""}</button><div class="habit-copy"><span class="habit-icon">${escapeHtml(item.icon)}</span><strong>${escapeHtml(item.label)}</strong><small>${done.has(item.id)?"Completed today":"Tap the circle when complete"}</small></div>${item.custom?`<button type="button" class="habit-remove" onclick="removeCustomHabit('${escapeHtml(item.id)}')">Remove</button>`:""}</div>`).join("");
   renderHabitWeek();

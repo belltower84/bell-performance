@@ -1,11 +1,6 @@
-# Validation
+# Validation — Bell Performance 7.0.16
 
-- JavaScript syntax checked with Node.js.
-- HTML duplicate IDs checked.
-- Local asset references verified.
-- Mission editor preserves historical app data.
-- Active block update preserves current week and start date.
-- New block restart preserves history and settings.
-- Injury recovery archives prior restrictions and restores normal substitutions.
-- Optional gradual-return week reduces strength set volume.
-- ZIP integrity tested.
+- Daily habits render at the top of the dashboard.
+- Dashboard habit controls update the same persistent history used by the Habits screen.
+- Full Habits screen remains available for weekly review and customization.
+- JavaScript syntax, duplicate IDs, local assets, service-worker cache, and ZIP integrity validated.

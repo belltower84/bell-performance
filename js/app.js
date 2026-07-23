@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderApp();
   setTimeout(() => { maybePromptDailyReadiness(); openPendingSessionFeedback(); }, 250);
-  setTimeout(() => { if (typeof maybeShowHowToGuide === "function" && document.getElementById("onboardingModal")?.classList.contains("hidden")) maybeShowHowToGuide(); }, 900);
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(error => {
@@ -41,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   if ("caches" in window) {
     caches.keys().then(keys => Promise.all(
-      keys.filter(key => key.startsWith("bell-performance-") && key !== "bell-performance-6-4-rebuilt-641")
+      keys.filter(key => key.startsWith("bell-performance-") && key !== "bell-performance-6.8.1")
           .map(key => caches.delete(key))
     )).catch(() => {});
   }

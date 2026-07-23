@@ -176,8 +176,8 @@ function renderDashboard() {
 
   byId("calorieOut").textContent = macros.calories; byId("proteinOut").textContent = `${macros.protein}g`; byId("carbOut").textContent = `${macros.carbs}g`; byId("fatOut").textContent = `${macros.fat}g`;
   byId("nutritionMode").textContent = `${macros.trainingDay ? "Training-day" : "Recovery-day"} target • ${data.nutrition.goal === "cut" ? "Fat-loss" : data.nutrition.goal === "gain" ? "Lean-gain" : "Maintenance"} mode`;
-  const completed = data.plan.filter(item => item.done).length; const weeklyPct = Math.round((completed / data.plan.length) * 100);
-  byId("scoreOut").textContent = `${weeklyPct}%`; byId("scoreBar").style.width = `${weeklyPct}%`; byId("scoreDetail").textContent = `${completed} of ${data.plan.length} planned sessions completed`;
+  const completed = data.plan.filter(item => item.done).length; const accountable = data.plan.filter(item => item.status!=="replaced" || item.done).length; const weeklyPct = Math.round((completed / Math.max(1,accountable)) * 100);
+  byId("scoreOut").textContent = `${weeklyPct}%`; byId("scoreBar").style.width = `${weeklyPct}%`; byId("scoreDetail").textContent = `${completed} completed • ${data.plan.filter(item=>item.status==="rescheduled").length} rescheduled • ${data.plan.filter(item=>item.status==="skipped").length} skipped`;
 }
 
 function renderPlan() {
@@ -185,17 +185,19 @@ function renderPlan() {
   container.innerHTML = "";
   data.plan.forEach((item, index) => {
     const row = document.createElement("div");
-    row.className = "plan-row";
+    const status=item.status||(item.done?"completed":"planned");
+    const statusLabel={planned:"Planned",completed:"Completed",rescheduled:"Rescheduled",skipped:"Skipped",replaced:"Replaced"}[status]||status;
+    row.className = `plan-row plan-status-${status}`;
     row.innerHTML = `
-      <div><strong>${item.day}</strong><div class="sub">${item.customLabel || item.mission}</div>${item.detail ? `<div class="hint">${item.detail}</div>` : ""}</div>
-      <label><input type="checkbox" ${item.done ? "checked" : ""} onchange="togglePlan(${index},this.checked)"> Done</label>
+      <div class="grow"><strong>${item.day}</strong><div class="sub">${item.customLabel || item.mission}</div>${item.detail ? `<div class="hint">${item.detail}</div>` : ""}${item.originalDay&&item.originalDay!==item.day?`<div class="hint">Moved from ${item.originalDay}</div>`:""}${item.missedReasonLabel?`<div class="hint">Reason: ${item.missedReasonLabel}</div>`:""}</div>
+      <div class="plan-actions"><span class="plan-status-chip">${statusLabel}</span>${status==="completed"?"":`<button class="secondary compact-button" onclick="openMissedSessionManager(${index})">Manage</button>`}</div>
     `;
     container.appendChild(row);
   });
 }
 
 function togglePlan(index, checked) {
-  data.plan[index].done = checked;
+  const item=data.plan[index]; item.done=checked; item.status=checked?"completed":"planned";
   saveData();
 }
 
@@ -222,6 +224,7 @@ function renderWorkoutLibrary() {
 
 function renderHistory() {
   const container = byId("historyList");
+  if(typeof renderPerformanceReviews==="function")renderPerformanceReviews();
   container.innerHTML = data.history.length ? "" : '<div class="card"><div class="hint">No completed training sessions yet.</div></div>';
 
   data.history.forEach(session => {
@@ -230,7 +233,7 @@ function renderHistory() {
     card.className = "card";
     card.innerHTML = `
       <h3>${session.label || session.name}</h3>
-      <div class="sub">${new Date(session.completedAt).toLocaleDateString()} • ${session.cardioType ? `${session.cardioType} • ` : ""}${Math.round((session.elapsed || 0) / 60)} min • ${sets} sets • ${session.readiness?.status ? trainingStatusText(session.readiness.status) : "-"} • RPE ${session.rpe || "-"}${session.feedback ? ` • Post-session ${feedbackRecoveryScore(session.feedback)}%` : ""}</div>
+      <div class="sub">${new Date(session.completedAt).toLocaleDateString()} • ${session.cardioType ? `${session.cardioType} • ` : ""}${Math.round((session.officialElapsed || session.elapsed || 0) / 60)} min${session.engineMetrics?.distance ? ` • ${session.engineMetrics.distance} ${session.engineMetrics.distanceUnit}${session.engineMetrics.pace ? ` • ${session.engineMetrics.pace}` : ""}` : ""} • ${sets} sets • ${session.readiness?.status ? trainingStatusText(session.readiness.status) : "-"} • RPE ${session.rpe || "-"}${session.feedback ? ` • Post-session ${feedbackRecoveryScore(session.feedback)}%` : ""}</div>
       ${session.notes ? `<div class="hint" style="margin-top:8px">${session.notes}</div>` : ""}
     `;
     container.appendChild(card);

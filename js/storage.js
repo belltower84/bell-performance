@@ -34,6 +34,8 @@ const defaults = {
   readinessLog: [],
   sessionFeedbackLog: [],
   pendingFeedbackSessionId: null,
+  performanceReviews: { weeklySeen:[], blockReviews:[], milestones:[] },
+  missedSessionLog: [],
   mission: {
     goalWorkouts: 40, goalMobility: 30, goalPullups: 25, goal5k: 28,
     currentPullups: 20, current5k: null
@@ -95,7 +97,9 @@ function normalizeData() {
   if (typeof normalizeEquipmentSettings === "function") normalizeEquipmentSettings();
 
   data.plan = Array.isArray(data.plan) ? data.plan : cloneDefaults().plan;
+  data.plan = data.plan.map((item,index)=>({...item,id:item.id||`plan-${index}-${String(item.day||"day").toLowerCase()}`,status:item.status||(item.done?"completed":"planned"),done:Boolean(item.done||item.status==="completed")}));
   data.history = Array.isArray(data.history) ? data.history : [];
+  data.missedSessionLog = Array.isArray(data.missedSessionLog) ? data.missedSessionLog : [];
   data.exerciseProgression = data.exerciseProgression && typeof data.exerciseProgression === "object" ? data.exerciseProgression : {};
   data.mobility = { ...defaults.mobility, ...(data.mobility || {}) };
   data.mobility.completedDates = Array.isArray(data.mobility.completedDates) ? data.mobility.completedDates : [];
@@ -103,6 +107,10 @@ function normalizeData() {
   data.readinessLog = Array.isArray(data.readinessLog) ? data.readinessLog : [];
   data.sessionFeedbackLog = Array.isArray(data.sessionFeedbackLog) ? data.sessionFeedbackLog : [];
   data.pendingFeedbackSessionId = data.pendingFeedbackSessionId || null;
+  data.performanceReviews = { ...defaults.performanceReviews, ...(data.performanceReviews || {}) };
+  data.performanceReviews.weeklySeen = Array.isArray(data.performanceReviews.weeklySeen) ? data.performanceReviews.weeklySeen : [];
+  data.performanceReviews.blockReviews = Array.isArray(data.performanceReviews.blockReviews) ? data.performanceReviews.blockReviews : [];
+  data.performanceReviews.milestones = Array.isArray(data.performanceReviews.milestones) ? data.performanceReviews.milestones : [];
   data.mission = { ...defaults.mission, ...(data.mission || {}) };
   data.nutrition = { ...defaults.nutrition, ...(data.nutrition || {}) };
   data.trainingBlock = { ...defaults.trainingBlock, ...(data.trainingBlock || {}) };

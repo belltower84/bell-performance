@@ -1,4 +1,4 @@
-# Bell Performance 7.0.3 — First Flight
+# Bell Performance 7.0.5 — First Flight
 
 - Adds a four-step interactive onboarding flow.
 - Introduces the Workout Location Editor during setup, including multiple locations, presets, custom equipment, and primary-location selection.
@@ -30,15 +30,29 @@ This maintenance release fixes the dashboard unexpectedly opening a large slides
 - Corrected old-cache cleanup logic.
 
 
-## 7.0.3 First Flight sequence
+## 7.0.5 First Flight sequence
 Athlete specifics are collected first. The app then opens a live, spotlight-guided dashboard tour before resuming Workout Location and coaching-preference setup.
 
 
-### 7.0.3 tour repair
+### 7.0.5 tour repair
 - Corrected the tour layer order so the written instruction panel always stays above dashboard highlights.
 - Clarified that the guide is text-based and does not require audio.
 - Renamed slideshow controls to Auto-Advance.
 
 
-## 7.0.3 Movement Limitations
+## 7.0.5 Movement Limitations
 First Flight now captures injury history and restricted movement patterns. Workout generation applies conservative injury-aware substitutions after equipment substitutions. Users can review the profile later under Athlete Settings. This feature is not medical diagnosis or treatment.
+
+
+## 7.0.5 Performance Intelligence
+Adds editable engine results, engine-specific debriefs, weekly and block reviews, performance milestones, and adaptive deload triggers.
+
+## Missed Session Management (7.0.5)
+
+Each planned session now includes a Manage action with three choices:
+
+- **Reschedule:** move the workout to another day while preserving its original day in the record.
+- **Replace:** convert it to recovery mobility, short Zone 2, or a shortened strength session.
+- **Skip and Continue:** record the missed session without cramming it into a later day.
+
+The athlete records a reason (schedule, fatigue, injury, illness, travel/equipment, or other). Decisions feed the weekly review, block history, and adaptive-deload logic. Fatigue-, pain-, or illness-related misses are treated as recovery signals rather than ordinary compliance failures.

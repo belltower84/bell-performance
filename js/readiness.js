@@ -124,32 +124,11 @@ function maybePromptDailyReadiness() {
   modal.classList.remove("hidden");
 }
 
+function pendingFeedbackSession(){return (data.history||[]).find(x=>x.completedAt===data.pendingFeedbackSessionId);}
 function saveSessionFeedback() {
-  const sessionId = data.pendingFeedbackSessionId;
-  const session = (data.history || []).find(x => x.completedAt === sessionId);
-  const entry = {
-    sessionId,
-    date:todayKey(),
-    sessionQuality:+document.getElementById("feedbackSessionQuality").value,
-    postEnergy:+document.getElementById("feedbackPostEnergy").value,
-    overallFeeling:+document.getElementById("feedbackOverallFeeling").value,
-    strain:+document.getElementById("feedbackStrain").value,
-    notes:document.getElementById("feedbackNotes").value.trim()
-  };
-  if (session) session.feedback = entry;
-  const existing = data.sessionFeedbackLog.findIndex(x => x.sessionId === sessionId);
-  if (existing >= 0) data.sessionFeedbackLog[existing] = entry; else data.sessionFeedbackLog.push(entry);
-  data.pendingFeedbackSessionId = null;
-  document.getElementById("sessionFeedbackModal")?.classList.add("hidden");
-  saveData();
+  const sessionId=data.pendingFeedbackSessionId,session=pendingFeedbackSession(),isEngine=Boolean(session?.cardioType)||String(session?.name||"").startsWith("R-");
+  const entry=isEngine?{sessionId,date:todayKey(),type:"engine",effortAccuracy:+document.getElementById("engineFeedbackEffort").value,breathing:+document.getElementById("engineFeedbackBreathing").value,legFreshness:+document.getElementById("engineFeedbackLegs").value,symptoms:+document.getElementById("engineFeedbackSymptoms").value,sessionQuality:+document.getElementById("engineFeedbackEffort").value,postEnergy:+document.getElementById("engineFeedbackLegs").value,overallFeeling:Math.round((+document.getElementById("engineFeedbackBreathing").value + +document.getElementById("engineFeedbackLegs").value)/2),strain:+document.getElementById("engineFeedbackSymptoms").value,notes:document.getElementById("feedbackNotes").value.trim()}:{sessionId,date:todayKey(),type:"strength",sessionQuality:+document.getElementById("feedbackSessionQuality").value,postEnergy:+document.getElementById("feedbackPostEnergy").value,overallFeeling:+document.getElementById("feedbackOverallFeeling").value,strain:+document.getElementById("feedbackStrain").value,notes:document.getElementById("feedbackNotes").value.trim()};
+  if(session)session.feedback=entry;const existing=data.sessionFeedbackLog.findIndex(x=>x.sessionId===sessionId);if(existing>=0)data.sessionFeedbackLog[existing]=entry;else data.sessionFeedbackLog.push(entry);data.pendingFeedbackSessionId=null;document.getElementById("sessionFeedbackModal")?.classList.add("hidden");saveData();
 }
-
-function skipSessionFeedback() {
-  data.pendingFeedbackSessionId = null;
-  document.getElementById("sessionFeedbackModal")?.classList.add("hidden");
-  saveData();
-}
-
-function openPendingSessionFeedback() {
-  if (data.pendingFeedbackSessionId) document.getElementById("sessionFeedbackModal")?.classList.remove("hidden");
-}
+function skipSessionFeedback(){data.pendingFeedbackSessionId=null;document.getElementById("sessionFeedbackModal")?.classList.add("hidden");saveData();}
+function openPendingSessionFeedback(){if(!data.pendingFeedbackSessionId)return;const session=pendingFeedbackSession(),isEngine=Boolean(session?.cardioType)||String(session?.name||"").startsWith("R-");document.getElementById("strengthFeedbackFields")?.classList.toggle("hidden",isEngine);document.getElementById("engineFeedbackFields")?.classList.toggle("hidden",!isEngine);const title=document.getElementById("feedbackTitle"),intro=document.getElementById("feedbackIntro");if(title)title.textContent=isEngine?"How did the engine session perform?":"How did that strength session land?";if(intro)intro.textContent=isEngine?"Report effort accuracy, breathing, leg response, and symptoms so the Coach Engine can progress distance and intensity logically.":"This feedback becomes part of your rolling seven-day readiness and strength progression.";document.getElementById("sessionFeedbackModal")?.classList.remove("hidden");}

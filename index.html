@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
   <title>Bell Performance 7.0.3 — First Flight</title>
-  <link rel="stylesheet" href="./css/app.css?v=703">
+  <link rel="stylesheet" href="./css/app.css?v=705">
 
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -25,7 +25,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-  <div class="brand-lockup"><img src="./assets/logo-shield.svg?v=703" alt="Bell Performance shield"><div><h1>BELL <span>PERFORMANCE</span></h1><div class="brand-tagline">TRAIN FOR LIFE</div></div></div>
+  <div class="brand-lockup"><img src="./assets/logo-shield.svg?v=705" alt="Bell Performance shield"><div><h1>BELL <span>PERFORMANCE</span></h1><div class="brand-tagline">TRAIN FOR LIFE</div></div></div>
   <div class="header-actions"><button id="notificationButton" aria-label="Open notifications" onclick="openNotificationCenter()">♢<span id="notificationBadge">0</span></button><button id="profileButton" aria-label="Open athlete profile" onclick="openAthleteProfile()">◎</button></div>
 </header>
 <main>
@@ -54,8 +54,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
   <div class="section-heading"><h2>Today's Mission</h2><button onclick="showScreen('plan')">View Full Schedule ›</button></div>
   <div class="training-pair">
-    <article class="training-card strength-card"><img id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=703" alt="Strength athlete"><div class="training-overlay"><div class="training-type">🏋 <span>STRENGTH</span></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
-    <article class="training-card engine-card"><img id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=703" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
+    <article class="training-card strength-card"><img id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=705" alt="Strength athlete"><div class="training-overlay"><div class="training-type">🏋 <span>STRENGTH</span></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
+    <article class="training-card engine-card"><img id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=705" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
   </div>
   <div id="todayPreview" class="hidden"></div>
 
@@ -79,7 +79,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
 <section id="workouts" class="screen"><h2 class="section-title">Training Library</h2><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div id="workoutLibrary" class="list"></div></section>
 
-<section id="history" class="screen"><h2 class="section-title">Training History</h2><div id="historyList" class="list"></div></section>
+<section id="history" class="screen"><h2 class="section-title">Performance Review</h2><div id="weeklyReview"></div><div id="blockReview"></div><div id="milestoneReview"></div><h2 class="section-title">Training History</h2><div id="historyList" class="list"></div></section>
 
 <section id="more" class="screen">
   <h2 class="section-title">Settings & Data</h2>
@@ -307,7 +307,12 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
 <div id="dailyReadinessModal" class="modal hidden"><div class="modal-box onboarding-box"><div class="card"><span class="metric-label">First Check-In Today</span><h2>How are you showing up?</h2><p class="sub">Five quick answers set today's Mission Status and help regulate your weekly training load.</p><div class="quick-check-grid"><label>Sleep<select id="promptsleepQuality"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Poor → Excellent</small></label><label>Soreness<select id="promptsoreness"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Fresh → Very sore</small></label><label>Energy<select id="promptenergy"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Exhausted → Energized</small></label><label>Motivation<select id="promptmotivation"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Low → High</small></label><label>Time available<select id="prompttimeAvailability"><option value="1">20–30 min</option><option value="2">30–45 min</option><option value="3">45–60 min</option><option value="4">60–75 min</option><option value="5">75–90+ min</option></select><small>Today's schedule</small></label></div><button class="good" onclick="saveDailyReadinessPrompt()">Set Today's Mission Status</button></div></div></div>
 
-<div id="sessionFeedbackModal" class="modal hidden"><div class="modal-box onboarding-box"><div class="card"><span class="metric-label">Training Debrief</span><h2>How did that session land?</h2><p class="sub">This feedback becomes part of your rolling seven-day readiness and helps the Coach Engine prevent unnecessary fatigue.</p><div class="feedback-grid"><label>How did the training feel?<select id="feedbackSessionQuality"><option value="1">1 — Poor</option><option value="2">2 — Below average</option><option value="3" selected>3 — Solid</option><option value="4">4 — Very good</option><option value="5">5 — Excellent</option></select></label><label>Energy afterward<select id="feedbackPostEnergy"><option value="1">1 — Drained</option><option value="2">2 — Low</option><option value="3" selected>3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Energized</option></select></label><label>How do you feel overall?<select id="feedbackOverallFeeling"><option value="1">1 — Rough</option><option value="2">2 — Below normal</option><option value="3" selected>3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Great</option></select></label><label>Muscle/joint strain<select id="feedbackStrain"><option value="1">1 — None</option><option value="2">2 — Mild</option><option value="3" selected>3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Concerning</option></select></label></div><label>Anything the coach should remember?</label><textarea id="feedbackNotes" placeholder="Example: legs felt unusually heavy, shoulder felt good, intervals were easier than expected"></textarea><button class="good" onclick="saveSessionFeedback()">Save Training Debrief</button><button class="secondary" onclick="skipSessionFeedback()">Skip for Now</button><div class="hint" style="margin-top:10px">Sharp pain, dizziness, chest pain, or other concerning symptoms should not be treated as a readiness score—stop training and seek appropriate medical guidance.</div></div></div></div>
+
+<div id="missedSessionModal" class="modal hidden"><div class="modal-box"><div class="card missed-session-card"><span class="metric-label">Missed Session Management</span><h2 id="missedSessionTitle">Manage workout</h2><p class="sub" id="missedSessionCurrent"></p><label>Why can’t this workout be completed as planned?<select id="missedReason"><option value="schedule">Schedule or time conflict</option><option value="fatigue">Poor readiness or fatigue</option><option value="injury">Injury or pain</option><option value="illness">Illness</option><option value="travel">Travel or equipment unavailable</option><option value="other">Other</option></select></label><div class="missed-option"><h3>Reschedule</h3><p class="hint">Move the session without automatically stacking it beside another high-stress workout.</p><label>New day<select id="rescheduleDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></label><button class="good" onclick="rescheduleManagedSession()">Move Workout</button></div><div class="missed-option"><h3>Replace Today’s Session</h3><p class="hint">Use a lower-cost option when doing something productive is better than forcing the original prescription.</p><label>Replacement<select id="replacementType"><option value="mobility">Recovery mobility</option><option value="zone2">Short Zone 2 session</option><option value="shortStrength">Shortened strength session</option></select></label><button class="secondary" onclick="replaceManagedSession()">Use Replacement</button></div><div class="missed-option"><h3>Skip and Continue</h3><p class="hint">Record the miss and continue the program. The app will not cram the workout into a later day.</p><button class="danger" onclick="skipManagedSession()">Skip Workout</button></div><button class="secondary" onclick="closeMissedSessionManager()">Cancel</button></div></div></div>
+<div id="sessionFeedbackModal" class="modal hidden"><div class="modal-box onboarding-box"><div class="card"><span class="metric-label">Training Debrief</span><h2 id="feedbackTitle">How did that session land?</h2><p class="sub" id="feedbackIntro">This feedback helps regulate future training load.</p>
+<div id="strengthFeedbackFields"><div class="feedback-grid"><label>How did the training feel?<select id="feedbackSessionQuality"><option value="1">1 — Poor</option><option value="2">2 — Below average</option><option value="3" selected>3 — Solid</option><option value="4">4 — Very good</option><option value="5">5 — Excellent</option></select></label><label>Energy afterward<select id="feedbackPostEnergy"><option value="1">1 — Drained</option><option value="2">2 — Low</option><option value="3" selected>3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Energized</option></select></label><label>How do you feel overall?<select id="feedbackOverallFeeling"><option value="1">1 — Rough</option><option value="2">2 — Below normal</option><option value="3" selected>3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Great</option></select></label><label>Muscle/joint strain<select id="feedbackStrain"><option value="1">1 — None</option><option value="2">2 — Mild</option><option value="3" selected>3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Concerning</option></select></label></div></div>
+<div id="engineFeedbackFields" class="hidden"><div class="feedback-grid"><label>Did you match the prescribed effort?<select id="engineFeedbackEffort"><option value="1">1 — Far too hard</option><option value="2">2 — Somewhat too hard</option><option value="3" selected>3 — On target</option><option value="4">4 — Slightly easier than planned</option><option value="5">5 — Very controlled</option></select></label><label>Breathing control<select id="engineFeedbackBreathing"><option value="1">1 — Could not control</option><option value="2">2 — Struggled</option><option value="3" selected>3 — Appropriate</option><option value="4">4 — Comfortable</option><option value="5">5 — Very comfortable</option></select></label><label>Leg freshness afterward<select id="engineFeedbackLegs"><option value="1">1 — Heavy / depleted</option><option value="2">2 — More tired than expected</option><option value="3" selected>3 — Normal</option><option value="4">4 — Fresh</option><option value="5">5 — Very fresh</option></select></label><label>Pain or concerning symptoms<select id="engineFeedbackSymptoms"><option value="1" selected>1 — None</option><option value="2">2 — Minor irritation</option><option value="3">3 — Noticeable discomfort</option><option value="4">4 — Significant pain</option><option value="5">5 — Stop / seek guidance</option></select></label></div></div>
+<label>Anything the coach should remember?</label><textarea id="feedbackNotes" placeholder="Strength: joint response or load quality. Engine: terrain, weather, splits, breathing, or unusual fatigue."></textarea><button class="good" onclick="saveSessionFeedback()">Save Training Debrief</button><button class="secondary" onclick="skipSessionFeedback()">Skip for Now</button><div class="hint" style="margin-top:10px">Sharp pain, dizziness, chest pain, or other concerning symptoms should not be treated as a readiness score—stop training and seek appropriate medical guidance.</div></div></div></div></div>
 
 <div id="notificationModal" class="modal hidden"><div class="modal-box notification-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Bell Performance</span><h2>Coach Notifications</h2></div><button class="modal-close" onclick="closeNotificationCenter()">×</button></div><div id="notificationList" class="notification-list"></div><button class="secondary" onclick="markNotificationsReviewed()">Mark Reviewed</button></div></div></div>
 
@@ -317,7 +322,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
       <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
       <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
     </div>
-    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=703" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
+    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=705" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
     <div class="card workout-control-card">
       <h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
       <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
@@ -325,6 +330,19 @@ main{display:block}.screen{display:none}.screen.active{display:block}
       <div class="row"><button class="secondary" onclick="closeWorkout()">Save & Exit</button><button class="danger" onclick="discardWorkout()">Discard</button></div>
     </div>
     <div id="warmupPanel" class="card hidden"></div>
+    <div id="engineResultCard" class="card hidden">
+      <span class="metric-label">Official Engine Result</span><h3>Enter the result from your watch or tracking app</h3>
+      <p class="hint">The in-app timer is only a convenience. These editable fields become the official history record.</p>
+      <div class="feedback-grid">
+        <label>Elapsed time<input id="engineManualTime" inputmode="numeric" placeholder="HH:MM:SS or MM:SS" oninput="updateEngineMetric('manualTime',this.value)"></label>
+        <label>Distance<input id="engineDistance" type="number" min="0" step="0.01" placeholder="0.00" oninput="updateEngineMetric('distance',this.value)"></label>
+        <label>Distance unit<select id="engineDistanceUnit" onchange="updateEngineMetric('distanceUnit',this.value)"><option value="mi">Miles</option><option value="km">Kilometers</option><option value="m">Meters</option><option value="yd">Yards</option></select></label>
+        <label>Average heart rate<input id="engineAvgHeartRate" type="number" min="0" max="240" placeholder="Optional" oninput="updateEngineMetric('avgHeartRate',this.value)"></label>
+        <label>Elevation gain<input id="engineElevation" type="number" min="0" step="1" placeholder="Optional" oninput="updateEngineMetric('elevationGain',this.value)"></label>
+        <label>Elevation unit<select id="engineElevationUnit" onchange="updateEngineMetric('elevationUnit',this.value)"><option value="ft">Feet</option><option value="m">Meters</option></select></label>
+      </div>
+      <div class="performance-callout" id="enginePacePreview">Enter time and distance to calculate pace.</div>
+    </div>
     <div id="activeExercises"></div>
     <div class="card"><label>Session RPE</label><input type="number" min="1" max="10" id="sessionRpe"><label>Training Notes</label><textarea id="sessionNotes"></textarea><button class="good" onclick="completeWorkout()">Finish Training</button></div>
   </div>
@@ -338,22 +356,24 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 
-<script src="./data/workouts.js?v=703"></script>
-<script src="./js/storage.js?v=703"></script>
-<script src="./js/readiness.js?v=703"></script>
-<script src="./js/equipment.js?v=703"></script>
+<script src="./data/workouts.js?v=705"></script>
+<script src="./js/storage.js?v=705"></script>
+<script src="./js/readiness.js?v=705"></script>
+<script src="./js/equipment.js?v=705"></script>
 <script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");</script>
-<script src="./js/training-blocks.js?v=703"></script>
-<script src="./js/mobility.js?v=703"></script>
-<script src="./js/nutrition.js?v=703"></script>
-<script src="./js/milestones.js?v=703"></script>
-<script src="./js/progression.js?v=703"></script>
-<script src="./js/workouts.js?v=703"></script>
-<script src="./js/artwork.js?v=703"></script>
-<script src="./js/quote-cache.js?v=703"></script>
-<script src="./js/ui.js?v=703"></script>
-<script src="./js/dual-goals.js?v=703"></script>
-<script src="./js/how-to.js?v=703"></script>
-<script src="./js/app.js?v=703"></script>
+<script src="./js/training-blocks.js?v=705"></script>
+<script src="./js/mobility.js?v=705"></script>
+<script src="./js/nutrition.js?v=705"></script>
+<script src="./js/milestones.js?v=705"></script>
+<script src="./js/progression.js?v=705"></script>
+<script src="./js/workouts.js?v=705"></script>
+<script src="./js/missed-sessions.js?v=705"></script>
+<script src="./js/performance-review.js?v=705"></script>
+<script src="./js/artwork.js?v=705"></script>
+<script src="./js/quote-cache.js?v=705"></script>
+<script src="./js/ui.js?v=705"></script>
+<script src="./js/dual-goals.js?v=705"></script>
+<script src="./js/how-to.js?v=705"></script>
+<script src="./js/app.js?v=705"></script>
 </body>
 </html>

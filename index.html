@@ -54,8 +54,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
   <div class="section-heading"><h2>Today's Mission</h2><button onclick="showScreen('plan')">View Full Schedule ›</button></div>
   <div class="training-pair">
-    <article class="training-card strength-card"><img id="strengthArtwork" src="./assets/strength-power.svg?v=663" alt="Strength athlete"><div class="training-overlay"><div class="training-type">🏋 <span>STRENGTH</span></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
-    <article class="training-card engine-card"><img id="engineArtwork" src="./assets/engine-route.svg?v=663" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
+    <article class="training-card strength-card"><img id="strengthArtwork" src="./assets/strength-classic.jpg?v=664" alt="Strength athlete"><div class="training-overlay"><div class="training-type">🏋 <span>STRENGTH</span></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
+    <article class="training-card engine-card"><img id="engineArtwork" src="./assets/engine-mountain-trail.jpg?v=664" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
   </div>
   <div id="todayPreview" class="hidden"></div>
 
@@ -204,7 +204,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
       <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
       <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
     </div>
-    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/strength-power.svg?v=663" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
+    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/strength-classic.jpg?v=664" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
     <div class="card workout-control-card">
       <h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
       <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>

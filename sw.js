@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-6-6-1-readiness-662";
+const CACHE_NAME = "bell-performance-6-6-4";
 const CORE = [
   "./", "./index.html", "./manifest.json", "./css/app.css?v=663",
   "./assets/logo-shield.svg?v=663", "./assets/strength-power.svg?v=663",

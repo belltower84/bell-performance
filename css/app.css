@@ -139,3 +139,13 @@ nav{grid-template-columns:repeat(5,1fr);background:rgba(7,9,11,.97);border-top-c
 body.female-profile .strength-card,body.female-session .workout-hero{border-color:rgba(176,130,235,.42)}
 body.female-profile .strength-card:before,body.female-session .workout-hero:before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle at 78% 30%,rgba(176,130,235,.10),transparent 36%)}
 @media(max-width:560px){.training-card img{object-position:58% center}.workout-hero img{object-position:60% center}}
+
+
+/* 6.6.4 — artwork matched to the approved dashboard concept */
+.strength-card img{object-position:72% 46%;filter:saturate(.86) contrast(1.09) brightness(.88)}
+.engine-card img{object-position:56% 50%;filter:saturate(.92) contrast(1.06) brightness(.88)}
+.strength-card:after{background:linear-gradient(90deg,rgba(5,7,9,.98) 0%,rgba(5,7,9,.84) 43%,rgba(5,7,9,.12) 76%,rgba(5,7,9,.04) 100%)}
+.engine-card:after{background:linear-gradient(90deg,rgba(5,7,9,.98) 0%,rgba(5,7,9,.81) 42%,rgba(5,7,9,.10) 76%,rgba(5,7,9,.03) 100%)}
+.workout-hero img[src*="strength-classic"]{object-position:72% 44%;filter:saturate(.86) contrast(1.09) brightness(.82)}
+.workout-hero img[src*="engine-mountain-trail"]{object-position:55% 50%;filter:saturate(.92) contrast(1.06) brightness(.84)}
+@media(max-width:560px){.strength-card img{object-position:67% center}.engine-card img{object-position:58% center}}

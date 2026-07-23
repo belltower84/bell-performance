@@ -392,7 +392,33 @@ function dashboardSessionsForToday(){
   return unique;
 }
 function optionalSessionHtml(primaryType){if(primaryType==='strength')return `<span class="metric-label">Optional Support</span><h3>Add Easy Cardio</h3><p class="hint">Add 20–30 minutes of easy Zone 2 work only when readiness is Green or Yellow and it will not compromise tomorrow's training.</p><div class="row"><button class="secondary" onclick="beginWorkout('R-1 Recovery Run')">Start Optional Cardio</button><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Choose Mobility Instead</button></div>`;return `<span class="metric-label">Optional Support</span><h3>Add Mobility</h3><p class="hint">A conditioning-only day can be paired with extra mobility, breathing, or easy recovery work without adding another hard session.</p><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Open Daily Mobility</button>`;}
-function renderTodayTrainingCards(){const sessions=dashboardSessionsForToday(),strengthCard=byId('strengthTrainingCard'),engineCard=byId('engineTrainingCard'),option=byId('singleSessionOption');const strength=sessions.find(x=>String(x.mission).startsWith('S-')),engine=sessions.find(x=>String(x.mission).startsWith('R-'));strengthCard?.classList.toggle('hidden',!strength);engineCard?.classList.toggle('hidden',!engine);if(strength){const t=scaledTemplate(strength.mission);setText('todayMission',strength.label||t?.label||strength.mission);setText('todayDuration',t?`${t.duration} minutes`:'—');strengthCard.querySelector('button[onclick="beginToday()"]')?.setAttribute('onclick',`beginWorkout('${strength.mission.replaceAll("'","\\'")}')`);}if(engine){const t=scaledTemplate(engine.mission);setText('engineSessionTitle',engine.label||t?.label||engine.mission);setText('engineSessionPurpose',engine.detail||'Complete the prescribed conditioning session.');const canonicalDuration=Number(engine.prescribedDuration)||Number(t?.duration)||30;const meta=engineCard.querySelector('.training-meta');if(meta)meta.innerHTML=`◷ <span>${canonicalDuration} minutes</span>`;engineCard.querySelector('button')?.setAttribute('onclick',`beginWorkout('${engine.mission.replaceAll("'","\\'")}')`);}option.classList.toggle('hidden',sessions.length!==1);if(sessions.length===1){option.innerHTML=optionalSessionHtml(strength?'strength':'engine');}}
+function renderTodayTrainingCards(){
+  const sessions=dashboardSessionsForToday(),strengthCard=byId('strengthTrainingCard'),engineCard=byId('engineTrainingCard'),option=byId('singleSessionOption');
+  const sessionType=session=>scheduleTypeForMission(session?.mission,session?.label,session?.detail);
+  const strength=sessions.find(session=>sessionType(session)==='strength');
+  const engine=sessions.find(session=>sessionType(session)==='engine');
+  strengthCard?.classList.toggle('hidden',!strength);
+  engineCard?.classList.toggle('hidden',!engine);
+  if(strength){
+    const t=scaledTemplate(strength.mission);
+    setText('todayMission',strength.label||t?.label||strength.mission);
+    setText('todayDuration',t?`${t.duration} minutes`:'—');
+    const button=strengthCard?.querySelector('button');
+    if(button){button.textContent=data.activeWorkout?.name===strength.mission?'Resume Strength':'Start Strength';button.setAttribute('onclick',`beginWorkout('${strength.mission.replaceAll("'","\\'")}')`);}
+  }
+  if(engine){
+    const t=scaledTemplate(engine.mission);
+    setText('engineSessionTitle',engine.label||t?.label||engine.mission);
+    setText('engineSessionPurpose',engine.detail||'Complete the prescribed conditioning session.');
+    const canonicalDuration=Number(engine.prescribedDuration)||Number(t?.duration)||30;
+    const meta=engineCard?.querySelector('.training-meta');
+    if(meta)meta.innerHTML=`◷ <span>${canonicalDuration} minutes</span>`;
+    const button=engineCard?.querySelector('button');
+    if(button){button.textContent=data.activeWorkout?.name===engine.mission?'Resume Engine':'Start Engine';button.setAttribute('onclick',`beginWorkout('${engine.mission.replaceAll("'","\\'")}')`);}
+  }
+  option?.classList.toggle('hidden',sessions.length!==1);
+  if(option&&sessions.length===1)option.innerHTML=optionalSessionHtml(strength?'strength':'engine');
+}
 
 function renderSettings() {
   setValue("athleteNameInput", data.settings.athleteName || "");

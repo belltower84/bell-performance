@@ -3,30 +3,22 @@
 const defaults = {
   settings: {
     phase: "Foundation",
-    athleteName: "Chris",
+    athleteName: "",
     athleteMode: "Hybrid Athlete",
     sex: "Male",
-    weight: 207,
-    goal: 185,
+    weight: null,
+    goal: null,
     cardioType: "Running",
     rotationWeek: 1,
-    maxes: { bench: 315, squat: 455, deadlift: 455, pushPress: 185 },
-    readiness: { sleepQuality:4, energy:4, motivation:4, soreness:3, timeAvailability:3, score:80, status:"GREEN", lastPromptDate:"" },
+    maxes: { bench: null, squat: null, deadlift: null, pushPress: null },
+    readiness: { sleepQuality:4, energy:4, motivation:4, soreness:3, timeAvailability:3, score:null, status:"", lastPromptDate:"" },
     coachMessages: { setupComplete:false, style:"Performance", scriptureFrequency:"Occasionally" },
     firstFlightStage: "profile",
     firstFlightTourComplete: false,
     injuryProfile: { hasLimitations:false, restrictedPatterns:[], affectedAreas:[], notes:"", medicalClearance:false, updatedAt:"", startedAt:"", recoveryHistory:[] },
     equipmentSetup: { locations:[{id:"default",name:"My Gym",environment:"commercial",equipment:["barbell","rack","bench","dumbbells","cables","machines","smith","kettlebells","bands","pullupBar","dipStation","plyoBox","treadmill","bike","rower","skiErg","sled","airBike","jumpRope","outdoor"]}], activeLocationId:"default" }
   },
-  plan: [
-    { day: "Monday", mission: "S-1 Upper Strength", done: false },
-    { day: "Tuesday", mission: "R-2 Easy Run", done: false },
-    { day: "Wednesday", mission: "S-2 Lower Strength", done: false },
-    { day: "Thursday", mission: "M-1 Daily Reset", done: false },
-    { day: "Friday", mission: "S-3 Athletic Upper", done: false },
-    { day: "Saturday", mission: "R-5 Long Run", done: false },
-    { day: "Sunday", mission: "S-4 Athletic Lower", done: false }
-  ],
+  plan: [],
   history: [],
   exerciseProgression: {},
   activeWorkout: null,
@@ -39,19 +31,20 @@ const defaults = {
   habits: {
     items: [
       {id:"training",label:"Complete prescribed training",icon:"⚒",custom:false},
-      {id:"mobility",label:"Complete mobility or recovery work",icon:"♡",custom:false},
-      {id:"protein",label:"Hit daily protein target",icon:"P",custom:false},
-      {id:"hydration",label:"Meet hydration target",icon:"◉",custom:false},
-      {id:"steps",label:"Complete daily movement / steps",icon:"↟",custom:false},
-      {id:"sleep",label:"Protect tonight’s sleep routine",icon:"☾",custom:false}
+      {id:"mobility",label:"Mobility",icon:"♡",custom:false},
+      {id:"protein",label:"Protein",icon:"P",custom:false},
+      {id:"hydration",label:"Hydration",icon:"◉",custom:false},
+      {id:"steps",label:"Daily movement",icon:"↟",custom:false},
+      {id:"sleep",label:"Sleep",icon:"☾",custom:false}
     ],
+    targets: {proteinGrams:0,hydrationOz:0,steps:0,sleepHours:0,mobilityMinutes:0,customized:false},
     completions: {}
   },
   mission: {
     goalWorkouts: 40, goalMobility: 30, goalPullups: 25, goal5k: 28,
     currentPullups: 20, current5k: null
   },
-  nutrition: { height: 66, age: 41, activity: 1.55, goal: "cut" },
+  nutrition: { height: null, age: null, activity: 1.55, goal: "maintain" },
   trainingBlock: {
     enabled: false, goalType: "General Hybrid", targetDate: "", targetMinutes: 60,
     lengthWeeks: 12, currentWeek: 1, trainingDays: 5, runDays: 3, strengthDays: 3,
@@ -75,18 +68,18 @@ try {
 function normalizeData() {
   data.settings = data.settings || {};
   data.settings.phase = data.settings.phase || defaults.settings.phase;
-  data.settings.athleteName = data.settings.athleteName || "Chris";
+  data.settings.athleteName = typeof data.settings.athleteName === "string" ? data.settings.athleteName : "";
   data.settings.athleteMode = data.settings.athleteMode || "Hybrid Athlete";
   data.settings.sex = ["Male", "Female", "Prefer not to say"].includes(data.settings.sex) ? data.settings.sex : "Male";
-  data.settings.weight = Number(data.settings.weight) || defaults.settings.weight;
-  data.settings.goal = Number(data.settings.goal) || defaults.settings.goal;
+  data.settings.weight = Number.isFinite(Number(data.settings.weight)) && Number(data.settings.weight) > 0 ? Number(data.settings.weight) : null;
+  data.settings.goal = Number.isFinite(Number(data.settings.goal)) && Number(data.settings.goal) > 0 ? Number(data.settings.goal) : null;
   data.settings.cardioType = data.settings.cardioType || "Running";
   data.settings.rotationWeek = Math.min(4, Math.max(1, Number(data.settings.rotationWeek) || 1));
   data.settings.maxes = {
-    bench: Number(data.settings.maxes?.bench) || 315,
-    squat: Number(data.settings.maxes?.squat) || 455,
-    deadlift: Number(data.settings.maxes?.deadlift) || 455,
-    pushPress: Number(data.settings.maxes?.pushPress) || 185
+    bench: Number(data.settings.maxes?.bench) || null,
+    squat: Number(data.settings.maxes?.squat) || null,
+    deadlift: Number(data.settings.maxes?.deadlift) || null,
+    pushPress: Number(data.settings.maxes?.pushPress) || null
   };
 
   const old = data.settings.readiness || {};
@@ -96,8 +89,8 @@ function normalizeData() {
     motivation: Number.isFinite(+old.motivation) ? +old.motivation : 4,
     soreness: Number.isFinite(+old.soreness) ? +old.soreness : 3,
     timeAvailability: Number.isFinite(+old.timeAvailability) ? +old.timeAvailability : 3,
-    score: Number.isFinite(+old.score) ? +old.score : 80,
-    status: old.status || "GREEN",
+    score: Number.isFinite(+old.score) ? +old.score : null,
+    status: old.status || "",
     lastPromptDate: old.lastPromptDate || ""
   };
   data.settings.coachMessages = { ...defaults.settings.coachMessages, ...(data.settings.coachMessages || {}) };
@@ -107,7 +100,7 @@ function normalizeData() {
   data.settings.injuryProfile={...defaults.settings.injuryProfile,...injury,restrictedPatterns:Array.isArray(injury.restrictedPatterns)?injury.restrictedPatterns:[],affectedAreas:Array.isArray(injury.affectedAreas)?injury.affectedAreas:[],recoveryHistory:Array.isArray(injury.recoveryHistory)?injury.recoveryHistory:[]};
   if (typeof normalizeEquipmentSettings === "function") normalizeEquipmentSettings();
 
-  data.plan = Array.isArray(data.plan) ? data.plan : cloneDefaults().plan;
+  data.plan = Array.isArray(data.plan) ? data.plan : [];
   data.plan = data.plan.map((item,index)=>({...item,id:item.id||`plan-${index}-${String(item.day||"day").toLowerCase()}`,status:item.status||(item.done?"completed":"planned"),done:Boolean(item.done||item.status==="completed")}));
   data.history = Array.isArray(data.history) ? data.history : [];
   data.missedSessionLog = Array.isArray(data.missedSessionLog) ? data.missedSessionLog : [];
@@ -115,6 +108,9 @@ function normalizeData() {
   data.habits=data.habits&&typeof data.habits==="object"?data.habits:habitDefaults;
   data.habits.items=Array.isArray(data.habits.items)&&data.habits.items.length?data.habits.items:habitDefaults.items;
   data.habits.items=data.habits.items.map((item,index)=>({id:item.id||`habit-${index}`,label:item.label||"Daily habit",icon:item.icon||"✓",custom:Boolean(item.custom)}));
+  data.habits.targets={...habitDefaults.targets,...(data.habits.targets||{})};
+  ["proteinGrams","hydrationOz","steps","sleepHours","mobilityMinutes"].forEach(key=>data.habits.targets[key]=Math.max(0,Number(data.habits.targets[key])||0));
+  data.habits.targets.customized=Boolean(data.habits.targets.customized);
   data.habits.completions=data.habits.completions&&typeof data.habits.completions==="object"?data.habits.completions:{};
   data.exerciseProgression = data.exerciseProgression && typeof data.exerciseProgression === "object" ? data.exerciseProgression : {};
   data.mobility = { ...defaults.mobility, ...(data.mobility || {}) };

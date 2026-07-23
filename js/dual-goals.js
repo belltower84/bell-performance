@@ -145,7 +145,8 @@ function engineWeekPrescription(kind){
     if(mode==="Sprint / Field")return{label:e.label,detail:`${recovery?4:6+Math.round(r*3)} quality efforts with full or sport-specific recovery`,duration:35,intensity:"High quality"};
     return{label:`${modality} Quality`,detail:recovery?"Short controlled technique intervals; finish fresh":taper?"Goal-specific sharpening; low total volume":`${4+Math.round(r*4)} repeats at threshold or goal-specific effort`,duration:Math.round(35+r*12),intensity:"Quality"};
   }
-  return{label:`Long ${modality}`,detail:`${Math.round((40+r*(e.level==="specialist"?80:45))*(recovery?.7:1)*(taper?.55:1))} min progressive endurance with fueling and technique practice`,duration:Math.round(45+r*60),intensity:"Endurance"};
+  const longDuration=Math.round((40+r*(e.level==="specialist"?80:45))*(recovery?.7:1)*(taper?.55:1));
+  return{label:`Long ${modality}`,detail:`${longDuration} min progressive endurance with fueling and technique practice`,duration:longDuration,intensity:"Endurance"};
 }
 
 function strengthMissionsForGoal(goal){
@@ -176,15 +177,15 @@ function buildCurrentWeekPlan(){
   if(isSixDayGeneralHybrid){
     const quality=engineWeekPrescription("quality"),easy=engineWeekPrescription("easy"),long=engineWeekPrescription("long");
     plan[0]={day:days[0],mission:strengthMissions[0],detail:`${s} • ${sp.label} • Primary upper-body strength`,done:false};
-    plan[1]={day:days[1],mission:"R-4 Intervals",detail:quality.detail,customLabel:quality.label,done:false};
+    plan[1]={day:days[1],mission:"R-4 Intervals",detail:quality.detail,customLabel:quality.label,prescribedDuration:quality.duration,done:false};
     plan[2]={day:days[2],mission:strengthMissions[1],detail:`${s} • ${sp.label} • Primary lower-body strength`,done:false};
-    plan[3]={day:days[3],mission:strengthMissions[2],detail:`${s} • ${sp.label} • Short power and durability emphasis`,done:false,secondaryMission:"R-2 Easy Run",secondaryLabel:easy.label,secondaryDetail:`20–30 min easy aerobic support after strength or in a separate session. ${easy.detail}`};
+    plan[3]={day:days[3],mission:strengthMissions[2],detail:`${s} • ${sp.label} • Short power and durability emphasis`,done:false,secondaryMission:"R-2 Easy Run",secondaryLabel:easy.label,secondaryDuration:easy.duration,secondaryDetail:`20–30 min easy aerobic support after strength or in a separate session. ${easy.detail}`};
     plan[4]={day:days[4],mission:strengthMissions[3],detail:`${s} • ${sp.label} • Secondary strength exposure; keep 1–3 reps in reserve`,done:false};
-    plan[5]={day:days[5],mission:"R-5 Long Run",detail:long.detail,customLabel:long.label,done:false};
+    plan[5]={day:days[5],mission:"R-5 Long Run",detail:long.detail,customLabel:long.label,prescribedDuration:long.duration,done:false};
     plan[6]={day:days[6],mission:"M-1 Daily Reset",detail:"Full recovery day: mobility, walking, and readiness review",done:false};
   }else{
     const strengthSlots=sd>=5?[0,1,3,4,5]:sd===4?[0,1,3,5]:sd===3?[0,2,4]:[0,3]; strengthSlots.slice(0,sd).forEach((idx,i)=>{plan[idx]={day:days[idx],mission:strengthMissions[i%strengthMissions.length],detail:`${s} • ${sp.label}`,done:false};});
-    if(ed>0){const engineKinds=ed===1?["easy"]:ed===2?["easy","long"]:ed===3?["easy","quality","long"]:ed===4?["easy","easy","quality","long"]:["easy","easy","quality","easy","long","easy"].slice(0,ed); const preferred=[1,3,5,2,6,4];engineKinds.forEach((kind,i)=>{const idx=preferred[i],p=engineWeekPrescription(kind),engine={mission:kind==="quality"?"R-4 Intervals":kind==="long"?"R-5 Long Run":"R-2 Easy Run",detail:p.detail,customLabel:p.label};if(plan[idx].mission==="M-1 Daily Reset"||coord==="Alternate Days")plan[idx]={day:days[idx],...engine,done:false};else{plan[idx].secondaryMission=engine.mission;plan[idx].secondaryLabel=p.label;plan[idx].secondaryDetail=p.detail;plan[idx].detail+=` • PM: ${p.label}`;}});}
+    if(ed>0){const engineKinds=ed===1?["easy"]:ed===2?["easy","long"]:ed===3?["easy","quality","long"]:ed===4?["easy","easy","quality","long"]:["easy","easy","quality","easy","long","easy"].slice(0,ed); const preferred=[1,3,5,2,6,4];engineKinds.forEach((kind,i)=>{const idx=preferred[i],p=engineWeekPrescription(kind),engine={mission:kind==="quality"?"R-4 Intervals":kind==="long"?"R-5 Long Run":"R-2 Easy Run",detail:p.detail,customLabel:p.label};if(plan[idx].mission==="M-1 Daily Reset"||coord==="Alternate Days")plan[idx]={day:days[idx],...engine,done:false};else{plan[idx].secondaryMission=engine.mission;plan[idx].secondaryLabel=p.label;plan[idx].secondaryDuration=p.duration;plan[idx].secondaryDetail=p.detail;plan[idx].detail+=` • PM: ${p.label}`;}});}
   }
   data.plan=plan;
 }

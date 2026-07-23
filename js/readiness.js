@@ -33,18 +33,20 @@ function weeklyReadinessSummary() {
   const keys = new Set(lastSevenDaysKeys());
   const daily = (data.readinessLog || []).filter(x => keys.has(x.date)).map(x => Number(x.score)).filter(Number.isFinite);
   const feedback = (data.sessionFeedbackLog || []).filter(x => keys.has(x.date)).map(feedbackRecoveryScore).filter(Number.isFinite);
-  const dailyAverage = daily.length ? Math.round(daily.reduce((a,b)=>a+b,0) / daily.length) : rawDailyReadinessScore();
+  const hasData = daily.length > 0 || feedback.length > 0;
+  if (!hasData) return { score:null, dailyAverage:null, feedbackAverage:null, checkIns:0, feedbackCount:0, lowFeedbackCount:0, trend:"NO_DATA", hasData:false };
+  const dailyAverage = daily.length ? Math.round(daily.reduce((a,b)=>a+b,0) / daily.length) : Math.round(feedback.reduce((a,b)=>a+b,0) / feedback.length);
   const feedbackAverage = feedback.length ? Math.round(feedback.reduce((a,b)=>a+b,0) / feedback.length) : dailyAverage;
   const score = Math.round(dailyAverage * .65 + feedbackAverage * .35);
   const lowFeedbackCount = feedback.filter(x => x < 52).length;
   const trend = lowFeedbackCount >= 2 ? "ACCUMULATING_FATIGUE" : score >= 75 ? "BUILDING_WELL" : score >= 55 ? "MANAGE_LOAD" : "RECOVERY_NEEDED";
-  return { score, dailyAverage, feedbackAverage, checkIns:daily.length, feedbackCount:feedback.length, lowFeedbackCount, trend };
+  return { score, dailyAverage, feedbackAverage, checkIns:daily.length, feedbackCount:feedback.length, lowFeedbackCount, trend, hasData:true };
 }
 
 function readinessScore() {
   const today = rawDailyReadinessScore();
   const weekly = weeklyReadinessSummary();
-  let adjusted = Math.round(today * .72 + weekly.score * .28);
+  let adjusted = weekly.hasData ? Math.round(today * .72 + weekly.score * .28) : today;
   if (weekly.lowFeedbackCount >= 2) adjusted = Math.min(adjusted, 68);
   if (weekly.lowFeedbackCount >= 3) adjusted = Math.min(adjusted, 50);
   return Math.max(0, Math.min(100, adjusted));

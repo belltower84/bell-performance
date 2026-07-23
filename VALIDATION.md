@@ -1,6 +1,9 @@
-# Validation — Bell Performance 7.0.16
+7.0.22 validation
 
-- Daily habits render at the top of the dashboard.
-- Dashboard habit controls update the same persistent history used by the Habits screen.
-- Full Habits screen remains available for weekly review and customization.
-- JavaScript syntax, duplicate IDs, local assets, service-worker cache, and ZIP integrity validated.
+- Bell Hypertrophy phase logic added.
+- Advanced techniques restricted to eligible accessory movements.
+- Techniques disabled during reduced-readiness, deload, recovery, taper, and event-week states.
+- Technique metadata persists into active workout records.
+- Workout cards render technique badges and instructions.
+- JavaScript syntax validation completed.
+- Local asset and ZIP integrity checks completed.

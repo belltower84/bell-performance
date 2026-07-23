@@ -258,14 +258,64 @@ const femaleBodybuildingVariations = {
   ]
 };
 
+function bellHypertrophyPhase() {
+  const block=data?.trainingBlock||{};
+  const current=Math.max(1,Number(block.currentWeek)||1), length=Math.max(1,Number(block.lengthWeeks)||12);
+  const progress=current/length;
+  const progression=typeof strengthProgression==="function"?strengthProgression():null;
+  const label=String(progression?.label||"").toLowerCase();
+  if(current===length||progression?.setScale<0.72||/deload|recovery|taper|event week|peak/.test(label))return"Recovery";
+  if(progress<=0.34)return"Foundation";
+  if(progress<=0.68)return"Overload";
+  return"Specialization";
+}
+function bellTechniqueEligible(exercise){
+  return /Raise|Curl|Extension|Pressdown|Fly|Pec Deck|Pullover|Kickback|Abduction|Calf|Tibialis|Leg Curl|Hamstring Curl|Leg Extension|Face Pull|Rear-Delt|Reverse Pec Deck|Cable Row|Lat Pulldown/.test(exercise);
+}
+function bellBodybuildingTechniques(name,exercises,phase,focus){
+  const status=typeof readinessStatus==="function"&&typeof readinessScore==="function"?readinessStatus(readinessScore()):"GREEN";
+  if(status!=="GREEN"||phase==="Recovery")return {};
+  const eligible=exercises.map((exercise,index)=>({exercise,index})).filter(x=>x.index>=2&&bellTechniqueEligible(x.exercise));
+  if(!eligible.length)return{};
+  const techniques={};
+  const final=eligible[eligible.length-1];
+  const focusMatch=x=>focus==="Balanced"||
+    (focus==="Shoulders & Arms"&&/Raise|Rear|Curl|Pressdown|Extension|Dips/.test(x.exercise))||
+    (focus==="Chest & Back"&&/Fly|Pec|Pullover|Row|Pulldown|Face Pull/.test(x.exercise))||
+    (focus==="Legs"&&/Leg|Calf|Tibialis/.test(x.exercise))||
+    (focus==="Glutes & Hamstrings"&&/Curl|Hamstring|Kickback|Abduction|Calf/.test(x.exercise));
+  if(phase==="Foundation"){
+    if(eligible.length>=2){
+      const a=eligible[eligible.length-2],b=eligible[eligible.length-1];
+      techniques[a.index]={name:"Bell Pair",short:"Antagonist superset",instruction:`Pair with ${b.exercise}. Complete both with clean form, then rest 45–60 seconds.`};
+      techniques[b.index]={name:"Bell Pair",short:"Antagonist superset",instruction:`Pair with ${a.exercise}. Stop with 1–2 quality reps in reserve.`};
+    }
+    return techniques;
+  }
+  if(phase==="Overload"){
+    techniques[final.index]={name:"Bell Finish",short:"Controlled drop set",instruction:"On the final set only: reach the target with clean form, reduce load 20–25%, then complete 8–12 controlled reps. No forced reps."};
+    return techniques;
+  }
+  const targeted=eligible.filter(focusMatch);
+  const first=(targeted[targeted.length-1]||final);
+  if(/Lateral Raise/.test(first.exercise)) techniques[first.index]={name:"Bell Finish",short:"Mechanical drop set",instruction:"Final set only: strict reps to the target, then 8–12 controlled partials from the strongest range."};
+  else if(/Leg Extension|Leg Curl|Hamstring Curl|Calf|Tibialis/.test(first.exercise)) techniques[first.index]={name:"Bell Density",short:"Myo-rep cluster",instruction:"Final set only: complete the target, rest 15 seconds, then perform 3 mini-sets of 3–5 reps with 15 seconds between. Stop when form or range drops."};
+  else techniques[first.index]={name:"Bell Finish",short:"Rest-pause",instruction:"Final set only: stop at technical failure, rest 15–20 seconds, then complete 3–5 additional clean reps. No assisted reps."};
+  const second=eligible.slice().reverse().find(x=>x.index!==first.index);
+  if(second) techniques[second.index]={name:"Bell Burnout",short:"Back-off set",instruction:"After the final working set, reduce load about 30% and complete one controlled 15–25 rep back-off set. Stop before technique breaks."};
+  return techniques;
+}
 function getBodybuildingTemplate(name, rotationWeek = getRotationWeek()) {
   const sex=data?.settings?.sex||"Prefer not to say"; const library=sex==="Female"?femaleBodybuildingVariations:bodybuildingVariations; const options=library[name]||bodybuildingVariations[name]; if(!options)return null; const ex=options[Math.max(0,Math.min(3,rotationWeek-1))];
-  const focus=data?.trainingBlock?.bodybuildingFocus||"Balanced"; const phase=data?.trainingBlock?.bodybuildingPhase||"Recomposition";
+  const focus=data?.trainingBlock?.bodybuildingFocus||"Balanced"; const physiquePhase=data?.trainingBlock?.bodybuildingPhase||"Recomposition"; const bellPhase=bellHypertrophyPhase();
   const profileLabel=sex==="Female"?"Female Profile":sex==="Male"?"Male Profile":"Individual Profile";
-  return {label:`${name.replace(/^B-\d\s*/,"")} — ${focus} Focus • ${profileLabel}`,duration:name.includes("Shoulders")?68:72,exercises:ex.map((exercise,i)=>{
+  const techniques=bellBodybuildingTechniques(name,ex,bellPhase,focus);
+  return {label:`Bell Hypertrophy • ${name.replace(/^B-\d\s*/,"")} — ${focus} Focus • ${profileLabel}`,duration:name.includes("Shoulders")?68:72,system:"Bell Hypertrophy System",phase:bellPhase,exercises:ex.map((exercise,i)=>{
     const compound=i<2, armDay=name.includes("Shoulders"), gluteExercise=/Hip Thrust|Glute|Kickback|Abduction|Romanian|Lunge/.test(exercise), focusBoost=(focus==="Shoulders & Arms"&&armDay)||(focus==="Chest & Back"&&name.includes("Chest"))||(focus==="Legs"&&name.includes("Legs"))||(focus==="Glutes & Hamstrings"&&gluteExercise);
-    const sets=compound?4:(focusBoost&&i>=2?4:3); const reps=compound?(phase==="Lean Gain"?"6–10":"8–12"):(i>=ex.length-2?"12–20":"10–15");
-    return{name:exercise,block:compound?"Primary Hypertrophy":"Accessory Hypertrophy",sets,reps,rest:compound?105:45,cue:compound?"Control the eccentric and stop with 1–2 reps in reserve.":"Use full range and constant tension. Add load only after reaching the top of the rep range."};
+    const sets=compound?4:(focusBoost&&i>=2?4:3); const reps=compound?(physiquePhase==="Lean Gain"?"6–10":"8–12"):(i>=ex.length-2?"12–20":"10–15");
+    const advancedTechnique=techniques[i]||null;
+    const baseCue=compound?"Control the eccentric and stop with 1–2 reps in reserve.":"Use full range and constant tension. Add load only after reaching the top of the rep range.";
+    return{name:exercise,block:compound?"Primary Hypertrophy":advancedTechnique?"Bell Performance Finisher":"Accessory Hypertrophy",sets,reps,rest:compound?105:45,cue:advancedTechnique?`${baseCue} ${advancedTechnique.instruction}`:baseCue,advancedTechnique,bellPhase};
   })};
 }
 

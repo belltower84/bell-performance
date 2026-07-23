@@ -26,6 +26,66 @@ function showScreen(name) {
   window.scrollTo(0, 0);
 }
 
+
+function trackedActivityDates() {
+  const dates = new Set();
+  (data.readinessLog || []).forEach(entry => entry?.date && dates.add(entry.date));
+  (data.history || []).forEach(session => session?.completedAt && dates.add(String(session.completedAt).slice(0,10)));
+  (data.mobility?.completedDates || []).forEach(date => date && dates.add(date));
+  Object.entries(data.habits?.completions || {}).forEach(([date, values]) => {
+    if (values && Object.values(values).some(Boolean)) dates.add(date);
+  });
+  return dates;
+}
+
+function currentActivityStreak() {
+  const dates = trackedActivityDates();
+  if (!dates.size) return 0;
+  const cursor = new Date();
+  const today = todayKey();
+  if (!dates.has(today)) cursor.setDate(cursor.getDate() - 1);
+  let streak = 0;
+  while (true) {
+    const key = `${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,"0")}-${String(cursor.getDate()).padStart(2,"0")}`;
+    if (!dates.has(key)) break;
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
+function renderReadinessTrendBars() {
+  const container = byId("readinessTrendBars");
+  if (!container) return;
+  const logs = new Map((data.readinessLog || []).map(entry => [entry.date, Number(entry.score)]));
+  const feedbackByDate = new Map();
+  (data.sessionFeedbackLog || []).forEach(entry => {
+    const score = feedbackRecoveryScore(entry);
+    if (!entry?.date || !Number.isFinite(score)) return;
+    const values = feedbackByDate.get(entry.date) || [];
+    values.push(score); feedbackByDate.set(entry.date, values);
+  });
+  const days = [];
+  for (let offset = 6; offset >= 0; offset--) {
+    const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-offset);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const daily = logs.get(key);
+    const feedback = feedbackByDate.get(key) || [];
+    const feedbackAverage = feedback.length ? feedback.reduce((a,b)=>a+b,0)/feedback.length : null;
+    const score = Number.isFinite(daily) ? (Number.isFinite(feedbackAverage) ? Math.round(daily*.65+feedbackAverage*.35) : daily) : feedbackAverage;
+    days.push({label:d.toLocaleDateString("en-US",{weekday:"narrow"}),score:Number.isFinite(score)?Math.round(score):null});
+  }
+  if (!days.some(day => day.score !== null)) {
+    container.className = "trend-bars empty";
+    container.innerHTML = '<div class="chart-empty-state">Complete a readiness check-in to begin your trend.</div>';
+    return;
+  }
+  container.className = "trend-bars";
+  container.innerHTML = days.map(day => day.score === null
+    ? `<i class="no-data" style="height:4%"><b>${day.label}</b></i>`
+    : `<i class="${day.score<52?"red":day.score<75?"yellow":""}" style="height:${Math.max(8,day.score)}%" title="${day.score}%"><b>${day.label}</b></i>`).join("");
+}
+
 function renderReadiness() {
   const score = readinessScore();
   const status = readinessStatus(score);
@@ -36,9 +96,10 @@ function renderReadiness() {
 
   const r = data.settings.readiness;
   const weekly = weeklyReadinessSummary();
-  setText("weeklyReadinessOut", `${weekly.score}%`);
-  setText("weeklyReadinessLabel", weekly.trend === "BUILDING_WELL" ? "Training load is being absorbed well" : weekly.trend === "MANAGE_LOAD" ? "Manage volume and protect recovery" : weekly.trend === "ACCUMULATING_FATIGUE" ? "Fatigue is accumulating — volume is capped" : "Recovery emphasis recommended");
-  setText("weeklyReadinessDetail", `${weekly.checkIns} daily check-ins • ${weekly.feedbackCount} post-session reports`);
+  setText("weeklyReadinessOut", weekly.hasData ? `${weekly.score}%` : "—");
+  setText("weeklyReadinessLabel", weekly.trend === "NO_DATA" ? "No readiness history yet" : weekly.trend === "BUILDING_WELL" ? "Training load is being absorbed well" : weekly.trend === "MANAGE_LOAD" ? "Manage volume and protect recovery" : weekly.trend === "ACCUMULATING_FATIGUE" ? "Fatigue is accumulating — volume is capped" : "Recovery emphasis recommended");
+  setText("weeklyReadinessDetail", weekly.hasData ? `${weekly.checkIns} daily check-ins • ${weekly.feedbackCount} post-session reports` : "Your rolling trend begins after the first check-in.");
+  renderReadinessTrendBars();
   ["sleepQuality", "energy", "motivation", "soreness", "timeAvailability"]
     .forEach(id => {
       const element = byId(id);
@@ -111,6 +172,44 @@ function renderVisualProfile(template, status) {
   setText("mobilityDashboardDetail", `Matched to today's training • ${data.mobility.completedDates.includes(todayKey()) ? "Completed today ✓" : "Complete morning or evening"}`);
 }
 
+
+function weeklyScheduleStart(reference=new Date()) {
+  const start=new Date(reference);
+  start.setHours(0,0,0,0);
+  const day=start.getDay();
+  start.setDate(start.getDate()-(day===0?6:day-1));
+  return start;
+}
+function scheduleTypeForMission(mission) {
+  const name=String(mission||"");
+  if(name.startsWith("S-")) return "strength";
+  if(name.startsWith("R-")) return "engine";
+  return null;
+}
+function renderWeeklyScheduleStrip() {
+  const host=byId("weeklyScheduleDays");
+  if(!host) return;
+  const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const shortDays=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const start=weeklyScheduleStart();
+  const today=todayKey();
+  host.innerHTML=days.map((day,index)=>{
+    const date=new Date(start); date.setDate(start.getDate()+index);
+    const key=date.toISOString().slice(0,10);
+    const items=(data.plan||[]).filter(item=>item.day===day && !["skipped","replaced"].includes(item.status));
+    const types=[];
+    items.forEach(item=>{
+      const primary=scheduleTypeForMission(item.mission);
+      const secondary=scheduleTypeForMission(item.secondaryMission);
+      if(primary&&!types.includes(primary)) types.push(primary);
+      if(secondary&&!types.includes(secondary)) types.push(secondary);
+    });
+    const codes=types.length?types.map(type=>`<i class="schedule-code ${type}" title="${type==='strength'?'Strength':'Engine'}">${type==='strength'?'S':'E'}</i>`).join(""):`<i class="schedule-code rest" title="Rest / recovery">R</i>`;
+    const allDone=items.length>0&&items.every(item=>item.done||item.status==="completed");
+    return `<div class="weekly-schedule-day${key===today?' today':''}${allDone?' completed':''}" aria-label="${day}, ${date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}: ${types.length?types.join(' and '):'rest'}"><span class="day-name">${shortDays[index]}</span><span class="day-date">${date.getDate()}</span><div class="weekly-schedule-codes">${codes}</div></div>`;
+  }).join("");
+}
+
 function renderDashboard() {
   const profile = scalingProfile();
   const plan = currentPlan();
@@ -120,9 +219,10 @@ function renderDashboard() {
   const macros = macroTargets();
   const block = data.trainingBlock;
   const scores = performanceScores();
-  const athleteName = data.settings.athleteName || "Chris";
+  const athleteName = data.settings.athleteName || "Athlete";
 
-  setText("greetingOut", `${timeGreeting()}, ${athleteName}`);
+  setText("greetingOut", data.settings.athleteName ? `${timeGreeting()}, ${athleteName}` : timeGreeting());
+  const streak=currentActivityStreak(); setText("streakDaysOut", String(streak)); setText("streakLabelOut", streak===1?"DAY STREAK":"DAY STREAK");
   const status = readinessStatus();
   setText("trainingStatusOut", trainingStatusText(status));
   const statusCard = byId("trainingStatusCard");
@@ -135,6 +235,7 @@ function renderDashboard() {
   setText("todayFocusOut", status === "GREEN" ? "Progress with clean, controlled work" : status === "YELLOW" ? "Protect quality and trim extra volume" : "Restore, move, and prepare for tomorrow");
   renderVisualProfile(template, status);
   renderTodayTrainingCards();
+  renderWeeklyScheduleStrip();
   byId("todayPreview").innerHTML = template
     ? template.exercises.slice(0, 5).map(exercise => `<span class="preview-block">${exercise.block || "Training"}</span> ${exercise.name}: ${exercise.sets} × ${exercise.reps}`).join("<br>")
     : "";
@@ -248,12 +349,12 @@ function saveHistoryEdit(){const index=Number(byId("historyEditIndex").value),se
 function deleteHistoryRecord(){const index=Number(byId("historyEditIndex").value);if(!data.history[index]||!confirm("Delete this workout record? This cannot be undone."))return;data.history.splice(index,1);closeHistoryEditor();saveData();}
 
 function currentDayName(){return new Intl.DateTimeFormat("en-US",{weekday:"long"}).format(new Date());}
-function dashboardSessionsForToday(){const day=currentDayName();const eligible=item=>item&&!item.done&&!['skipped','replaced'].includes(item.status);let item=data.plan.find(x=>eligible(x)&&x.day===day);if(!item)item=data.plan.find(eligible)||null;if(!item)return[];const sessions=[{mission:item.mission,label:item.customLabel,detail:item.detail,primary:true}];if(item.secondaryMission)sessions.push({mission:item.secondaryMission,label:item.secondaryLabel,detail:item.secondaryDetail,primary:false});return sessions.filter(x=>!String(x.mission||'').startsWith('M-'));}
+function dashboardSessionsForToday(){const day=currentDayName();const eligible=item=>item&&!item.done&&!['skipped','replaced'].includes(item.status);let item=data.plan.find(x=>eligible(x)&&x.day===day);if(!item)item=data.plan.find(eligible)||null;if(!item)return[];const sessions=[{mission:item.mission,label:item.customLabel,detail:item.detail,prescribedDuration:item.prescribedDuration,primary:true}];if(item.secondaryMission)sessions.push({mission:item.secondaryMission,label:item.secondaryLabel,detail:item.secondaryDetail,prescribedDuration:item.secondaryDuration,primary:false});return sessions.filter(x=>!String(x.mission||'').startsWith('M-'));}
 function optionalSessionHtml(primaryType){if(primaryType==='strength')return `<span class="metric-label">Optional Support</span><h3>Add Easy Cardio</h3><p class="hint">Add 20–30 minutes of easy Zone 2 work only when readiness is Green or Yellow and it will not compromise tomorrow's training.</p><div class="row"><button class="secondary" onclick="beginWorkout('R-1 Recovery Run')">Start Optional Cardio</button><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Choose Mobility Instead</button></div>`;return `<span class="metric-label">Optional Support</span><h3>Add Mobility</h3><p class="hint">A conditioning-only day can be paired with extra mobility, breathing, or easy recovery work without adding another hard session.</p><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Open Daily Mobility</button>`;}
-function renderTodayTrainingCards(){const sessions=dashboardSessionsForToday(),strengthCard=byId('strengthTrainingCard'),engineCard=byId('engineTrainingCard'),option=byId('singleSessionOption');const strength=sessions.find(x=>String(x.mission).startsWith('S-')),engine=sessions.find(x=>String(x.mission).startsWith('R-'));strengthCard?.classList.toggle('hidden',!strength);engineCard?.classList.toggle('hidden',!engine);if(strength){const t=scaledTemplate(strength.mission);setText('todayMission',strength.label||t?.label||strength.mission);setText('todayDuration',t?`${t.duration} minutes`:'—');strengthCard.querySelector('button[onclick="beginToday()"]')?.setAttribute('onclick',`beginWorkout('${strength.mission.replaceAll("'","\\'")}')`);}if(engine){const t=scaledTemplate(engine.mission);setText('engineSessionTitle',engine.label||t?.label||engine.mission);setText('engineSessionPurpose',engine.detail||'Complete the prescribed conditioning session.');const meta=engineCard.querySelector('.training-meta');if(meta)meta.innerHTML=`◷ <span>${t?.duration||30} minutes</span>`;engineCard.querySelector('button')?.setAttribute('onclick',`beginWorkout('${engine.mission.replaceAll("'","\\'")}')`);}option.classList.toggle('hidden',sessions.length!==1);if(sessions.length===1){option.innerHTML=optionalSessionHtml(strength?'strength':'engine');}}
+function renderTodayTrainingCards(){const sessions=dashboardSessionsForToday(),strengthCard=byId('strengthTrainingCard'),engineCard=byId('engineTrainingCard'),option=byId('singleSessionOption');const strength=sessions.find(x=>String(x.mission).startsWith('S-')),engine=sessions.find(x=>String(x.mission).startsWith('R-'));strengthCard?.classList.toggle('hidden',!strength);engineCard?.classList.toggle('hidden',!engine);if(strength){const t=scaledTemplate(strength.mission);setText('todayMission',strength.label||t?.label||strength.mission);setText('todayDuration',t?`${t.duration} minutes`:'—');strengthCard.querySelector('button[onclick="beginToday()"]')?.setAttribute('onclick',`beginWorkout('${strength.mission.replaceAll("'","\\'")}')`);}if(engine){const t=scaledTemplate(engine.mission);setText('engineSessionTitle',engine.label||t?.label||engine.mission);setText('engineSessionPurpose',engine.detail||'Complete the prescribed conditioning session.');const canonicalDuration=Number(engine.prescribedDuration)||Number(t?.duration)||30;const meta=engineCard.querySelector('.training-meta');if(meta)meta.innerHTML=`◷ <span>${canonicalDuration} minutes</span>`;engineCard.querySelector('button')?.setAttribute('onclick',`beginWorkout('${engine.mission.replaceAll("'","\\'")}')`);}option.classList.toggle('hidden',sessions.length!==1);if(sessions.length===1){option.innerHTML=optionalSessionHtml(strength?'strength':'engine');}}
 
 function renderSettings() {
-  setValue("athleteNameInput", data.settings.athleteName || "Chris");
+  setValue("athleteNameInput", data.settings.athleteName || "");
   setValue("athleteModeInput", data.settings.athleteMode || "Hybrid Athlete");
   setValue("sexInput", data.settings.sex || "Male");
   setValue("phaseInput", data.settings.phase);
@@ -295,7 +396,7 @@ function renderSettings() {
 
 
 function saveProfile() {
-  data.settings.athleteName = byId("athleteNameInput").value.trim() || "Chris";
+  data.settings.athleteName = byId("athleteNameInput").value.trim();
   data.settings.athleteMode = byId("athleteModeInput").value || "Hybrid Athlete";
   data.settings.sex = byId("sexInput").value || "Prefer not to say";
   data.settings.phase = byId("phaseInput").value.trim() || data.settings.phase;
@@ -417,14 +518,14 @@ let onboardingStep=0;
 let missionEditorActive=false;
 function openFirstFlight(startStep=null){
   const modal=byId("onboardingModal"); if(!modal||!modal.classList.contains("hidden"))return;
-  byId("onboardingAthleteName").value=data.settings.athleteName==="Chris"&&!data.settings.firstFlightTourComplete?"":(data.settings.athleteName||"");
+  byId("onboardingAthleteName").value=data.settings.athleteName||"";
   byId("onboardingSex").value=data.settings.sex||"Prefer not to say";
   byId("onboardingAthleteMode").value=data.settings.athleteMode||"Hybrid Athlete";
   byId("onboardingAge").value=data.nutrition.age||"";
   byId("onboardingBodyweight").value=data.settings.weight||"";
-  const totalHeight=Number(data.nutrition.height)||66;
-  byId("onboardingHeightFeet").value=Math.floor(totalHeight/12);
-  byId("onboardingHeightInches").value=totalHeight%12;
+  const totalHeight=Number(data.nutrition.height)||0;
+  byId("onboardingHeightFeet").value=totalHeight?Math.floor(totalHeight/12):"";
+  byId("onboardingHeightInches").value=totalHeight?totalHeight%12:"";
   byId("onboardingGoalWeight").value=data.settings.goal||"";
   byId("onboardingMessageStyle").value=data.settings.coachMessages?.style||"Performance";
   byId("onboardingScriptureFrequency").value=data.settings.coachMessages?.scriptureFrequency||"Occasionally";

@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderApp();
   setTimeout(() => { maybePromptDailyReadiness(); openPendingSessionFeedback(); }, 250);
+  setTimeout(() => { if (typeof maybeShowHowToGuide === "function" && document.getElementById("onboardingModal")?.classList.contains("hidden")) maybeShowHowToGuide(); }, 900);
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(error => {

@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 6.6.3",
+  "name": "Bell Performance 6.8",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Equipment-aware Strength and Engine coaching with daily readiness prompts, post-session training debriefs, and rolling seven-day autoregulation."
+  "description": "Equipment-aware Strength and Engine coaching with a built-in guided tour, daily readiness, adaptive progression, and rolling seven-day autoregulation."
 }

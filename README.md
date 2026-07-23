@@ -19,3 +19,12 @@ Deploy all files and perform one hard refresh after GitHub Pages updates.
 - Bottom navigation button is labeled **Training** because the library contains both Strength and Engine sessions.
 - Library heading is now **Training Library**.
 - Cache version bumped to 6.7.1.
+
+
+## 6.8 Guided Tour
+- Eight-slide in-app How to Use Bell Performance guide
+- First-use automatic launch
+- Manual replay from More → How to Use Bell Performance
+- Optional autoplay slideshow
+- Keyboard navigation with arrow keys and Escape
+- Covers readiness, dual goals, Training, exercise feedback, progression, debrief, and recovery

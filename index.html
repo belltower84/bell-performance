@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
-  <title>Bell Performance 6.6.1</title>
-  <link rel="stylesheet" href="./css/app.css?v=671">
+  <title>Bell Performance 6.8</title>
+  <link rel="stylesheet" href="./css/app.css?v=680">
 
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -25,7 +25,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-  <div class="brand-lockup"><img src="./assets/logo-shield.svg?v=671" alt="Bell Performance shield"><div><h1>BELL <span>PERFORMANCE</span></h1><div class="brand-tagline">TRAIN FOR LIFE</div></div></div>
+  <div class="brand-lockup"><img src="./assets/logo-shield.svg?v=680" alt="Bell Performance shield"><div><h1>BELL <span>PERFORMANCE</span></h1><div class="brand-tagline">TRAIN FOR LIFE</div></div></div>
   <div class="header-actions"><button id="notificationButton" aria-label="Open notifications" onclick="openNotificationCenter()">♢<span id="notificationBadge">0</span></button><button id="profileButton" aria-label="Open athlete profile" onclick="openAthleteProfile()">◎</button></div>
 </header>
 <main>
@@ -54,8 +54,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
   <div class="section-heading"><h2>Today's Mission</h2><button onclick="showScreen('plan')">View Full Schedule ›</button></div>
   <div class="training-pair">
-    <article class="training-card strength-card"><img id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=671" alt="Strength athlete"><div class="training-overlay"><div class="training-type">🏋 <span>STRENGTH</span></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
-    <article class="training-card engine-card"><img id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=671" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
+    <article class="training-card strength-card"><img id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=680" alt="Strength athlete"><div class="training-overlay"><div class="training-type">🏋 <span>STRENGTH</span></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength & Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
+    <article class="training-card engine-card"><img id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=680" alt="Endurance athlete"><div class="training-overlay"><div class="training-type">ϟ <span>ENGINE</span></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
   </div>
   <div id="todayPreview" class="hidden"></div>
 
@@ -83,6 +83,15 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
 <section id="more" class="screen">
   <h2 class="section-title">Settings & Data</h2>
+  <div class="card how-to-card">
+    <div class="how-to-copy">
+      <span class="metric-label">New Athlete Guide</span>
+      <h3>How to Use Bell Performance</h3>
+      <p class="sub">Take a quick guided tour of readiness, dual goals, Training, Engine, progression feedback, and recovery.</p>
+      <div class="how-to-actions"><button onclick="openHowToGuide()">Start Guided Tour</button><button class="secondary" onclick="openHowToGuide(4)">Show Training Logging</button></div>
+    </div>
+    <div class="how-to-preview" aria-hidden="true"><span>1</span><span>2</span><span>3</span><b>▶</b></div>
+  </div>
   <div class="card">
     <h3>Athlete Profile</h3>
     <div class="row"><div><label>First name</label><input id="athleteNameInput"></div><div><label>Programming profile</label><select id="sexInput"><option value="Male">Male</option><option value="Female">Female</option><option value="Prefer not to say">Prefer not to say</option></select></div><div><label>Coaching mode</label><select id="athleteModeInput"><option value="Hybrid Athlete">Hybrid Athlete</option><option value="Tactical Athlete">Tactical Athlete</option><option value="Strength Athlete">Strength Athlete</option><option value="Endurance Athlete">Endurance Athlete</option><option value="Masters Athlete">Masters Athlete</option><option value="Youth Athlete">Youth Athlete</option></select></div></div>
@@ -190,6 +199,26 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </section>
 </main>
 
+
+<div id="howToModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="howToTitle">
+  <div class="modal-box how-to-modal-box">
+    <div class="how-to-shell">
+      <div class="how-to-header">
+        <div><span class="metric-label">Bell Performance Guide</span><h2 id="howToTitle">How to Use the App</h2></div>
+        <button class="modal-close" onclick="closeHowToGuide()" aria-label="Close guide">×</button>
+      </div>
+      <div class="how-to-progress"><i id="howToProgress"></i></div>
+      <div id="howToSlide" class="how-to-slide"></div>
+      <div class="how-to-footer">
+        <button id="howToBack" class="secondary" onclick="previousHowToSlide()">Back</button>
+        <div id="howToDots" class="how-to-dots" aria-label="Guide progress"></div>
+        <button id="howToNext" onclick="nextHowToSlide()">Next</button>
+      </div>
+      <button id="howToAutoPlay" class="how-to-autoplay" onclick="toggleHowToAutoplay()">▶ Play Slideshow</button>
+    </div>
+  </div>
+</div>
+
 <div id="onboardingModal" class="modal hidden"><div class="modal-box onboarding-box"><div class="card"><h2>Welcome to Bell Performance</h2><p class="sub">Set up your athlete profile. These choices create your starting program and can be changed later in Settings.</p><div class="row"><div><label>First name</label><input id="onboardingAthleteName" placeholder="First name"></div><div><label>Programming profile</label><select id="onboardingSex"><option value="Male">Male</option><option value="Female">Female</option><option value="Prefer not to say">Prefer not to say</option></select></div></div><div class="hint" style="margin-bottom:12px">This adjusts starting exercise selection and muscle-group emphasis. It never limits strength, goals, or exercise choices.</div><h3>Your Training Setup</h3><label>Where will you train most often?</label><select id="onboardingEnvironment" onchange="applyEquipmentPreset('onboardingEquipment',this.value)"><option value="commercial">Commercial gym</option><option value="home">Home gym</option><option value="minimal">Minimal equipment</option><option value="bodyweight">Bodyweight only</option><option value="travel">Travel setup</option></select><div class="equipment-grid onboarding-equipment" id="onboardingEquipmentGrid"></div><label>What kind of coaching messages would you like?</label><select id="onboardingMessageStyle" onchange="document.getElementById('onboardingScriptureWrap').style.display=['Faith-Based','Mixed'].includes(this.value)?'block':'none'"><option value="Performance">Performance</option><option value="Stoic">Stoic</option><option value="Faith-Based">Faith-Based</option><option value="Mixed">Mixed performance + faith</option><option value="Off">No coach messages</option></select><div id="onboardingScriptureWrap"><label>How often should Scripture appear?</label><select id="onboardingScriptureFrequency"><option value="Occasionally">Occasionally</option><option value="Several">A few times per week</option><option value="Daily">Daily</option></select></div><button onclick="completeOnboarding()">Save & Continue</button></div></div></div>
 
 <div id="dailyReadinessModal" class="modal hidden"><div class="modal-box onboarding-box"><div class="card"><span class="metric-label">First Check-In Today</span><h2>How are you showing up?</h2><p class="sub">Five quick answers set today's Mission Status and help regulate your weekly training load.</p><div class="quick-check-grid"><label>Sleep<select id="promptsleepQuality"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Poor → Excellent</small></label><label>Soreness<select id="promptsoreness"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Fresh → Very sore</small></label><label>Energy<select id="promptenergy"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Exhausted → Energized</small></label><label>Motivation<select id="promptmotivation"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><small>Low → High</small></label><label>Time available<select id="prompttimeAvailability"><option value="1">20–30 min</option><option value="2">30–45 min</option><option value="3">45–60 min</option><option value="4">60–75 min</option><option value="5">75–90+ min</option></select><small>Today's schedule</small></label></div><button class="good" onclick="saveDailyReadinessPrompt()">Set Today's Mission Status</button></div></div></div>
@@ -204,7 +233,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
       <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
       <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
     </div>
-    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=671" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
+    <div class="workout-hero" id="workoutHero"><img id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=680" alt="Athlete training"><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
     <div class="card workout-control-card">
       <h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
       <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
@@ -225,20 +254,21 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 
-<script src="./data/workouts.js?v=671"></script>
-<script src="./js/storage.js?v=671"></script>
-<script src="./js/readiness.js?v=671"></script>
-<script src="./js/equipment.js?v=671"></script>
+<script src="./data/workouts.js?v=680"></script>
+<script src="./js/storage.js?v=680"></script>
+<script src="./js/readiness.js?v=680"></script>
+<script src="./js/equipment.js?v=680"></script>
 <script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment");applyEquipmentPreset("onboardingEquipment","commercial");</script>
-<script src="./js/training-blocks.js?v=671"></script>
-<script src="./js/mobility.js?v=671"></script>
-<script src="./js/nutrition.js?v=671"></script>
-<script src="./js/milestones.js?v=671"></script>
-<script src="./js/progression.js?v=671"></script>
-<script src="./js/workouts.js?v=671"></script>
-<script src="./js/artwork.js?v=671"></script>
-<script src="./js/ui.js?v=671"></script>
-<script src="./js/dual-goals.js?v=671"></script>
-<script src="./js/app.js?v=671"></script>
+<script src="./js/training-blocks.js?v=680"></script>
+<script src="./js/mobility.js?v=680"></script>
+<script src="./js/nutrition.js?v=680"></script>
+<script src="./js/milestones.js?v=680"></script>
+<script src="./js/progression.js?v=680"></script>
+<script src="./js/workouts.js?v=680"></script>
+<script src="./js/artwork.js?v=680"></script>
+<script src="./js/ui.js?v=680"></script>
+<script src="./js/dual-goals.js?v=680"></script>
+<script src="./js/how-to.js?v=680"></script>
+<script src="./js/app.js?v=680"></script>
 </body>
 </html>

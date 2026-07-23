@@ -1,6 +1,6 @@
 "use strict";
 
-const BELL_APP_VERSION = window.BELL_APP_VERSION || "7.0.35";
+const BELL_APP_VERSION = window.BELL_APP_VERSION || "7.0.36";
 
 function renderAppVersion() {
   document.querySelectorAll("[data-app-version]").forEach(element => {

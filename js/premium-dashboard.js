@@ -68,12 +68,12 @@ function renderPremiumWeek(){
   }).join('');
 }
 
-function premiumReadinessMetric(value){return `${Math.max(1,Math.min(10,Math.round(Number(value)||1)))}/10`;}
+function premiumReadinessMetric(value){return `${Math.max(1,Math.min(5,Math.round(Number(value)||1)))}/5`;}
 function premiumSleepDuration(r){const h=Math.max(0,Number(r.sleepHours)||0),m=Math.max(0,Number(r.sleepMinutes)||0);return `${h}h ${String(m).padStart(2,'0')}m`;}
 function renderPremiumReadiness(){
   const score=readinessScore(),status=readinessStatus(score),r=data.settings.readiness||{};
   setText('premiumReadinessScore',String(score));setText('premiumReadinessStatus',status);setText('premiumReadinessDetail',trainingStatusText(status));
-  setText('premiumSleep',premiumSleepDuration(r));setText('premiumEnergy',premiumReadinessMetric(r.energy));setText('premiumSoreness',premiumReadinessMetric(r.soreness));setText('premiumMotivation',premiumReadinessMetric(r.motivation));
+  setText('premiumSleep',premiumSleepDuration(r));setText('premiumEnergy',premiumReadinessMetric(r.energy));setText('premiumSoreness',premiumReadinessMetric(r.recoveryStatus));setText('premiumMotivation',premiumReadinessMetric(r.motivation));
   const card=byId('premiumReadinessCard');if(card)card.dataset.status=status.toLowerCase();
 }
 function rotatePremiumQuote(){premiumQuoteOffset++;renderPremiumQuote();}

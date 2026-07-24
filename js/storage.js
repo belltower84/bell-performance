@@ -11,7 +11,7 @@ const defaults = {
     cardioType: "Running",
     rotationWeek: 1,
     maxes: { bench: null, squat: null, deadlift: null, pushPress: null },
-    readiness: { sleepHours:7, sleepMinutes:30, sleepQuality:8, energy:8, motivation:8, soreness:4, timeAvailability:3, score:null, status:"", lastPromptDate:"" },
+    readiness: { sleepHours:7, sleepMinutes:30, sleepQuality:4, energy:4, motivation:4, recoveryStatus:4, timeAvailability:3, score:null, status:"", lastPromptDate:"" },
     coachMessages: { setupComplete:false, style:"Performance", scriptureFrequency:"Occasionally" },
     firstFlightStage: "profile",
     firstFlightTourComplete: false,
@@ -89,14 +89,25 @@ function normalizeData() {
     const number=Number(value); if(!Number.isFinite(number))return fallback;
     return number<=5?Math.max(1,Math.min(10,Math.round((number-1)*2.25+1))):Math.max(1,Math.min(10,Math.round(number)));
   };
+  const toFive = (value, fallback=4) => {
+    const number=Number(value); if(!Number.isFinite(number))return fallback;
+    if(number<=5)return Math.max(1,Math.min(5,Math.round(number)));
+    return Math.max(1,Math.min(5,Math.round(1+(number-1)*4/9)));
+  };
+  const legacySoreness=Number(old.soreness);
+  const migratedRecovery=Number.isFinite(+old.recoveryStatus)
+    ? toFive(old.recoveryStatus,4)
+    : Number.isFinite(legacySoreness)
+      ? Math.max(1,Math.min(5,Math.round(5-(legacySoreness-1)*4/9)))
+      : 4;
   data.settings.readiness = {
     sleepHours: Math.max(0,Math.min(16,Number.isFinite(+old.sleepHours)?+old.sleepHours:7)),
     sleepMinutes: Math.max(0,Math.min(59,Number.isFinite(+old.sleepMinutes)?+old.sleepMinutes:30)),
-    sleepQuality: migrateTen(old.sleepQuality ?? old.sleep, 8),
-    energy: migrateTen(old.energy, 8),
-    motivation: migrateTen(old.motivation, 8),
-    soreness: migrateTen(old.soreness, 4),
-    timeAvailability: Number.isFinite(+old.timeAvailability) ? +old.timeAvailability : 3,
+    sleepQuality: toFive(old.sleepQuality ?? old.sleep,4),
+    energy: toFive(old.energy,4),
+    motivation: toFive(old.motivation,4),
+    recoveryStatus: migratedRecovery,
+    timeAvailability: Math.max(1,Math.min(5,Number.isFinite(+old.timeAvailability)?Math.round(+old.timeAvailability):3)),
     score: Number.isFinite(+old.score) ? +old.score : null,
     status: old.status || "",
     lastPromptDate: old.lastPromptDate || ""

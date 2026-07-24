@@ -42,6 +42,7 @@ function showScreen(name) {
   document.querySelectorAll("nav button").forEach(button => button.classList.remove("active"));
   document.querySelector(`nav button[data-screen="${name}"]`)?.classList.add("active");
   window.scrollTo(0, 0);
+  if (typeof applyBellScreenIdentity === "function") applyBellScreenIdentity(name);
 }
 
 
@@ -118,7 +119,7 @@ function renderReadiness() {
   setText("weeklyReadinessLabel", weekly.trend === "NO_DATA" ? "No readiness history yet" : weekly.trend === "BUILDING_WELL" ? "Training load is being absorbed well" : weekly.trend === "MANAGE_LOAD" ? "Manage volume and protect recovery" : weekly.trend === "ACCUMULATING_FATIGUE" ? "Fatigue is accumulating — volume is capped" : "Recovery emphasis recommended");
   setText("weeklyReadinessDetail", weekly.hasData ? `${weekly.checkIns} daily check-ins • ${weekly.feedbackCount} post-session reports` : "Your rolling trend begins after the first check-in.");
   renderReadinessTrendBars();
-  ["sleepQuality", "energy", "motivation", "soreness", "timeAvailability"]
+  ["sleepQuality", "energy", "motivation", "recoveryStatus", "timeAvailability"]
     .forEach(id => {
       const element = byId(id);
       if (element) element.value = r[id];
@@ -176,11 +177,17 @@ function renderVisualProfile(template, status) {
   const strengthArt = byId("strengthArtwork");
   const engineArt = byId("engineArtwork");
   document.body.classList.toggle("female-profile", female);
-  if (strengthArt) strengthArt.src = typeof chooseArtwork === "function" ? chooseArtwork("strength", "dashboard") : "./assets/artwork/strength/powerlifting.jpg?v=670";
-  if (engineArt) engineArt.src = typeof chooseArtwork === "function" ? chooseArtwork("engine", "dashboard") : "./assets/artwork/engine/mountain-trail.jpg?v=670";
+  if (typeof assignArtworkWithFallback === "function") {
+    assignArtworkWithFallback(strengthArt, "strength", "dashboard");
+    assignArtworkWithFallback(engineArt, "engine", "dashboard");
+    if (typeof applyCuratedArtworkTheme === "function") applyCuratedArtworkTheme();
+  } else {
+    if (strengthArt) strengthArt.src = "./assets/strength-classic.jpg?v=8530";
+    if (engineArt) engineArt.src = "./assets/engine-mountain-trail.jpg?v=8530";
+  }
   const r = data.settings.readiness || {};
   setText("dashSleep", readinessWord(r.sleepQuality));
-  setText("dashSoreness", readinessWord(r.soreness, true));
+  setText("dashSoreness", readinessWord(r.recoveryStatus));
   setText("dashEnergy", readinessWord(r.energy));
   setText("dashMotivation", readinessWord(r.motivation));
   setText("dashTime", timeAvailabilityLabel(r.timeAvailability));
@@ -622,6 +629,7 @@ function renderOnboardingStep(){
   const subtitles=["Enter the athlete details that personalize Bell Performance.","Identify movement patterns that require modification or avoidance.","Map the equipment available everywhere you train.","Choose the Strength and Engine goals for your first coordinated block.","Choose how the coach communicates with you.","Confirm the flight plan before launch."];
   byId("onboardingStepSubtitle").textContent=subtitles[onboardingStep];
   if(onboardingStep===5)renderOnboardingReview();
+  if(typeof updateFirstFlightIdentity === "function") updateFirstFlightIdentity(onboardingStep);
 }
 function saveFirstFlightProfile(){
   const name=byId("onboardingAthleteName").value.trim();

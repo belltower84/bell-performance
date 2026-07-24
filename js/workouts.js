@@ -212,7 +212,10 @@ function openWorkoutUI() {
   setText("workoutHeroStatus", `${active.readiness?.status || readinessStatus()} Zone`);
   setText("workoutZoneLabel", trainingStatusText(active.readiness?.status || readinessStatus()));
   const art = document.getElementById("workoutHeroArt");
-  if (art) art.src = typeof chooseArtwork === "function" ? chooseArtwork(isEngine ? "engine" : "strength", `workout-${active.name || "session"}`) : (isEngine ? "./assets/artwork/engine/mountain-trail.jpg?v=670" : "./assets/artwork/strength/powerlifting.jpg?v=670");
+  if (art) {
+    if (typeof assignArtworkWithFallback === "function") assignArtworkWithFallback(art, isEngine ? "engine" : "strength", `workout-${active.name || "session"}`);
+    else art.src = isEngine ? "./assets/engine-mountain-trail.jpg?v=8530" : "./assets/strength-classic.jpg?v=8530";
+  }
   renderActiveWorkout();
   renderEngineResultFields();
 }

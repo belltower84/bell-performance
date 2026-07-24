@@ -275,3 +275,12 @@ body.female-profile .strength-card:before,body.female-session .workout-hero:befo
 
 /* Bell Performance 8.0.0 day navigation */
 .mission-day-heading{align-items:flex-end}.day-navigator{display:flex;justify-content:center;align-items:center;gap:10px;margin:-4px 0 14px}.day-nav-current{min-width:190px;background:transparent;border:1px solid rgba(255,255,255,.18);color:inherit}.day-nav-current.viewing-today{border-color:rgba(235,191,83,.7);box-shadow:0 0 0 1px rgba(235,191,83,.15) inset}.no-training-day{text-align:center;padding:22px}.weekly-schedule-day.selected{outline:2px solid rgba(235,191,83,.8);outline-offset:2px}.weekly-schedule-day{cursor:pointer}.session-complete-badge{display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(53,180,112,.16);font-size:.72rem;font-weight:800}
+
+
+/* Bell Performance 8.0.1 required session warm-ups */
+#warmupPanel{display:block;margin-bottom:14px;border-color:rgba(235,191,83,.34);background:linear-gradient(145deg,rgba(235,191,83,.08),rgba(255,255,255,.025))}
+#warmupPanel.hidden{display:none}.warmup-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.warmup-heading h3{margin:3px 0 0}.warmup-time{padding:5px 9px;border-radius:999px;background:rgba(235,191,83,.13);color:#f0c85e;font-size:.72rem;font-weight:900}.warmup-grid{display:grid;gap:8px;margin-top:12px}.warmup-step{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:11px;background:rgba(0,0,0,.14);cursor:pointer}.warmup-step input{width:18px;height:18px;margin-top:1px}.warmup-step span{display:grid;gap:3px}.warmup-step b{font-size:.82rem}.warmup-step small{color:var(--muted);line-height:1.4}.warmup-step.completed{opacity:.58}.warmup-step.completed b,.warmup-step.completed small{text-decoration:line-through}
+
+/* Bell Performance 8.0.2 optional Core sessions */
+.optional-core-rest{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}
+#singleSessionOption button[disabled],.optional-core-rest button[disabled]{opacity:.55;cursor:not-allowed}

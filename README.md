@@ -1,8 +1,8 @@
-# Bell Performance 8.0.0 — Date-Aware Multi-Session Training
+# Bell Performance 8.0.2 — Date-Aware Multi-Session Training
 
 GitHub-ready static progressive web app. Open `index.html` locally or deploy the folder root to GitHub Pages.
 
-## 8.0.0 changes
+## 8.0.2 changes
 
 - Dashboard defaults to the current local calendar day and never pulls a future unfinished session forward.
 - Previous/next-day navigation and one-click return to Today.
@@ -16,4 +16,17 @@ GitHub-ready static progressive web app. Open `index.html` locally or deploy the
 
 1. Upload the contents of this folder to the repository root.
 2. In GitHub Pages, deploy from the desired branch and `/ (root)`.
-3. After deployment, hard-refresh once so the 8.0.0 service worker replaces older caches.
+3. After deployment, hard-refresh once so the 8.0.2 service worker replaces older caches.
+
+
+### Warm-up correction
+- Every Strength session now displays a required 8–12 minute Raise–Mobilize–Activate–Ramp sequence.
+- Every Engine session now displays modality-specific preparation and progressive pickups.
+- Warm-ups no longer disappear when a numeric starting weight is unavailable.
+
+
+## 8.0.2 optional Core system
+- Adds rotating Core A, B, and C sessions on days with zero or one prescribed workout.
+- Rest days receive a separate low-fatigue Recovery Core + Mobility option.
+- Core sessions are logged in History and use persistent timers, set tracking, readiness scaling, and equipment replacement.
+- Optional Core never blocks prescribed-day completion and never turns a rest day into an incomplete day.

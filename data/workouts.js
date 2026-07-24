@@ -305,17 +305,67 @@ function bellBodybuildingTechniques(name,exercises,phase,focus){
   if(second) techniques[second.index]={name:"Bell Burnout",short:"Back-off set",instruction:"After the final working set, reduce load about 30% and complete one controlled 15–25 rep back-off set. Stop before technique breaks."};
   return techniques;
 }
+function femalePhysiqueProfile(focus="Balanced") {
+  const key=String(focus||"Balanced");
+  if(key==="Glute Development"||key==="Glutes & Hamstrings")return {label:"Glute Development",glutePriority:3,quadPriority:1,upperPriority:1};
+  if(key==="Lower Body / Wellness")return {label:"Lower Body / Wellness",glutePriority:3,quadPriority:2,upperPriority:1};
+  if(key==="Athletic Shape")return {label:"Athletic Shape",glutePriority:2,quadPriority:1,upperPriority:2};
+  return {label:"Balanced Female Physique",glutePriority:2,quadPriority:1,upperPriority:2};
+}
+function femalePhysiqueExerciseRole(name){
+  const n=String(name||"");
+  if(/Romanian|Good Morning|Single-Leg Romanian|Reverse Lunge|Bulgarian|Walking Lunge|Back Extension/.test(n))return"Glute Lengthened";
+  if(/Hip Thrust|Glute Bridge|Cable Kickback/.test(n))return"Glute Shortened";
+  if(/Hip Abduction/.test(n))return"Glute Abduction";
+  if(/Squat|Leg Press|Hack Squat|Leg Extension/.test(n))return"Quad / Glute";
+  if(/Leg Curl|Hamstring Curl/.test(n))return"Hamstrings";
+  if(/Lateral Raise|Rear-Delt|Face Pull|Pulldown|Pull-up|Row/.test(n))return"Upper Silhouette";
+  return"General Hypertrophy";
+}
+function femalePhysiqueAdditions(dayName,focus,exercises){
+  const profile=femalePhysiqueProfile(focus), names=new Set(exercises);
+  const add=[];
+  if(dayName.includes("Chest")&&profile.upperPriority>=2&&!Array.from(names).some(x=>/Cable Lateral Raise/.test(x)))add.push("Cable Lateral Raise");
+  if(dayName.includes("Shoulders")&&profile.glutePriority>=3)add.push("Machine Hip Abduction");
+  if(dayName.includes("Legs")){
+    if(!Array.from(names).some(x=>/Hip Thrust|Glute Bridge/.test(x)))add.push("Hip Thrust");
+    if(!Array.from(names).some(x=>/Hip Abduction/.test(x)))add.push("Cable Hip Abduction");
+  }
+  if(dayName.includes("Posterior")&&!Array.from(names).some(x=>/Cable Kickback|Hip Abduction/.test(x)))add.push(profile.glutePriority>=3?"Cable Kickback":"Machine Hip Abduction");
+  return add.filter(x=>!names.has(x)).slice(0,dayName.includes("Legs")?2:1);
+}
+function femalePhysiqueRecoveryScale(){
+  const status=typeof readinessStatus==="function"&&typeof readinessScore==="function"?readinessStatus(readinessScore()):"GREEN";
+  if(status==="RED")return {status,setScale:.65,note:"Recovery priority: perform primary patterns only and stop with at least 3 reps in reserve."};
+  if(status==="YELLOW")return {status,setScale:.82,note:"Readiness adjustment: keep quality work, remove advanced finishers, and stop with 2–3 reps in reserve."};
+  return {status,setScale:1,note:"Full prescription: progress load or repetitions while preserving technique."};
+}
 function getBodybuildingTemplate(name, rotationWeek = getRotationWeek()) {
-  const sex=data?.settings?.sex||"Prefer not to say"; const library=sex==="Female"?femaleBodybuildingVariations:bodybuildingVariations; const options=library[name]||bodybuildingVariations[name]; if(!options)return null; const ex=options[Math.max(0,Math.min(3,rotationWeek-1))];
+  const sex=data?.settings?.sex||"Prefer not to say"; const female=sex==="Female"; const library=female?femaleBodybuildingVariations:bodybuildingVariations; const options=library[name]||bodybuildingVariations[name]; if(!options)return null;
+  let ex=[...options[Math.max(0,Math.min(3,rotationWeek-1))]];
   const focus=data?.trainingBlock?.bodybuildingFocus||"Balanced"; const physiquePhase=data?.trainingBlock?.bodybuildingPhase||"Recomposition"; const bellPhase=bellHypertrophyPhase();
-  const profileLabel=sex==="Female"?"Female Profile":sex==="Male"?"Male Profile":"Individual Profile";
+  const femaleProfile=female?femalePhysiqueProfile(focus):null;
+  if(female)ex.push(...femalePhysiqueAdditions(name,focus,ex));
+  const profileLabel=female?femaleProfile.label:sex==="Male"?"Male Profile":"Individual Profile";
   const techniques=bellBodybuildingTechniques(name,ex,bellPhase,focus);
-  return {label:`Bell Hypertrophy • ${name.replace(/^B-\d\s*/,"")} — ${focus} Focus • ${profileLabel}`,duration:name.includes("Shoulders")?68:72,system:"Bell Hypertrophy System",phase:bellPhase,exercises:ex.map((exercise,i)=>{
-    const compound=i<2, armDay=name.includes("Shoulders"), gluteExercise=/Hip Thrust|Glute|Kickback|Abduction|Romanian|Lunge/.test(exercise), focusBoost=(focus==="Shoulders & Arms"&&armDay)||(focus==="Chest & Back"&&name.includes("Chest"))||(focus==="Legs"&&name.includes("Legs"))||(focus==="Glutes & Hamstrings"&&gluteExercise);
-    const sets=compound?4:(focusBoost&&i>=2?4:3); const reps=compound?(physiquePhase==="Lean Gain"?"6–10":"8–12"):(i>=ex.length-2?"12–20":"10–15");
-    const advancedTechnique=techniques[i]||null;
+  const recovery=female?femalePhysiqueRecoveryScale():{status:"GREEN",setScale:1,note:""};
+  return {label:`Bell Hypertrophy • ${name.replace(/^B-\d\s*/,"")} — ${profileLabel}`,duration:name.includes("Shoulders")?70:name.includes("Legs")||name.includes("Posterior")?78:72,system:female?"Bell Female Physique System":"Bell Hypertrophy System",phase:bellPhase,profile:profileLabel,recoveryNote:recovery.note,exercises:ex.map((exercise,i)=>{
+    const compound=i<2, armDay=name.includes("Shoulders"), role=female?femalePhysiqueExerciseRole(exercise):"General Hypertrophy";
+    const gluteExercise=/Hip Thrust|Glute|Kickback|Abduction|Romanian|Lunge|Good Morning|Back Extension/.test(exercise);
+    const lowerDay=name.includes("Legs")||name.includes("Posterior");
+    const focusBoost=(focus==="Shoulders & Arms"&&armDay)||(focus==="Chest & Back"&&name.includes("Chest"))||(focus==="Legs"&&name.includes("Legs"))||((focus==="Glutes & Hamstrings"||focus==="Glute Development"||focus==="Lower Body / Wellness")&&gluteExercise);
+    let sets=compound?4:(focusBoost&&i>=2?4:3);
+    if(female){
+      if(gluteExercise&&femaleProfile.glutePriority>=3)sets=Math.max(sets,4);
+      if(role==="Glute Abduction")sets=femaleProfile.glutePriority>=3?4:3;
+      if(role==="Upper Silhouette"&&femaleProfile.upperPriority>=2)sets=Math.max(sets,3);
+      sets=Math.max(compound?2:1,recovery.status==="RED"?Math.floor(sets*recovery.setScale):Math.round(sets*recovery.setScale));
+    }
+    const reps=compound?(physiquePhase==="Lean Gain"?"6–10":"8–12"):(role==="Glute Abduction"||i>=ex.length-2?"12–20":"10–15");
+    const advancedTechnique=recovery.status==="GREEN"?(techniques[i]||null):null;
     const baseCue=compound?"Control the eccentric and stop with 1–2 reps in reserve.":"Use full range and constant tension. Add load only after reaching the top of the rep range.";
-    return{name:exercise,block:compound?"Primary Hypertrophy":advancedTechnique?"Bell Performance Finisher":"Accessory Hypertrophy",sets,reps,rest:compound?105:45,cue:advancedTechnique?`${baseCue} ${advancedTechnique.instruction}`:baseCue,advancedTechnique,bellPhase};
+    const roleCue=female?` Female physique slot: ${role}.`:"";
+    return{name:exercise,block:compound?"Primary Hypertrophy":advancedTechnique?"Bell Performance Finisher":"Accessory Hypertrophy",sets,reps,rest:compound?105:role==="Glute Abduction"?40:45,cue:`${advancedTechnique?`${baseCue} ${advancedTechnique.instruction}`:baseCue}${roleCue}${recovery.status!=="GREEN"?` ${recovery.note}`:""}`.trim(),advancedTechnique,bellPhase,physiqueRole:role};
   })};
 }
 

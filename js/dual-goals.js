@@ -95,7 +95,7 @@ function updateDualGoalBuilder(){
   const desc=document.getElementById("strengthGoalDescription"); if(desc)desc.textContent=p.description;
   const strengthDays=document.getElementById("blockStrengthDays"); if(strengthDays && !strengthDays.dataset.touched) strengthDays.value=String(p.defaultStrengthDays);
   const specific=document.getElementById("strengthSpecificFields");
-  if(specific) specific.innerHTML = strength==="Bodybuilding" ? '<div class="row"><div><label>Physique phase</label><select id="dualPhysiquePhase"><option>Lean Gain</option><option selected>Recomposition</option><option>Cut</option></select></div><div><label>Weak-point emphasis</label><select id="dualBodybuildingFocus"><option>Balanced</option><option>Shoulders & Arms</option><option>Chest & Back</option><option>Legs</option><option>Glutes & Hamstrings</option></select></div></div>' : strength==="Athlete" ? '<label>Sport emphasis</label><select id="dualSport"><option>General Athlete</option><option>Hockey</option><option>Lacrosse</option><option>Football</option><option>Soccer</option><option>Baseball</option><option>Basketball</option></select>' : strength==="Olympic Lifting" ? '<label>Technical emphasis</label><select id="dualOlympicFocus"><option>Balanced Snatch + Clean & Jerk</option><option>Snatch Priority</option><option>Clean & Jerk Priority</option></select>' : '';
+  if(specific) specific.innerHTML = strength==="Bodybuilding" ? '<div class="row"><div><label>Physique phase</label><select id="dualPhysiquePhase"><option>Lean Gain</option><option selected>Recomposition</option><option>Cut</option></select></div><div><label>Weak-point emphasis</label><select id="dualBodybuildingFocus"><option>Balanced</option><option>Shoulders & Arms</option><option>Chest & Back</option><option>Legs</option><option>Glutes & Hamstrings</option><option>Glute Development</option><option>Lower Body / Wellness</option><option>Athletic Shape</option></select></div></div>' : strength==="Athlete" ? '<label>Sport emphasis</label><select id="dualSport"><option>General Athlete</option><option>Hockey</option><option>Lacrosse</option><option>Football</option><option>Soccer</option><option>Baseball</option><option>Basketball</option></select>' : strength==="Olympic Lifting" ? '<label>Technical emphasis</label><select id="dualOlympicFocus"><option>Balanced Snatch + Clean & Jerk</option><option>Snatch Priority</option><option>Clean & Jerk Priority</option></select>' : '';
   populateEngineGoals(true);
 }
 
@@ -158,6 +158,83 @@ function strengthMissionsForGoal(goal){
     "Bodybuilding":["B-1 Chest & Back","B-2 Legs","B-3 Shoulders & Arms","B-4 Back & Posterior","B-3 Shoulders & Arms","B-1 Chest & Back"]
   }[goal]||["S-1 Upper Strength","S-2 Lower Strength","S-3 Athletic Upper"];
 }
+function scheduleMissionFamily(block=data.trainingBlock, strengthGoal=block?.dualGoals?.strengthGoal||"Hybrid", engine=engineGoalProfile()){
+  const mission=block?.mission||{}, event=String(mission.eventType||"").toLowerCase(), development=String(mission.developmentGoal||"").toLowerCase();
+  if(/tactical games|law-enforcement|military|hyrox|strongman|crossfit|obstacle/.test(event)||/sport-specific/.test(development))return"tactical";
+  if(/bodybuilding|physique/.test(event)||strengthGoal==="Bodybuilding"||/fat loss|muscle building|body recomposition/.test(development))return"physique";
+  if(/marathon|half marathon|10k|5k|triathlon/.test(event)||["specialist","performance"].includes(engine?.level)||/endurance/.test(development))return"endurance";
+  if(strengthGoal==="Powerlifting"||strengthGoal==="Olympic Lifting"||/strength development/.test(development))return"strength";
+  return"hybrid";
+}
+function engineKindsForCount(count,family){
+  if(count<=0)return[];
+  if(family==="physique")return(count===1?["easy"]:count===2?["easy","long"]:["easy","easy","long","quality","easy","easy"].slice(0,count));
+  const map={
+    endurance:["quality","easy","long","easy","easy","quality"],
+    tactical:["quality","easy","long","easy","quality","easy"],
+    strength:["easy","long","easy","quality","easy","easy"],
+    hybrid:["easy","quality","long","easy","easy","quality"]
+  };
+  return (map[family]||map.hybrid).slice(0,count);
+}
+function fiveDayScheduleProtocol(family,strengthDays,engineDays){
+  const strengthSlots={
+    physique:[0,1,3,4,5],
+    tactical:[0,3,4,1,5],
+    endurance:[0,3,4,1,5],
+    strength:[0,1,3,4,5],
+    hybrid:[0,1,3,4,5]
+  }[family]||[0,1,3,4,5];
+  let engineSlots={
+    tactical:[1,4,5,3,0,2],
+    endurance:[1,3,5,4,0,2],
+    strength:[1,5,3,4,0,2],
+    hybrid:[1,3,5,4,0,2]
+  }[family]||[1,3,5,4,0,2];
+  if(family==="physique")engineSlots=engineDays===1?[5]:engineDays===2?[1,5]:[1,3,5,4,0,2];
+  return{strengthSlots:strengthSlots.slice(0,strengthDays),engineSlots:engineSlots.slice(0,engineDays),engineKinds:engineKindsForCount(engineDays,family),restSlots:[2,6],label:{
+    physique:"Physique 5-Day Rhythm",
+    tactical:"Tactical 5-Day Rhythm",
+    endurance:"Endurance 5-Day Rhythm",
+    strength:"Strength 5-Day Rhythm",
+    hybrid:"Hybrid 5-Day Rhythm"
+  }[family]};
+}
+function defaultScheduleProtocol(trainingDays,strengthDays,engineDays,family){
+  if(trainingDays===5)return fiveDayScheduleProtocol(family,strengthDays,engineDays);
+  const strengthMap={
+    6:[0,1,2,3,4,5],
+    4:[0,1,3,5],
+    3:[0,2,5]
+  };
+  const engineMap={
+    6:[1,3,5,2,4,0],
+    4:[1,3,5,0,2,4],
+    3:[1,4,2,5]
+  };
+  const strengthSlots=(strengthMap[trainingDays]||(strengthDays>=5?[0,1,3,4,5]:strengthDays===4?[0,1,3,5]:strengthDays===3?[0,2,4]:[0,3])).slice(0,strengthDays);
+  const engineSlots=(engineMap[trainingDays]||[1,3,5,2,6,4,0]).slice(0,engineDays);
+  return{strengthSlots,engineSlots,engineKinds:engineKindsForCount(engineDays,family),restSlots:[],label:`${trainingDays}-Day ${family[0].toUpperCase()+family.slice(1)} Rhythm`};
+}
+function weeklyScheduleProtocol(block=data.trainingBlock,strengthGoal=block?.dualGoals?.strengthGoal||"Hybrid",engine=engineGoalProfile(),strengthDays=block?.strengthDays||4,engineDays=block?.runDays||0){
+  const family=scheduleMissionFamily(block,strengthGoal,engine),days=Number(block?.trainingDays)||5;
+  return{family,...defaultScheduleProtocol(days,strengthDays,engineDays,family)};
+}
+function attachEngineSession(plan,days,index,kind,coord){
+  const prescription=engineWeekPrescription(kind),engine={mission:kind==="quality"?"R-4 Intervals":kind==="long"?"R-5 Long Run":"R-2 Easy Run",detail:prescription.detail,customLabel:prescription.label,prescribedDuration:prescription.duration};
+  let target=index;
+  if(coord==="Alternate Days"&&plan[target]?.mission!=="M-1 Daily Reset"){
+    target=[1,3,5,4,0,2,6].find(slot=>plan[slot]?.mission==="M-1 Daily Reset");
+  }
+  if(!Number.isInteger(target)||!plan[target])return;
+  if(plan[target].mission==="M-1 Daily Reset")plan[target]={day:days[target],...engine,done:false};
+  else{
+    plan[target].secondaryMission=engine.mission;plan[target].secondaryLabel=prescription.label;plan[target].secondaryDuration=prescription.duration;plan[target].secondaryDetail=prescription.detail;
+    plan[target].detail=`${plan[target].detail||""} • ${kind==="easy"?"Easy Engine support":"PM Engine"}: ${prescription.label}`;
+  }
+}
+
+
 function saveBlockFromGoalBuilder(preserveProgress=false){
   applyHybridScheduleRecommendation();
   const previous={currentWeek:data.trainingBlock?.currentWeek||1,startDate:data.trainingBlock?.startDate||todayKey(),mission:data.trainingBlock?.mission};
@@ -184,8 +261,12 @@ function buildCurrentWeekPlan(){
     plan[5]={day:days[5],mission:"R-5 Long Run",detail:long.detail,customLabel:long.label,prescribedDuration:long.duration,done:false};
     plan[6]={day:days[6],mission:"M-1 Daily Reset",detail:"Full recovery day: mobility, walking, and readiness review",done:false};
   }else{
-    const strengthSlots=sd>=5?[0,1,3,4,5]:sd===4?[0,1,3,5]:sd===3?[0,2,4]:[0,3]; strengthSlots.slice(0,sd).forEach((idx,i)=>{plan[idx]={day:days[idx],mission:strengthMissions[i%strengthMissions.length],detail:`${s} • ${sp.label}`,done:false};});
-    if(ed>0){const engineKinds=ed===1?["easy"]:ed===2?["easy","long"]:ed===3?["easy","quality","long"]:ed===4?["easy","easy","quality","long"]:["easy","easy","quality","easy","long","easy"].slice(0,ed); const preferred=[1,3,5,2,6,4];engineKinds.forEach((kind,i)=>{const idx=preferred[i],p=engineWeekPrescription(kind),engine={mission:kind==="quality"?"R-4 Intervals":kind==="long"?"R-5 Long Run":"R-2 Easy Run",detail:p.detail,customLabel:p.label};if(plan[idx].mission==="M-1 Daily Reset"||coord==="Alternate Days")plan[idx]={day:days[idx],...engine,done:false};else{plan[idx].secondaryMission=engine.mission;plan[idx].secondaryLabel=p.label;plan[idx].secondaryDuration=p.duration;plan[idx].secondaryDetail=p.detail;plan[idx].detail+=` • PM: ${p.label}`;}});}
+    const protocol=weeklyScheduleProtocol(b,s,e,sd,ed);b.scheduleProtocol=protocol.label;
+    protocol.strengthSlots.forEach((idx,i)=>{plan[idx]={day:days[idx],mission:strengthMissions[i%strengthMissions.length],detail:`${s} • ${sp.label} • ${protocol.label}`,done:false};});
+    protocol.engineKinds.forEach((kind,i)=>attachEngineSession(plan,days,protocol.engineSlots[i],kind,coord));
+    if((b.trainingDays||5)===5){
+      [2,6].forEach(idx=>{if(plan[idx].mission==="M-1 Daily Reset")plan[idx].detail=idx===2?"Midweek recovery anchor: mobility, walking, and readiness review":"Full recovery day: mobility, family activity, and preparation for Monday";});
+    }
   }
   data.plan=plan;
 }
@@ -195,7 +276,7 @@ function renderDualGoals(){
   normalizeDualGoals(); const b=data.trainingBlock,d=b.dualGoals,e=engineGoalProfile(),week=b.currentWeek||1,total=b.lengthWeeks||12;
   const sg=document.getElementById("strengthGoal");if(sg)sg.value=d.strengthGoal;const em=document.getElementById("engineMode");if(em)em.value=d.engineMode;populateEngineGoals();const eg=document.getElementById("engineGoal");if(eg)eg.value=d.engineGoal;updateEngineGoalDetails();
   const coord=document.getElementById("trainingCoordination");if(coord)coord.value=d.trainingCoordination||"Coach Decides";
-  setText("currentStrengthGoal",d.strengthGoal);setText("currentEngineGoal",`${d.engineMode} • ${e.label}`);setText("currentStrengthWeek",b.enabled?`Week ${week} of ${total}`:"Not started");setText("currentEngineWeek",b.enabled?`Week ${week} of ${total}`:"Not started");setText("dualMissionHeadline",`${d.strengthGoal} + ${e.label}`);setText("dualMissionPhase",b.enabled?`${dualBlockPhase()} • coordinated by readiness and interference rules`:"Build a coordinated block in More");
+  setText("currentStrengthGoal",d.strengthGoal);setText("currentEngineGoal",`${d.engineMode} • ${e.label}`);setText("currentStrengthWeek",b.enabled?`Week ${week} of ${total}`:"Not started");setText("currentEngineWeek",b.enabled?`Week ${week} of ${total}`:"Not started");setText("dualMissionHeadline",`${d.strengthGoal} + ${e.label}`);setText("dualMissionPhase",b.enabled?`${dualBlockPhase()} • ${b.scheduleProtocol||"adaptive weekly rhythm"} • readiness-coordinated`:"Build a coordinated block in More");
   setText("missionBlock",b.enabled?`${d.strengthGoal} + ${e.label}`:data.settings.phase);
   const engineTitle=document.getElementById("engineSessionTitle"), enginePurpose=document.getElementById("engineSessionPurpose"), p=engineWeekPrescription("easy"); if(engineTitle)engineTitle.textContent=p.label;if(enginePurpose)enginePurpose.textContent=p.detail;
   renderNotifications();

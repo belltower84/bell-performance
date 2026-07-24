@@ -36,7 +36,19 @@ function cardioGuidance() {
   return notes[data.settings.cardioType || "Running"];
 }
 
-function saveCardioType() { data.settings.cardioType = document.getElementById("cardioType").value; saveData(); }
+function saveCardioType() {
+  const settingsSelect = document.getElementById("cardioType");
+  data.settings.cardioType = settingsSelect?.value || data.settings.cardioType || "Running";
+  const quick = document.getElementById("engineModeQuick");
+  if (quick && quick.value !== data.settings.cardioType) quick.value = data.settings.cardioType;
+  saveData();
+}
+function switchQuickEngineMode(value) {
+  data.settings.cardioType = value;
+  const settingsSelect = document.getElementById("cardioType");
+  if (settingsSelect) settingsSelect.value = value;
+  saveData();
+}
 function roundTo5(value) { return Math.max(5, Math.round(value / 5) * 5); }
 
 function recommendedWeight(exerciseName, status) {

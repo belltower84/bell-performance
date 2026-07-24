@@ -62,8 +62,33 @@ function toggleOnboardingMissionPath() {
   byId("onboardingEventMissionPanel")?.classList.toggle("hidden",!eventPath);
   byId("onboardingDevelopmentMissionPanel")?.classList.toggle("hidden",eventPath);
   toggleSportGoalField();
+  updateTrainingIdentityContext();
   updateOnboardingMissionPreview();
 }
+function recommendedTrainingIdentity(){
+  if(onboardingMissionPath()==="event"){
+    const event=byId("onboardingEventType")?.value||"";
+    if(/Powerlifting|Strongman/i.test(event))return "Strength Athlete";
+    if(/Marathon|Half Marathon|10K|5K|Triathlon|Obstacle Course/i.test(event))return "Endurance Athlete";
+    if(/Tactical|Military|Law-Enforcement/i.test(event))return "Tactical Athlete";
+    if(/CrossFit|HYROX/i.test(event))return "Functional Fitness Athlete";
+    return "Hybrid Athlete";
+  }
+  const goal=byId("onboardingDevelopmentGoal")?.value||"";
+  if(/Strength|Muscle Building/i.test(goal))return "Strength Athlete";
+  if(/Endurance/i.test(goal))return "Endurance Athlete";
+  if(/Sport-Specific|General Hybrid|Body Recomposition|Fat Loss|Mobility/i.test(goal))return "Hybrid Athlete";
+  return "Hybrid Athlete";
+}
+function trainingIdentityLabel(value){
+  return ({"Hybrid Athlete":"Balanced / mixed training","Tactical Athlete":"Tactical or occupational fitness","Strength Athlete":"Strength or powerlifting background","Endurance Athlete":"Running or endurance background","Functional Fitness Athlete":"Functional fitness / CrossFit background","Masters Athlete":"Masters athlete / recovery-focused","Youth Athlete":"Developing youth athlete"})[value]||value;
+}
+function updateTrainingIdentityContext(){
+  const box=byId("onboardingIdentityContext"),selected=byId("onboardingAthleteMode")?.value,recommended=recommendedTrainingIdentity();
+  if(!box||!selected)return;
+  box.innerHTML=selected===recommended?`<strong>Good fit for this mission.</strong> ${escapeHtml(trainingIdentityLabel(selected))} supports the current programming direction.`:`<strong>Mission stays in control.</strong> Your background is ${escapeHtml(trainingIdentityLabel(selected))}; this mission would commonly align with ${escapeHtml(trainingIdentityLabel(recommended))}. Bell Performance will use your background for coaching context without changing the selected goal.`;
+}
+
 function toggleSportGoalField(){
   const sport=byId("onboardingDevelopmentGoal")?.value==="Sport-Specific Performance";
   byId("onboardingSportGoalWrap")?.classList.toggle("hidden",!sport);
@@ -72,9 +97,16 @@ function toggleSecondaryGoalFields(){
   const enabled=!!byId("onboardingSecondaryEnabled")?.checked;
   byId("onboardingSecondaryGoalWrap")?.classList.toggle("hidden",!enabled);
 }
+function toggleEventSecondaryGoalFields(){
+  const enabled=!!byId("onboardingEventSecondaryEnabled")?.checked;
+  byId("onboardingEventSecondaryGoalWrap")?.classList.toggle("hidden",!enabled);
+}
 function selectedSecondaryProfile(){
-  if(onboardingMissionPath()!=="development"||!byId("onboardingSecondaryEnabled")?.checked)return null;
-  return SECONDARY_MISSION_PROFILES[byId("onboardingSecondaryGoal")?.value]||SECONDARY_MISSION_PROFILES.Custom;
+  const eventPath=onboardingMissionPath()==="event";
+  const enabled=eventPath?byId("onboardingEventSecondaryEnabled")?.checked:byId("onboardingSecondaryEnabled")?.checked;
+  if(!enabled)return null;
+  const selectId=eventPath?"onboardingEventSecondaryGoal":"onboardingSecondaryGoal";
+  return SECONDARY_MISSION_PROFILES[byId(selectId)?.value]||SECONDARY_MISSION_PROFILES.Custom;
 }
 function daysBetweenKeys(startKey,endKey){
   const start=new Date(`${startKey}T12:00:00`),end=new Date(`${endKey}T12:00:00`);
@@ -82,11 +114,13 @@ function daysBetweenKeys(startKey,endKey){
 }
 function eventWeeksFrom(startKey,eventDate){return Math.max(2,Math.min(52,Math.ceil(daysBetweenKeys(startKey,eventDate)/7)));}
 function selectedMissionProfile(){
-  if(onboardingMissionPath()==="event") return EVENT_MISSION_PROFILES[byId("onboardingEventType")?.value] || EVENT_MISSION_PROFILES["Custom Sport Event"];
-  const primary={...(DEVELOPMENT_MISSION_PROFILES[byId("onboardingDevelopmentGoal")?.value] || DEVELOPMENT_MISSION_PROFILES["General Hybrid Fitness"])};
+  const eventPath=onboardingMissionPath()==="event";
+  const primary=eventPath
+    ? {...(EVENT_MISSION_PROFILES[byId("onboardingEventType")?.value] || EVENT_MISSION_PROFILES["Custom Sport Event"])}
+    : {...(DEVELOPMENT_MISSION_PROFILES[byId("onboardingDevelopmentGoal")?.value] || DEVELOPMENT_MISSION_PROFILES["General Hybrid Fitness"])};
   const secondary=selectedSecondaryProfile();
   if(secondary){
-    if(secondary.engineMode){primary.engineMode=secondary.engineMode;primary.engineGoal=secondary.engineGoal;}
+    if(!eventPath && secondary.engineMode){primary.engineMode=secondary.engineMode;primary.engineGoal=secondary.engineGoal;}
     primary.engineDays=Math.max(primary.engineDays,secondary.minimumEngineDays||0);
     primary.engineFocus=`${primary.engineFocus}. Secondary target: ${secondary.focus}`;
   }
@@ -112,10 +146,12 @@ function updateOnboardingMissionPreview(){
   const profile=selectedMissionProfile(),availability=missionAvailability(profile);
   if(onboardingMissionPath()==="event"){
     const type=byId("onboardingEventType")?.value||"Event",date=byId("onboardingEventDate")?.value;
+    const secondary=selectedSecondaryProfile(), secondaryType=byId("onboardingEventSecondaryGoal")?.value, secondaryDate=byId("onboardingEventSecondaryDate")?.value, secondaryTarget=byId("onboardingEventSecondaryTarget")?.value.trim();
     const start=byId("onboardingBlockStart")?.value==="nextMonday"?nextMondayKey():todayKey();
     const weeks=date?eventWeeksFrom(start,date):profile.idealWeeks;
     const timing=date?(daysBetweenKeys(start,date)<profile.minimumWeeks*7?`Compressed ${weeks}-week preparation. The timeline is shorter than the recommended ${profile.minimumWeeks}+ weeks.`:`${weeks}-week preparation leading into peak and taper.`):`Recommended preparation: approximately ${profile.idealWeeks} weeks.`;
-    box.innerHTML=`<strong>${escapeHtml(type)} mission</strong><span><b>Derived Strength:</b> ${escapeHtml(profile.strengthFocus)}</span><span><b>Derived Engine:</b> ${escapeHtml(profile.engineFocus)}</span><span>${escapeHtml(timing)} ${availability.strengthDays} Strength exposures + ${availability.engineDays} Engine exposures across ${availability.trainingDays} training days${availability.combinedSessions?`, including ${availability.combinedSessions} blended session${availability.combinedSessions===1?"":"s"}`:""}.</span>`;
+    const secondaryLine=secondary?`<span><b>Secondary target:</b> ${escapeHtml(secondaryType)}${secondaryTarget?` • ${escapeHtml(secondaryTarget)}`:""}${secondaryDate?` • ${escapeHtml(secondaryDate)}`:""}. The event remains the programming priority.</span>`:"";
+    box.innerHTML=`<strong>${escapeHtml(type)} mission</strong><span><b>Derived Strength:</b> ${escapeHtml(profile.strengthFocus)}</span><span><b>Derived Engine:</b> ${escapeHtml(profile.engineFocus)}</span>${secondaryLine}<span>${escapeHtml(timing)} ${availability.strengthDays} Strength exposures + ${availability.engineDays} Engine exposures across ${availability.trainingDays} training days${availability.combinedSessions?`, including ${availability.combinedSessions} blended session${availability.combinedSessions===1?"":"s"}`:""}.</span>`;
   }else{
     const goal=byId("onboardingDevelopmentGoal")?.value||"General Hybrid Fitness",sport=goal==="Sport-Specific Performance"?(byId("onboardingSportGoal")?.value.trim()||"your sport"):"";
     const secondary=selectedSecondaryProfile(),secondaryType=byId("onboardingSecondaryGoal")?.value,secondaryDate=byId("onboardingSecondaryDate")?.value,secondaryTarget=byId("onboardingSecondaryTarget")?.value.trim();
@@ -134,6 +170,10 @@ function loadOnboardingDualGoals(){
   if(byId("onboardingEventExperience"))byId("onboardingEventExperience").value=mission.experience||"intermediate";
   if(byId("onboardingEventObjective"))byId("onboardingEventObjective").value=mission.objective||"perform";
   if(byId("onboardingEventDivision"))byId("onboardingEventDivision").value=mission.division||"";
+  if(byId("onboardingEventSecondaryEnabled"))byId("onboardingEventSecondaryEnabled").checked=!!mission.secondaryGoal;
+  if(byId("onboardingEventSecondaryGoal")&&mission.secondaryGoal)byId("onboardingEventSecondaryGoal").value=mission.secondaryGoal.type||"5K Race";
+  if(byId("onboardingEventSecondaryDate"))byId("onboardingEventSecondaryDate").value=mission.secondaryGoal?.targetDate||"";
+  if(byId("onboardingEventSecondaryTarget"))byId("onboardingEventSecondaryTarget").value=mission.secondaryGoal?.target||"";
   if(mission.developmentGoal&&byId("onboardingDevelopmentGoal"))byId("onboardingDevelopmentGoal").value=mission.developmentGoal;
   if(byId("onboardingSportGoal"))byId("onboardingSportGoal").value=mission.sport||"";
   if(byId("onboardingDevelopmentPriority"))byId("onboardingDevelopmentPriority").value=mission.priority||"balanced";
@@ -144,11 +184,12 @@ function loadOnboardingDualGoals(){
   if(byId("onboardingDevelopmentWeeks"))byId("onboardingDevelopmentWeeks").value=String(data.trainingBlock?.lengthWeeks||12);
   if(byId("onboardingTrainingDays"))byId("onboardingTrainingDays").value=String(data.trainingBlock?.trainingDays||5);
   if(byId("onboardingSessionMinutes"))byId("onboardingSessionMinutes").value=String(data.trainingBlock?.sessionMinutes||75);
-  toggleOnboardingMissionPath();toggleSecondaryGoalFields();
+  toggleOnboardingMissionPath();toggleSecondaryGoalFields();toggleEventSecondaryGoalFields();updateTrainingIdentityContext();
 }
 
 function saveOnboardingDualGoals(buildPlan=true){
   const path=onboardingMissionPath(),profile=selectedMissionProfile(),availability=missionAvailability(profile);
+  if(byId("onboardingAthleteMode"))data.settings.athleteMode=byId("onboardingAthleteMode").value||"Hybrid Athlete";
   let mission,lengthWeeks;
   if(path==="event"){
     const eventType=byId("onboardingEventType").value,eventDate=byId("onboardingEventDate").value;
@@ -156,7 +197,15 @@ function saveOnboardingDualGoals(buildPlan=true){
     const start=byId("onboardingBlockStart")?.value==="nextMonday"?nextMondayKey():todayKey();
     if(daysBetweenKeys(start,eventDate)<7){byId("onboardingEventDate").focus();alert("Choose an event date at least one week after the block start.");return false;}
     lengthWeeks=eventWeeksFrom(start,eventDate);
-    mission={path,eventType,eventName:byId("onboardingEventName").value.trim()||eventType,eventDate,experience:byId("onboardingEventExperience").value,objective:byId("onboardingEventObjective").value,division:byId("onboardingEventDivision").value.trim(),strengthFocus:profile.strengthFocus,engineFocus:profile.engineFocus,minimumWeeks:profile.minimumWeeks,idealWeeks:profile.idealWeeks};
+    let secondaryGoal=null;
+    if(byId("onboardingEventSecondaryEnabled")?.checked){
+      const type=byId("onboardingEventSecondaryGoal").value,targetDate=byId("onboardingEventSecondaryDate").value,target=byId("onboardingEventSecondaryTarget").value.trim();
+      if(!targetDate){byId("onboardingEventSecondaryDate").focus();alert("Choose a target date for the secondary goal.");return false;}
+      if(daysBetweenKeys(start,targetDate)<14){byId("onboardingEventSecondaryDate").focus();alert("Choose a secondary target date at least two weeks after the block start.");return false;}
+      if(daysBetweenKeys(targetDate,eventDate)<0){byId("onboardingEventSecondaryDate").focus();alert("The secondary goal date must fall on or before the main event date.");return false;}
+      secondaryGoal={type,targetDate,target,focus:(SECONDARY_MISSION_PROFILES[type]||SECONDARY_MISSION_PROFILES.Custom).focus};
+    }
+    mission={path,eventType,eventName:byId("onboardingEventName").value.trim()||eventType,eventDate,experience:byId("onboardingEventExperience").value,objective:byId("onboardingEventObjective").value,division:byId("onboardingEventDivision").value.trim(),strengthFocus:profile.strengthFocus,engineFocus:profile.engineFocus,minimumWeeks:profile.minimumWeeks,idealWeeks:profile.idealWeeks,secondaryGoal};
   }else{
     const goal=byId("onboardingDevelopmentGoal").value;
     if(goal==="Sport-Specific Performance"&&!byId("onboardingSportGoal").value.trim()){byId("onboardingSportGoal").focus();alert("Enter the sport or activity you want the program to prepare for.");return false;}
@@ -199,10 +248,11 @@ function renderOnboardingReview(){
   if(typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();
   const injurySummary=injuryProfileSummaryText(),primary=onboardingLocations.find(x=>x.id===onboardingActiveLocationId)||onboardingLocations[0],height=Number(data.nutrition.height)||66,p=selectedMissionProfile(),r=recommendedFirstBlockSettings(),start=byId("onboardingBlockStart")?.value==="nextMonday"?"Next Monday":"Today";
   const missionTitle=onboardingMissionPath()==="event"?(byId("onboardingEventName")?.value.trim()||byId("onboardingEventType")?.value||"Event Mission"):(byId("onboardingDevelopmentGoal")?.value||"Development Mission");
-  const secondaryReview=byId("onboardingSecondaryEnabled")?.checked?` • Secondary: ${byId("onboardingSecondaryGoal")?.value}${byId("onboardingSecondaryDate")?.value?` by ${byId("onboardingSecondaryDate").value}`:""}`:"";
-  const missionDetail=onboardingMissionPath()==="event"?`${byId("onboardingEventDate")?.value||"Date required"} • ${r.lengthWeeks}-week event build`:`${r.lengthWeeks}-week development block${secondaryReview}`;
+  const developmentSecondaryReview=byId("onboardingSecondaryEnabled")?.checked?` • Secondary: ${byId("onboardingSecondaryGoal")?.value}${byId("onboardingSecondaryDate")?.value?` by ${byId("onboardingSecondaryDate").value}`:""}`:"";
+  const eventSecondaryReview=byId("onboardingEventSecondaryEnabled")?.checked?` • Secondary: ${byId("onboardingEventSecondaryGoal")?.value}${byId("onboardingEventSecondaryDate")?.value?` by ${byId("onboardingEventSecondaryDate").value}`:""}`:"";
+  const missionDetail=onboardingMissionPath()==="event"?`${byId("onboardingEventDate")?.value||"Date required"} • ${r.lengthWeeks}-week event build${eventSecondaryReview}`:`${r.lengthWeeks}-week development block${developmentSecondaryReview}`;
   const enteredMaxes=[data.settings.maxes?.bench&&`Bench ${data.settings.maxes.bench} lb`,data.settings.maxes?.squat&&`Squat ${data.settings.maxes.squat} lb`,data.settings.maxes?.deadlift&&`Deadlift ${data.settings.maxes.deadlift} lb`,data.settings.maxes?.pushPress&&`Push Press ${data.settings.maxes.pushPress} lb`].filter(Boolean);
-  byId("onboardingReview").innerHTML=`<div><span>Athlete</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>${escapeHtml(byId("onboardingAthleteMode").value)} • Age ${escapeHtml(data.nutrition.age)} • ${escapeHtml(data.settings.weight)} lb • ${Math.floor(height/12)}′${height%12}″</small></div><div><span>Strength baseline</span><strong>${enteredMaxes.length?`${enteredMaxes.length} max lift${enteredMaxes.length===1?"":"s"} entered`:"Effort-based loading"}</strong><small>${enteredMaxes.length?escapeHtml(enteredMaxes.join(" • ")):"No maxes entered; prescriptions will use RIR and RPE until updated."}</small></div><div><span>Movement limitations</span><strong>${escapeHtml(injurySummary.title)}</strong><small>${escapeHtml(injurySummary.detail)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Mission</span><strong>${escapeHtml(missionTitle)}</strong><small>${escapeHtml(missionDetail)}</small></div><div><span>Derived training priorities</span><strong>${escapeHtml(p.strengthGoal)} + ${escapeHtml(p.engineMode)}</strong><small>${r.strengthDays} Strength exposures • ${r.engineDays} Engine exposures${r.combinedSessions?` • ${r.combinedSessions} blended`:""} • peak/deload logic included</small></div><div><span>Block launch</span><strong>${selectedOnboardingBlockMode()==="recommended"?"Recommended structure":"Mission-based structure"}</strong><small>Week 1 begins ${escapeHtml(start.toLowerCase())}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>Preference saved</small></div>`;
+  byId("onboardingReview").innerHTML=`<div><span>Athlete profile</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>Age ${escapeHtml(data.nutrition.age)} • ${escapeHtml(data.settings.weight)} lb • ${Math.floor(height/12)}′${height%12}″</small></div><div><span>Training background</span><strong>${escapeHtml(trainingIdentityLabel(byId("onboardingAthleteMode").value))}</strong><small>Supporting coaching preference; the mission remains the primary programming driver.</small></div><div><span>Strength baseline</span><strong>${enteredMaxes.length?`${enteredMaxes.length} max lift${enteredMaxes.length===1?"":"s"} entered`:"Effort-based loading"}</strong><small>${enteredMaxes.length?escapeHtml(enteredMaxes.join(" • ")):"No maxes entered; prescriptions will use RIR and RPE until updated."}</small></div><div><span>Movement limitations</span><strong>${escapeHtml(injurySummary.title)}</strong><small>${escapeHtml(injurySummary.detail)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Mission</span><strong>${escapeHtml(missionTitle)}</strong><small>${escapeHtml(missionDetail)}</small></div><div><span>Derived training priorities</span><strong>${escapeHtml(p.strengthGoal)} + ${escapeHtml(p.engineMode)}</strong><small>${r.strengthDays} Strength exposures • ${r.engineDays} Engine exposures${r.combinedSessions?` • ${r.combinedSessions} blended`:""} • peak/deload logic included</small></div><div><span>Block launch</span><strong>${selectedOnboardingBlockMode()==="recommended"?"Recommended structure":"Mission-based structure"}</strong><small>Week 1 begins ${escapeHtml(start.toLowerCase())}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>Preference saved</small></div>`;
 }
 
 function completeOnboarding(){
@@ -296,4 +346,4 @@ function updateEventContextFields(){
   field.placeholder=placeholders[type]||"Optional — division, class, or distance";
 }
 
-document.addEventListener("DOMContentLoaded",()=>{toggleOnboardingMissionPath();toggleSecondaryGoalFields();updateEventContextFields();["onboardingTrainingDays","onboardingSessionMinutes","onboardingBlockStart"].forEach(id=>byId(id)?.addEventListener("change",updateOnboardingMissionPreview));});
+document.addEventListener("DOMContentLoaded",()=>{toggleOnboardingMissionPath();toggleSecondaryGoalFields();toggleEventSecondaryGoalFields();updateEventContextFields();["onboardingTrainingDays","onboardingSessionMinutes","onboardingBlockStart"].forEach(id=>byId(id)?.addEventListener("change",updateOnboardingMissionPreview));});

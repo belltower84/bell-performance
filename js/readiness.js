@@ -1,14 +1,22 @@
 "use strict";
 
-function rawDailyReadinessScore(readiness = data.settings.readiness || {}) {
-  const n = (value, fallback) => Number.isFinite(+value) ? +value : fallback;
-  const sleep = n(readiness.sleepQuality, 4);
-  const energy = n(readiness.energy, 4);
-  const motivation = n(readiness.motivation, 4);
-  const sorenessRecovery = 6 - n(readiness.soreness, 3);
-  return Math.max(0, Math.min(100, Math.round((sleep * .32 + energy * .30 + motivation * .18 + sorenessRecovery * .20) * 20)));
+function sleepDurationScore(readiness = data.settings.readiness || {}) {
+  const total=Math.max(0,(Number(readiness.sleepHours)||0)+(Number(readiness.sleepMinutes)||0)/60);
+  if(total>=7&&total<=9)return 10;
+  if(total>9)return Math.max(5,10-(total-9)*1.5);
+  if(total>=6)return 7+(total-6)*3;
+  if(total>=5)return 4+(total-5)*3;
+  return Math.max(0,total/5*4);
 }
-
+function rawDailyReadinessScore(readiness = data.settings.readiness || {}) {
+  const n=(value,fallback)=>Number.isFinite(+value)?+value:fallback;
+  const duration=sleepDurationScore(readiness);
+  const sleepQuality=n(readiness.sleepQuality,8);
+  const energy=n(readiness.energy,8);
+  const motivation=n(readiness.motivation,8);
+  const sorenessRecovery=10-n(readiness.soreness,4);
+  return Math.max(0,Math.min(100,Math.round(duration*2.5+sleepQuality*1.5+energy*2.5+sorenessRecovery*2+motivation*1.5)));
+}
 function feedbackRecoveryScore(entry) {
   if (!entry) return null;
   const n = (value, fallback) => Number.isFinite(+value) ? +value : fallback;
@@ -84,6 +92,8 @@ function hasTodayReadiness() {
 function collectReadinessFrom(prefix = "") {
   const id = name => document.getElementById(`${prefix}${name}`);
   return {
+    sleepHours:+id("sleepHours").value,
+    sleepMinutes:+id("sleepMinutes").value,
     sleepQuality:+id("sleepQuality").value,
     soreness:+id("soreness").value,
     energy:+id("energy").value,
@@ -119,9 +129,9 @@ function maybePromptDailyReadiness() {
   const modal = document.getElementById("dailyReadinessModal");
   if (!modal) return;
   const r = data.settings.readiness || {};
-  ["sleepQuality","soreness","energy","motivation","timeAvailability"].forEach(name => {
+  ["sleepHours","sleepMinutes","sleepQuality","soreness","energy","motivation","timeAvailability"].forEach(name => {
     const el = document.getElementById(`prompt${name}`);
-    if (el) el.value = r[name] || (name === "soreness" || name === "timeAvailability" ? 3 : 4);
+    if (el) el.value = r[name] ?? ({sleepHours:7,sleepMinutes:30,sleepQuality:8,soreness:4,energy:8,motivation:8,timeAvailability:3}[name]);
   });
   modal.classList.remove("hidden");
 }

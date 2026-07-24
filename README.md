@@ -1,32 +1,57 @@
-# Bell Performance 8.0.2 — Date-Aware Multi-Session Training
+# Bell Performance 8.5.0 — Seamless Premium Interface
 
-GitHub-ready static progressive web app. Open `index.html` locally or deploy the folder root to GitHub Pages.
+GitHub-ready static PWA.
 
-## 8.0.2 changes
-
-- Dashboard defaults to the current local calendar day and never pulls a future unfinished session forward.
-- Previous/next-day navigation and one-click return to Today.
-- Automatic local-midnight rollover, including resume after the app was backgrounded.
-- Multi-session days track Strength and Engine completion independently; the plan day completes only when every prescribed session is finished.
-- Workout timers are derived from persisted timestamps, so refreshes, PWA suspension, and tab closure no longer lose elapsed time.
-- Core accessory volume now responds to the active strength goal and saved sex profile while preserving primary lifts, readiness scaling, equipment substitutions, injury logic, and engine prescriptions.
-- Existing history, progression, nutrition, habits, readiness, equipment, First Flight, mission builder, and service-worker support are preserved.
-
-## Deployment
-
-1. Upload the contents of this folder to the repository root.
-2. In GitHub Pages, deploy from the desired branch and `/ (root)`.
-3. After deployment, hard-refresh once so the 8.0.2 service worker replaces older caches.
+## Changes
+- Actual sleep hours and minutes in Daily Readiness.
+- Sleep quality, energy, soreness, and motivation use direct 1–10 inputs.
+- Backward migration from legacy 1–5 readiness values.
+- Strength-location and Engine-mode selectors restored inside unified mission rows.
+- Premium visual system extended across Training, Plan, History, Habits, Settings, workout modal, and First Flight onboarding.
+- Existing planning, Core, timers, progression, substitutions, history, and dashboard systems preserved.
 
 
-### Warm-up correction
-- Every Strength session now displays a required 8–12 minute Raise–Mobilize–Activate–Ramp sequence.
-- Every Engine session now displays modality-specific preparation and progressive pickups.
-- Warm-ups no longer disappear when a numeric starting weight is unavailable.
+## 8.5.0 Female Physique refinement
+- Dedicated female physique programming for Body Recomposition and Bodybuilding goals.
+- New emphasis choices: Glute Development, Lower Body / Wellness, and Athletic Shape.
+- Three weekly glute exposures when glute-priority profiles are selected.
+- Exercise roles balance lengthened glute work, shortened-position work, abduction, hamstrings, quads, and upper-body silhouette development.
+- Readiness-aware set scaling protects recovery without deleting the primary movement patterns.
+- Existing general, male, hybrid, tactical, strength, and endurance programming remains unchanged.
 
 
-## 8.0.2 optional Core system
-- Adds rotating Core A, B, and C sessions on days with zero or one prescribed workout.
-- Rest days receive a separate low-fatigue Recovery Core + Mobility option.
-- Core sessions are logged in History and use persistent timers, set tracking, readiness scaling, and equipment replacement.
-- Optional Core never blocks prescribed-day completion and never turns a rest day into an incomplete day.
+## 8.5.0 discipline-specific coaching pathways
+
+Bell Performance now distinguishes General Fitness, Body Recomposition, Muscle Building, Strength, and Hybrid Performance at the coaching-engine level. Each pathway has its own training promise, weekly intent, progression method, recovery/readiness response, exercise-rotation cadence, missed-session rule, and discipline-specific Coach Briefing language. Existing event, tactical, endurance, female-physique, equipment, readiness, and workout-history systems remain available.
+
+## 8.5.0 expert event coaching
+Event missions now resolve through seven dedicated coaching families: running events, multisport endurance, functional competitions, strength competitions, tactical/occupational events, obstacle/loaded endurance, and physique competition. Each family defines its own weekly structure, phase progression, simulations, taper window, readiness response, missed-session policy, and event-day guidance.
+
+
+## 8.5.0 First Flight flow refinement
+
+## 8.5.0 weekly calendar artwork refinement
+- The premium weekly calendar now uses mini image cards that visually match the Today's Mission styling instead of single-letter codes.
+- Two-a-day dates render up to two stacked mini session cards so both Strength and Engine remain visible in the weekly view.
+- Rest days now render as a dedicated recovery tile instead of a plain letter badge.
+
+- Athlete identity no longer competes with the mission during the opening profile step.
+- The mission is selected first and remains the primary programming driver.
+- Training background is collected afterward as a supporting preference for coaching language, exercise complexity, and familiar methods.
+- The review screen explicitly separates athlete profile, mission, and training background.
+
+## 8.5.0 dashboard visual refinement
+- Updated the premium dashboard styling to match the preferred high-fidelity mockup while preserving all recent dashboard logic and controls.
+- Weekly schedule now uses compact Strength / Engine icon buttons instead of letter tiles or artwork cards, and two-a-day dates still show both sessions.
+- Muted the palette by replacing bright blues with a more cohesive gold / green / graphite system.
+- Preserved the shield logo and aligned the header, mission cards, readiness panel, support card, and progress sections to the refined visual system.
+
+## 8.5.0 premium polish pass
+- Applied a second visual polish pass to the premium dashboard controls and Strength / Engine icon treatments.
+- Refined the workout experience with a more premium workout hero, control cards, and exercise card styling.
+- Updated First Flight onboarding to better match the premium dashboard through improved card treatments, step visuals, and mission-selection panels.
+
+## 8.5.0 full-app visual unification
+- Extended the premium dark / gold / green design system across the bottom navigation, Weekly Plan, Training Library, History, Performance Review, Settings, Exercise Library, and Habits screens.
+- Added clearer status hierarchy for planned, completed, rescheduled, skipped, and replaced training sessions.
+- Preserved all existing programming, storage, navigation, logging, mission, and onboarding behavior.

@@ -11,7 +11,7 @@ const defaults = {
     cardioType: "Running",
     rotationWeek: 1,
     maxes: { bench: null, squat: null, deadlift: null, pushPress: null },
-    readiness: { sleepQuality:4, energy:4, motivation:4, soreness:3, timeAvailability:3, score:null, status:"", lastPromptDate:"" },
+    readiness: { sleepHours:7, sleepMinutes:30, sleepQuality:8, energy:8, motivation:8, soreness:4, timeAvailability:3, score:null, status:"", lastPromptDate:"" },
     coachMessages: { setupComplete:false, style:"Performance", scriptureFrequency:"Occasionally" },
     firstFlightStage: "profile",
     firstFlightTourComplete: false,
@@ -85,11 +85,17 @@ function normalizeData() {
   };
 
   const old = data.settings.readiness || {};
+  const migrateTen = (value, fallback) => {
+    const number=Number(value); if(!Number.isFinite(number))return fallback;
+    return number<=5?Math.max(1,Math.min(10,Math.round((number-1)*2.25+1))):Math.max(1,Math.min(10,Math.round(number)));
+  };
   data.settings.readiness = {
-    sleepQuality: Number.isFinite(+old.sleepQuality) ? +old.sleepQuality : (Number.isFinite(+old.sleep) ? +old.sleep : 4),
-    energy: Number.isFinite(+old.energy) ? +old.energy : 4,
-    motivation: Number.isFinite(+old.motivation) ? +old.motivation : 4,
-    soreness: Number.isFinite(+old.soreness) ? +old.soreness : 3,
+    sleepHours: Math.max(0,Math.min(16,Number.isFinite(+old.sleepHours)?+old.sleepHours:7)),
+    sleepMinutes: Math.max(0,Math.min(59,Number.isFinite(+old.sleepMinutes)?+old.sleepMinutes:30)),
+    sleepQuality: migrateTen(old.sleepQuality ?? old.sleep, 8),
+    energy: migrateTen(old.energy, 8),
+    motivation: migrateTen(old.motivation, 8),
+    soreness: migrateTen(old.soreness, 4),
     timeAvailability: Number.isFinite(+old.timeAvailability) ? +old.timeAvailability : 3,
     score: Number.isFinite(+old.score) ? +old.score : null,
     status: old.status || "",

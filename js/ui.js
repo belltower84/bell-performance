@@ -24,6 +24,7 @@ const ATHLETE_TYPE_DESCRIPTIONS = {
   "Tactical Athlete": "Built for police, fire, military, and other demanding occupations requiring strength, work capacity, durability, and readiness.",
   "Strength Athlete": "Prioritizes maximal strength and powerful compound lifting while using Engine work to support conditioning and recovery.",
   "Endurance Athlete": "Prioritizes running, cycling, rowing, or similar Engine goals while Strength work supports durability and performance.",
+  "Functional Fitness Athlete": "Uses mixed-modal conditioning, barbell skill, gymnastics, and repeat-effort capacity familiar to functional fitness athletes.",
   "Masters Athlete": "Generally intended for athletes age 40+ or those competing in a masters age division, with added emphasis on recovery and sustainable progression.",
   "Youth Athlete": "For developing athletes, using age-appropriate technique, movement quality, conservative loading, and appropriate supervision."
 };
@@ -197,6 +198,21 @@ function weeklyScheduleStart(reference=new Date()) {
   start.setDate(start.getDate()-(day===0?6:day-1));
   return start;
 }
+function weeklyScheduleReferenceDate(){
+  if (typeof selectedDashboardDateKey === "function") return localDateFromKey(selectedDashboardDateKey());
+  if (data.trainingBlock?.startDate) return localDateFromKey(data.trainingBlock.startDate);
+  return new Date();
+}
+function syncDashboardCardQuickControls(){
+  const quick = byId("engineModeQuick");
+  const settingsSelect = byId("cardioType");
+  if (quick) {
+    const options = ["Running","Cycling","Rower","Swimming","Hiking / Rucking","Sprint / Field","Air Bike","Elliptical","Stair Climber"];
+    quick.innerHTML = options.map(option => `<option value="${option}">${option}</option>`).join("");
+    quick.value = data.settings.cardioType || "Running";
+  }
+  if (settingsSelect) settingsSelect.value = data.settings.cardioType || "Running";
+}
 function scheduleTypeForMission(mission, label="", detail="") {
   const text=`${mission||""} ${label||""} ${detail||""}`.toLowerCase();
   if(/^s-/.test(String(mission||"").trim()) || /\b(strength|hypertrophy|bodybuilding|powerlifting|upper body|lower body|athletic upper|athletic lower)\b/.test(text)) return "strength";
@@ -216,7 +232,7 @@ function renderWeeklyScheduleStrip() {
   if(!host) return;
   const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   const shortDays=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-  const start=weeklyScheduleStart();
+  const start=weeklyScheduleStart(weeklyScheduleReferenceDate());
   const today=todayKey();
   host.innerHTML=days.map((day,index)=>{
     const date=new Date(start); date.setDate(start.getDate()+index);
@@ -256,6 +272,7 @@ function renderDashboard() {
   setText("todayDuration", template ? `${template.duration} minutes` : "—");
   setText("todayFocusOut", status === "GREEN" ? "Progress with clean, controlled work" : status === "YELLOW" ? "Protect quality and trim extra volume" : "Restore, move, and prepare for tomorrow");
   renderVisualProfile(template, status);
+  syncDashboardCardQuickControls();
   renderTodayTrainingCards();
   renderWeeklyScheduleStrip();
   byId("todayPreview").innerHTML = template
@@ -573,8 +590,9 @@ function openFirstFlight(startStep=null){
   const modal=byId("onboardingModal"); if(!modal||!modal.classList.contains("hidden"))return;
   byId("onboardingAthleteName").value=data.settings.athleteName||"";
   byId("onboardingSex").value=data.settings.sex||"Prefer not to say";
-  byId("onboardingAthleteMode").value=data.settings.athleteMode||"Hybrid Athlete";
+  if(byId("onboardingAthleteMode"))byId("onboardingAthleteMode").value=data.settings.athleteMode||"Hybrid Athlete";
   renderAthleteTypeDescription("onboardingAthleteMode", "onboardingAthleteModeDescription");
+  if(typeof updateTrainingIdentityContext==="function")updateTrainingIdentityContext();
   byId("onboardingAge").value=data.nutrition.age||"";
   byId("onboardingBodyweight").value=data.settings.weight||"";
   const totalHeight=Number(data.nutrition.height)||0;

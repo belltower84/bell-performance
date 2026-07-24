@@ -28,6 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderAppVersion();
+  const hasCompletedCurrentPlan=(data.plan||[]).some(item=>item.done||item.status==="completed"||Object.keys(item.sessionCompletions||{}).length);
+  if(data.trainingBlock?.enabled&&!hasCompletedCurrentPlan&&typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();
+  if(typeof updateAdaptiveTrainingState==="function")updateAdaptiveTrainingState({save:false});
   renderApp();
   setTimeout(() => { maybePromptDailyReadiness(); openPendingSessionFeedback(); }, 250);
 

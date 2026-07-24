@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-8.8.0";
+const CACHE_NAME = "bell-performance-8.9.1";
 const CORE = [
   "./",
   "./index.html",
@@ -32,6 +32,7 @@ const CORE = [
   "./js/progression.js?v=8800",
   "./js/workouts.js?v=8800",
   "./js/missed-sessions.js?v=8800",
+  "./js/adaptive-engine.js?v=8900",
   "./js/performance-review.js?v=8800",
   "./js/artwork.js?v=8800",
   "./js/quote-cache.js?v=8800",

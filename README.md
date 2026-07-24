@@ -87,3 +87,20 @@ Event missions now resolve through seven dedicated coaching families: running ev
 - Added a reusable Bell commercial design system covering typography, graphite/brass surfaces, motion, card hierarchy, and interaction states.
 - Rebuilt First Flight into a cinematic split-layout onboarding experience with artwork and messaging that changes by onboarding step.
 - Preserved all training, readiness, planning, storage, workout, and progression logic.
+
+
+## 8.9.0 Adaptive Training Engine
+- Enforces Wednesday and Sunday recovery days for five-day schedules.
+- Enforces Tuesday, Thursday, and Sunday recovery days for four-day schedules.
+- Uses seven-day readiness trends, post-session feedback, completion rate, RPE, and fatigue-related misses to choose BUILD, HOLD, RECOVER, or REBUILD status.
+- Scales strength volume, calculated working loads, and Engine duration automatically.
+- Converts quality Engine sessions to recovery work when fatigue signals require it.
+- Stores the adaptive decision with each completed session for future coaching review.
+
+
+## 8.9.1 Week Completion Flow
+
+- Future ungenerated calendar weeks now show a clear locked-state message instead of appearing to be empty rest weeks.
+- The dashboard identifies the active training cycle, current block week, and current phase.
+- When all prescribed sessions are completed or resolved, the dashboard displays a prominent prompt to close the week and generate the next adaptive week.
+- The final week displays a block-complete review prompt rather than attempting to generate a nonexistent week.

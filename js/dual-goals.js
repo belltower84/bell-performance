@@ -135,7 +135,7 @@ function updateGoalBuilderFields(){ updateDualGoalBuilder(); }
 function dualBlockPhase(){ const b=data.trainingBlock,w=blockWeek(),t=b.lengthWeeks||12,s=strengthGoalProfile(),names=s.phaseNames;if(w===t)return names[3]; const r=w/t;if(w%4===0)return"Recovery & Absorption";if(r<=.3)return names[0];if(r<=.7)return names[1];return names[2]; }
 function blockPhase(){ return dualBlockPhase(); }
 
-function engineWeekPrescription(kind){
+function baseEngineWeekPrescription(kind){
   const b=data.trainingBlock,e=engineGoalProfile(),w=blockWeek(),t=b.lengthWeeks||12,r=Math.min(1,w/Math.max(1,t-2)),recovery=w%4===0&&w!==t, taper=w>=t-1;
   const mode=b.dualGoals.engineMode; const baseDur=Math.round((25+r*25)*(recovery?.7:1)*(taper?.65:1));
   const modality={"Running":"Run","Rowing":"Row","Hiking / Rucking":"Hike / Ruck","Cycling":"Ride","Sprint / Field":"Speed Session","Swimming":"Swim","General Conditioning":"Conditioning","None / Recovery Only":"Recovery Walk"}[mode]||"Engine";
@@ -147,6 +147,11 @@ function engineWeekPrescription(kind){
   }
   const longDuration=Math.round((40+r*(e.level==="specialist"?80:45))*(recovery?.7:1)*(taper?.55:1));
   return{label:`Long ${modality}`,detail:`${longDuration} min progressive endurance with fueling and technique practice`,duration:longDuration,intensity:"Endurance"};
+}
+
+function engineWeekPrescription(kind){
+  const prescription=baseEngineWeekPrescription(kind);
+  return typeof applyAdaptiveEnginePrescription==="function"?applyAdaptiveEnginePrescription(prescription,kind):prescription;
 }
 
 function strengthMissionsForGoal(goal){
@@ -204,17 +209,20 @@ function defaultScheduleProtocol(trainingDays,strengthDays,engineDays,family){
   if(trainingDays===5)return fiveDayScheduleProtocol(family,strengthDays,engineDays);
   const strengthMap={
     6:[0,1,2,3,4,5],
-    4:[0,1,3,5],
-    3:[0,2,5]
+    5:[0,1,3,4,5],
+    4:[0,2,4,5],
+    3:[0,2,4]
   };
   const engineMap={
     6:[1,3,5,2,4,0],
-    4:[1,3,5,0,2,4],
-    3:[1,4,2,5]
+    5:[1,3,5,4,0],
+    4:[2,5,0,4],
+    3:[2,5,0]
   };
   const strengthSlots=(strengthMap[trainingDays]||(strengthDays>=5?[0,1,3,4,5]:strengthDays===4?[0,1,3,5]:strengthDays===3?[0,2,4]:[0,3])).slice(0,strengthDays);
   const engineSlots=(engineMap[trainingDays]||[1,3,5,2,6,4,0]).slice(0,engineDays);
-  return{strengthSlots,engineSlots,engineKinds:engineKindsForCount(engineDays,family),restSlots:[],label:`${trainingDays}-Day ${family[0].toUpperCase()+family.slice(1)} Rhythm`};
+  const restSlots=trainingDays===5?[2,6]:trainingDays===4?[1,3,6]:trainingDays===3?[1,3,5,6]:trainingDays===6?[6]:[];
+  return{strengthSlots,engineSlots,engineKinds:engineKindsForCount(engineDays,family),restSlots,label:`${trainingDays}-Day ${family[0].toUpperCase()+family.slice(1)} Rhythm`};
 }
 function weeklyScheduleProtocol(block=data.trainingBlock,strengthGoal=block?.dualGoals?.strengthGoal||"Hybrid",engine=engineGoalProfile(),strengthDays=block?.strengthDays||4,engineDays=block?.runDays||0){
   const family=scheduleMissionFamily(block,strengthGoal,engine),days=Number(block?.trainingDays)||5;
@@ -264,13 +272,13 @@ function buildCurrentWeekPlan(){
     const protocol=weeklyScheduleProtocol(b,s,e,sd,ed);b.scheduleProtocol=protocol.label;
     protocol.strengthSlots.forEach((idx,i)=>{plan[idx]={day:days[idx],mission:strengthMissions[i%strengthMissions.length],detail:`${s} • ${sp.label} • ${protocol.label}`,done:false};});
     protocol.engineKinds.forEach((kind,i)=>attachEngineSession(plan,days,protocol.engineSlots[i],kind,coord));
-    if((b.trainingDays||5)===5){
-      [2,6].forEach(idx=>{if(plan[idx].mission==="M-1 Daily Reset")plan[idx].detail=idx===2?"Midweek recovery anchor: mobility, walking, and readiness review":"Full recovery day: mobility, family activity, and preparation for Monday";});
-    }
+    (protocol.restSlots||[]).forEach(idx=>{
+      plan[idx]={day:days[idx],mission:"M-1 Daily Reset",detail:idx===6?"Full recovery day: mobility, family activity, and preparation for Monday":"Scheduled recovery anchor: mobility, walking, and readiness review",done:false,lockedRestDay:true};
+    });
   }
   data.plan=plan;
 }
-function coachRecommendation(){ if(!data.trainingBlock.enabled)return"Choose a Strength goal and a compatible Engine goal in More. The Coach Engine will coordinate both progressions."; const status=readinessStatus(readinessScore()),e=engineGoalProfile(),compat=compatibilityInfo(data.trainingBlock.dualGoals.strengthGoal,data.trainingBlock.dualGoals.engineMode,e.id); if(status==="RED")return`${dualBlockPhase()}: recovery is the mission. Keep mobility, remove hard Engine work, and retain only essential technique or easy strength work.`;if(status==="YELLOW")return`${dualBlockPhase()}: preserve the main Strength work, trim accessory volume, and convert hard Engine work to easy aerobic support. ${compat.note}`;return`${dualBlockPhase()}: execute both progressions as scheduled. ${compat.note}`; }
+function coachRecommendation(){ if(!data.trainingBlock.enabled)return"Choose a Strength goal and a compatible Engine goal in More. The Coach Engine will coordinate both progressions."; const status=readinessStatus(readinessScore()),e=engineGoalProfile(),compat=compatibilityInfo(data.trainingBlock.dualGoals.strengthGoal,data.trainingBlock.dualGoals.engineMode,e.id); if(status==="RED")return`${dualBlockPhase()}: recovery is the mission. Keep mobility, remove hard Engine work, and retain only essential technique or easy strength work.`;if(status==="YELLOW")return`${dualBlockPhase()}: preserve the main Strength work, trim accessory volume, and convert hard Engine work to easy aerobic support. ${compat.note}`;return`${dualBlockPhase()}: execute both progressions as scheduled. ${compat.note} ${typeof adaptiveCoachBrief==="function"?adaptiveCoachBrief():""}`; }
 
 function renderDualGoals(){
   normalizeDualGoals(); const b=data.trainingBlock,d=b.dualGoals,e=engineGoalProfile(),week=b.currentWeek||1,total=b.lengthWeeks||12;

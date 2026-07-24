@@ -8,9 +8,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
-  <title>Bell Performance 8.8.0 — Commercial Refinement</title>
+  <title>Bell Performance 8.9.1 — Adaptive Training</title>
   <link rel="stylesheet" href="./css/app.css?v=8800">
-  <link rel="stylesheet" href="./css/polish-880.css?v=8800">
+  <link rel="stylesheet" href="./css/polish-880.css?v=8810">
+<link rel="stylesheet" href="./css/polish-881.css?v=8910">
 
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -65,9 +66,9 @@ main{display:block}.screen{display:none}.screen.active{display:block}
     <section id="premiumSupportPanel" class="premium-support-panel hidden"><div id="premiumSupportContent"></div></section>
 
     <section class="premium-week-card">
-      <div class="premium-section-heading"><div><span class="premium-kicker">Weekly Schedule</span><h2 id="premiumWeekTitle">This Week</h2></div><button class="premium-text-button" onclick="showScreen('plan')">Full Plan ›</button></div>
+      <div class="premium-section-heading"><div><span class="premium-kicker">Weekly Schedule</span><h2 id="premiumWeekTitle">This Week</h2><div class="premium-week-context"><span id="premiumBlockType">Open Plan</span><span id="premiumBlockWeek">Current Week</span></div></div><button class="premium-text-button" onclick="showScreen('plan')">Full Plan ›</button></div>
       <div id="premiumWeekDays" class="premium-week-days"></div>
-      <div class="premium-week-legend"><span><b class="strength">↟</b> Strength</span><span><b class="engine">↠</b> Engine</span><span><b class="rest">○</b> Rest</span></div>
+      <div class="premium-week-legend"><span><b class="strength">↟</b> Strength</span><span><b class="engine">↠</b> Engine</span><span><b class="rest">○</b> Rest</span></div><div id="premiumWeekAdvance" class="premium-week-advance hidden"></div>
     </section>
 
     <section class="premium-coach-card">
@@ -362,7 +363,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
   <div class="modal-box first-flight-box">
     <div class="first-flight-shell">
       <header class="first-flight-header">
-        <div><span class="metric-label" id="onboardingVersion">Bell Performance 8.8.0</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
+        <div><span class="metric-label" id="onboardingVersion">Bell Performance 8.9.1</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
         <div class="first-flight-step-badge"><strong id="onboardingStepNumber">1</strong><span>of 6</span></div>
       </header>
       <div class="first-flight-progress"><i id="onboardingProgress"></i></div>
@@ -537,7 +538,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 
-<script>window.BELL_APP_VERSION = "8.8.0";</script>
+<script>window.BELL_APP_VERSION = "8.9.1";</script>
 <script src="./data/workouts.js?v=8700"></script>
 <script src="./js/exercise-library.js?v=8700"></script>
 <script src="./js/storage.js?v=8700"></script>
@@ -551,6 +552,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/progression.js?v=8700"></script>
 <script src="./js/workouts.js?v=8700"></script>
 <script src="./js/missed-sessions.js?v=8700"></script>
+<script src="./js/adaptive-engine.js?v=8900"></script>
 <script src="./js/performance-review.js?v=8700"></script>
 <script src="./js/artwork.js?v=8700"></script>
 <script src="./js/quote-cache.js?v=8700"></script>
@@ -564,7 +566,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/how-to.js?v=8700"></script>
 <script src="./js/design-system.js?v=8700"></script>
 <script src="./js/premium-dashboard.js?v=8800"></script>
-<script src="./js/polish-880.js?v=8800"></script>
+<script src="./js/polish-880.js?v=8810"></script>
+<script src="./js/polish-881.js?v=8810"></script>
 <script src="./js/app.js?v=8800"></script>
 </body>
 </html>

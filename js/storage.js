@@ -26,6 +26,7 @@ const defaults = {
   mobility: { focus: "Auto", minutes: 10, completedDates: [], checks: {} },
   readinessLog: [],
   sessionFeedbackLog: [],
+  adaptiveTraining: { enabled:true, lastEvaluation:"", currentStatus:"BASELINE", volumeScale:1, loadScale:1, engineScale:1, reasons:[], consecutiveLowReadiness:0, complianceRate:null, sessionCount:0 },
   pendingFeedbackSessionId: null,
   dayNavigation: { selectedDate: "", lastLocalDate: "" },
   performanceReviews: { weeklySeen:[], blockReviews:[], milestones:[] },
@@ -140,6 +141,9 @@ function normalizeData() {
   data.mobility.checks = data.mobility.checks || {};
   data.readinessLog = Array.isArray(data.readinessLog) ? data.readinessLog : [];
   data.sessionFeedbackLog = Array.isArray(data.sessionFeedbackLog) ? data.sessionFeedbackLog : [];
+  data.adaptiveTraining = { ...defaults.adaptiveTraining, ...(data.adaptiveTraining || {}) };
+  data.adaptiveTraining.enabled = data.adaptiveTraining.enabled !== false;
+  data.adaptiveTraining.reasons = Array.isArray(data.adaptiveTraining.reasons) ? data.adaptiveTraining.reasons : [];
   data.pendingFeedbackSessionId = data.pendingFeedbackSessionId || null;
   data.dayNavigation = { ...defaults.dayNavigation, ...(data.dayNavigation || {}) };
   data.dayNavigation.selectedDate = /^\d{4}-\d{2}-\d{2}$/.test(data.dayNavigation.selectedDate || "") ? data.dayNavigation.selectedDate : "";

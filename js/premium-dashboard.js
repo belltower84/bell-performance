@@ -11,7 +11,7 @@ function premiumSessionType(session){return scheduleTypeForMission(session?.miss
 function premiumInlineIcon(kind){
   const icons={
     strength:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6"/><path d="M6 7v10"/><path d="M9 6v12"/><path d="M15 6v12"/><path d="M18 7v10"/><path d="M21 9v6"/><path d="M9 12h6"/></svg>`,
-    engine:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="5" r="2"/><path d="M8 13l3-3 3 1 2 3"/><path d="M10 9l2-3"/><path d="M7 19l3-5"/><path d="M14 14l-1 5"/><path d="M4 12l4 1"/></svg>`,
+    engine:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5c2.1-5.9 4.8-8.9 8.1-8.9 2.2 0 3.4 1.4 4.7 1.4 1.1 0 2.1-.8 3.2-2.4"/><path d="M4 17.5h5.2"/><path d="M14.8 17.5H20"/><path d="m12.5 5.5 2.2 3.1-2.2 3.1"/><circle cx="4" cy="17.5" r="1.35"/><circle cx="20" cy="7.6" r="1.35"/></svg>`,
     core:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4c1.8 2.7 5.2 2.7 7 5.4-1.3 1.9-1.3 4.1 0 6-1.8 2.7-5.2 2.7-7 5.4-1.8-2.7-5.2-2.7-7-5.4 1.3-1.9 1.3-4.1 0-6C6.8 6.7 10.2 6.7 12 4Z"/></svg>`,
     rest:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12c0 3.3 2.7 6 6 6 2.8 0 5.2-1.9 5.9-4.5A7 7 0 0 1 10.5 6 6 6 0 0 0 6 12Z"/></svg>`
   };
@@ -47,9 +47,56 @@ function renderPremiumMission(){
   setText('premiumCompletionCount',String(completed));setText('premiumCompletionTotal',`of ${total}`);setText('premiumCompletionLabel',total?(completed===total?'MISSION COMPLETE':'COMPLETE'):'REST DAY');
   const ring=byId('premiumCompletionRing');if(ring)ring.style.setProperty('--mission-progress',`${pct*3.6}deg`);
   const stack=byId('premiumSessionStack');if(!stack)return;
+  const weekState=premiumSelectedWeekState();
+  if(weekState.isFuture){
+    setText('premiumCompletionCount','—');setText('premiumCompletionTotal','');setText('premiumCompletionLabel','WEEK LOCKED');
+    if(ring)ring.style.setProperty('--mission-progress','0deg');
+    stack.innerHTML=`<article class="premium-session-row week-locked"><div class="premium-session-icon">⌛</div><div class="premium-session-copy"><span>Next Training Week</span><strong>Complete the current week first</strong><small>Bell Performance will generate the next adaptive week after you close the current one.</small></div></article>`;
+    return;
+  }
   const eligible=sessions.length<=1;
   stack.innerHTML=sessions.map(premiumSessionRow).join('')+(eligible?premiumOptionalCoreRow():'');
   if(!sessions.length)stack.insertAdjacentHTML('afterbegin','<article class="premium-session-row rest"><div class="premium-session-icon">☾</div><div class="premium-session-copy"><span>Recovery</span><strong>No prescribed training</strong><small>Mobility, walking, and daily standards remain available.</small></div></article>');
+}
+
+
+function premiumCurrentPlanMonday(){
+  const dated=(data.plan||[]).map(planDateKey).filter(Boolean).sort();
+  return dated.length?mondayKeyFor(dated[0]):planWeekStartKey();
+}
+function premiumSelectedWeekState(){
+  const selectedMonday=mondayKeyFor(selectedDashboardDateKey()),currentMonday=premiumCurrentPlanMonday();
+  return {selectedMonday,currentMonday,isCurrent:selectedMonday===currentMonday,isFuture:localDateFromKey(selectedMonday)>localDateFromKey(currentMonday),isPast:localDateFromKey(selectedMonday)<localDateFromKey(currentMonday)};
+}
+function premiumWeekCompletion(){
+  const active=(data.plan||[]).filter(item=>!['replaced'].includes(item.status));
+  const sessions=active.flatMap(sessionsFromPlanItem).filter(session=>!String(session.mission||'').startsWith('M-'));
+  const completed=sessions.filter(session=>session.completed).length;
+  const unresolvedItems=active.filter(item=>{
+    if(item.status==='skipped')return false;
+    const prescribed=sessionsFromPlanItem(item).filter(session=>!String(session.mission||'').startsWith('M-'));
+    return prescribed.some(session=>!session.completed);
+  });
+  return {total:sessions.length,completed,remaining:unresolvedItems.length,ready:sessions.length>0&&unresolvedItems.length===0};
+}
+function premiumBlockTypeLabel(){
+  if(!data.trainingBlock?.enabled)return 'Open Plan';
+  const primary=data.trainingBlock.dualGoals?.strengthGoal||data.trainingBlock.goalType||'Training Block';
+  const secondary=data.trainingBlock.dualGoals?.engineGoal;
+  return secondary&&secondary!==primary?`${primary} + ${secondary}`:primary;
+}
+function renderPremiumWeekAdvance(){
+  const host=byId('premiumWeekAdvance');if(!host)return;
+  const state=premiumSelectedWeekState(),completion=premiumWeekCompletion(),block=data.trainingBlock||{};
+  host.classList.add('hidden');host.innerHTML='';
+  if(!block.enabled||!state.isCurrent)return;
+  if(completion.ready&&block.currentWeek<block.lengthWeeks){
+    host.classList.remove('hidden');
+    host.innerHTML=`<div class="premium-week-advance-copy"><span class="premium-kicker">Week Complete</span><strong>Week ${blockWeek()} is ready to close</strong><p>Review the completed work, then generate Week ${blockWeek()+1} with the adaptive engine.</p></div><button class="premium-start-button" onclick="advanceBlockWeek()">Complete Week & Build Next ›</button>`;
+  }else if(completion.ready&&block.currentWeek>=block.lengthWeeks){
+    host.classList.remove('hidden');
+    host.innerHTML=`<div class="premium-week-advance-copy"><span class="premium-kicker">Training Block Complete</span><strong>${escapeHtml(premiumBlockTypeLabel())} cycle finished</strong><p>Review the block results before creating the next training cycle.</p></div><button class="premium-start-button" onclick="showScreen('history')">Review Block ›</button>`;
+  }
 }
 
 function premiumWeekSessionChip(session){
@@ -59,13 +106,22 @@ function premiumWeekSessionChip(session){
 function premiumWeekRestChip(){return `<div class="premium-week-chip rest" title="Rest day">${premiumInlineIcon('rest')}</div>`;}
 
 function renderPremiumWeek(){
-  const selected=selectedDashboardDateKey(),monday=mondayKeyFor(selected),days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  setText('premiumWeekTitle',localDateFromKey(monday).toLocaleDateString('en-US',{month:'long',day:'numeric'})+' Week');
+  const selected=selectedDashboardDateKey(),monday=mondayKeyFor(selected),days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],state=premiumSelectedWeekState();
+  const block=data.trainingBlock||{};
+  setText('premiumWeekTitle',state.isCurrent?'Current Training Week':localDateFromKey(monday).toLocaleDateString('en-US',{month:'long',day:'numeric'})+' Week');
+  setText('premiumBlockType',premiumBlockTypeLabel());
+  setText('premiumBlockWeek',block.enabled?`Week ${blockWeek()} of ${block.lengthWeeks} · ${blockPhase()}`:'Current Week');
   const host=byId('premiumWeekDays');if(!host)return;
+  if(state.isFuture){
+    const completion=premiumWeekCompletion();
+    host.innerHTML=`<div class="premium-week-lock"><div><strong>Next week has not been generated yet</strong><p>${completion.ready?'Complete the current week to let Bell Performance build the next adaptive training week.':`Complete or manage the current week first. ${completion.remaining} planned day${completion.remaining===1?' remains':'s remain'}.`}</p><button class="premium-outline-button" onclick="setDashboardDate('${state.currentMonday}')" style="margin-top:.75rem">Return to Current Week</button></div></div>`;
+    renderPremiumWeekAdvance();return;
+  }
   host.innerHTML=days.map((day,index)=>{
     const key=addLocalDays(monday,index),items=(data.plan||[]).filter(x=>planDateKey(x)===key&&!['skipped','replaced'].includes(x.status)),sessions=items.flatMap(sessionsFromPlanItem),allDone=sessions.length&&sessions.every(x=>x.completed),chips=sessions.length? sessions.slice(0,2).map(premiumWeekSessionChip).join('') : premiumWeekRestChip();
     return `<button class="premium-week-day-card ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''} ${sessions.length>1?'two-a-day':''}" onclick="setDashboardDate('${key}')"><span>${day}</span><strong>${localDateFromKey(key).getDate()}</strong><div class="premium-week-chips">${chips}</div></button>`;
   }).join('');
+  renderPremiumWeekAdvance();
 }
 
 function premiumReadinessMetric(value){return `${Math.max(1,Math.min(5,Math.round(Number(value)||1)))}/5`;}

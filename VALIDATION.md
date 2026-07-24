@@ -77,3 +77,11 @@
 - First Flight artwork and messaging update with each onboarding step.
 - Reduced-motion preferences are respected.
 - Existing application logic and stored data structures remain unchanged.
+
+
+## 8.9.1 checks
+
+- Verified future-week dashboard state does not display false rest days.
+- Verified current block type, week number, and phase display on the dashboard.
+- Verified week-complete prompt appears only after prescribed sessions are completed or explicitly resolved.
+- Verified next-week generation continues through the existing adaptive block advancement path.

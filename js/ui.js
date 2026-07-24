@@ -234,7 +234,7 @@ function renderWeeklyScheduleStrip() {
 
 function renderDashboard() {
   const profile = scalingProfile();
-  const plan = currentPlan();
+  const plan = typeof dashboardPrimaryPlanItem==="function" ? dashboardPrimaryPlanItem() : currentPlan();
   const template = plan ? scaledTemplate(plan.mission) : null;
   const rank = rankInfo();
   const mission = missionProgress();
@@ -371,55 +371,40 @@ function closeHistoryEditor(){byId("historyEditModal").classList.add("hidden");}
 function saveHistoryEdit(){const index=Number(byId("historyEditIndex").value),session=data.history[index];if(!session)return;session.label=byId("historyEditLabel").value.trim()||session.label||session.name;const dateValue=byId("historyEditDate").value;if(dateValue)session.completedAt=new Date(dateValue).toISOString();session.rpe=byId("historyEditRpe").value;session.notes=byId("historyEditNotes").value;const enteredTime=typeof parseEngineTime==="function"?parseEngineTime(byId("historyEditTime").value):0;if(enteredTime){session.officialElapsed=enteredTime;session.elapsed=enteredTime;}const distance=byId("historyEditDistance").value;if(session.engineMetrics||distance){session.engineMetrics=session.engineMetrics||{};session.engineMetrics.manualTime=byId("historyEditTime").value;session.engineMetrics.distance=distance;session.engineMetrics.distanceUnit=byId("historyEditDistanceUnit").value;session.engineMetrics.avgHeartRate=byId("historyEditHeartRate").value;session.engineMetrics.elevationGain=byId("historyEditElevation").value;session.engineMetrics.pace=typeof calculateEnginePace==="function"?calculateEnginePace(session.engineMetrics,session.officialElapsed||session.elapsed||0):"";}closeHistoryEditor();saveData();}
 function deleteHistoryRecord(){const index=Number(byId("historyEditIndex").value);if(!data.history[index]||!confirm("Delete this workout record? This cannot be undone."))return;data.history.splice(index,1);closeHistoryEditor();saveData();}
 
-function currentDayName(){return new Intl.DateTimeFormat("en-US",{weekday:"long"}).format(new Date());}
+function currentDayName(dateKey=selectedDashboardDateKey()){return new Intl.DateTimeFormat("en-US",{weekday:"long"}).format(localDateFromKey(dateKey));}
+function sessionCompletionKey(planItem, slot, sessionIndex){return `${planItem.id||planItem.day}:${slot}${Number.isInteger(sessionIndex)?`:${sessionIndex}`:""}`;}
 function sessionsFromPlanItem(item){
   if(!item)return[];
   const sessions=[];
-  const push=session=>{if(session?.mission)sessions.push(session);};
-  push({mission:item.mission,label:item.customLabel,detail:item.detail,prescribedDuration:item.prescribedDuration,primary:true,planId:item.id});
-  push({mission:item.secondaryMission,label:item.secondaryLabel,detail:item.secondaryDetail,prescribedDuration:item.secondaryDuration,primary:false,planId:item.id});
-  if(Array.isArray(item.sessions))item.sessions.forEach((session,index)=>push({mission:session.mission,label:session.label||session.customLabel,detail:session.detail,prescribedDuration:session.prescribedDuration||session.duration,primary:false,planId:item.id,sessionIndex:index}));
+  const push=(session,slot,index)=>{if(!session?.mission)return;const sessionKey=sessionCompletionKey(item,slot,index);sessions.push({...session,sessionKey,completed:Boolean(item.sessionCompletions?.[sessionKey]||item.done),scheduledDate:item.scheduledDate||planDateKey(item)});};
+  push({mission:item.mission,label:item.customLabel,detail:item.detail,prescribedDuration:item.prescribedDuration,primary:true,planId:item.id},"primary");
+  push({mission:item.secondaryMission,label:item.secondaryLabel,detail:item.secondaryDetail,prescribedDuration:item.secondaryDuration,primary:false,planId:item.id},"secondary");
+  if(Array.isArray(item.sessions))item.sessions.forEach((session,index)=>push({mission:session.mission,label:session.label||session.customLabel,detail:session.detail,prescribedDuration:session.prescribedDuration||session.duration,primary:false,planId:item.id,sessionIndex:index},"session",index));
   return sessions.filter(x=>!String(x.mission||'').startsWith('M-'));
 }
+function dashboardPrimaryPlanItem(){const key=selectedDashboardDateKey();return(data.plan||[]).find(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status))||null;}
 function dashboardSessionsForToday(){
-  const day=currentDayName();
-  const eligible=item=>item&&!item.done&&!['skipped','replaced'].includes(item.status);
-  let items=(data.plan||[]).filter(item=>eligible(item)&&item.day===day);
-  if(!items.length){const next=(data.plan||[]).find(eligible);items=next?[next]:[];}
-  const sessions=items.flatMap(sessionsFromPlanItem);
+  const key=selectedDashboardDateKey();
+  const items=(data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status));
+  const sessions=items.flatMap(sessionsFromPlanItem).filter(session=>!session.completed);
   const unique=[];
-  sessions.forEach(session=>{const key=`${session.mission}|${session.label||''}|${session.planId||''}|${session.sessionIndex??''}`;if(!unique.some(x=>x._key===key))unique.push({...session,_key:key});});
+  sessions.forEach(session=>{const identity=session.sessionKey; if(!unique.some(x=>x.sessionKey===identity))unique.push(session);});
   return unique;
 }
+function beginPlannedWorkout(planId,sessionKey,mission){const item=(data.plan||[]).find(x=>x.id===planId);beginWorkout(mission,{planId,sessionKey,scheduledDate:item?.scheduledDate||selectedDashboardDateKey()});}
 function optionalSessionHtml(primaryType){if(primaryType==='strength')return `<span class="metric-label">Optional Support</span><h3>Add Easy Cardio</h3><p class="hint">Add 20–30 minutes of easy Zone 2 work only when readiness is Green or Yellow and it will not compromise tomorrow's training.</p><div class="row"><button class="secondary" onclick="beginWorkout('R-1 Recovery Run')">Start Optional Cardio</button><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Choose Mobility Instead</button></div>`;return `<span class="metric-label">Optional Support</span><h3>Add Mobility</h3><p class="hint">A conditioning-only day can be paired with extra mobility, breathing, or easy recovery work without adding another hard session.</p><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Open Daily Mobility</button>`;}
 function renderTodayTrainingCards(){
-  const sessions=dashboardSessionsForToday(),strengthCard=byId('strengthTrainingCard'),engineCard=byId('engineTrainingCard'),option=byId('singleSessionOption');
+  renderDashboardDayNavigation();
+  const sessions=dashboardSessionsForToday(),strengthCard=byId('strengthTrainingCard'),engineCard=byId('engineTrainingCard'),option=byId('singleSessionOption'),empty=byId('noTrainingForDay');
   const sessionType=session=>scheduleTypeForMission(session?.mission,session?.label,session?.detail);
   const strength=sessions.find(session=>sessionType(session)==='strength');
   const engine=sessions.find(session=>sessionType(session)==='engine');
-  strengthCard?.classList.toggle('hidden',!strength);
-  engineCard?.classList.toggle('hidden',!engine);
-  if(strength){
-    const t=scaledTemplate(strength.mission);
-    setText('todayMission',strength.label||t?.label||strength.mission);
-    setText('todayDuration',t?`${t.duration} minutes`:'—');
-    const button=strengthCard?.querySelector('button');
-    if(button){button.textContent=data.activeWorkout?.name===strength.mission?'Resume Strength':'Start Strength';button.setAttribute('onclick',`beginWorkout('${strength.mission.replaceAll("'","\\'")}')`);}
-  }
-  if(engine){
-    const t=scaledTemplate(engine.mission);
-    setText('engineSessionTitle',engine.label||t?.label||engine.mission);
-    setText('engineSessionPurpose',engine.detail||'Complete the prescribed conditioning session.');
-    const canonicalDuration=Number(engine.prescribedDuration)||Number(t?.duration)||30;
-    const meta=engineCard?.querySelector('.training-meta');
-    if(meta)meta.innerHTML=`◷ <span>${canonicalDuration} minutes</span>`;
-    const button=engineCard?.querySelector('button');
-    if(button){button.textContent=data.activeWorkout?.name===engine.mission?'Resume Engine':'Start Engine';button.setAttribute('onclick',`beginWorkout('${engine.mission.replaceAll("'","\\'")}')`);}
-  }
-  option?.classList.toggle('hidden',sessions.length!==1);
-  if(option&&sessions.length===1)option.innerHTML=optionalSessionHtml(strength?'strength':'engine');
+  strengthCard?.classList.toggle('hidden',!strength);engineCard?.classList.toggle('hidden',!engine);empty?.classList.toggle('hidden',sessions.length>0);
+  if(!sessions.length){const item=dashboardPrimaryPlanItem(),allCompleted=item&&sessionsFromPlanItem(item).length&&sessionsFromPlanItem(item).every(x=>x.completed);setText('noTrainingDayTitle',allCompleted?'All sessions complete':'No prescribed training');setText('noTrainingDayDetail',allCompleted?'This training day is complete. Recovery and daily standards remain available.':'Recovery, mobility, and daily standards remain available. The dashboard will not pull a session forward from another day.');}
+  if(strength){const t=scaledTemplate(strength.mission);setText('todayMission',strength.label||t?.label||strength.mission);setText('todayDuration',t?`${t.duration} minutes`:'—');const button=strengthCard?.querySelector('button');if(button){button.textContent=data.activeWorkout?.planSessionKey===strength.sessionKey?'Resume Strength':'Start Strength';button.setAttribute('onclick',`beginPlannedWorkout('${strength.planId}','${strength.sessionKey}','${strength.mission.replaceAll("'","\\'")}')`);}}
+  if(engine){const t=scaledTemplate(engine.mission);setText('engineSessionTitle',engine.label||t?.label||engine.mission);setText('engineSessionPurpose',engine.detail||'Complete the prescribed conditioning session.');const canonicalDuration=Number(engine.prescribedDuration)||Number(t?.duration)||30;const meta=engineCard?.querySelector('.training-meta');if(meta)meta.innerHTML=`◷ <span>${canonicalDuration} minutes</span>`;const button=engineCard?.querySelector('button');if(button){button.textContent=data.activeWorkout?.planSessionKey===engine.sessionKey?'Resume Engine':'Start Engine';button.setAttribute('onclick',`beginPlannedWorkout('${engine.planId}','${engine.sessionKey}','${engine.mission.replaceAll("'","\\'")}')`);}}
+  option?.classList.toggle('hidden',sessions.length!==1);if(option&&sessions.length===1)option.innerHTML=optionalSessionHtml(strength?'strength':'engine');
 }
-
 function renderSettings() {
   setValue("athleteNameInput", data.settings.athleteName || "");
   setValue("athleteModeInput", data.settings.athleteMode || "Hybrid Athlete");

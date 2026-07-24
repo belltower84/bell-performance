@@ -272,3 +272,6 @@ body.female-profile .strength-card:before,body.female-session .workout-hero:befo
    The workout modal appears later in the document, so equal z-index values
    caused Learn and Replace to open invisibly underneath it. */
 #exerciseDetailModal,#exerciseSwapModal{z-index:140}
+
+/* Bell Performance 8.0.0 day navigation */
+.mission-day-heading{align-items:flex-end}.day-navigator{display:flex;justify-content:center;align-items:center;gap:10px;margin:-4px 0 14px}.day-nav-current{min-width:190px;background:transparent;border:1px solid rgba(255,255,255,.18);color:inherit}.day-nav-current.viewing-today{border-color:rgba(235,191,83,.7);box-shadow:0 0 0 1px rgba(235,191,83,.15) inset}.no-training-day{text-align:center;padding:22px}.weekly-schedule-day.selected{outline:2px solid rgba(235,191,83,.8);outline-offset:2px}.weekly-schedule-day{cursor:pointer}.session-complete-badge{display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(53,180,112,.16);font-size:.72rem;font-weight:800}

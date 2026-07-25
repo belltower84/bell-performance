@@ -34,7 +34,7 @@ const CURATED_ARTWORK = {
 
 function artworkHash(text) { let hash = 2166136261; for (let i = 0; i < text.length; i += 1) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 16777619); } return Math.abs(hash >>> 0); }
 function artworkDayKey() { const now = new Date(); return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`; }
-function fallbackArtworkPath(type){ return type === 'engine' ? './assets/engine-mountain-trail.jpg?v=8610' : './assets/strength-classic.jpg?v=8610'; }
+function fallbackArtworkPath(type){ return type === 'engine' ? './assets/engine-mountain-trail.jpg?v=8600' : './assets/strength-classic.jpg?v=8600'; }
 
 function currentArtworkSignals() {
   const dual = data?.trainingBlock?.dualGoals || {};
@@ -102,7 +102,7 @@ function curatedArtworkList(type, context = 'dashboard') {
 
 function artworkPath(type, selected){
   const ext = CUSTOM_ARTWORK_EXTENSIONS[selected] || 'jpg';
-  return `./assets/artwork/${type}/${selected}.${ext}?v=8610`;
+  return `./assets/artwork/${type}/${selected}.${ext}?v=8600`;
 }
 
 function chooseArtwork(type, context = 'dashboard') {

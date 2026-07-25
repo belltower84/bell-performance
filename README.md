@@ -1,11 +1,90 @@
-# Bell Performance 8.6.1
+# Bell Performance 8.6.2
 
-Stable rebuild based directly on Bell Performance 8.6.0.
+## 8.6.2
+- Replaced the Engine protocol symbol with one reusable metallic-gold running-shoe SVG.
+- Applied it to Today's Mission, weekly schedule chips, and Engine session surfaces.
+- No mission, workout-generation, or First Flight logic changed.
 
-## Change in this release
+# Bell Performance 8.6.0 — Seamless Premium Interface
 
-- Replaced the Energy symbol in Today's Mission with a custom golden running shoe.
-- Replaced weekly calendar Energy `E` markers and the legend marker with the same golden running shoe.
-- Matched the gold visual treatment used by the Strength side of the interface.
-- Preserved the existing First Flight mission form and mission-controller logic.
-- Updated application and service-worker cache versions.
+GitHub-ready static PWA.
+
+## Changes
+- Actual sleep hours and minutes in Daily Readiness.
+- Sleep quality, energy, soreness, and motivation use direct 1–10 inputs.
+- Backward migration from legacy 1–5 readiness values.
+- Strength-location and Engine-mode selectors restored inside unified mission rows.
+- Premium visual system extended across Training, Plan, History, Habits, Settings, workout modal, and First Flight onboarding.
+- Existing planning, Core, timers, progression, substitutions, history, and dashboard systems preserved.
+
+
+## 8.6.0 Female Physique refinement
+- Dedicated female physique programming for Body Recomposition and Bodybuilding goals.
+- New emphasis choices: Glute Development, Lower Body / Wellness, and Athletic Shape.
+- Three weekly glute exposures when glute-priority profiles are selected.
+- Exercise roles balance lengthened glute work, shortened-position work, abduction, hamstrings, quads, and upper-body silhouette development.
+- Readiness-aware set scaling protects recovery without deleting the primary movement patterns.
+- Existing general, male, hybrid, tactical, strength, and endurance programming remains unchanged.
+
+
+## 8.6.0 discipline-specific coaching pathways
+
+Bell Performance now distinguishes General Fitness, Body Recomposition, Muscle Building, Strength, and Hybrid Performance at the coaching-engine level. Each pathway has its own training promise, weekly intent, progression method, recovery/readiness response, exercise-rotation cadence, missed-session rule, and discipline-specific Coach Briefing language. Existing event, tactical, endurance, female-physique, equipment, readiness, and workout-history systems remain available.
+
+## 8.6.0 expert event coaching
+Event missions now resolve through seven dedicated coaching families: running events, multisport endurance, functional competitions, strength competitions, tactical/occupational events, obstacle/loaded endurance, and physique competition. Each family defines its own weekly structure, phase progression, simulations, taper window, readiness response, missed-session policy, and event-day guidance.
+
+
+## 8.6.0 First Flight flow refinement
+
+## 8.6.0 weekly calendar artwork refinement
+- The premium weekly calendar now uses mini image cards that visually match the Today's Mission styling instead of single-letter codes.
+- Two-a-day dates render up to two stacked mini session cards so both Strength and Engine remain visible in the weekly view.
+- Rest days now render as a dedicated recovery tile instead of a plain letter badge.
+
+- Athlete identity no longer competes with the mission during the opening profile step.
+- The mission is selected first and remains the primary programming driver.
+- Training background is collected afterward as a supporting preference for coaching language, exercise complexity, and familiar methods.
+- The review screen explicitly separates athlete profile, mission, and training background.
+
+## 8.6.0 dashboard visual refinement
+- Updated the premium dashboard styling to match the preferred high-fidelity mockup while preserving all recent dashboard logic and controls.
+- Weekly schedule now uses compact Strength / Engine icon buttons instead of letter tiles or artwork cards, and two-a-day dates still show both sessions.
+- Muted the palette by replacing bright blues with a more cohesive gold / green / graphite system.
+- Preserved the shield logo and aligned the header, mission cards, readiness panel, support card, and progress sections to the refined visual system.
+
+## 8.6.0 premium polish pass
+- Applied a second visual polish pass to the premium dashboard controls and Strength / Engine icon treatments.
+- Refined the workout experience with a more premium workout hero, control cards, and exercise card styling.
+- Updated First Flight onboarding to better match the premium dashboard through improved card treatments, step visuals, and mission-selection panels.
+
+## 8.6.0 full-app visual unification
+- Extended the premium dark / gold / green design system across the bottom navigation, Weekly Plan, Training Library, History, Performance Review, Settings, Exercise Library, and Habits screens.
+- Added clearer status hierarchy for planned, completed, rescheduled, skipped, and replaced training sessions.
+- Preserved all existing programming, storage, navigation, logging, mission, and onboarding behavior.
+
+## 8.6.0 readiness check-in refinement
+- Replaced number-entry readiness fields with fast native sliders.
+- Sleep duration uses one slider in 15-minute increments.
+- Sleep quality, energy, recovery status, motivation, and available time use consistent 1–5 scales.
+- Every 1–5 input now runs in the same direction: 1 is worst and 5 is best.
+- Replaced the inverted soreness input with a direct muscle-and-joint recovery score, where 5 means fresh and pain-free.
+- Existing readiness history is migrated into the new model.
+
+## 8.6.0 guided tour and artwork refinement
+- Reworked the guided tour to match the premium app aesthetic and current dashboard architecture.
+- Updated the tour content so it explains the new readiness sliders, unified mission module, weekly icon calendar, and current navigation model.
+- Refined artwork usage across the app by curating cleaner Strength and Engine image rotations and adding deterministic fallback artwork for dashboard and workout imagery.
+
+## 8.6.0 true artwork curation pass
+- Added a dedicated artwork-categorization layer so visuals now match the athlete's actual training path instead of rotating from generic pools.
+- Strength visuals now differentiate powerlifting / strength, hybrid athletic, tactical, functional, male physique, female physique, and endurance-support contexts.
+- Engine visuals now differentiate recovery, aerobic base, speed-oriented endurance, long-endurance, trail / loaded endurance, multisport, and mixed-modal conditioning.
+- Event missions now inherit more intentional visual identities using the event-family architecture.
+- Premium quote-card background now follows the curated Engine artwork theme, and dashboard / workout surfaces retain deterministic fallback imagery.
+
+## 8.6.0 premium guided tour redesign
+- Rebuilt the guided tour to align with the approved premium artwork direction and the current full-app design system.
+- Expanded the tour so it now walks through Home, Readiness, Today's Mission, Weekly Schedule, Training Library, Workout logging, Weekly Plan, History, and More/Settings.
+- Added custom in-repo artwork assets generated for Bell Performance and used them in both the tour and the broader artwork curation system.
+- Refined artwork curation by folding the new custom premium images into strength, hybrid, tactical, endurance, and mixed-modal visual pools.

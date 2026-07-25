@@ -3,12 +3,12 @@
 
 /* Dashboard mission and weekly schedule now use integrated artwork, not detached tiles. */
 .premium-mission-card,.premium-week-card{position:relative;isolation:isolate;overflow:hidden}
-.premium-mission-card:before,.premium-week-card:before{content:"";position:absolute;inset:0;z-index:-2;background-size:cover;background-repeat:no-repeat;filter:brightness(.48) saturate(.72);opacity:var(--bp-card-art-opacity);transform:scale(1.025)}
-.premium-mission-card:before{background-image:url('../assets/artwork/strength/custom-sled-push.jpg?v=8810');background-position:center 54%}
-.premium-week-card:before{background-image:url('../assets/artwork/engine/hill-country.jpg?v=8810');background-position:center 48%}
+.premium-mission-card:before,.premium-week-card:before{content:"";position:absolute;inset:0;z-index:-2;background-size:cover;background-repeat:no-repeat;filter:brightness(.42) saturate(.66) contrast(1.04);opacity:.38;transform:scale(1.025)}
+.premium-mission-card:before{background-image:url('../assets/artwork/strength/power-performance.jpg?v=8940');background-position:78% center}
+.premium-week-card:before{background-image:url('../assets/artwork/strength/strength-size.jpg?v=8940');background-position:72% center}
 .premium-mission-card:after,.premium-week-card:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(7,10,13,.98) 0%,rgba(7,10,13,.88) 54%,rgba(7,10,13,.60) 100%),linear-gradient(180deg,rgba(7,10,13,.35),rgba(7,10,13,.92));pointer-events:none}
 .premium-mission-card>* ,.premium-week-card>*{position:relative;z-index:1}
-.premium-mission-card{border-color:#56451f}.premium-week-card{border-color:#38452d}
+.premium-mission-card{border-color:#56451f}.premium-week-card{border-color:#4a4030}
 .premium-session-row{backdrop-filter:blur(5px);background:linear-gradient(90deg,rgba(16,23,28,.94),rgba(10,14,18,.78))}.premium-session-row.engine{background:linear-gradient(90deg,rgba(24,21,14,.93),rgba(10,14,18,.78))}
 .premium-week-day-card{backdrop-filter:blur(7px);background:linear-gradient(180deg,rgba(15,20,24,.91),rgba(8,12,15,.82))}
 

@@ -1,5 +1,5 @@
-# Bell Performance 8.7.1
+# Bell Performance 8.7.2
 
 GitHub Pages-ready Bell Performance build.
 
-This maintenance release refines First Flight by restoring required athlete measurements to page 1, replacing the disconnected readiness experience with the app's actual slider controls, and repairing secondary-goal selection with visible goal cards.
+This focused UI release streamlines page 1 of First Flight by removing the outdated setup label and required-field message, replacing them with a concise mission introduction, and tightening the spacing before the athlete profile fields. No onboarding validation, goal selection, readiness, mission generation, or training logic was changed.

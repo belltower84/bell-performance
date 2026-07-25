@@ -150,3 +150,10 @@ Replaced the visibly synthetic Today’s Mission and Weekly Schedule backgrounds
 - The editor is made visible before saved mission data is hydrated, preventing malformed legacy values from making the control appear unresponsive.
 - Reopening an already active First Flight modal now honors the requested step instead of returning early.
 - Added guarded field hydration and console diagnostics while keeping the editor usable.
+
+
+## 8.9.10 Mobile First Flight controls
+- First Flight now uses the mobile dynamic viewport height.
+- The artwork panel is hidden on narrow phones so the form and navigation controls fit reliably.
+- The Continue and Back controls remain in a dedicated footer while the form body scrolls independently.
+- Safe-area padding supports mobile Chrome and installed PWAs.

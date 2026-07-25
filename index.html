@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
-  <title>Bell Performance 8.9.11 — Mission Builder Reliability</title>
+  <title>Bell Performance 8.9.12 — Two-Path Coaching Model</title>
   <link rel="stylesheet" href="./css/app.css?v=8800">
   <link rel="stylesheet" href="./css/polish-880.css?v=8810">
 <link rel="stylesheet" href="./css/polish-881.css?v=8950">
@@ -384,7 +384,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
   <div class="modal-box first-flight-box">
     <div class="first-flight-shell">
       <header class="first-flight-header">
-        <div><span class="metric-label" id="onboardingVersion">Bell Performance 8.9.11</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
+        <div><span class="metric-label" id="onboardingVersion">Bell Performance 8.9.12</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
         <div class="first-flight-step-badge"><strong id="onboardingStepNumber">1</strong><span>of 6</span></div>
       </header>
       <div class="first-flight-progress"><i id="onboardingProgress"></i></div>
@@ -450,8 +450,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
           <p class="sub">Choose the outcome that matters right now. Your mission is the primary programming driver. After that, tell Bell Performance about your training background so the Coach Engine can choose appropriate exercise complexity, terminology, and progression without overriding the mission.</p>
           <div class="mission-path-grid" id="onboardingMissionPathGrid">
             <label class="mission-path-choice" data-mission-choice="event"><input type="radio" name="onboardingMissionPath" value="event" checked><span><strong>Specific Event</strong><small>Prepare for a dated competition, race, tournament, meet, or fitness test.</small></span></label>
-            <label class="mission-path-choice" data-mission-choice="performance"><input type="radio" name="onboardingMissionPath" value="performance"><span><strong>Performance</strong><small>Build strength, endurance, mobility, hybrid fitness, or sport-specific ability.</small></span></label>
-            <label class="mission-path-choice" data-mission-choice="bodyComposition"><input type="radio" name="onboardingMissionPath" value="bodyComposition"><span><strong>Body Composition</strong><small>Lose fat, build muscle, or pursue body recomposition without a dated event.</small></span></label>
+            <label class="mission-path-choice" data-mission-choice="development"><input type="radio" name="onboardingMissionPath" value="development"><span><strong>Performance / Body Composition</strong><small>Choose a training discipline, then add a secondary goal only when it supports the primary mission.</small></span></label>
           </div>
           <div id="onboardingEventMissionPanel" class="mission-builder-panel">
             <div class="onboarding-dual-goal-grid">
@@ -462,7 +461,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
           </div>
           <div id="onboardingDevelopmentMissionPanel" class="mission-builder-panel hidden" aria-live="polite">
             <div class="onboarding-dual-goal-grid">
-              <div class="onboarding-goal-card"><span class="metric-label" id="onboardingDevelopmentPanelLabel">Primary Outcome</span><label>Goal</label><select id="onboardingDevelopmentGoal" onchange="toggleSportGoalField();updateTrainingIdentityContext();updateOnboardingMissionPreview()"><option>Fat Loss</option><option>Muscle Building</option><option>Body Recomposition</option><option>Mobility & Longevity</option><option>Sport-Specific Performance</option><option>General Hybrid Fitness</option><option>Strength Development</option><option>Endurance Development</option></select><div id="onboardingSportGoalWrap" class="hidden"><label>Sport or activity</label><input id="onboardingSportGoal" placeholder="Hockey, lacrosse, golf, wrestling..." oninput="updateOnboardingMissionPreview()"></div><label>Priority</label><select id="onboardingDevelopmentPriority" onchange="updateOnboardingMissionPreview()"><option value="balanced" selected>Balanced and sustainable</option><option value="aggressive">Faster progress with more training demand</option><option value="minimum">Minimum effective dose</option></select></div>
+              <div class="onboarding-goal-card"><span class="metric-label" id="onboardingDevelopmentPanelLabel">Primary Discipline</span><label>Discipline</label><select id="onboardingDevelopmentGoal" onchange="toggleSportGoalField();updateTrainingIdentityContext();updateOnboardingMissionPreview()"><option>Fat Loss</option><option>Muscle Building</option><option>Body Recomposition</option><option>Mobility & Longevity</option><option>Sport-Specific Performance</option><option>General Hybrid Fitness</option><option>Strength Development</option><option>Endurance Development</option></select><div id="onboardingSportGoalWrap" class="hidden"><label>Sport or activity</label><input id="onboardingSportGoal" placeholder="Hockey, lacrosse, golf, wrestling..." oninput="updateOnboardingMissionPreview()"></div><label>Priority</label><select id="onboardingDevelopmentPriority" onchange="updateOnboardingMissionPreview()"><option value="balanced" selected>Balanced and sustainable</option><option value="aggressive">Faster progress with more training demand</option><option value="minimum">Minimum effective dose</option></select></div>
               <div class="onboarding-goal-card"><span class="metric-label">Secondary Performance Goal</span><label class="active-location-control"><span><input id="onboardingSecondaryEnabled" type="checkbox" onchange="toggleSecondaryGoalFields();updateOnboardingMissionPreview()"> Add a secondary dated goal</span></label><div id="onboardingSecondaryGoalWrap" class="hidden"><label>Secondary goal</label><select id="onboardingSecondaryGoal" onchange="updateOnboardingMissionPreview()"><option value="5K Race">Run a 5K</option><option value="10K Race">Run a 10K</option><option value="Half Marathon">Complete a half marathon</option><option value="Marathon">Complete a marathon</option><option value="Strength Benchmark">Reach a strength benchmark</option><option value="Mobility Standard">Reach a mobility standard</option><option value="Sport Performance">Improve sport performance</option><option value="Custom">Custom performance target</option></select><label>Target date</label><input id="onboardingSecondaryDate" type="date" onchange="updateOnboardingMissionPreview()"><label>Target or details</label><input id="onboardingSecondaryTarget" placeholder="Example: sub-30-minute 5K" oninput="updateOnboardingMissionPreview()"></div><label>Initial block length</label><select id="onboardingDevelopmentWeeks" onchange="updateOnboardingMissionPreview()"><option value="8">8 weeks</option><option value="12" selected>12 weeks</option><option value="16">16 weeks</option><option value="20">20 weeks</option><option value="24">24 weeks</option></select><p class="hint">The primary goal drives the program. A secondary dated goal adds the minimum effective specific work and a short peak without replacing the primary mission.</p></div>
             </div>
           </div>
@@ -560,7 +559,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 
-<script>window.BELL_APP_VERSION = "8.9.11";</script>
+<script>window.BELL_APP_VERSION = "8.9.12";</script>
 <script src="./data/workouts.js?v=8700"></script>
 <script src="./js/exercise-library.js?v=8970"></script>
 <script src="./js/storage.js?v=89100"></script>
@@ -582,7 +581,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/habits.js?v=8700"></script>
 <script src="./js/dual-goals.js?v=8700"></script>
 <script src="./js/version-8.js?v=8700"></script>
-<script src="./js/mission-planner.js?v=89110"></script>
+<script src="./js/mission-planner.js?v=89120"></script>
 <script src="./js/coaching-pathways.js?v=8700"></script>
 <script src="./js/event-coaching.js?v=8700"></script>
 <script src="./js/how-to.js?v=8700"></script>

@@ -165,3 +165,8 @@ Replaced the visibly synthetic Today’s Mission and Weekly Schedule backgrounds
 - Performance and Body Composition use their own filtered goal lists.
 - Added delegated mobile-safe click/change handling and saved-profile migration.
 - Updated the service-worker cache to prevent stale mission logic from being served.
+
+
+## 8.9.12 Two-path coaching model
+
+First Flight now presents exactly two mission choices: Specific Event or Performance / Body Composition. The second path asks the athlete to select one primary discipline from the combined performance and body-composition disciplines, with an optional secondary dated goal when useful. Existing saved performance or body-composition missions migrate into the combined path.

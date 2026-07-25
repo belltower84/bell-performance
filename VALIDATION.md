@@ -148,3 +148,12 @@
 - Verified Performance and Body Composition populate distinct valid goal sets.
 - Verified older `development` missions migrate to the appropriate choice.
 - Verified mission choice remains compatible with the existing training engine.
+
+
+## 8.9.12 Two-path mission validation
+
+- First Flight exposes exactly two top-level mission choices.
+- Specific Event opens the dated event builder.
+- Performance / Body Composition opens one combined discipline selector.
+- Optional secondary goal remains available without becoming a third coaching path.
+- Existing saved development missions restore into the combined path.

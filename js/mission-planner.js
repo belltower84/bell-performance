@@ -56,27 +56,32 @@ function addMissionEngineGoal(mode, profile) {
   ["Sprint / Field",{id:"custom-event",label:"Custom Event Conditioning",weeks:12,level:"sport",description:"General base and event-specific work-to-rest conditioning."}]
 ].forEach(([mode,profile])=>addMissionEngineGoal(mode,profile));
 
-const PERFORMANCE_DEVELOPMENT_GOALS = ["Mobility & Longevity","Sport-Specific Performance","General Hybrid Fitness","Strength Development","Endurance Development"];
-const BODY_COMPOSITION_GOALS = ["Fat Loss","Muscle Building","Body Recomposition"];
+const DEVELOPMENT_DISCIPLINES = [
+  "General Hybrid Fitness",
+  "Strength Development",
+  "Endurance Development",
+  "Sport-Specific Performance",
+  "Mobility & Longevity",
+  "Fat Loss",
+  "Muscle Building",
+  "Body Recomposition"
+];
 
 function onboardingMissionChoice() {
-  return document.querySelector('input[name="onboardingMissionPath"]:checked')?.value || "event";
+  const value=document.querySelector('input[name="onboardingMissionPath"]:checked')?.value || "event";
+  return value==="event" ? "event" : "development";
 }
 function onboardingMissionPath() {
-  return onboardingMissionChoice()==="event" ? "event" : "development";
+  return onboardingMissionChoice();
 }
-function missionChoiceForDevelopmentGoal(goal) {
-  return BODY_COMPOSITION_GOALS.includes(goal) ? "bodyComposition" : "performance";
-}
-function setDevelopmentGoalOptions(choice,{preserve=true}={}) {
+function setDevelopmentGoalOptions(_choice,{preserve=true}={}) {
   const select=byId("onboardingDevelopmentGoal");
   if(!select)return;
   const current=select.value;
-  const goals=choice==="bodyComposition"?BODY_COMPOSITION_GOALS:PERFORMANCE_DEVELOPMENT_GOALS;
-  select.innerHTML=goals.map(goal=>`<option value="${escapeHtml(goal)}">${escapeHtml(goal)}</option>`).join("");
-  select.value=preserve&&goals.includes(current)?current:(choice==="bodyComposition"?"Body Recomposition":"General Hybrid Fitness");
+  select.innerHTML=DEVELOPMENT_DISCIPLINES.map(goal=>`<option value="${escapeHtml(goal)}">${escapeHtml(goal)}</option>`).join("");
+  select.value=preserve&&DEVELOPMENT_DISCIPLINES.includes(current)?current:"General Hybrid Fitness";
   const label=byId("onboardingDevelopmentPanelLabel");
-  if(label)label.textContent=choice==="bodyComposition"?"Primary Body-Composition Outcome":"Primary Performance Outcome";
+  if(label)label.textContent="Primary Discipline";
 }
 function renderOnboardingMissionState({preserveGoal=true}={}) {
   const choice=onboardingMissionChoice();
@@ -88,7 +93,7 @@ function renderOnboardingMissionState({preserveGoal=true}={}) {
     card.classList.toggle("active",active);
     card.setAttribute("aria-selected",String(active));
   });
-  if(!eventPath)setDevelopmentGoalOptions(choice,{preserve:preserveGoal});
+  if(!eventPath)setDevelopmentGoalOptions("development",{preserve:preserveGoal});
   try{toggleSportGoalField();}catch(error){console.warn("Mission sport field update failed",error);}
   try{updateTrainingIdentityContext();}catch(error){console.warn("Mission identity preview failed",error);}
   try{updateOnboardingMissionPreview();}catch(error){console.warn("Mission preview failed",error);}
@@ -192,9 +197,9 @@ function updateOnboardingMissionPreview(){
 function loadOnboardingDualGoals(){
   const mission=data.trainingBlock?.mission||{};
   const savedPath=mission.path||"event";
-  const choice=savedPath==="event"?"event":missionChoiceForDevelopmentGoal(mission.developmentGoal||"");
+  const choice=savedPath==="event"?"event":"development";
   const radio=document.querySelector(`input[name="onboardingMissionPath"][value="${choice}"]`);if(radio)radio.checked=true;
-  if(choice!=="event")setDevelopmentGoalOptions(choice,{preserve:false});
+  if(choice!=="event")setDevelopmentGoalOptions("development",{preserve:false});
   if(mission.eventType&&byId("onboardingEventType"))byId("onboardingEventType").value=mission.eventType;
   if(byId("onboardingEventName"))byId("onboardingEventName").value=mission.eventName||"";
   if(byId("onboardingEventDate"))byId("onboardingEventDate").value=mission.eventDate||"";

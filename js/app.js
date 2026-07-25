@@ -42,7 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Explicit listeners back up the inline controls and make Mission / Block
   // editing reliable in installed PWAs and browsers with stricter event policies.
-  document.getElementById("editMissionButton")?.addEventListener("click", openMissionEditor);
+  const editMissionButton=document.getElementById("editMissionButton");
+  if(editMissionButton&&!editMissionButton.hasAttribute("onclick"))editMissionButton.addEventListener("click", openMissionEditor);
   document.getElementById("adjustBlockButton")?.addEventListener("click", focusBlockEditor);
 
   setTimeout(() => { maybePromptDailyReadiness(); openPendingSessionFeedback(); }, 250);

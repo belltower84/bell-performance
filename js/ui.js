@@ -495,12 +495,12 @@ function closeCompetingModalsForEditor(){
   ["howToModal","recoveryClearanceModal","workoutModal","exerciseLibraryModal"].forEach(id=>byId(id)?.classList.add("hidden"));
   document.body.classList.remove("modal-open");
 }
-function openMissionEditor(){
+function openMissionEditor(event){
+  if(event){event.preventDefault();event.stopPropagation();}
   missionEditorActive=true;
   closeCompetingModalsForEditor();
-  const modal=byId("onboardingModal");
-  if(modal)modal.classList.add("hidden");
-  openFirstFlight(3);
+  const opened=openFirstFlight(3);
+  if(!opened)missionEditorActive=false;
 }
 function focusBlockEditor(){
   closeCompetingModalsForEditor();
@@ -616,31 +616,55 @@ function saveCoachMessagePreferences() {
 let onboardingStep=0;
 let missionEditorActive=false;
 function openFirstFlight(startStep=null){
-  const modal=byId("onboardingModal"); if(!modal)return; if(!modal.classList.contains("hidden")){renderOnboardingStep();return;}
-  byId("onboardingAthleteName").value=data.settings.athleteName||"";
-  byId("onboardingSex").value=data.settings.sex||"Prefer not to say";
-  if(byId("onboardingAthleteMode"))byId("onboardingAthleteMode").value=data.settings.athleteMode||"Hybrid Athlete";
-  renderAthleteTypeDescription("onboardingAthleteMode", "onboardingAthleteModeDescription");
-  if(typeof updateTrainingIdentityContext==="function")updateTrainingIdentityContext();
-  byId("onboardingAge").value=data.nutrition.age||"";
-  byId("onboardingBodyweight").value=data.settings.weight||"";
-  const totalHeight=Number(data.nutrition.height)||0;
-  byId("onboardingHeightFeet").value=totalHeight?Math.floor(totalHeight/12):"";
-  byId("onboardingHeightInches").value=totalHeight?totalHeight%12:"";
-  byId("onboardingGoalWeight").value=data.settings.goal||"";
-  const onboardingMaxes=data.settings.maxes||{};
-  byId("onboardingBenchMax").value=onboardingMaxes.bench??"";
-  byId("onboardingSquatMax").value=onboardingMaxes.squat??"";
-  byId("onboardingDeadliftMax").value=onboardingMaxes.deadlift??"";
-  byId("onboardingPushPressMax").value=onboardingMaxes.pushPress??"";
-  byId("onboardingMessageStyle").value=data.settings.coachMessages?.style||"Performance";
-  byId("onboardingScriptureFrequency").value=data.settings.coachMessages?.scriptureFrequency||"Occasionally";
-  toggleOnboardingScripture();
-  loadOnboardingInjuryProfile();
-  if(typeof initializeOnboardingLocationEditor==="function")initializeOnboardingLocationEditor();
-  loadOnboardingDualGoals();
+  const modal=byId("onboardingModal");
+  if(!modal){
+    alert("The mission editor could not be opened because the First Flight panel is unavailable. Reload the app and try again.");
+    return false;
+  }
+
+  // Always honor the requested destination. The prior implementation returned
+  // early whenever the modal was already considered open, which could leave the
+  // editor on a hidden or unrelated First Flight step.
   const resolvedStep=startStep===null?(data.settings.firstFlightStage==="configure"?2:0):Number(startStep);
-  onboardingStep=Math.max(0,Math.min(5,resolvedStep));renderOnboardingStep();modal.classList.remove("hidden");document.body.classList.add("modal-open");
+  onboardingStep=Math.max(0,Math.min(5,Number.isFinite(resolvedStep)?resolvedStep:0));
+  modal.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+  renderOnboardingStep();
+
+  try{
+    const setValue=(id,value)=>{const element=byId(id);if(element)element.value=value??"";};
+    setValue("onboardingAthleteName",data.settings.athleteName||"");
+    setValue("onboardingSex",data.settings.sex||"Prefer not to say");
+    setValue("onboardingAthleteMode",data.settings.athleteMode||"Hybrid Athlete");
+    if(typeof renderAthleteTypeDescription==="function")renderAthleteTypeDescription("onboardingAthleteMode", "onboardingAthleteModeDescription");
+    if(typeof updateTrainingIdentityContext==="function")updateTrainingIdentityContext();
+    setValue("onboardingAge",data.nutrition.age||"");
+    setValue("onboardingBodyweight",data.settings.weight||"");
+    const totalHeight=Number(data.nutrition.height)||0;
+    setValue("onboardingHeightFeet",totalHeight?Math.floor(totalHeight/12):"");
+    setValue("onboardingHeightInches",totalHeight?totalHeight%12:"");
+    setValue("onboardingGoalWeight",data.settings.goal||"");
+    const onboardingMaxes=data.settings.maxes||{};
+    setValue("onboardingBenchMax",onboardingMaxes.bench??"");
+    setValue("onboardingSquatMax",onboardingMaxes.squat??"");
+    setValue("onboardingDeadliftMax",onboardingMaxes.deadlift??"");
+    setValue("onboardingPushPressMax",onboardingMaxes.pushPress??"");
+    setValue("onboardingMessageStyle",data.settings.coachMessages?.style||"Performance");
+    setValue("onboardingScriptureFrequency",data.settings.coachMessages?.scriptureFrequency||"Occasionally");
+    if(typeof toggleOnboardingScripture==="function")toggleOnboardingScripture();
+    if(typeof loadOnboardingInjuryProfile==="function")loadOnboardingInjuryProfile();
+    if(typeof initializeOnboardingLocationEditor==="function")initializeOnboardingLocationEditor();
+    if(typeof loadOnboardingDualGoals==="function")loadOnboardingDualGoals();
+    renderOnboardingStep();
+    return true;
+  }catch(error){
+    console.error("First Flight editor hydration failed:",error);
+    // Keep the requested editor visible even if a legacy saved value cannot be
+    // hydrated. This allows the athlete to revise and save the mission instead
+    // of experiencing a button that appears to do nothing.
+    renderOnboardingStep();
+    return true;
+  }
 }
 function renderOnboardingStep(){
   document.querySelectorAll("[data-onboarding-step]").forEach((step,index)=>step.classList.toggle("active",index===onboardingStep));

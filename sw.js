@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-8.9.8";
+const CACHE_NAME = "bell-performance-8.9.9";
 const CORE = [
   "./",
   "./index.html",
@@ -26,7 +26,7 @@ const CORE = [
   "./assets/artwork/strength/power-performance.jpg?v=8940",
   "./assets/artwork/strength/strength-size.jpg?v=8940",
   "./data/workouts.js?v=8800",
-  "./js/storage.js?v=8980",
+  "./js/storage.js?v=8990",
   "./js/exercise-library.js?v=8800",
   "./js/readiness.js?v=8800",
   "./js/equipment.js?v=8800",
@@ -41,7 +41,7 @@ const CORE = [
   "./js/performance-review.js?v=8800",
   "./js/artwork.js?v=8800",
   "./js/quote-cache.js?v=8800",
-  "./js/ui.js?v=8980",
+  "./js/ui.js?v=8990",
   "./js/habits.js?v=8800",
   "./js/dual-goals.js?v=8800",
   "./js/version-8.js?v=8800",
@@ -50,7 +50,7 @@ const CORE = [
   "./js/event-coaching.js?v=8800",
   "./js/how-to.js?v=8800",
   "./js/premium-dashboard.js?v=8800",
-  "./js/app.js?v=8980"
+  "./js/app.js?v=8990"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

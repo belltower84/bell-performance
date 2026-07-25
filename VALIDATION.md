@@ -126,3 +126,11 @@
 - Every generated exercise record now includes teaching content and media hooks.
 - Exercise detail layout supports future animation and video URLs.
 - Version and service-worker cache identifiers updated to 8.9.8.
+
+
+## 8.9.9 Mission editor reliability
+
+- Edit Mission / Event now uses a direct button handler and always opens First Flight at the Mission step.
+- The editor is made visible before saved mission data is hydrated, preventing malformed legacy values from making the control appear unresponsive.
+- Reopening an already active First Flight modal now honors the requested step instead of returning early.
+- Added guarded field hydration and console diagnostics while keeping the editor usable.

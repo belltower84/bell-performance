@@ -142,3 +142,11 @@ Replaced the visibly synthetic Today’s Mission and Weekly Schedule backgrounds
 - Added exercise-specific teaching templates for squat, hinge, presses, pulls, single-leg work, arms, running, conditioning machines, jumps, core, carries, calves, and shoulder isolation.
 - Added media-ready fields for thumbnails, looping animations, and full coaching videos.
 - Added a movement-demonstration placeholder in every exercise detail page so future media can be added without rebuilding the interface or data model.
+
+
+## 8.9.9 Mission editor reliability
+
+- Edit Mission / Event now uses a direct button handler and always opens First Flight at the Mission step.
+- The editor is made visible before saved mission data is hydrated, preventing malformed legacy values from making the control appear unresponsive.
+- Reopening an already active First Flight modal now honors the requested step instead of returning early.
+- Added guarded field hydration and console diagnostics while keeping the editor usable.

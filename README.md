@@ -134,3 +134,11 @@ Replaced the visibly synthetic Today’s Mission and Weekly Schedule backgrounds
 - Four-day schedules now enforce Tuesday, Thursday, and Sunday as recovery anchors.
 - Existing uncompleted weeks generated with Friday as a rest day are migrated automatically without deleting completed sessions.
 - New weeks continue to use the corrected schedule protocol.
+
+## 8.9.8 Exercise Intelligence Library
+
+- Rebuilt exercise entries as practical teaching guides rather than generic descriptions.
+- Added movement purpose, detailed setup, step-by-step execution, coaching cues, common mistakes, breathing and bracing, regressions, progressions, substitution guidance, and stop/modify guidance.
+- Added exercise-specific teaching templates for squat, hinge, presses, pulls, single-leg work, arms, running, conditioning machines, jumps, core, carries, calves, and shoulder isolation.
+- Added media-ready fields for thumbnails, looping animations, and full coaching videos.
+- Added a movement-demonstration placeholder in every exercise detail page so future media can be added without rebuilding the interface or data model.

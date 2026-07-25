@@ -196,21 +196,35 @@ function importData(event) {
   reader.readAsText(file);
 }
 
-function resetApp() {
-  if (!confirm("Reset all Bell Performance data on this device?")) return;
-  localStorage.removeItem(STORAGE_KEY);
+async function resetApp() {
+  if (!confirm("Reset all Bell Performance data on this device? This clears the athlete profile, active block, history, readiness, and settings.")) return;
+
+  // Clear every Bell Performance key so First Flight behaves like a true first launch.
+  Object.keys(localStorage).forEach(key => {
+    if (key === STORAGE_KEY || key.startsWith("bellPerformance")) localStorage.removeItem(key);
+  });
+  sessionStorage.setItem("bellPerformanceForceFirstFlight", "1");
+
   data = cloneDefaults();
-  delete data.missionPlan;
-  data.settings.maxes = { bench:null, squat:null, deadlift:null, pushPress:null };
-  data.mission = { goalWorkouts:null, goalMobility:null, goalPullups:null, goal5k:null, currentPullups:null, current5k:null };
-  data.trainingBlock = cloneDefaults().trainingBlock;
-  data.plan = [];
-  data.history = [];
-  data.exerciseProgression = {};
-  data.exerciseIntelligence = { replacements:[], personalConstraints:[] };
-  data.habits.targets = {proteinGrams:0,hydrationOz:0,steps:0,sleepHours:0,mobilityMinutes:0,customized:false};
+  normalizeData();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  window.location.reload();
+
+  // Remove stale app-shell caches and service workers before reloading. Older cached
+  // scripts were able to restore a completed setup state after a reset.
+  try {
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter(key => key.startsWith("bell-performance-")).map(key => caches.delete(key)));
+    }
+    if ("serviceWorker" in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(registration => registration.unregister()));
+    }
+  } catch (error) {
+    console.warn("Bell Performance reset cleanup was partially blocked:", error);
+  }
+
+  window.location.replace(`${window.location.pathname}?reset=${Date.now()}`);
 }
 
 normalizeData();

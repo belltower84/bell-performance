@@ -119,3 +119,10 @@
 - Verified four-day rest anchors are Tuesday, Thursday, and Sunday.
 - Added migration logic for previously generated uncompleted weeks with incorrect rest placement.
 - Version and cache identifiers updated to 8.9.6.
+
+## 8.9.8 checks
+
+- Exercise library JavaScript syntax validated.
+- Every generated exercise record now includes teaching content and media hooks.
+- Exercise detail layout supports future animation and video URLs.
+- Version and service-worker cache identifiers updated to 8.9.8.

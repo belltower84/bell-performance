@@ -32,6 +32,19 @@ document.addEventListener("DOMContentLoaded", () => {
   if(data.trainingBlock?.enabled&&!hasCompletedCurrentPlan&&typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();
   if(typeof updateAdaptiveTrainingState==="function")updateAdaptiveTrainingState({save:false});
   renderApp();
+
+  // A true reset always returns the athlete to First Flight, even when an older
+  // service worker or guide preference was previously stored.
+  if (sessionStorage.getItem("bellPerformanceForceFirstFlight") === "1") {
+    sessionStorage.removeItem("bellPerformanceForceFirstFlight");
+    window.setTimeout(() => openFirstFlight(0), 120);
+  }
+
+  // Explicit listeners back up the inline controls and make Mission / Block
+  // editing reliable in installed PWAs and browsers with stricter event policies.
+  document.getElementById("editMissionButton")?.addEventListener("click", openMissionEditor);
+  document.getElementById("adjustBlockButton")?.addEventListener("click", focusBlockEditor);
+
   setTimeout(() => { maybePromptDailyReadiness(); openPendingSessionFeedback(); }, 250);
 
   if ("serviceWorker" in navigator) {

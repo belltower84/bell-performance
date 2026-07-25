@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
-  <title>Bell Performance 8.9.6 — Adaptive Training</title>
+  <title>Bell Performance 8.9.7 — Exercise Intelligence</title>
   <link rel="stylesheet" href="./css/app.css?v=8800">
   <link rel="stylesheet" href="./css/polish-880.css?v=8810">
 <link rel="stylesheet" href="./css/polish-881.css?v=8950">
@@ -189,7 +189,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <section id="exerciseLibrary" class="screen">
   <div class="bp-screen-hero" data-hero-screen="exerciseLibrary"></div>
   <div class="section-heading bp-fallback-title"><div><span class="metric-label">Movement Education & Substitution</span><h2 class="section-title">Exercise Intelligence Library</h2></div><button type="button" onclick="showScreen('more')">Settings ›</button></div>
-  <div class="card exercise-library-intro"><div><h3>Understand it. Perform it. Replace it intelligently.</h3><p class="sub">Search every movement currently used by Bell Performance. Open an exercise for setup, execution, muscles trained, common mistakes, and purpose-matched alternatives.</p></div><div class="library-count"><strong id="exerciseLibraryCount">0</strong><span>movements</span></div></div>
+  <div class="card exercise-library-intro"><div><h3>Understand it. Perform it. Replace it intelligently.</h3><p class="sub">Search every movement currently used by Bell Performance. Open an exercise for its purpose, detailed setup, step-by-step execution, breathing, coaching cues, common mistakes, regressions, progressions, and purpose-matched alternatives.</p></div><div class="library-count"><strong id="exerciseLibraryCount">0</strong><span>movements</span></div></div>
   <div class="card exercise-library-controls">
     <label class="library-search">Search exercises<input id="exerciseLibrarySearch" type="search" placeholder="Try squat, chest, dumbbell, running…" oninput="renderExerciseLibrary()"></label>
     <div class="library-filter-grid"><label>Movement pattern<select id="exercisePatternFilter" onchange="renderExerciseLibrary()"><option value="all">All patterns</option></select></label><label>Equipment<select id="exerciseEquipmentFilter" onchange="renderExerciseLibrary()"><option value="all">All equipment</option></select></label><label>Training role<select id="exerciseRoleFilter" onchange="renderExerciseLibrary()"><option value="all">All roles</option><option value="strength">Strength</option><option value="hypertrophy">Hypertrophy</option><option value="power">Power</option><option value="conditioning">Conditioning</option><option value="mobility">Mobility</option></select></label></div>
@@ -252,7 +252,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 
   <div class="card mission-management-card">
     <div class="status-line"><div><span class="metric-label">Active Programming</span><h3>Mission & Block Management</h3><div id="activeMissionManagementSummary" class="mission-title">No active block</div><div id="activeMissionManagementDetail" class="hint">Create or edit a mission without resetting app data.</div></div></div>
-    <div class="row three"><button type="button" onclick="openMissionEditor()">Edit Mission / Event</button><button type="button" class="secondary" onclick="focusBlockEditor()">Adjust Current Block</button><button type="button" class="secondary" onclick="startFreshBlockFromCurrentMission()">Restart Block at Week 1</button></div>
+    <div class="row three"><button type="button" id="editMissionButton">Edit Mission / Event</button><button type="button" id="adjustBlockButton" class="secondary">Adjust Current Block</button><button type="button" class="secondary" onclick="startFreshBlockFromCurrentMission()">Restart Block at Week 1</button></div>
     <div class="hint">Editing or restarting a block preserves workout history, milestones, habits, equipment, readiness, and athlete settings.</div>
   </div>
 
@@ -384,7 +384,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
   <div class="modal-box first-flight-box">
     <div class="first-flight-shell">
       <header class="first-flight-header">
-        <div><span class="metric-label" id="onboardingVersion">Bell Performance 8.9.4</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
+        <div><span class="metric-label" id="onboardingVersion">Bell Performance 8.9.8</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
         <div class="first-flight-step-badge"><strong id="onboardingStepNumber">1</strong><span>of 6</span></div>
       </header>
       <div class="first-flight-progress"><i id="onboardingProgress"></i></div>
@@ -559,10 +559,10 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 
-<script>window.BELL_APP_VERSION = "8.9.6";</script>
+<script>window.BELL_APP_VERSION = "8.9.8";</script>
 <script src="./data/workouts.js?v=8700"></script>
-<script src="./js/exercise-library.js?v=8700"></script>
-<script src="./js/storage.js?v=8700"></script>
+<script src="./js/exercise-library.js?v=8970"></script>
+<script src="./js/storage.js?v=8980"></script>
 <script src="./js/readiness.js?v=8700"></script>
 <script src="./js/equipment.js?v=8700"></script>
 <script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");</script>
@@ -577,7 +577,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/performance-review.js?v=8700"></script>
 <script src="./js/artwork.js?v=8700"></script>
 <script src="./js/quote-cache.js?v=8700"></script>
-<script src="./js/ui.js?v=8700"></script>
+<script src="./js/ui.js?v=8980"></script>
 <script src="./js/habits.js?v=8700"></script>
 <script src="./js/dual-goals.js?v=8700"></script>
 <script src="./js/version-8.js?v=8700"></script>
@@ -589,6 +589,6 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/premium-dashboard.js?v=8950"></script>
 <script src="./js/polish-880.js?v=8810"></script>
 <script src="./js/polish-881.js?v=8810"></script>
-<script src="./js/app.js?v=8800"></script>
+<script src="./js/app.js?v=8980"></script>
 </body>
 </html>

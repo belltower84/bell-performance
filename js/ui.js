@@ -491,8 +491,30 @@ function missionManagementText(){
   const detail=`Week ${b.currentWeek||1} of ${b.lengthWeeks||12} • ${b.strengthDays||0} Strength • ${b.runDays||0} Engine${m?.eventDate?` • Event ${m.eventDate}`:""}`;
   return {title,detail};
 }
-function openMissionEditor(){missionEditorActive=true;openFirstFlight(3);}
-function focusBlockEditor(){showScreen("more");window.setTimeout(()=>document.querySelector(".dual-goal-builder")?.scrollIntoView({behavior:"smooth",block:"start"}),80);}
+function closeCompetingModalsForEditor(){
+  ["howToModal","recoveryClearanceModal","workoutModal","exerciseLibraryModal"].forEach(id=>byId(id)?.classList.add("hidden"));
+  document.body.classList.remove("modal-open");
+}
+function openMissionEditor(){
+  missionEditorActive=true;
+  closeCompetingModalsForEditor();
+  const modal=byId("onboardingModal");
+  if(modal)modal.classList.add("hidden");
+  openFirstFlight(3);
+}
+function focusBlockEditor(){
+  closeCompetingModalsForEditor();
+  showScreen("more");
+  const editor=document.querySelector(".dual-goal-builder");
+  if(!editor){alert("The current block editor could not be opened. Reload the app and try again.");return;}
+  editor.classList.add("editor-focus-pulse");
+  window.setTimeout(()=>{
+    editor.scrollIntoView({behavior:"smooth",block:"start"});
+    const first=editor.querySelector("select,input,button");
+    if(first)first.focus({preventScroll:true});
+  },120);
+  window.setTimeout(()=>editor.classList.remove("editor-focus-pulse"),1600);
+}
 function startFreshBlockFromCurrentMission(){
   if(!data.trainingBlock?.enabled){openMissionEditor();return;}
   if(!confirm("Restart the active mission at Week 1? Workout history and all other app data will be preserved."))return;
@@ -594,7 +616,7 @@ function saveCoachMessagePreferences() {
 let onboardingStep=0;
 let missionEditorActive=false;
 function openFirstFlight(startStep=null){
-  const modal=byId("onboardingModal"); if(!modal||!modal.classList.contains("hidden"))return;
+  const modal=byId("onboardingModal"); if(!modal)return; if(!modal.classList.contains("hidden")){renderOnboardingStep();return;}
   byId("onboardingAthleteName").value=data.settings.athleteName||"";
   byId("onboardingSex").value=data.settings.sex||"Prefer not to say";
   if(byId("onboardingAthleteMode"))byId("onboardingAthleteMode").value=data.settings.athleteMode||"Hybrid Athlete";

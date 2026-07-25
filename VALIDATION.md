@@ -157,3 +157,11 @@
 - Performance / Body Composition opens one combined discipline selector.
 - Optional secondary goal remains available without becoming a third coaching path.
 - Existing saved development missions restore into the combined path.
+
+
+## 8.9.13 Mission path expansion
+- First Flight initially displays exactly two mission choices: Train for an Event and Performance / Body Composition.
+- Selecting a choice hides the other choice and expands only the selected mission path.
+- Change Mission Type returns to the original two-choice screen without deleting saved mission fields.
+- Existing event and development mission data hydrates the correct selected path in Edit Mission / Event.
+- Service-worker cache version advanced to 8.9.13.

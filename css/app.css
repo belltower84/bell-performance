@@ -401,3 +401,11 @@ html{scroll-behavior:smooth}body{background:radial-gradient(circle at 50% -10%,#
 /* 8.9.11 mission builder state */
 .mission-path-choice.active span{border-color:#d6ae59;box-shadow:0 0 0 2px rgba(214,174,89,.18);background:rgba(214,174,89,.08)}
 @media(max-width:900px){.mission-path-grid{grid-template-columns:1fr}}
+
+
+/* 8.9.13 — Two-choice mission expansion */
+.mission-path-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mission-path-grid.has-selection{grid-template-columns:1fr}
+.mission-path-choice.mission-choice-collapsed{display:none}
+.mission-type-change{display:block;width:max-content;margin:10px 0 4px}
+@media(max-width:720px){.mission-type-change{width:100%;min-height:46px}}

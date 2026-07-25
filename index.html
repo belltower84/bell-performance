@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Bell Performance" />
   <link rel="manifest" href="manifest.json" />
-  <title>Bell Performance 8.9.12 — Two-Path Coaching Model</title>
+  <title>Bell Performance 8.9.13 — Mission Path Selection</title>
   <link rel="stylesheet" href="./css/app.css?v=8800">
   <link rel="stylesheet" href="./css/polish-880.css?v=8810">
 <link rel="stylesheet" href="./css/polish-881.css?v=8950">
@@ -384,7 +384,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
   <div class="modal-box first-flight-box">
     <div class="first-flight-shell">
       <header class="first-flight-header">
-        <div><span class="metric-label" id="onboardingVersion">Bell Performance 8.9.12</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
+        <div><span class="metric-label" id="onboardingVersion">Bell Performance 8.9.13</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
         <div class="first-flight-step-badge"><strong id="onboardingStepNumber">1</strong><span>of 6</span></div>
       </header>
       <div class="first-flight-progress"><i id="onboardingProgress"></i></div>
@@ -449,10 +449,11 @@ main{display:block}.screen{display:none}.screen.active{display:block}
           <span class="first-flight-kicker">Flight Check 04</span><h3>Choose your mission</h3>
           <p class="sub">Choose the outcome that matters right now. Your mission is the primary programming driver. After that, tell Bell Performance about your training background so the Coach Engine can choose appropriate exercise complexity, terminology, and progression without overriding the mission.</p>
           <div class="mission-path-grid" id="onboardingMissionPathGrid">
-            <label class="mission-path-choice" data-mission-choice="event"><input type="radio" name="onboardingMissionPath" value="event" checked><span><strong>Specific Event</strong><small>Prepare for a dated competition, race, tournament, meet, or fitness test.</small></span></label>
+            <label class="mission-path-choice" data-mission-choice="event"><input type="radio" name="onboardingMissionPath" value="event"><span><strong>Train for an Event</strong><small>Prepare for a dated competition, race, tournament, meet, or fitness test.</small></span></label>
             <label class="mission-path-choice" data-mission-choice="development"><input type="radio" name="onboardingMissionPath" value="development"><span><strong>Performance / Body Composition</strong><small>Choose a training discipline, then add a secondary goal only when it supports the primary mission.</small></span></label>
           </div>
-          <div id="onboardingEventMissionPanel" class="mission-builder-panel">
+          <button type="button" id="onboardingChangeMissionType" class="secondary mission-type-change hidden" onclick="changeOnboardingMissionType()">Change Mission Type</button>
+          <div id="onboardingEventMissionPanel" class="mission-builder-panel hidden">
             <div class="onboarding-dual-goal-grid">
               <div class="onboarding-goal-card"><span class="metric-label">Target Event</span><label>Event type</label><select id="onboardingEventType" onchange="updateEventContextFields();updateTrainingIdentityContext();updateOnboardingMissionPreview()"><option>HYROX</option><option>CrossFit Competition</option><option>Powerlifting Meet</option><option>Strongman Competition</option><option>Bodybuilding / Physique Competition</option><option>Combat Sports Tournament</option><option>Marathon</option><option>Half Marathon</option><option>10K Race</option><option>5K Race</option><option>Triathlon</option><option>Obstacle Course Race</option><option>Tactical Games</option><option>Military / Law-Enforcement Fitness Test</option><option>Custom Sport Event</option></select><label>Event name</label><input id="onboardingEventName" placeholder="Example: HYROX Dallas" oninput="updateOnboardingMissionPreview()"><label>Event date</label><input id="onboardingEventDate" type="date" onchange="updateOnboardingMissionPreview()"></div>
               <div class="onboarding-goal-card"><span class="metric-label">Competition Context</span><label>Experience level</label><select id="onboardingEventExperience" onchange="updateOnboardingMissionPreview()"><option value="first">First event / novice</option><option value="intermediate" selected>Some experience</option><option value="advanced">Experienced competitor</option></select><label>Primary objective</label><select id="onboardingEventObjective" onchange="updateOnboardingMissionPreview()"><option value="complete">Complete confidently</option><option value="perform" selected>Perform at my best</option><option value="podium">Compete for placing / podium</option></select><label>Division, weight class, or distance</label><input id="onboardingEventDivision" placeholder="Optional — division, class, or distance" oninput="updateOnboardingMissionPreview()"></div>
@@ -559,7 +560,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 
-<script>window.BELL_APP_VERSION = "8.9.12";</script>
+<script>window.BELL_APP_VERSION = "8.9.13";</script>
 <script src="./data/workouts.js?v=8700"></script>
 <script src="./js/exercise-library.js?v=8970"></script>
 <script src="./js/storage.js?v=89100"></script>
@@ -581,7 +582,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/habits.js?v=8700"></script>
 <script src="./js/dual-goals.js?v=8700"></script>
 <script src="./js/version-8.js?v=8700"></script>
-<script src="./js/mission-planner.js?v=89120"></script>
+<script src="./js/mission-planner.js?v=89130"></script>
 <script src="./js/coaching-pathways.js?v=8700"></script>
 <script src="./js/event-coaching.js?v=8700"></script>
 <script src="./js/how-to.js?v=8700"></script>

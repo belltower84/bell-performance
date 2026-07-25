@@ -11,7 +11,7 @@ function premiumSessionType(session){return scheduleTypeForMission(session?.miss
 function premiumInlineIcon(kind){
   const icons={
     strength:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6"/><path d="M6 7v10"/><path d="M9 6v12"/><path d="M15 6v12"/><path d="M18 7v10"/><path d="M21 9v6"/><path d="M9 12h6"/></svg>`,
-    engine:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5c2.1-5.9 4.8-8.9 8.1-8.9 2.2 0 3.4 1.4 4.7 1.4 1.1 0 2.1-.8 3.2-2.4"/><path d="M4 17.5h5.2"/><path d="M14.8 17.5H20"/><path d="m12.5 5.5 2.2 3.1-2.2 3.1"/><circle cx="4" cy="17.5" r="1.35"/><circle cx="20" cy="7.6" r="1.35"/></svg>`,
+    engine:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15.2c2.8.1 4.6-.6 6.1-2.3l1.8-2.1 1.3 2.5c.7 1.3 1.9 2.1 3.4 2.3l1.9.3c.9.1 1.5.9 1.5 1.8 0 1.1-.9 1.9-2 1.9H6.1C4.4 19.6 3 18.2 3 16.5c0-.8.8-1.4 2-1.3Z"/><path d="M8.7 15.1 7.5 11.5"/><path d="m10.8 13.2-1.5-3.5"/><path d="M14.2 17.2h4.2"/><path d="M4.2 17.1h3.2"/></svg>`,
     core:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4c1.8 2.7 5.2 2.7 7 5.4-1.3 1.9-1.3 4.1 0 6-1.8 2.7-5.2 2.7-7 5.4-1.8-2.7-5.2-2.7-7-5.4 1.3-1.9 1.3-4.1 0-6C6.8 6.7 10.2 6.7 12 4Z"/></svg>`,
     rest:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12c0 3.3 2.7 6 6 6 2.8 0 5.2-1.9 5.9-4.5A7 7 0 0 1 10.5 6 6 6 0 0 0 6 12Z"/></svg>`
   };
@@ -124,6 +124,25 @@ function renderPremiumWeek(){
   renderPremiumWeekAdvance();
 }
 
+
+function renderPremiumCycle(){
+  const block=data.trainingBlock||{},card=byId('premiumCycleCard');if(!card)return;
+  if(!block.enabled){
+    setText('premiumCycleName','No active training block');setText('premiumCyclePhase','Open Plan');setText('premiumCycleWeek','—');setText('premiumCycleFocus','Build a goal-based plan in More.');setText('premiumCycleProgressPct','0%');setText('premiumCycleEstimate','Progress begins when a block is created.');setText('premiumCycleWeekProgress','0 of 0 workouts completed');
+    const bar=byId('premiumCycleProgressBar');if(bar)bar.style.width='0%';const dots=byId('premiumCycleDots');if(dots)dots.innerHTML='';const action=byId('premiumCycleAction');if(action)action.innerHTML=`<span class="premium-kicker">Next Step</span><strong>Build your first training cycle</strong><p>Choose a goal, schedule, and available equipment.</p><button class="premium-start-button" onclick="showScreen('more')">Build Training Plan ›</button>`;return;
+  }
+  const completion=premiumWeekCompletion(),length=Math.max(1,Number(block.lengthWeeks)||1),week=Math.max(1,Number(block.currentWeek)||1);
+  const weekFraction=completion.total?completion.completed/completion.total:0;
+  const pct=Math.max(0,Math.min(100,Math.round(((week-1+weekFraction)/length)*100)));
+  setText('premiumCycleName',premiumBlockTypeLabel());setText('premiumCyclePhase',blockPhase());setText('premiumCycleWeek',`Week ${week} of ${length}`);setText('premiumCycleFocus',`Focus: ${dualBlockPhase()}`);setText('premiumCycleProgressPct',`${pct}%`);setText('premiumCycleEstimate',pct>=100?'Training cycle complete.':`${length-week} week${length-week===1?'':'s'} remain after the current week.`);setText('premiumCycleWeekProgress',`${completion.completed} of ${completion.total} workouts completed`);
+  const bar=byId('premiumCycleProgressBar');if(bar)bar.style.width=`${pct}%`;
+  const dots=byId('premiumCycleDots');if(dots)dots.innerHTML=Array.from({length:Math.min(completion.total,10)},(_,i)=>`<i class="${i<completion.completed?'done':''}">${i<completion.completed?'✓':''}</i>`).join('');
+  const action=byId('premiumCycleAction');if(!action)return;
+  if(completion.ready&&week<length){action.innerHTML=`<span class="premium-kicker">Week Complete?</span><strong>Week ${week} is ready to close</strong><p>Let the adaptive engine review your work and build Week ${week+1}.</p><button class="premium-start-button" onclick="advanceBlockWeek()">Complete Week & Build Next ›</button>`;}
+  else if(completion.ready&&week>=length){action.innerHTML=`<span class="premium-kicker">Block Complete</span><strong>Review your training cycle</strong><p>See your results before creating the next block.</p><button class="premium-start-button" onclick="showScreen('history')">Review Block ›</button>`;}
+  else {const left=Math.max(0,completion.total-completion.completed);action.innerHTML=`<span class="premium-kicker">Current Week</span><strong>${left} workout${left===1?'':'s'} remaining</strong><p>Finish or manage the remaining sessions before building the next week.</p><button class="premium-outline-button" onclick="showScreen('plan')">View Full Plan ›</button>`;}
+}
+
 function premiumReadinessMetric(value){return `${Math.max(1,Math.min(5,Math.round(Number(value)||1)))}/5`;}
 function premiumSleepDuration(r){const h=Math.max(0,Number(r.sleepHours)||0),m=Math.max(0,Number(r.sleepMinutes)||0);return `${h}h ${String(m).padStart(2,'0')}m`;}
 function renderPremiumReadiness(){
@@ -157,7 +176,7 @@ function renderPremiumStandards(){
   const host=byId('premiumStandardsGrid');if(!host)return;const items=(data.habits?.items||[]).slice(0,4),done=new Set(typeof habitCompletedIds==='function'?habitCompletedIds(todayKey()):[]);
   host.innerHTML=items.length?items.map(item=>{const copy=habitDisplay(item),complete=done.has(item.id);return `<button class="${complete?'complete':''}" onclick="toggleHabit('${escapeHtml(item.id)}');renderPremiumStandards()"><i>${complete?'✓':'○'}</i><span>${escapeHtml(copy.title)}</span><strong>${complete?'Complete':escapeHtml(copy.detail||'Today')}</strong></button>`}).join(''):'<button onclick="showScreen(\'habits\')"><i>+</i><span>Set Daily Standards</span><strong>Open Habits</strong></button>';
 }
-function renderPremiumDashboard(){renderPremiumQuote();renderPremiumReadiness();renderPremiumMission();renderPremiumWeek();renderPremiumSupport();renderPremiumProgress();renderPremiumCoach();renderPremiumStandards();}
+function renderPremiumDashboard(){renderPremiumQuote();renderPremiumReadiness();renderPremiumMission();renderPremiumWeek();renderPremiumCycle();renderPremiumSupport();renderPremiumProgress();renderPremiumCoach();renderPremiumStandards();}
 
 const premiumBaseRenderApp=renderApp;
 renderApp=function(){premiumBaseRenderApp();renderPremiumDashboard();};

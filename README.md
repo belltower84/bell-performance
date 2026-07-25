@@ -157,3 +157,11 @@ Replaced the visibly synthetic Today’s Mission and Weekly Schedule backgrounds
 - The artwork panel is hidden on narrow phones so the form and navigation controls fit reliably.
 - The Continue and Back controls remain in a dedicated footer while the form body scrolls independently.
 - Safe-area padding supports mobile Chrome and installed PWAs.
+
+
+## 8.9.11 Mission Builder reliability
+- Rebuilt First Flight mission selection as a state-driven three-path controller.
+- Specific Event, Performance, and Body Composition now each reveal the correct goal-entry panel.
+- Performance and Body Composition use their own filtered goal lists.
+- Added delegated mobile-safe click/change handling and saved-profile migration.
+- Updated the service-worker cache to prevent stale mission logic from being served.

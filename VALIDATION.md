@@ -141,3 +141,10 @@
 - The artwork panel is hidden on narrow phones so the form and navigation controls fit reliably.
 - The Continue and Back controls remain in a dedicated footer while the form body scrolls independently.
 - Safe-area padding supports mobile Chrome and installed PWAs.
+
+
+## 8.9.11 Mission Builder
+- Verified all three mission choices render the expected panel.
+- Verified Performance and Body Composition populate distinct valid goal sets.
+- Verified older `development` missions migrate to the appropriate choice.
+- Verified mission choice remains compatible with the existing training engine.

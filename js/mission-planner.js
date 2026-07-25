@@ -56,15 +56,44 @@ function addMissionEngineGoal(mode, profile) {
   ["Sprint / Field",{id:"custom-event",label:"Custom Event Conditioning",weeks:12,level:"sport",description:"General base and event-specific work-to-rest conditioning."}]
 ].forEach(([mode,profile])=>addMissionEngineGoal(mode,profile));
 
-function onboardingMissionPath() { return document.querySelector('input[name="onboardingMissionPath"]:checked')?.value || "event"; }
-function toggleOnboardingMissionPath() {
-  const eventPath=onboardingMissionPath()==="event";
+const PERFORMANCE_DEVELOPMENT_GOALS = ["Mobility & Longevity","Sport-Specific Performance","General Hybrid Fitness","Strength Development","Endurance Development"];
+const BODY_COMPOSITION_GOALS = ["Fat Loss","Muscle Building","Body Recomposition"];
+
+function onboardingMissionChoice() {
+  return document.querySelector('input[name="onboardingMissionPath"]:checked')?.value || "event";
+}
+function onboardingMissionPath() {
+  return onboardingMissionChoice()==="event" ? "event" : "development";
+}
+function missionChoiceForDevelopmentGoal(goal) {
+  return BODY_COMPOSITION_GOALS.includes(goal) ? "bodyComposition" : "performance";
+}
+function setDevelopmentGoalOptions(choice,{preserve=true}={}) {
+  const select=byId("onboardingDevelopmentGoal");
+  if(!select)return;
+  const current=select.value;
+  const goals=choice==="bodyComposition"?BODY_COMPOSITION_GOALS:PERFORMANCE_DEVELOPMENT_GOALS;
+  select.innerHTML=goals.map(goal=>`<option value="${escapeHtml(goal)}">${escapeHtml(goal)}</option>`).join("");
+  select.value=preserve&&goals.includes(current)?current:(choice==="bodyComposition"?"Body Recomposition":"General Hybrid Fitness");
+  const label=byId("onboardingDevelopmentPanelLabel");
+  if(label)label.textContent=choice==="bodyComposition"?"Primary Body-Composition Outcome":"Primary Performance Outcome";
+}
+function renderOnboardingMissionState({preserveGoal=true}={}) {
+  const choice=onboardingMissionChoice();
+  const eventPath=choice==="event";
   byId("onboardingEventMissionPanel")?.classList.toggle("hidden",!eventPath);
   byId("onboardingDevelopmentMissionPanel")?.classList.toggle("hidden",eventPath);
-  toggleSportGoalField();
-  updateTrainingIdentityContext();
-  updateOnboardingMissionPreview();
+  document.querySelectorAll("[data-mission-choice]").forEach(card=>{
+    const active=card.dataset.missionChoice===choice;
+    card.classList.toggle("active",active);
+    card.setAttribute("aria-selected",String(active));
+  });
+  if(!eventPath)setDevelopmentGoalOptions(choice,{preserve:preserveGoal});
+  try{toggleSportGoalField();}catch(error){console.warn("Mission sport field update failed",error);}
+  try{updateTrainingIdentityContext();}catch(error){console.warn("Mission identity preview failed",error);}
+  try{updateOnboardingMissionPreview();}catch(error){console.warn("Mission preview failed",error);}
 }
+function toggleOnboardingMissionPath() { renderOnboardingMissionState(); }
 function recommendedTrainingIdentity(){
   if(onboardingMissionPath()==="event"){
     const event=byId("onboardingEventType")?.value||"";
@@ -162,8 +191,10 @@ function updateOnboardingMissionPreview(){
 
 function loadOnboardingDualGoals(){
   const mission=data.trainingBlock?.mission||{};
-  const path=mission.path||"event";
-  const radio=document.querySelector(`input[name="onboardingMissionPath"][value="${path}"]`);if(radio)radio.checked=true;
+  const savedPath=mission.path||"event";
+  const choice=savedPath==="event"?"event":missionChoiceForDevelopmentGoal(mission.developmentGoal||"");
+  const radio=document.querySelector(`input[name="onboardingMissionPath"][value="${choice}"]`);if(radio)radio.checked=true;
+  if(choice!=="event")setDevelopmentGoalOptions(choice,{preserve:false});
   if(mission.eventType&&byId("onboardingEventType"))byId("onboardingEventType").value=mission.eventType;
   if(byId("onboardingEventName"))byId("onboardingEventName").value=mission.eventName||"";
   if(byId("onboardingEventDate"))byId("onboardingEventDate").value=mission.eventDate||"";
@@ -219,7 +250,7 @@ function saveOnboardingDualGoals(buildPlan=true){
       secondaryGoal={type,targetDate,target,focus:(SECONDARY_MISSION_PROFILES[type]||SECONDARY_MISSION_PROFILES.Custom).focus};
       lengthWeeks=Math.max(lengthWeeks,eventWeeksFrom(start,targetDate));
     }
-    mission={path,developmentGoal:goal,sport:byId("onboardingSportGoal").value.trim(),priority:byId("onboardingDevelopmentPriority").value,strengthFocus:profile.strengthFocus,engineFocus:profile.engineFocus,secondaryGoal};
+    mission={path,category:onboardingMissionChoice(),developmentGoal:goal,sport:byId("onboardingSportGoal").value.trim(),priority:byId("onboardingDevelopmentPriority").value,strengthFocus:profile.strengthFocus,engineFocus:profile.engineFocus,secondaryGoal};
   }
   data.trainingBlock={...data.trainingBlock,enabled:true,goalType:profile.strengthGoal,lengthWeeks,currentWeek:1,trainingDays:availability.trainingDays,strengthDays:availability.strengthDays,runDays:availability.engineDays,sessionMinutes:availability.sessionMinutes,hybridCombinedSessions:availability.combinedSessions,targetDate:mission.eventDate||mission.secondaryGoal?.targetDate||"",mission,dualGoals:{strengthGoal:profile.strengthGoal,engineMode:profile.engineMode,engineGoal:profile.engineGoal,trainingCoordination:"Coach Decides",engineSessions:availability.engineDays,targetValue:0}};
   data.settings.cardioType=profile.engineMode==="General Conditioning"?"Air Bike":profile.engineMode==="None / Recovery Only"?"Walking":profile.engineMode;
@@ -346,4 +377,18 @@ function updateEventContextFields(){
   field.placeholder=placeholders[type]||"Optional — division, class, or distance";
 }
 
-document.addEventListener("DOMContentLoaded",()=>{toggleOnboardingMissionPath();toggleSecondaryGoalFields();toggleEventSecondaryGoalFields();updateEventContextFields();["onboardingTrainingDays","onboardingSessionMinutes","onboardingBlockStart"].forEach(id=>byId(id)?.addEventListener("change",updateOnboardingMissionPreview));});
+document.addEventListener("DOMContentLoaded",()=>{
+  const missionGrid=byId("onboardingMissionPathGrid");
+  missionGrid?.addEventListener("change",event=>{
+    if(event.target?.matches('input[name="onboardingMissionPath"]'))renderOnboardingMissionState({preserveGoal:false});
+  });
+  missionGrid?.addEventListener("click",event=>{
+    const card=event.target.closest("[data-mission-choice]");
+    if(!card)return;
+    const radio=card.querySelector('input[name="onboardingMissionPath"]');
+    if(radio&&!radio.checked){radio.checked=true;radio.dispatchEvent(new Event("change",{bubbles:true}));}
+  });
+  renderOnboardingMissionState();
+  toggleSecondaryGoalFields();toggleEventSecondaryGoalFields();updateEventContextFields();
+  ["onboardingTrainingDays","onboardingSessionMinutes","onboardingBlockStart"].forEach(id=>byId(id)?.addEventListener("change",updateOnboardingMissionPreview));
+});

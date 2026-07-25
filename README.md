@@ -111,19 +111,26 @@ Event missions now resolve through seven dedicated coaching families: running ev
 Replaced the dashboard Engine modality tile with a premium close-up air-bike image composed and graded to match the Strength tile. The tile retains native Bell typography and controls, uses a right-weighted crop for clear text space, and is cached for offline use.
 
 
-## 8.9.5 Dashboard Refinement
+## 8.9.6 Dashboard Refinement
 
 - Replaced the dashboard Engine air-bike artwork with a trail-running hero.
 - Matched Strength and Engine card borders, overlays, contrast, and interaction treatment.
 - Reduced saturation and increased text-safe shadowing so the imagery feels integrated rather than generated or pasted on.
 
 
-## 8.9.5 Dashboard Artwork Correction
+## 8.9.6 Dashboard Artwork Correction
 Replaced the visibly synthetic Today’s Mission and Weekly Schedule backgrounds. Today’s Mission now uses a clean close-up plate-and-bar composition; Weekly Schedule uses a restrained, equipment-focused training-space image. Both cards use stronger integrated overlays and right-weighted crops so live UI remains readable without distorted athletes or disconnected objects.
 
 
-## 8.9.5 Dashboard Cycle Status
+## 8.9.6 Dashboard Cycle Status
 - Replaced the Engine schedule glyph with a connected running-shoe icon.
 - Added an always-visible Current Training Cycle panel to the premium dashboard.
 - Added block progress, current phase, week progress, completed-workout indicators, and the correct next action.
 - The panel shows Complete Week & Build Next only when all required sessions are resolved.
+
+
+## 8.9.6 Schedule Anchor Correction
+- Five-day schedules now enforce Wednesday and Sunday as recovery anchors.
+- Four-day schedules now enforce Tuesday, Thursday, and Sunday as recovery anchors.
+- Existing uncompleted weeks generated with Friday as a rest day are migrated automatically without deleting completed sessions.
+- New weeks continue to use the corrected schedule protocol.

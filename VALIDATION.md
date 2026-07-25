@@ -94,21 +94,28 @@
 - Confirmed the new asset and updated polish stylesheet are included in the service-worker cache.
 
 
-## 8.9.5 checks
+## 8.9.6 checks
 
 - Engine modality tile uses `custom-ridge-runner.jpg`.
 - Air-bike asset is no longer referenced by dashboard CSS or service worker.
-- Version and cache identifiers updated to 8.9.5.
+- Version and cache identifiers updated to 8.9.6.
 
 
-## 8.9.5 checks
+## 8.9.6 checks
 - Confirmed Today’s Mission no longer references custom-sled-push artwork.
 - Confirmed Weekly Schedule no longer references hill-country artwork.
 - Confirmed replacement artwork exists and is included in the service-worker cache.
-- Version and cache identifiers updated to 8.9.5.
+- Version and cache identifiers updated to 8.9.6.
 
 
-## 8.9.5 checks
+## 8.9.6 checks
 - Verified the running-shoe SVG renders in weekly schedule chips and legends.
 - Verified the cycle panel handles no block, active week, week complete, and final-block states.
-- Version and cache identifiers updated to 8.9.5.
+- Version and cache identifiers updated to 8.9.6.
+
+
+## 8.9.6 checks
+- Verified five-day rest anchors are Wednesday and Sunday.
+- Verified four-day rest anchors are Tuesday, Thursday, and Sunday.
+- Added migration logic for previously generated uncompleted weeks with incorrect rest placement.
+- Version and cache identifiers updated to 8.9.6.

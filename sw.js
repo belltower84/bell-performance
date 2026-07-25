@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-8.9.5";
+const CACHE_NAME = "bell-performance-8.9.6";
 const CORE = [
   "./",
   "./index.html",

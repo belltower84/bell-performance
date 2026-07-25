@@ -277,6 +277,58 @@ function buildCurrentWeekPlan(){
     });
   }
   data.plan=plan;
+  enforceTrainingDayRestAnchors({allowRebuild:false});
+}
+
+function scheduledRestIndexes(trainingDays=Number(data.trainingBlock?.trainingDays)||5){
+  if(trainingDays===5)return [2,6]; // Wednesday and Sunday
+  if(trainingDays===4)return [1,3,6]; // Tuesday, Thursday, and Sunday
+  if(trainingDays===3)return [1,3,5,6];
+  if(trainingDays===6)return [6];
+  return [];
+}
+function isScheduledRestItem(item){
+  return !!item && (item.lockedRestDay===true || item.mission==="M-1 Daily Reset");
+}
+function clonePlanItemForDay(item,day){
+  const copy={...item,day};
+  delete copy.lockedRestDay;
+  return copy;
+}
+function restItemForDay(index,days){
+  return {day:days[index],mission:"M-1 Daily Reset",detail:index===6?"Full recovery day: mobility, family activity, and preparation for Monday":"Scheduled recovery anchor: mobility, walking, and readiness review",done:false,lockedRestDay:true};
+}
+function enforceTrainingDayRestAnchors({allowRebuild=true}={}){
+  if(!data.trainingBlock?.enabled || !Array.isArray(data.plan) || data.plan.length!==7)return false;
+  const trainingDays=Number(data.trainingBlock.trainingDays)||5;
+  if(![4,5].includes(trainingDays))return false;
+  const required=scheduledRestIndexes(trainingDays);
+  const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  let changed=false;
+
+  // Migrate old generated weeks that placed a rest day on Friday or another non-anchor day.
+  for(const restIndex of required){
+    const current=data.plan[restIndex];
+    if(isScheduledRestItem(current))continue;
+    if(current?.done)continue; // never rewrite completed training history
+    const donorIndex=data.plan.findIndex((item,index)=>!required.includes(index)&&isScheduledRestItem(item)&&!item?.done);
+    if(donorIndex>=0){
+      const displaced=clonePlanItemForDay(current,days[donorIndex]);
+      data.plan[donorIndex]=displaced;
+      data.plan[restIndex]=restItemForDay(restIndex,days);
+      changed=true;
+    }
+  }
+
+  // If this is a fresh, uncompleted week and no safe swap existed, regenerate using the current protocol.
+  if(allowRebuild && required.some(i=>!isScheduledRestItem(data.plan[i])) && !data.plan.some(item=>item?.done)){
+    buildCurrentWeekPlan();
+    return true;
+  }
+  if(changed){
+    data.trainingBlock.scheduleProtocol=trainingDays===5?"5-Day Rhythm • Rest Wednesday & Sunday":"4-Day Rhythm • Rest Tuesday, Thursday & Sunday";
+  }
+  return changed;
 }
 function coachRecommendation(){ if(!data.trainingBlock.enabled)return"Choose a Strength goal and a compatible Engine goal in More. The Coach Engine will coordinate both progressions."; const status=readinessStatus(readinessScore()),e=engineGoalProfile(),compat=compatibilityInfo(data.trainingBlock.dualGoals.strengthGoal,data.trainingBlock.dualGoals.engineMode,e.id); if(status==="RED")return`${dualBlockPhase()}: recovery is the mission. Keep mobility, remove hard Engine work, and retain only essential technique or easy strength work.`;if(status==="YELLOW")return`${dualBlockPhase()}: preserve the main Strength work, trim accessory volume, and convert hard Engine work to easy aerobic support. ${compat.note}`;return`${dualBlockPhase()}: execute both progressions as scheduled. ${compat.note} ${typeof adaptiveCoachBrief==="function"?adaptiveCoachBrief():""}`; }
 
@@ -301,7 +353,10 @@ function handleNotification(action){closeNotificationCenter();if(action==="readi
 function openAthleteProfile(){showScreen("more");setTimeout(()=>document.getElementById("athleteNameInput")?.scrollIntoView({behavior:"smooth",block:"center"}),100);}
 
 const originalRenderApp=renderApp;
-renderApp=function(){originalRenderApp();renderDualGoals();const planList=document.getElementById("planList");if(planList){[...planList.children].forEach((row,i)=>{const item=data.plan[i];if(item?.secondaryLabel){const target=row.querySelector(".hint")||row.querySelector(".sub");target?.insertAdjacentHTML("afterend",`<div class="two-a-day-tag">PM ENGINE • ${item.secondaryLabel}<br><small>${item.secondaryDetail}</small></div>`);}});}};
+renderApp=function(){
+  const scheduleCorrected=enforceTrainingDayRestAnchors();
+  if(scheduleCorrected)saveData({render:false});
+  originalRenderApp();renderDualGoals();const planList=document.getElementById("planList");if(planList){[...planList.children].forEach((row,i)=>{const item=data.plan[i];if(item?.secondaryLabel){const target=row.querySelector(".hint")||row.querySelector(".sub");target?.insertAdjacentHTML("afterend",`<div class="two-a-day-tag">PM ENGINE • ${item.secondaryLabel}<br><small>${item.secondaryDetail}</small></div>`);}});}};
 
 document.addEventListener("DOMContentLoaded",()=>{document.getElementById("blockStrengthDays")?.addEventListener("change",e=>e.target.dataset.touched="1");document.getElementById("blockRunDays")?.addEventListener("change",e=>e.target.dataset.touched="1");["blockTrainingDays","trainingCoordination"].forEach(id=>document.getElementById(id)?.addEventListener("change",applyHybridScheduleRecommendation));setTimeout(()=>{updateDualGoalBuilder();renderDualGoals();applyHybridScheduleRecommendation();},80);});
 

@@ -26,7 +26,6 @@ const defaults = {
   mobility: { focus: "Auto", minutes: 10, completedDates: [], checks: {} },
   readinessLog: [],
   sessionFeedbackLog: [],
-  adaptiveTraining: { enabled:true, lastEvaluation:"", currentStatus:"BASELINE", volumeScale:1, loadScale:1, engineScale:1, reasons:[], consecutiveLowReadiness:0, complianceRate:null, sessionCount:0 },
   pendingFeedbackSessionId: null,
   dayNavigation: { selectedDate: "", lastLocalDate: "" },
   performanceReviews: { weeklySeen:[], blockReviews:[], milestones:[] },
@@ -141,9 +140,6 @@ function normalizeData() {
   data.mobility.checks = data.mobility.checks || {};
   data.readinessLog = Array.isArray(data.readinessLog) ? data.readinessLog : [];
   data.sessionFeedbackLog = Array.isArray(data.sessionFeedbackLog) ? data.sessionFeedbackLog : [];
-  data.adaptiveTraining = { ...defaults.adaptiveTraining, ...(data.adaptiveTraining || {}) };
-  data.adaptiveTraining.enabled = data.adaptiveTraining.enabled !== false;
-  data.adaptiveTraining.reasons = Array.isArray(data.adaptiveTraining.reasons) ? data.adaptiveTraining.reasons : [];
   data.pendingFeedbackSessionId = data.pendingFeedbackSessionId || null;
   data.dayNavigation = { ...defaults.dayNavigation, ...(data.dayNavigation || {}) };
   data.dayNavigation.selectedDate = /^\d{4}-\d{2}-\d{2}$/.test(data.dayNavigation.selectedDate || "") ? data.dayNavigation.selectedDate : "";
@@ -196,35 +192,21 @@ function importData(event) {
   reader.readAsText(file);
 }
 
-async function resetApp() {
-  if (!confirm("Reset all Bell Performance data on this device? This clears the athlete profile, active block, history, readiness, and settings.")) return;
-
-  // Clear every Bell Performance key so First Flight behaves like a true first launch.
-  Object.keys(localStorage).forEach(key => {
-    if (key === STORAGE_KEY || key.startsWith("bellPerformance")) localStorage.removeItem(key);
-  });
-  sessionStorage.setItem("bellPerformanceForceFirstFlight", "1");
-
+function resetApp() {
+  if (!confirm("Reset all Bell Performance data on this device?")) return;
+  localStorage.removeItem(STORAGE_KEY);
   data = cloneDefaults();
-  normalizeData();
+  delete data.missionPlan;
+  data.settings.maxes = { bench:null, squat:null, deadlift:null, pushPress:null };
+  data.mission = { goalWorkouts:null, goalMobility:null, goalPullups:null, goal5k:null, currentPullups:null, current5k:null };
+  data.trainingBlock = cloneDefaults().trainingBlock;
+  data.plan = [];
+  data.history = [];
+  data.exerciseProgression = {};
+  data.exerciseIntelligence = { replacements:[], personalConstraints:[] };
+  data.habits.targets = {proteinGrams:0,hydrationOz:0,steps:0,sleepHours:0,mobilityMinutes:0,customized:false};
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-
-  // Remove stale app-shell caches and service workers before reloading. Older cached
-  // scripts were able to restore a completed setup state after a reset.
-  try {
-    if ("caches" in window) {
-      const keys = await caches.keys();
-      await Promise.all(keys.filter(key => key.startsWith("bell-performance-")).map(key => caches.delete(key)));
-    }
-    if ("serviceWorker" in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map(registration => registration.unregister()));
-    }
-  } catch (error) {
-    console.warn("Bell Performance reset cleanup was partially blocked:", error);
-  }
-
-  window.location.replace(`${window.location.pathname}?reset=${Date.now()}`);
+  window.location.reload();
 }
 
 normalizeData();

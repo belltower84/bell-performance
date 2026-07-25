@@ -42,7 +42,6 @@ function showScreen(name) {
   document.querySelectorAll("nav button").forEach(button => button.classList.remove("active"));
   document.querySelector(`nav button[data-screen="${name}"]`)?.classList.add("active");
   window.scrollTo(0, 0);
-  if (typeof applyBellScreenIdentity === "function") applyBellScreenIdentity(name);
 }
 
 
@@ -491,30 +490,8 @@ function missionManagementText(){
   const detail=`Week ${b.currentWeek||1} of ${b.lengthWeeks||12} • ${b.strengthDays||0} Strength • ${b.runDays||0} Engine${m?.eventDate?` • Event ${m.eventDate}`:""}`;
   return {title,detail};
 }
-function closeCompetingModalsForEditor(){
-  ["howToModal","recoveryClearanceModal","workoutModal","exerciseLibraryModal"].forEach(id=>byId(id)?.classList.add("hidden"));
-  document.body.classList.remove("modal-open");
-}
-function openMissionEditor(event){
-  if(event){event.preventDefault();event.stopPropagation();}
-  missionEditorActive=true;
-  closeCompetingModalsForEditor();
-  const opened=openFirstFlight(3);
-  if(!opened)missionEditorActive=false;
-}
-function focusBlockEditor(){
-  closeCompetingModalsForEditor();
-  showScreen("more");
-  const editor=document.querySelector(".dual-goal-builder");
-  if(!editor){alert("The current block editor could not be opened. Reload the app and try again.");return;}
-  editor.classList.add("editor-focus-pulse");
-  window.setTimeout(()=>{
-    editor.scrollIntoView({behavior:"smooth",block:"start"});
-    const first=editor.querySelector("select,input,button");
-    if(first)first.focus({preventScroll:true});
-  },120);
-  window.setTimeout(()=>editor.classList.remove("editor-focus-pulse"),1600);
-}
+function openMissionEditor(){missionEditorActive=true;openFirstFlight(3);}
+function focusBlockEditor(){showScreen("more");window.setTimeout(()=>document.querySelector(".dual-goal-builder")?.scrollIntoView({behavior:"smooth",block:"start"}),80);}
 function startFreshBlockFromCurrentMission(){
   if(!data.trainingBlock?.enabled){openMissionEditor();return;}
   if(!confirm("Restart the active mission at Week 1? Workout history and all other app data will be preserved."))return;
@@ -616,55 +593,31 @@ function saveCoachMessagePreferences() {
 let onboardingStep=0;
 let missionEditorActive=false;
 function openFirstFlight(startStep=null){
-  const modal=byId("onboardingModal");
-  if(!modal){
-    alert("The mission editor could not be opened because the First Flight panel is unavailable. Reload the app and try again.");
-    return false;
-  }
-
-  // Always honor the requested destination. The prior implementation returned
-  // early whenever the modal was already considered open, which could leave the
-  // editor on a hidden or unrelated First Flight step.
+  const modal=byId("onboardingModal"); if(!modal||!modal.classList.contains("hidden"))return;
+  byId("onboardingAthleteName").value=data.settings.athleteName||"";
+  byId("onboardingSex").value=data.settings.sex||"Prefer not to say";
+  if(byId("onboardingAthleteMode"))byId("onboardingAthleteMode").value=data.settings.athleteMode||"Hybrid Athlete";
+  renderAthleteTypeDescription("onboardingAthleteMode", "onboardingAthleteModeDescription");
+  if(typeof updateTrainingIdentityContext==="function")updateTrainingIdentityContext();
+  byId("onboardingAge").value=data.nutrition.age||"";
+  byId("onboardingBodyweight").value=data.settings.weight||"";
+  const totalHeight=Number(data.nutrition.height)||0;
+  byId("onboardingHeightFeet").value=totalHeight?Math.floor(totalHeight/12):"";
+  byId("onboardingHeightInches").value=totalHeight?totalHeight%12:"";
+  byId("onboardingGoalWeight").value=data.settings.goal||"";
+  const onboardingMaxes=data.settings.maxes||{};
+  byId("onboardingBenchMax").value=onboardingMaxes.bench??"";
+  byId("onboardingSquatMax").value=onboardingMaxes.squat??"";
+  byId("onboardingDeadliftMax").value=onboardingMaxes.deadlift??"";
+  byId("onboardingPushPressMax").value=onboardingMaxes.pushPress??"";
+  byId("onboardingMessageStyle").value=data.settings.coachMessages?.style||"Performance";
+  byId("onboardingScriptureFrequency").value=data.settings.coachMessages?.scriptureFrequency||"Occasionally";
+  toggleOnboardingScripture();
+  loadOnboardingInjuryProfile();
+  if(typeof initializeOnboardingLocationEditor==="function")initializeOnboardingLocationEditor();
+  loadOnboardingDualGoals();
   const resolvedStep=startStep===null?(data.settings.firstFlightStage==="configure"?2:0):Number(startStep);
-  onboardingStep=Math.max(0,Math.min(5,Number.isFinite(resolvedStep)?resolvedStep:0));
-  modal.classList.remove("hidden");
-  document.body.classList.add("modal-open");
-  renderOnboardingStep();
-
-  try{
-    const setValue=(id,value)=>{const element=byId(id);if(element)element.value=value??"";};
-    setValue("onboardingAthleteName",data.settings.athleteName||"");
-    setValue("onboardingSex",data.settings.sex||"Prefer not to say");
-    setValue("onboardingAthleteMode",data.settings.athleteMode||"Hybrid Athlete");
-    if(typeof renderAthleteTypeDescription==="function")renderAthleteTypeDescription("onboardingAthleteMode", "onboardingAthleteModeDescription");
-    if(typeof updateTrainingIdentityContext==="function")updateTrainingIdentityContext();
-    setValue("onboardingAge",data.nutrition.age||"");
-    setValue("onboardingBodyweight",data.settings.weight||"");
-    const totalHeight=Number(data.nutrition.height)||0;
-    setValue("onboardingHeightFeet",totalHeight?Math.floor(totalHeight/12):"");
-    setValue("onboardingHeightInches",totalHeight?totalHeight%12:"");
-    setValue("onboardingGoalWeight",data.settings.goal||"");
-    const onboardingMaxes=data.settings.maxes||{};
-    setValue("onboardingBenchMax",onboardingMaxes.bench??"");
-    setValue("onboardingSquatMax",onboardingMaxes.squat??"");
-    setValue("onboardingDeadliftMax",onboardingMaxes.deadlift??"");
-    setValue("onboardingPushPressMax",onboardingMaxes.pushPress??"");
-    setValue("onboardingMessageStyle",data.settings.coachMessages?.style||"Performance");
-    setValue("onboardingScriptureFrequency",data.settings.coachMessages?.scriptureFrequency||"Occasionally");
-    if(typeof toggleOnboardingScripture==="function")toggleOnboardingScripture();
-    if(typeof loadOnboardingInjuryProfile==="function")loadOnboardingInjuryProfile();
-    if(typeof initializeOnboardingLocationEditor==="function")initializeOnboardingLocationEditor();
-    if(typeof loadOnboardingDualGoals==="function")loadOnboardingDualGoals();
-    renderOnboardingStep();
-    return true;
-  }catch(error){
-    console.error("First Flight editor hydration failed:",error);
-    // Keep the requested editor visible even if a legacy saved value cannot be
-    // hydrated. This allows the athlete to revise and save the mission instead
-    // of experiencing a button that appears to do nothing.
-    renderOnboardingStep();
-    return true;
-  }
+  onboardingStep=Math.max(0,Math.min(5,resolvedStep));renderOnboardingStep();modal.classList.remove("hidden");document.body.classList.add("modal-open");
 }
 function renderOnboardingStep(){
   document.querySelectorAll("[data-onboarding-step]").forEach((step,index)=>step.classList.toggle("active",index===onboardingStep));
@@ -675,7 +628,6 @@ function renderOnboardingStep(){
   const subtitles=["Enter the athlete details that personalize Bell Performance.","Identify movement patterns that require modification or avoidance.","Map the equipment available everywhere you train.","Choose the Strength and Engine goals for your first coordinated block.","Choose how the coach communicates with you.","Confirm the flight plan before launch."];
   byId("onboardingStepSubtitle").textContent=subtitles[onboardingStep];
   if(onboardingStep===5)renderOnboardingReview();
-  if(typeof updateFirstFlightIdentity === "function") updateFirstFlightIdentity(onboardingStep);
 }
 function saveFirstFlightProfile(){
   const name=byId("onboardingAthleteName").value.trim();

@@ -56,7 +56,6 @@ function recommendedWeight(exerciseName, status) {
   const bodyweight = Number(data.settings.weight) || null;
   const scale = status === "GREEN" ? 1 : status === "YELLOW" ? 0.90 : 0.75;
   const blockLoadFactor = data.trainingBlock?.enabled ? (strengthProgression().load / 0.76) : 1;
-  const adaptiveLoadFactor = data.trainingBlock?.enabled && typeof adaptiveStrengthLoadScale === "function" ? adaptiveStrengthLoadScale() : 1;
   const table = {
     "Bench Press":{base:m.bench*0.70,label:"based on bench strength"},"Paused Bench Press":{base:m.bench*0.74,label:"based on bench strength"},"Close-Grip Bench Press":{base:m.bench*0.62,label:"based on bench strength"},"Incline Barbell Press":{base:m.bench*0.58,label:"based on bench strength"},
     "Back Squat":{base:m.squat*0.68,label:"based on squat strength"},"Tempo Back Squat":{base:m.squat*0.58,label:"based on squat strength"},"Speed Back Squat":{base:m.squat*0.50,label:"move explosively"},"Front Squat":{base:m.squat*0.52,label:"based on squat strength"},"Narrow-Stance Squat":{base:m.squat*0.55,label:"based on squat strength"},
@@ -74,7 +73,7 @@ function recommendedWeight(exerciseName, status) {
   if (/Pull-up|Chin-up|Push-up|Jump|Sprint|Plank|Raise|Curl|Pressdown|Extension|Fly|Face Pull|Crunch|Ab Wheel|Hamstring Curl|Leg Extension/.test(exerciseName)) return {value:"",display:"Choose by effort",note:"Use clean reps and stop before technique breaks."};
   const item = table[exerciseName];
   if (!item || !Number.isFinite(Number(item.base)) || Number(item.base) <= 0) return {value:"",display:"Choose by effort",note:"Enter your current max lifts in Athlete Settings for calculated starting weights. Until then, use clean reps and the prescribed RIR."};
-  const baseline = roundTo5(item.base * scale * blockLoadFactor * adaptiveLoadFactor);
+  const baseline = roundTo5(item.base * scale * blockLoadFactor);
   const value = typeof prescribedWeightForExercise === "function" ? prescribedWeightForExercise(exerciseName, baseline) : baseline;
   const progress = typeof exerciseProgressionSummary === "function" ? exerciseProgressionSummary(exerciseName) : null;
   return {value,display:`${value} lb`,note: progress?.nextLoad ? `${progress.method}; ${progress.reason}` : `${item.label}; ${status.toLowerCase()} readiness applied.`};
@@ -98,7 +97,6 @@ function scaledTemplate(name) {
   if (typeof applyEquipmentToTemplate === "function") base = applyEquipmentToTemplate(base);
   if (!(data.trainingBlock?.enabled && name.startsWith("R-"))) base = applyCardioModality(name, base);
   const profile = scalingProfile();
-  const adaptive = data.trainingBlock?.enabled && typeof adaptiveTrainingModifier === "function" ? adaptiveTrainingModifier() : {status:"BUILD",volumeScale:1,engineScale:1,reasons:[]};
   const isMobility = name.startsWith("M-");
   const isRun = name.startsWith("R-");
   return {
@@ -109,7 +107,7 @@ function scaledTemplate(name) {
     equipmentLocation:base.equipmentLocation || (typeof activeEquipmentLocation === "function" ? activeEquipmentLocation().name : ""),
     readinessStatus:profile.status,
     duration:isRun
-      ? Math.max(15, Math.round((profile.status === "RED" ? Math.min(25, Math.max(15, Number(base.duration) || 20)) : Math.max(10, Number(base.duration) || 30)) * (Number(adaptive.engineScale)||1)))
+      ? (profile.status === "RED" ? Math.min(25, Math.max(15, Number(base.duration) || 20)) : Math.max(10, Number(base.duration) || 30))
       : Math.max(10, Math.min(profile.timeMinutes, Math.round(base.duration * (isMobility ? 1 : profile.status === "GREEN" ? 1 : profile.status === "YELLOW" ? 0.82 : 0.58)))) ,
     exercises:base.exercises.map(exercise => {
       const originalSets = exercise.sets;
@@ -118,16 +116,13 @@ function scaledTemplate(name) {
       if (!isMobility) {
         sets = Math.max(1, Math.floor(exercise.sets * (isRun ? profile.conditioning : profile.sets)));
         if (profile.status === "GREEN") sets = originalSets;
-        if (!isRun && !isMobility && data.trainingBlock?.enabled) sets = Math.max(1, Math.floor(sets * strengthProgression().setScale * (Number(adaptive.volumeScale)||1)));
-        if (isRun && data.trainingBlock?.enabled) sets = Math.max(1, Math.floor(sets * (Number(adaptive.engineScale)||1)));
+        if (!isRun && !isMobility && data.trainingBlock?.enabled) sets = Math.max(1, Math.floor(sets * strengthProgression().setScale));
         if (profile.status === "YELLOW" && exercise.block === "Golden Era Finisher") sets = Math.min(2, sets);
         if (profile.status === "RED" && exercise.block === "Golden Era Finisher") sets = 0;
-        if (isRun && (profile.status === "RED" || adaptive.status === "RECOVER")) { reps = (data.settings.cardioType||"Running") === "Running" ? "15–25 min easy walk or walk/jog" : "15–25 min very easy"; sets = 1; }
-        else if(isRun && adaptive.status === "HOLD") reps = `${reps} • reduce total work to about ${Math.round((Number(adaptive.engineScale)||.72)*100)}% and finish controlled`;
-        else if(isRun && adaptive.status === "REBUILD") reps = `${reps} • keep the effort simple and finish with energy in reserve`;
+        if (isRun && profile.status === "RED") { reps = (data.settings.cardioType||"Running") === "Running" ? "15–25 min easy walk or walk/jog" : "15–25 min very easy"; sets = 1; }
       }
       const recommendation = recommendedWeight(exercise.name, profile.status);
-      return {...exercise,originalSets,sets,reps,recommendedWeight:recommendation.value,recommendationDisplay:recommendation.display,recommendationNote:recommendation.note,scaleNote:sets===0?"RED: optional finisher removed to protect recovery":adaptive.status!=="BUILD"?`ADAPTIVE ${adaptive.status}: ${sets} sets • ${adaptive.reasons.join("; ")}`:profile.status === "GREEN"?`GREEN: ${sets} sets as written`:profile.status === "YELLOW"?`YELLOW: scaled to ${sets} sets and reduced load`: `RED: scaled to ${sets} sets and technique-focused load`};
+      return {...exercise,originalSets,sets,reps,recommendedWeight:recommendation.value,recommendationDisplay:recommendation.display,recommendationNote:recommendation.note,scaleNote:sets===0?"RED: optional finisher removed to protect recovery":profile.status === "GREEN"?`GREEN: ${sets} sets as written`:profile.status === "YELLOW"?`YELLOW: scaled to ${sets} sets and reduced load`: `RED: scaled to ${sets} sets and technique-focused load`};
     }).filter(exercise => exercise.sets > 0).filter((exercise, index) => {
       if (isMobility) return true;
       const cap = profile.timeMinutes;
@@ -262,5 +257,5 @@ function syncActiveWorkoutTimer(){if(!data.activeWorkout)return 0;const elapsed=
 function startTimer(){clearInterval(timerInterval);if(!data.activeWorkout)return;if(data.activeWorkout.timerRunning!==false&&!data.activeWorkout.timerStartedAt)data.activeWorkout.timerStartedAt=new Date().toISOString();data.activeWorkout.timerRunning=true;timerInterval=setInterval(()=>{if(!data.activeWorkout)return;const elapsed=syncActiveWorkoutTimer();updateTimerDisplay();if(elapsed%15===0)saveData({render:false});},1000);updateTimerDisplay();}
 function updateTimerDisplay(){const elapsed=syncActiveWorkoutTimer();const hours=Math.floor(elapsed/3600);const minutes=String(Math.floor((elapsed%3600)/60)).padStart(2,"0");const seconds=String(elapsed%60).padStart(2,"0");const timer=document.getElementById("workoutTimer");if(timer)timer.textContent=hours?`${String(hours).padStart(2,"0")}:${minutes}:${seconds}`:`${minutes}:${seconds}`;}
 function closeWorkout(){if(data.activeWorkout){syncActiveWorkoutTimer();persistActive();}document.getElementById("workoutModal").classList.add("hidden");clearInterval(timerInterval);clearInterval(restInterval);document.body.classList.remove("workout-open","engine-session","female-session");document.body.style.top="";window.scrollTo(0,savedPageScroll);}
-function completeWorkout(){if(!data.activeWorkout)return;syncActiveWorkoutTimer();persistActive();if(data.activeWorkout.engineMetrics&&!parseEngineTime(data.activeWorkout.engineMetrics.manualTime)){data.activeWorkout.engineMetrics.manualTime=formatEngineTime(data.activeWorkout.elapsed||0);data.activeWorkout.officialElapsed=data.activeWorkout.elapsed||0;}const completed={...data.activeWorkout,timerRunning:false,completedAt:new Date().toISOString()};if(typeof applyCompletedWorkoutProgression==="function")applyCompletedWorkoutProgression(completed);if(typeof adaptiveSessionCompleted==="function")adaptiveSessionCompleted(completed);data.history.unshift(completed);if(typeof markPlannedSessionComplete==="function")markPlannedSessionComplete(completed);else{const plan=data.plan.find(item=>item.mission===completed.name&&!item.done&&!["skipped","replaced"].includes(item.status));if(plan){plan.done=true;plan.status="completed";plan.completedAt=completed.completedAt;}}closeWorkout();data.activeWorkout=null;data.pendingFeedbackSessionId=completed.completedAt;saveData();openPendingSessionFeedback();}
+function completeWorkout(){if(!data.activeWorkout)return;syncActiveWorkoutTimer();persistActive();if(data.activeWorkout.engineMetrics&&!parseEngineTime(data.activeWorkout.engineMetrics.manualTime)){data.activeWorkout.engineMetrics.manualTime=formatEngineTime(data.activeWorkout.elapsed||0);data.activeWorkout.officialElapsed=data.activeWorkout.elapsed||0;}const completed={...data.activeWorkout,timerRunning:false,completedAt:new Date().toISOString()};if(typeof applyCompletedWorkoutProgression==="function")applyCompletedWorkoutProgression(completed);data.history.unshift(completed);if(typeof markPlannedSessionComplete==="function")markPlannedSessionComplete(completed);else{const plan=data.plan.find(item=>item.mission===completed.name&&!item.done&&!["skipped","replaced"].includes(item.status));if(plan){plan.done=true;plan.status="completed";plan.completedAt=completed.completedAt;}}closeWorkout();data.activeWorkout=null;data.pendingFeedbackSessionId=completed.completedAt;saveData();openPendingSessionFeedback();}
 function discardWorkout(){if(!confirm("Discard this workout?"))return;closeWorkout();data.activeWorkout=null;saveData();}

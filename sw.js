@@ -1,10 +1,12 @@
 "use strict";
-const CACHE_NAME = "bell-performance-8.9.1";
+const CACHE_NAME = "bell-performance-8.9.3";
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./css/app.css?v=8800",
+  "./css/polish-880.css?v=8930",
+  "./css/polish-881.css?v=8910",
   "./assets/logo-shield.svg?v=8800",
   "./assets/artwork/strength/powerlifting.jpg?v=8800",
   "./assets/artwork/strength/strength-building.jpg?v=8800",
@@ -20,6 +22,7 @@ const CORE = [
   "./assets/artwork/engine/desert-trail.jpg?v=8800",
   "./assets/artwork/engine/winter-trail.jpg?v=8800",
   "./assets/artwork/engine/hill-country.jpg?v=8800",
+  "./assets/artwork/engine/custom-ridge-runner.jpg?v=8930",
   "./data/workouts.js?v=8800",
   "./js/storage.js?v=8800",
   "./js/exercise-library.js?v=8800",

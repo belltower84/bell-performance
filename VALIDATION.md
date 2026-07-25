@@ -85,3 +85,17 @@
 - Verified current block type, week number, and phase display on the dashboard.
 - Verified week-complete prompt appears only after prescribed sessions are completed or explicitly resolved.
 - Verified next-week generation continues through the existing adaptive block advancement path.
+
+
+## 8.9.2 checks
+- Confirmed the Engine modality tile uses `custom-airbike.jpg`.
+- Confirmed the image contains no baked-in Bell UI text or controls.
+- Confirmed the tile uses a right-weighted object position and existing overlay for readability.
+- Confirmed the new asset and updated polish stylesheet are included in the service-worker cache.
+
+
+## 8.9.3 checks
+
+- Engine modality tile uses `custom-ridge-runner.jpg`.
+- Air-bike asset is no longer referenced by dashboard CSS or service worker.
+- Version and cache identifiers updated to 8.9.3.

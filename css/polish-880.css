@@ -9,12 +9,12 @@
 
 /* Seamless modality surfaces */
 .bp-modality-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0 18px}
-.bp-modality-tile{position:relative;min-height:150px;overflow:hidden;border:1px solid #303941;border-radius:20px;background:#0a0f13;box-shadow:0 14px 32px rgba(0,0,0,.2);isolation:isolate}
-.bp-modality-tile:before{content:"";position:absolute;inset:0;z-index:-2;background-image:var(--tile-art);background-size:cover;background-position:center;filter:brightness(.65) saturate(.86);transform:scale(1.02);transition:transform .5s var(--bp-ease),filter .3s ease}
-.bp-modality-tile:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,7,9,.06),rgba(5,7,9,.91)),linear-gradient(90deg,rgba(5,7,9,.52),transparent 72%)}
-.bp-modality-tile:hover:before{transform:scale(1.055);filter:brightness(.72) saturate(.9)}
+.bp-modality-tile{position:relative;min-height:158px;overflow:hidden;border:1px solid rgba(111,122,132,.34);border-radius:20px;background:#0a0f13;box-shadow:0 14px 32px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.035);isolation:isolate}
+.bp-modality-tile:before{content:"";position:absolute;inset:0;z-index:-2;background-image:var(--tile-art);background-size:cover;background-position:var(--tile-position,center);filter:brightness(.62) saturate(.78) contrast(1.02);transform:scale(1.02);transition:transform .5s var(--bp-ease),filter .3s ease}
+.bp-modality-tile:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,7,9,.12),rgba(5,7,9,.93)),linear-gradient(90deg,rgba(5,7,9,.64),rgba(5,7,9,.16) 74%,rgba(5,7,9,.28))}
+.bp-modality-tile:hover:before{transform:scale(1.055);filter:brightness(.69) saturate(.82) contrast(1.03)}
 .bp-modality-tile>div{position:absolute;left:15px;right:15px;bottom:14px}.bp-modality-tile span{display:block;color:var(--bp-gold);font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.bp-modality-tile strong{display:block;margin-top:5px;font-size:18px}.bp-modality-tile small{display:block;margin-top:3px;color:#b9c1c7}
-.bp-modality-tile.strength{--tile-art:url('../assets/artwork/strength/custom-heavy-deadlift.jpg?v=8800')}.bp-modality-tile.engine{--tile-art:url('../assets/artwork/engine/custom-ridge-runner.jpg?v=8800')}.bp-modality-tile.recovery{--tile-art:url('../assets/artwork/engine/alpine-lake.jpg?v=8800')}.bp-modality-tile.mobility{--tile-art:url('../assets/artwork/engine/forest-trail.jpg?v=8800')}
+.bp-modality-tile.strength{--tile-art:url('../assets/artwork/strength/custom-heavy-deadlift.jpg?v=8800');border-color:rgba(211,164,55,.42)}.bp-modality-tile.engine{--tile-art:url('../assets/artwork/engine/custom-ridge-runner.jpg?v=8930');--tile-position:74% center;border-color:rgba(211,164,55,.42)}.bp-modality-tile.recovery{--tile-art:url('../assets/artwork/engine/alpine-lake.jpg?v=8800')}.bp-modality-tile.mobility{--tile-art:url('../assets/artwork/engine/forest-trail.jpg?v=8800')}
 
 /* Weekly plan: calm planner, not a stack of unrelated rows */
 #planList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.plan-row{position:relative;min-height:178px;padding:18px 18px 16px 86px!important;border:1px solid #303940!important;border-radius:21px!important;overflow:hidden;background:linear-gradient(145deg,#11171c,#090d11)!important;box-shadow:0 14px 34px rgba(0,0,0,.18);transition:transform var(--bp-motion-fast) var(--bp-ease),border-color var(--bp-motion-fast) ease}

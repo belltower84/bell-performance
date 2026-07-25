@@ -104,3 +104,15 @@ Event missions now resolve through seven dedicated coaching families: running ev
 - The dashboard identifies the active training cycle, current block week, and current phase.
 - When all prescribed sessions are completed or resolved, the dashboard displays a prominent prompt to close the week and generate the next adaptive week.
 - The final week displays a block-complete review prompt rather than attempting to generate a nonexistent week.
+
+
+## 8.9.2 Engine Tile Artwork
+
+Replaced the dashboard Engine modality tile with a premium close-up air-bike image composed and graded to match the Strength tile. The tile retains native Bell typography and controls, uses a right-weighted crop for clear text space, and is cached for offline use.
+
+
+## 8.9.3 Dashboard Refinement
+
+- Replaced the dashboard Engine air-bike artwork with a trail-running hero.
+- Matched Strength and Engine card borders, overlays, contrast, and interaction treatment.
+- Reduced saturation and increased text-safe shadowing so the imagery feels integrated rather than generated or pasted on.

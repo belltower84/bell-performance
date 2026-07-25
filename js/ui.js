@@ -247,7 +247,7 @@ function renderWeeklyScheduleStrip() {
     const types=[];
     items.forEach(item=>scheduleTypesForItem(item).forEach(type=>{if(!types.includes(type))types.push(type);}));
     types.sort((a,b)=>({strength:0,engine:1}[a]??9)-({strength:0,engine:1}[b]??9));
-    const codes=types.length?types.map(type=>`<i class="schedule-code ${type}" title="${type==='strength'?'Strength':'Engine'}">${type==='strength'?'S':'<img class="engine-shoe-icon" src="./assets/icons/engine-shoe.svg?v=8620" alt="" aria-hidden="true">'}</i>`).join(""):`<i class="schedule-code rest" title="Rest / recovery">R</i>`;
+    const codes=types.length?types.map(type=>`<i class="schedule-code ${type}" title="${type==='strength'?'Strength':'Engine'}">${type==='strength'?'S':'<img class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=8640" alt="" aria-hidden="true">'}</i>`).join(""):`<i class="schedule-code rest" title="Rest / recovery">R</i>`;
     const allDone=items.length>0&&items.every(item=>item.done||item.status==="completed");
     const blended=types.includes("strength")&&types.includes("engine");
     return `<div class="weekly-schedule-day${key===today?' today':''}${allDone?' completed':''}${blended?' blended':''}" aria-label="${day}, ${date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}: ${types.length?types.join(' and '):'rest'}"><span class="day-name">${shortDays[index]}</span><span class="day-date">${date.toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}</span><div class="weekly-schedule-codes">${codes}</div></div>`;

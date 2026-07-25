@@ -11,13 +11,23 @@ function premiumSessionType(session){return scheduleTypeForMission(session?.miss
 function premiumInlineIcon(kind){
   const icons={
     strength:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6"/><path d="M6 7v10"/><path d="M9 6v12"/><path d="M15 6v12"/><path d="M18 7v10"/><path d="M21 9v6"/><path d="M9 12h6"/></svg>`,
-    engine:`<img class="engine-shoe-icon" src="./assets/icons/engine-shoe.svg?v=8620" alt="" aria-hidden="true">`,
+    engine:`<img class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=8640" alt="" aria-hidden="true">`,
     core:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4c1.8 2.7 5.2 2.7 7 5.4-1.3 1.9-1.3 4.1 0 6-1.8 2.7-5.2 2.7-7 5.4-1.8-2.7-5.2-2.7-7-5.4 1.3-1.9 1.3-4.1 0-6C6.8 6.7 10.2 6.7 12 4Z"/></svg>`,
     rest:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12c0 3.3 2.7 6 6 6 2.8 0 5.2-1.9 5.9-4.5A7 7 0 0 1 10.5 6 6 6 0 0 0 6 12Z"/></svg>`
   };
   return `<span class="premium-inline-icon ${kind}">${icons[kind]||icons.strength}</span>`;
 }
 function premiumSessionIcon(type){return premiumInlineIcon(type==='engine'?'engine':'strength');}
+
+function premiumSessionArtwork(type,session){
+  const copy=`${session?.label||''} ${session?.mission||''}`.toLowerCase();
+  if(type==='engine') return './assets/artwork/engine/mountain-trail.jpg?v=8650';
+  if(type==='core') return './assets/artwork/strength/custom-strength-shadows.jpg?v=8650';
+  if(copy.includes('upper')) return './assets/artwork/strength/upper-body.jpg?v=8650';
+  if(copy.includes('bodybuild')||copy.includes('hypertrophy')) return './assets/artwork/strength/bodybuilding.jpg?v=8650';
+  if(copy.includes('power')||copy.includes('deadlift')||copy.includes('squat')) return './assets/artwork/strength/powerlifting.jpg?v=8650';
+  return './assets/artwork/strength/strength-building.jpg?v=8650';
+}
 function premiumLocationSelector(){
   normalizeEquipmentSettings();const setup=data.settings.equipmentSetup,active=activeEquipmentLocation();
   return `<label class="premium-session-selector"><span>Training at</span><select onchange="switchEquipmentLocation(this.value)">${setup.locations.map(x=>`<option value="${x.id}" ${x.id===active.id?'selected':''}>${escapeHtml(x.name)}</option>`).join('')}</select></label>`;
@@ -32,12 +42,12 @@ function premiumSessionAction(session){
   return `<button class="premium-start-button" onclick="beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\\'")}')">${active?'Resume Workout':'Start Workout'} ›</button>`;
 }
 function premiumSessionRow(session){
-  const type=premiumSessionType(session), template=scaledTemplate(session.mission),duration=Number(session.prescribedDuration)||Number(template?.duration)||30;
-  return `<article class="premium-session-row ${type} ${session.completed?'completed':''}"><div class="premium-session-icon">${session.completed?'<span class="premium-complete-check">✓</span>':premiumSessionIcon(type)}</div><div class="premium-session-copy"><div class="premium-session-titleline"><span>${type==='engine'?'Engine':'Strength'}</span>${type==='engine'?premiumEngineSelector():premiumLocationSelector()}</div><strong>${escapeHtml(session.label||template?.label||session.mission)}</strong><small>◷ ${duration} min${session.detail?` · ${escapeHtml(session.detail)}`:''}</small></div>${premiumSessionAction(session)}</article>`;
+  const type=premiumSessionType(session), template=scaledTemplate(session.mission),duration=Number(session.prescribedDuration)||Number(template?.duration)||30,art=premiumSessionArtwork(type,session);
+  return `<article class="premium-session-row premium-session-hero ${type} ${session.completed?'completed':''}" style="--session-art:url('${art}')"><div class="premium-session-shade"></div><div class="premium-session-icon">${session.completed?'<span class="premium-complete-check">✓</span>':premiumSessionIcon(type)}</div><div class="premium-session-copy"><div class="premium-session-titleline"><span>${type==='engine'?'Engine':'Strength'}</span>${type==='engine'?premiumEngineSelector():premiumLocationSelector()}</div><strong>${escapeHtml(session.label||template?.label||session.mission)}</strong><small>◷ ${duration} min${session.detail?` · ${escapeHtml(session.detail)}`:''}</small></div>${premiumSessionAction(session)}</article>`;
 }
 function premiumOptionalCoreRow(){
-  const key=selectedDashboardDateKey(),done=optionalCoreCompletedForDate(key),name=coreSessionName(key),template=coreTemplate(name);
-  return `<article class="premium-session-row optional ${done?'completed':''}"><div class="premium-session-icon">${done?'<span class="premium-complete-check">✓</span>':premiumInlineIcon('core')}</div><div class="premium-session-copy"><span>Optional</span><strong>${escapeHtml(template.label)}</strong><small>${template.duration} min · Does not affect completion</small></div><button class="premium-session-status" ${done?'disabled':''} onclick="beginOptionalCore('${key}')">${done?'Completed':'Start ›'}</button></article>`;
+  const key=selectedDashboardDateKey(),done=optionalCoreCompletedForDate(key),name=coreSessionName(key),template=coreTemplate(name),art=premiumSessionArtwork('core');
+  return `<article class="premium-session-row premium-session-hero optional core ${done?'completed':''}" style="--session-art:url('${art}')"><div class="premium-session-shade"></div><div class="premium-session-icon">${done?'<span class="premium-complete-check">✓</span>':premiumInlineIcon('core')}</div><div class="premium-session-copy"><span>Optional Core</span><strong>${escapeHtml(template.label)}</strong><small>${template.duration} min · Does not affect completion</small></div><button class="premium-session-status" ${done?'disabled':''} onclick="beginOptionalCore('${key}')">${done?'Completed':'Start ›'}</button></article>`;
 }
 function renderPremiumMission(){
   const key=selectedDashboardDateKey(),date=localDateFromKey(key),today=localDateKey(),sessions=premiumAllSessions();
@@ -64,8 +74,16 @@ function renderPremiumWeek(){
   const host=byId('premiumWeekDays');if(!host)return;
   host.innerHTML=days.map((day,index)=>{
     const key=addLocalDays(monday,index),items=(data.plan||[]).filter(x=>planDateKey(x)===key&&!['skipped','replaced'].includes(x.status)),sessions=items.flatMap(sessionsFromPlanItem),allDone=sessions.length&&sessions.every(x=>x.completed),chips=sessions.length? sessions.slice(0,2).map(premiumWeekSessionChip).join('') : premiumWeekRestChip();
-    return `<button class="premium-week-day-card ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''} ${sessions.length>1?'two-a-day':''}" onclick="setDashboardDate('${key}')"><span>${day}</span><strong>${localDateFromKey(key).getDate()}</strong><div class="premium-week-chips">${chips}</div></button>`;
+    const label=sessions.length?sessions.map(x=>x.label||scaledTemplate(x.mission)?.label||x.mission).join(', '):'Rest / recovery';
+    return `<button class="premium-week-day-card ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''} ${sessions.length>1?'two-a-day':''}" onclick="setDashboardDate('${key}')" aria-label="${day} ${localDateFromKey(key).getDate()}: ${escapeHtml(label)}"><span>${day}</span><strong>${localDateFromKey(key).getDate()}</strong><div class="premium-week-chips">${chips}</div></button>`;
   }).join('');
+  const selectedItems=(data.plan||[]).filter(x=>planDateKey(x)===selected&&!['skipped','replaced'].includes(x.status)).flatMap(sessionsFromPlanItem);
+  const summary=byId('premiumWeekSelectedSummary');
+  if(summary){
+    const selectedDate=localDateFromKey(selected).toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+    const selectedCopy=selectedItems.length?selectedItems.map(x=>escapeHtml(x.label||scaledTemplate(x.mission)?.label||x.mission)).join(' · '):'Rest and recovery';
+    summary.innerHTML=`<span>${selectedDate}</span><strong>${selectedCopy}</strong><button type="button" onclick="showScreen('plan')">View plan ›</button>`;
+  }
 }
 
 function premiumReadinessMetric(value){return `${Math.max(1,Math.min(5,Math.round(Number(value)||1)))}/5`;}
@@ -88,7 +106,7 @@ function renderPremiumQuote(){
 function togglePremiumSupport(){const panel=byId('premiumSupportPanel');panel?.classList.toggle('hidden');renderPremiumSupport();}
 function renderPremiumSupport(){
   const host=byId('premiumSupportContent');if(!host)return;const key=selectedDashboardDateKey(),mobilityDone=data.mobility.completedDates.includes(key),coreDone=optionalCoreCompletedForDate(key);
-  host.innerHTML=`<div><span class="premium-kicker">Recovery Mobility</span><strong>${data.mobility.minutes||10} min ${escapeHtml(resolvedMobilityFocus())}</strong><p>${mobilityDone?'Completed for this day.':'Complete the current mobility prescription without adding training fatigue.'}</p><button class="premium-outline-button" ${mobilityDone?'disabled':''} onclick="completeMobility()">${mobilityDone?'Mobility Complete':'Complete Mobility'}</button></div><div><span class="premium-kicker">Optional Core</span><strong>${escapeHtml(coreTemplate(coreSessionName(key)).label)}</strong><p>Rotates by goal and recent core exposure. Never blocks mission completion.</p><button class="premium-outline-button" ${coreDone?'disabled':''} onclick="beginOptionalCore('${key}')">${coreDone?'Core Complete':'Start Core'}</button></div>`;
+  host.innerHTML=`<div class="premium-support-art mobility" style="--support-art:url('./assets/artwork/engine/alpine-lake.jpg?v=8650')"><div class="premium-support-art-shade"></div><div class="premium-support-art-copy"><span class="premium-kicker">Recovery Mobility</span><strong>${data.mobility.minutes||10} min ${escapeHtml(resolvedMobilityFocus())}</strong><p>${mobilityDone?'Completed for this day.':'Open the full mobility prescription and work through each movement.'}</p><button class="premium-outline-button" ${mobilityDone?'disabled':''} onclick="openMobilityRoutine('${key}')">${mobilityDone?'Mobility Complete':'View Mobility Routine'}</button></div></div><div class="premium-support-art core" style="--support-art:url('./assets/artwork/strength/custom-strength-shadows.jpg?v=8650')"><div class="premium-support-art-shade"></div><div class="premium-support-art-copy"><span class="premium-kicker">Optional Core</span><strong>${escapeHtml(coreTemplate(coreSessionName(key)).label)}</strong><p>Rotates by goal and recent core exposure. Never blocks mission completion.</p><button class="premium-outline-button" ${coreDone?'disabled':''} onclick="beginOptionalCore('${key}')">${coreDone?'Core Complete':'Start Core'}</button></div></div>`;
 }
 function percentChange(current,previous){if(!previous)return current?100:0;return Math.round((current-previous)/previous*100);}
 function renderPremiumProgress(){

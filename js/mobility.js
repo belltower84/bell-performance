@@ -66,3 +66,114 @@ function completeMobility() {
     alert("Daily mobility complete. +40 XP earned.");
   }
 }
+
+
+let activeMobilityDateKey = null;
+let mobilitySavedPageScroll = 0;
+
+function mobilityDateKey(dateKey) {
+  return dateKey || (typeof selectedDashboardDateKey === "function" ? selectedDashboardDateKey() : todayKey());
+}
+
+function openMobilityRoutine(dateKey) {
+  activeMobilityDateKey = mobilityDateKey(dateKey);
+  mobilitySavedPageScroll = window.scrollY;
+  document.body.style.top = `-${mobilitySavedPageScroll}px`;
+  document.body.classList.add("workout-open", "mobility-session");
+  const modal = document.getElementById("mobilityRoutineModal");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  modal.setAttribute("aria-hidden", "false");
+  renderMobilityRoutineScreen();
+}
+
+function closeMobilityRoutine() {
+  const modal = document.getElementById("mobilityRoutineModal");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden", "true");
+  }
+  document.body.classList.remove("workout-open", "mobility-session");
+  document.body.style.top = "";
+  window.scrollTo(0, mobilitySavedPageScroll);
+  activeMobilityDateKey = null;
+}
+
+function updateMobilityRoutineSettings() {
+  const focus = document.getElementById("mobilityRoutineFocusSelect");
+  const minutes = document.getElementById("mobilityRoutineMinutesSelect");
+  if (!focus || !minutes) return;
+  data.mobility.focus = focus.value;
+  data.mobility.minutes = Number(minutes.value) || 10;
+  const key = mobilityDateKey(activeMobilityDateKey);
+  data.mobility.checks[key] = {};
+  saveData({ render: false });
+  renderMobilityRoutineScreen();
+}
+
+function toggleMobilityRoutineMove(index, checked) {
+  const key = mobilityDateKey(activeMobilityDateKey);
+  data.mobility.checks[key] = data.mobility.checks[key] || {};
+  data.mobility.checks[key][index] = Boolean(checked);
+  saveData({ render: false });
+  renderMobilityRoutineScreen();
+}
+
+function renderMobilityRoutineScreen() {
+  const key = mobilityDateKey(activeMobilityDateKey);
+  const routine = dailyMobilityRoutine();
+  const checks = data.mobility.checks[key] || {};
+  const completed = routine.filter((_, index) => checks[index]).length;
+  const total = routine.length;
+  const percent = total ? Math.round((completed / total) * 100) : 0;
+  const focus = resolvedMobilityFocus();
+  const minutes = Number(data.mobility.minutes) || 10;
+  const done = data.mobility.completedDates.includes(key);
+
+  const focusSelect = document.getElementById("mobilityRoutineFocusSelect");
+  const minutesSelect = document.getElementById("mobilityRoutineMinutesSelect");
+  if (focusSelect) focusSelect.value = data.mobility.focus || "Auto";
+  if (minutesSelect) minutesSelect.value = String(minutes);
+  setText("mobilityRoutineTitle", done ? "Mobility Complete" : "Daily Mobility");
+  setText("mobilityRoutineHeroTitle", `${minutes} min ${focus}`);
+  setText("mobilityRoutineDuration", `${minutes} min`);
+  setText("mobilityRoutineFocus", focus);
+  setText("mobilityRoutineReason", data.mobility.focus === "Auto" ? `Auto-selected ${focus} to support today's training.` : `${focus} recovery routine selected.`);
+  setText("mobilityRoutineProgressText", `${completed} of ${total} movements complete`);
+  const bar = document.getElementById("mobilityRoutineProgressBar");
+  if (bar) bar.style.width = `${done ? 100 : percent}%`;
+
+  const host = document.getElementById("mobilityRoutineMoves");
+  if (host) {
+    host.innerHTML = routine.map((move, index) => `
+      <article class="mobility-routine-move ${checks[index] ? "complete" : ""}">
+        <button type="button" class="mobility-move-check" onclick="toggleMobilityRoutineMove(${index},${checks[index] ? "false" : "true"})" aria-pressed="${checks[index] ? "true" : "false"}">${checks[index] ? "✓" : index + 1}</button>
+        <div><span class="metric-label">Movement ${index + 1}</span><h3>${move[0]}</h3><p>${move[1]}</p><small>Move slowly and stay within a comfortable range.</small></div>
+      </article>`).join("");
+  }
+
+  const finish = document.getElementById("finishMobilityRoutineButton");
+  const hint = document.getElementById("mobilityRoutineFinishHint");
+  if (finish) {
+    finish.disabled = done || completed < total;
+    finish.textContent = done ? "Mobility Completed ✓" : completed < total ? `Complete ${total - completed} More Movement${total - completed === 1 ? "" : "s"}` : "Finish Mobility Routine";
+  }
+  if (hint) hint.textContent = done ? "Recovery mobility is complete for this day." : completed < total ? "Check off every movement before finishing the routine." : "Routine complete. Finish to record recovery work and earn XP.";
+}
+
+function finishMobilityRoutine() {
+  const key = mobilityDateKey(activeMobilityDateKey);
+  const routine = dailyMobilityRoutine();
+  const checks = data.mobility.checks[key] || {};
+  if (!routine.every((_, index) => checks[index])) {
+    alert("Complete each mobility movement before finishing the routine.");
+    return;
+  }
+  if (!data.mobility.completedDates.includes(key)) {
+    data.mobility.completedDates.push(key);
+    saveData({ render: false });
+  }
+  renderMobilityRoutineScreen();
+  if (typeof renderApp === "function") renderApp();
+  setTimeout(() => alert("Daily mobility complete. +40 XP earned."), 50);
+}

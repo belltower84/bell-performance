@@ -83,15 +83,27 @@ function setDevelopmentGoalOptions(_choice,{preserve=true}={}) {
   const label=byId("onboardingDevelopmentPanelLabel");
   if(label)label.textContent="Primary Discipline";
 }
-function renderOnboardingMissionState({preserveGoal=true}={}) {
+function setOnboardingPanelVisible(id,visible){
+  const panel=byId(id);
+  if(!panel)return;
+  panel.classList.toggle("hidden",!visible);
+  panel.hidden=!visible;
+  panel.setAttribute("aria-hidden",String(!visible));
+}
+function renderOnboardingMissionState({preserveGoal=true,scrollToPanel=false}={}) {
   const choice=onboardingMissionChoice();
   const selected=choice==="event"||choice==="development";
   const eventPath=choice==="event";
+  const developmentPath=choice==="development";
   const grid=byId("onboardingMissionPathGrid");
   grid?.classList.toggle("has-selection",selected);
-  byId("onboardingEventMissionPanel")?.classList.toggle("hidden",!eventPath);
-  byId("onboardingDevelopmentMissionPanel")?.classList.toggle("hidden",choice!=="development");
-  byId("onboardingChangeMissionType")?.classList.toggle("hidden",!selected);
+  setOnboardingPanelVisible("onboardingEventMissionPanel",eventPath);
+  setOnboardingPanelVisible("onboardingDevelopmentMissionPanel",developmentPath);
+  const changeControl=byId("onboardingChangeMissionType");
+  if(changeControl){
+    changeControl.classList.toggle("hidden",!selected);
+    changeControl.hidden=!selected;
+  }
   document.querySelectorAll("[data-mission-choice]").forEach(card=>{
     const active=card.dataset.missionChoice===choice;
     card.classList.toggle("active",active);
@@ -107,6 +119,17 @@ function renderOnboardingMissionState({preserveGoal=true}={}) {
   try{toggleSportGoalField();}catch(error){console.warn("Mission sport field update failed",error);}
   try{updateTrainingIdentityContext();}catch(error){console.warn("Mission identity preview failed",error);}
   try{updateOnboardingMissionPreview();}catch(error){console.warn("Mission preview failed",error);}
+  if(scrollToPanel){
+    const panel=eventPath?byId("onboardingEventMissionPanel"):byId("onboardingDevelopmentMissionPanel");
+    panel?.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+}
+function selectOnboardingMissionType(choice){
+  if(choice!=="event"&&choice!=="development")return;
+  document.querySelectorAll('input[name="onboardingMissionPath"]').forEach(radio=>{
+    radio.checked=radio.value===choice;
+  });
+  renderOnboardingMissionState({preserveGoal:true,scrollToPanel:true});
 }
 function toggleOnboardingMissionPath() { renderOnboardingMissionState(); }
 function changeOnboardingMissionType(){

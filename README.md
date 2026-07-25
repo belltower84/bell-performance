@@ -172,9 +172,12 @@ Replaced the visibly synthetic Today’s Mission and Weekly Schedule backgrounds
 First Flight now presents exactly two mission choices: Specific Event or Performance / Body Composition. The second path asks the athlete to select one primary discipline from the combined performance and body-composition disciplines, with an optional secondary dated goal when useful. Existing saved performance or body-composition missions migrate into the combined path.
 
 
-## 8.9.13 Mission path expansion
+## 8.9.14 Mission path expansion
 - First Flight initially displays exactly two mission choices: Train for an Event and Performance / Body Composition.
 - Selecting a choice hides the other choice and expands only the selected mission path.
 - Change Mission Type returns to the original two-choice screen without deleting saved mission fields.
 - Existing event and development mission data hydrates the correct selected path in Edit Mission / Event.
-- Service-worker cache version advanced to 8.9.13.
+- Service-worker cache version advanced to 8.9.14.
+
+## 8.9.14 Mission selection hotfix
+Mission-path selection now directly initializes and reveals the appropriate question panel, with native and CSS visibility state kept in sync.

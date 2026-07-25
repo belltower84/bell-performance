@@ -187,7 +187,7 @@ function loadOnboardingDualGoals(){
   toggleOnboardingMissionPath();toggleSecondaryGoalFields();toggleEventSecondaryGoalFields();updateTrainingIdentityContext();
 }
 
-function saveOnboardingDualGoals(buildPlan=true){
+function saveLegacyOnboardingMission(buildPlan=true){
   const path=onboardingMissionPath(),profile=selectedMissionProfile(),availability=missionAvailability(profile);
   if(byId("onboardingAthleteMode"))data.settings.athleteMode=byId("onboardingAthleteMode").value||"Hybrid Athlete";
   let mission,lengthWeeks;
@@ -244,7 +244,7 @@ function applyRecommendedFirstBlock(){
   updateOnboardingMissionPreview();return r;
 }
 
-function renderOnboardingReview(){
+function renderLegacyOnboardingReview(){
   if(typeof syncOnboardingEquipmentFromChecks==="function")syncOnboardingEquipmentFromChecks();
   const injurySummary=injuryProfileSummaryText(),primary=onboardingLocations.find(x=>x.id===onboardingActiveLocationId)||onboardingLocations[0],height=Number(data.nutrition.height)||66,p=selectedMissionProfile(),r=recommendedFirstBlockSettings(),start=byId("onboardingBlockStart")?.value==="nextMonday"?"Next Monday":"Today";
   const missionTitle=onboardingMissionPath()==="event"?(byId("onboardingEventName")?.value.trim()||byId("onboardingEventType")?.value||"Event Mission"):(byId("onboardingDevelopmentGoal")?.value||"Development Mission");
@@ -255,9 +255,9 @@ function renderOnboardingReview(){
   byId("onboardingReview").innerHTML=`<div><span>Athlete profile</span><strong>${escapeHtml(byId("onboardingAthleteName").value.trim())}</strong><small>Age ${escapeHtml(data.nutrition.age)} • ${escapeHtml(data.settings.weight)} lb • ${Math.floor(height/12)}′${height%12}″</small></div><div><span>Training background</span><strong>${escapeHtml(trainingIdentityLabel(byId("onboardingAthleteMode").value))}</strong><small>Supporting coaching preference; the mission remains the primary programming driver.</small></div><div><span>Strength baseline</span><strong>${enteredMaxes.length?`${enteredMaxes.length} max lift${enteredMaxes.length===1?"":"s"} entered`:"Effort-based loading"}</strong><small>${enteredMaxes.length?escapeHtml(enteredMaxes.join(" • ")):"No maxes entered; prescriptions will use RIR and RPE until updated."}</small></div><div><span>Movement limitations</span><strong>${escapeHtml(injurySummary.title)}</strong><small>${escapeHtml(injurySummary.detail)}</small></div><div><span>Primary workout location</span><strong>${escapeHtml(primary.name)}</strong><small>${primary.equipment.length} equipment options • ${onboardingLocations.length} saved location${onboardingLocations.length===1?"":"s"}</small></div><div><span>Mission</span><strong>${escapeHtml(missionTitle)}</strong><small>${escapeHtml(missionDetail)}</small></div><div><span>Derived training priorities</span><strong>${escapeHtml(p.strengthGoal)} + ${escapeHtml(p.engineMode)}</strong><small>${r.strengthDays} Strength exposures • ${r.engineDays} Engine exposures${r.combinedSessions?` • ${r.combinedSessions} blended`:""} • peak/deload logic included</small></div><div><span>Block launch</span><strong>${selectedOnboardingBlockMode()==="recommended"?"Recommended structure":"Mission-based structure"}</strong><small>Week 1 begins ${escapeHtml(start.toLowerCase())}</small></div><div><span>Coach messages</span><strong>${escapeHtml(byId("onboardingMessageStyle").value)}</strong><small>Preference saved</small></div>`;
 }
 
-function completeOnboarding(){
+function completeLegacyOnboarding(){
   if(selectedOnboardingBlockMode()==="recommended")applyRecommendedFirstBlock();
-  if(!saveOnboardingDualGoals(false))return;
+  if(!saveLegacyOnboardingMission(false))return;
   if(!saveFirstFlightProfile()||!saveOnboardingInjuryProfile())return;
   if(typeof saveOnboardingEquipment==="function")saveOnboardingEquipment();
   data.trainingBlock.startDate=byId("onboardingBlockStart")?.value==="nextMonday"?nextMondayKey():todayKey();

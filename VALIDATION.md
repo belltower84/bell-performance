@@ -1,4 +1,4 @@
-# Bell Performance 8.7.2 Validation
+# Bell Performance 8.7.3 Validation
 
 ## Changes verified
 - Removed the page 1 setup kicker and outdated required-field guidance.
@@ -9,5 +9,5 @@
 ## Static checks
 - All JavaScript files pass `node --check`.
 - No duplicate HTML IDs detected.
-- Service-worker cache and asset query versions updated to 8.7.2 / 8720.
+- Service-worker cache and asset query versions updated to 8.7.3 / 8730.
 - ZIP integrity validated after packaging.

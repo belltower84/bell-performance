@@ -1,4 +1,4 @@
-# Bell Performance 8.7.2
+# Bell Performance 8.7.3
 
 GitHub Pages-ready Bell Performance build.
 

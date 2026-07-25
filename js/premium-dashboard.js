@@ -21,12 +21,12 @@ function premiumSessionIcon(type){return premiumInlineIcon(type==='engine'?'engi
 
 function premiumSessionArtwork(type,session){
   const copy=`${session?.label||''} ${session?.mission||''}`.toLowerCase();
-  if(type==='engine') return './assets/artwork/engine/mountain-trail.jpg?v=8700';
-  if(type==='core') return './assets/artwork/strength/custom-strength-shadows.jpg?v=8700';
-  if(copy.includes('upper')) return './assets/artwork/strength/upper-body.jpg?v=8700';
-  if(copy.includes('bodybuild')||copy.includes('hypertrophy')) return './assets/artwork/strength/bodybuilding.jpg?v=8700';
-  if(copy.includes('power')||copy.includes('deadlift')||copy.includes('squat')) return './assets/artwork/strength/powerlifting.jpg?v=8700';
-  return './assets/artwork/strength/strength-building.jpg?v=8700';
+  if(type==='engine') return './assets/artwork/engine/mountain-trail.jpg?v=8710';
+  if(type==='core') return './assets/artwork/strength/custom-strength-shadows.jpg?v=8710';
+  if(copy.includes('upper')) return './assets/artwork/strength/upper-body.jpg?v=8710';
+  if(copy.includes('bodybuild')||copy.includes('hypertrophy')) return './assets/artwork/strength/bodybuilding.jpg?v=8710';
+  if(copy.includes('power')||copy.includes('deadlift')||copy.includes('squat')) return './assets/artwork/strength/powerlifting.jpg?v=8710';
+  return './assets/artwork/strength/strength-building.jpg?v=8710';
 }
 function premiumLocationSelector(){
   normalizeEquipmentSettings();const setup=data.settings.equipmentSetup,active=activeEquipmentLocation();
@@ -106,7 +106,7 @@ function renderPremiumQuote(){
 function togglePremiumSupport(){const panel=byId('premiumSupportPanel');panel?.classList.toggle('hidden');renderPremiumSupport();}
 function renderPremiumSupport(){
   const host=byId('premiumSupportContent');if(!host)return;const key=selectedDashboardDateKey(),mobilityDone=data.mobility.completedDates.includes(key),coreDone=optionalCoreCompletedForDate(key);
-  host.innerHTML=`<div class="premium-support-art mobility" style="--support-art:url('./assets/artwork/engine/alpine-lake.jpg?v=8700')"><div class="premium-support-art-shade"></div><div class="premium-support-art-copy"><span class="premium-kicker">Recovery Mobility</span><strong>${data.mobility.minutes||10} min ${escapeHtml(resolvedMobilityFocus())}</strong><p>${mobilityDone?'Completed for this day.':'Open the full mobility prescription and work through each movement.'}</p><button class="premium-outline-button" ${mobilityDone?'disabled':''} onclick="openMobilityRoutine('${key}')">${mobilityDone?'Mobility Complete':'View Mobility Routine'}</button></div></div><div class="premium-support-art core" style="--support-art:url('./assets/artwork/strength/custom-strength-shadows.jpg?v=8700')"><div class="premium-support-art-shade"></div><div class="premium-support-art-copy"><span class="premium-kicker">Optional Core</span><strong>${escapeHtml(coreTemplate(coreSessionName(key)).label)}</strong><p>Rotates by goal and recent core exposure. Never blocks mission completion.</p><button class="premium-outline-button" ${coreDone?'disabled':''} onclick="beginOptionalCore('${key}')">${coreDone?'Core Complete':'Start Core'}</button></div></div>`;
+  host.innerHTML=`<div class="premium-support-art mobility" style="--support-art:url('./assets/artwork/engine/alpine-lake.jpg?v=8710')"><div class="premium-support-art-shade"></div><div class="premium-support-art-copy"><span class="premium-kicker">Recovery Mobility</span><strong>${data.mobility.minutes||10} min ${escapeHtml(resolvedMobilityFocus())}</strong><p>${mobilityDone?'Completed for this day.':'Open the full mobility prescription and work through each movement.'}</p><button class="premium-outline-button" ${mobilityDone?'disabled':''} onclick="openMobilityRoutine('${key}')">${mobilityDone?'Mobility Complete':'View Mobility Routine'}</button></div></div><div class="premium-support-art core" style="--support-art:url('./assets/artwork/strength/custom-strength-shadows.jpg?v=8710')"><div class="premium-support-art-shade"></div><div class="premium-support-art-copy"><span class="premium-kicker">Optional Core</span><strong>${escapeHtml(coreTemplate(coreSessionName(key)).label)}</strong><p>Rotates by goal and recent core exposure. Never blocks mission completion.</p><button class="premium-outline-button" ${coreDone?'disabled':''} onclick="beginOptionalCore('${key}')">${coreDone?'Core Complete':'Start Core'}</button></div></div>`;
 }
 function percentChange(current,previous){if(!previous)return current?100:0;return Math.round((current-previous)/previous*100);}
 function renderPremiumProgress(){

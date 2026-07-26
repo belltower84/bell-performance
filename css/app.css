@@ -450,3 +450,6 @@ nav{left:50%;right:auto;bottom:12px;width:min(720px,calc(100vw - 24px));transfor
 .onboarding-step[data-onboarding-step="0"] > h3 { margin-top: 0; margin-bottom: 6px; }
 .onboarding-step[data-onboarding-step="0"] .first-flight-welcome-sub { margin-top: 0; margin-bottom: 18px; }
 .onboarding-step[data-onboarding-step="0"] .profile-basics-grid { margin-top: 0; }
+
+/* Bell Performance 9.0.1 — First Flight 2.0 */
+.schedule-choice-panel{display:grid;gap:18px}.readiness-divider{display:flex;align-items:center;gap:12px;margin:22px 0 12px;color:var(--gold,#d5aa55);font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.readiness-divider:after{content:"";height:1px;flex:1;background:rgba(213,170,85,.25)}.mission-ready-note{margin-top:18px;padding:16px 18px;border:1px solid rgba(213,170,85,.28);border-radius:14px;background:rgba(213,170,85,.06);display:flex;flex-direction:column;gap:5px}.mission-ready-note strong{color:#fff}.mission-ready-note span{color:var(--gold,#d5aa55);font-weight:700;letter-spacing:.04em}@media(max-width:700px){.first-flight-box{max-height:94vh}.onboarding-step[data-onboarding-step="4"] .onboarding-readiness-list{gap:12px}.onboarding-step[data-onboarding-step="4"] .readiness-slider-row{padding:12px}.mission-ready-note{margin-bottom:6px}}

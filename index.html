@@ -9,8 +9,8 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
-<title>Bell Performance 8.7.3 — Date-Aware Multi-Session Training</title>
-<link href="./css/app.css?v=8730" rel="stylesheet"/>
+<title>Bell Performance 9.0.1 — Date-Aware Multi-Session Training</title>
+<link href="./css/app.css?v=9010" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -25,7 +25,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=8730"/><div><h1>BELL PERFORMANCE</h1></div></div>
+<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=9010"/><div><h1>BELL PERFORMANCE</h1></div></div>
 <div class="header-actions"><button aria-label="Open notifications" id="notificationButton" onclick="openNotificationCenter()">◌<span id="notificationBadge">0</span></button><button aria-label="Open athlete profile" id="profileButton" onclick="openAthleteProfile()">◉</button></div>
 </header>
 <main>
@@ -62,7 +62,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="premium-section-heading"><div><span class="premium-kicker">Weekly Schedule</span><h2 id="premiumWeekTitle">This Week</h2></div><button class="premium-text-button" onclick="showScreen('plan')">Full Plan ›</button></div>
 <div class="premium-week-days" id="premiumWeekDays"></div>
 <div class="premium-week-selected-summary" id="premiumWeekSelectedSummary"></div>
-<div class="premium-week-legend"><span><b class="strength">↟</b> Strength</span><span><b class="engine"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=8730"/></b> Engine</span><span><b class="rest">○</b> Rest</span></div>
+<div class="premium-week-legend"><span><b class="strength">↟</b> Strength</span><span><b class="engine"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=9010"/></b> Engine</span><span><b class="rest">○</b> Rest</span></div>
 </section>
 <section class="premium-coach-card">
 <div class="premium-coach-icon">◍</div><div><span class="premium-kicker">Coach Briefing</span><strong id="premiumCoachTitle">Current phase guidance</strong><p id="premiumCoachText">Your programming guidance will appear here.</p></div>
@@ -120,8 +120,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div aria-label="Training day navigation" class="day-navigator"><button aria-label="Previous day" class="secondary compact-button" onclick="navigateDashboardDay(-1)">‹</button><button class="day-nav-current" id="dashboardDayButton" onclick="resetDashboardToToday()">Today</button><button aria-label="Next day" class="secondary compact-button" onclick="navigateDashboardDay(1)">›</button></div>
 <div class="card no-training-day hidden" id="noTrainingForDay"><strong id="noTrainingDayTitle">No prescribed training</strong><div class="hint" id="noTrainingDayDetail">Recovery, mobility, and daily standards remain available.</div></div>
 <div class="training-pair">
-<article class="training-card strength-card" id="strengthTrainingCard"><img alt="Strength athlete" id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=8730"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type">🏋 <span>STRENGTH</span></div><label class="training-quick-control strength-location-control" title="Change the equipment location used for strength substitutions"><span>Training at</span><select aria-label="Strength workout location" id="activeLocationQuick" onchange="switchEquipmentLocation(this.value);renderApp()"></select></label></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength &amp; Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
-<article class="training-card engine-card" id="engineTrainingCard"><img alt="Endurance athlete" id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=8730"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=8730"/> <span>ENGINE</span></div><label class="training-quick-control engine-mode-control" title="Choose today's engine modality"><span>Engine mode</span><select aria-label="Today's engine mode" id="engineModeQuick" onchange="switchQuickEngineMode(this.value)"></select></label></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
+<article class="training-card strength-card" id="strengthTrainingCard"><img alt="Strength athlete" id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=9010"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type">🏋 <span>STRENGTH</span></div><label class="training-quick-control strength-location-control" title="Change the equipment location used for strength substitutions"><span>Training at</span><select aria-label="Strength workout location" id="activeLocationQuick" onchange="switchEquipmentLocation(this.value);renderApp()"></select></label></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength &amp; Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
+<article class="training-card engine-card" id="engineTrainingCard"><img alt="Endurance athlete" id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=9010"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=9010"/> <span>ENGINE</span></div><label class="training-quick-control engine-mode-control" title="Choose today's engine modality"><span>Engine mode</span><select aria-label="Today's engine mode" id="engineModeQuick" onchange="switchQuickEngineMode(this.value)"></select></label></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
 </div>
 <div class="card single-session-option hidden" id="singleSessionOption"></div>
 <div class="hidden" id="todayPreview"></div>
@@ -324,7 +324,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="modal-box first-flight-box">
 <div class="first-flight-shell">
 <header class="first-flight-header">
-<div><span class="metric-label" id="onboardingVersion">Bell Performance 8.7.3</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
+<div><span class="metric-label" id="onboardingVersion">Bell Performance 9.0.1</span><h2 id="onboardingTitle">First Flight</h2><p id="onboardingStepSubtitle">Build your athlete profile and training environment.</p></div>
 <div class="first-flight-step-badge"><strong id="onboardingStepNumber">1</strong><span>of 6</span></div>
 </header>
 <div class="first-flight-progress"><i id="onboardingProgress"></i></div>
@@ -364,24 +364,29 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <input id="onboardingAthleteMode" type="hidden"/><div class="hidden" id="onboardingAthleteModeDescription"></div>
 </section>
 <section class="onboarding-step" data-onboarding-step="2">
-<span class="first-flight-kicker">Flight Check 03</span><h3>Would you like to emphasize anything?</h3>
-<p class="sub">A secondary goal modifies the primary program. It does not replace it.</p>
-<label>Secondary goal <span class="optional-label">optional</span></label>
+<span class="first-flight-kicker">Flight Check 03</span><h3>Choose your training focus</h3>
+<p class="sub">Your focus changes the emphasis of the program while Strength, Engine, Mobility, and Core remain in every block.</p>
+<label>Training focus <span class="optional-label">optional</span></label>
 <div class="secondary-goal-grid" id="onboardingSecondaryGoalGrid"></div>
 <select class="hidden" id="onboardingSecondaryEmphasis" aria-hidden="true"></select>
-<div class="hidden" id="onboardingSecondaryDateWrap"><label>Target date <span class="optional-label">optional</span></label><input id="onboardingSecondaryTargetDate" type="date"/></div>
+<div class="hidden" id="onboardingSecondaryDateWrap"><label>Target date</label><input id="onboardingSecondaryTargetDate" type="date"/></div>
+<input id="onboardingStrengthGoal" type="hidden"/><input id="onboardingEngineMode" type="hidden"/><input id="onboardingEngineGoal" type="hidden"/><input id="onboardingStrengthDays" type="hidden"/><input id="onboardingEngineDays" type="hidden"/><input id="onboardingBlockLength" type="hidden" value="12"/>
+</section>
+<section class="onboarding-step" data-onboarding-step="3">
+<span class="first-flight-kicker">Flight Check 04</span><h3>Build a schedule you can sustain</h3>
+<p class="sub">Choose the weekly commitment, session length, and equipment Bell Performance should program around.</p>
+<div class="schedule-choice-panel">
 <div class="row"><div><label>Training days per week</label><select id="onboardingTrainingDays"><option>3</option><option>4</option><option selected="">5</option><option>6</option></select></div><div><label>Typical session length</label><select id="onboardingSessionMinutes"><option value="45">45 minutes</option><option selected="" value="60">60 minutes</option><option value="75">75 minutes</option><option value="90">90 minutes</option></select></div></div>
 <label>Primary training environment</label><div class="environment-choice-grid" id="onboardingEnvironmentChoices">
 <label><input checked="" name="onboardingSimpleEnvironment" type="radio" value="commercial"/><span><strong>Commercial Gym</strong><small>Full equipment access</small></span></label>
 <label><input name="onboardingSimpleEnvironment" type="radio" value="home"/><span><strong>Home Gym</strong><small>Rack, barbell, dumbbells, or similar</small></span></label>
 <label><input name="onboardingSimpleEnvironment" type="radio" value="minimal"/><span><strong>Minimal Equipment</strong><small>Dumbbells, bands, kettlebells</small></span></label>
 <label><input name="onboardingSimpleEnvironment" type="radio" value="bodyweight"/><span><strong>Bodyweight</strong><small>No equipment required</small></span></label>
-</div>
-<input id="onboardingStrengthGoal" type="hidden"/><input id="onboardingEngineMode" type="hidden"/><input id="onboardingEngineGoal" type="hidden"/><input id="onboardingStrengthDays" type="hidden"/><input id="onboardingEngineDays" type="hidden"/><input id="onboardingBlockLength" type="hidden" value="12"/>
+</div></div>
 </section>
-<section class="onboarding-step" data-onboarding-step="3">
-<span class="first-flight-kicker">Flight Check 04</span><h3>Training background and limitations</h3>
-<p class="sub">One experience choice and a simple limitation check are enough to start.</p>
+<section class="onboarding-step" data-onboarding-step="4">
+<span class="first-flight-kicker">Flight Check 05</span><h3>Set your starting point</h3>
+<p class="sub">Training experience, current limitations, and readiness help Bell Performance scale the first week responsibly.</p>
 <label>Training experience</label><div class="experience-choice-grid">
 <label><input name="onboardingExperience" type="radio" value="Beginner"/><span><strong>Beginner</strong><small>New or returning after a long break</small></span></label>
 <label><input checked="" name="onboardingExperience" type="radio" value="Intermediate"/><span><strong>Intermediate</strong><small>Consistent training experience</small></span></label>
@@ -393,11 +398,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <label>Short note <span class="optional-label">optional</span></label><textarea id="onboardingInjuryNotes" maxlength="300" placeholder="Example: Avoid running impact and deep knee flexion."></textarea>
 </div>
 <div class="hidden" id="onboardingLimitationGrid"></div><input class="hidden" id="onboardingMedicalClearance" type="checkbox"/>
-<div class="first-flight-callout"><strong>Safety</strong><span>Bell Performance modifies training selections but does not diagnose or treat injuries.</span></div>
-</section>
-<section class="onboarding-step" data-onboarding-step="4">
-<span class="first-flight-kicker">Flight Check 05</span><h3>Set today’s readiness</h3>
-<p class="sub">Use the same check-in controls you will see each training day. Higher is always better.</p>
+<div class="readiness-divider"><span>Current readiness</span></div>
 <div class="readiness-slider-list onboarding-readiness-list">
 <label class="readiness-slider-row sleep-slider-row" for="onboardingSleepDurationMinutes"><div class="readiness-slider-heading"><span>Sleep duration</span><strong id="onboardingSleepDurationValue">7h 30m</strong></div><input id="onboardingSleepDurationMinutes" max="720" min="180" step="15" type="range" value="450"/><div class="readiness-slider-ends"><span>3h</span><small>15-minute increments</small><span>12h</span></div></label>
 <label class="readiness-slider-row" for="onboardingSleepQuality"><div class="readiness-slider-heading"><span>Sleep quality</span><strong id="onboardingSleepQualityValue">4 · Good</strong></div><input id="onboardingSleepQuality" max="5" min="1" step="1" type="range" value="4"/><div class="readiness-slider-ends"><span>1 · Poor</span><span>5 · Excellent</span></div></label>
@@ -408,11 +409,13 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </div>
 <div class="onboarding-coach-preference"><label>Coach message style</label><select id="onboardingMessageStyle"><option value="Performance">Performance</option><option value="Stoic">Stoic</option><option value="Faith-Based">Faith-Based</option><option value="Mixed">Mixed</option><option value="Off">Off</option></select><div id="onboardingScriptureWrap"><label>Scripture frequency</label><select id="onboardingScriptureFrequency"><option>Occasionally</option><option>Several</option><option>Daily</option></select></div></div>
 <input checked="" class="hidden" name="onboardingBlockMode" type="radio" value="recommended"/><select class="hidden" id="onboardingBlockStart"><option selected="" value="today">Today</option><option value="nextMonday">Next Monday</option></select>
+<div class="first-flight-callout"><strong>Safety</strong><span>Bell Performance modifies training selections but does not diagnose or treat injuries.</span></div>
 </section>
 <section class="onboarding-step" data-onboarding-step="5">
 <span class="first-flight-kicker">Flight Check 06</span><h3>Mission ready</h3>
-<p class="sub">Review the essentials. You can refine any detail later without resetting the app.</p>
+<p class="sub">Review your training block before Bell Performance builds Week 1.</p>
 <div class="onboarding-review" id="onboardingReview"></div>
+<div class="mission-ready-note"><strong>Your block always includes</strong><span>Strength · Engine · Mobility · Core</span></div>
 </section>
 </div>
 <footer class="first-flight-footer"><button class="secondary" id="onboardingBack" onclick="previousOnboardingStep()" type="button">Back</button><button id="onboardingNext" onclick="nextOnboardingStep()" type="button">Continue</button></footer>
@@ -444,7 +447,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
 <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
 </div>
-<div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=8730"/><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
+<div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=9010"/><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
 <div class="card workout-control-card">
 <h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
 <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
@@ -476,32 +479,32 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="history"><span class="icon">◷</span>History</button>
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
-<script>window.BELL_APP_VERSION = "8.7.3";</script>
-<script src="./data/workouts.js?v=8730"></script>
-<script src="./js/exercise-library.js?v=8730"></script>
-<script src="./js/storage.js?v=8730"></script>
-<script src="./js/readiness.js?v=8730"></script>
-<script src="./js/equipment.js?v=8730"></script>
+<script>window.BELL_APP_VERSION = "9.0.1";</script>
+<script src="./data/workouts.js?v=9010"></script>
+<script src="./js/exercise-library.js?v=9010"></script>
+<script src="./js/storage.js?v=9010"></script>
+<script src="./js/readiness.js?v=9010"></script>
+<script src="./js/equipment.js?v=9010"></script>
 <script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");</script>
-<script src="./js/training-blocks.js?v=8730"></script>
-<script src="./js/mobility.js?v=8730"></script>
-<script src="./js/nutrition.js?v=8730"></script>
-<script src="./js/milestones.js?v=8730"></script>
-<script src="./js/progression.js?v=8730"></script>
-<script src="./js/workouts.js?v=8730"></script>
-<script src="./js/missed-sessions.js?v=8730"></script>
-<script src="./js/performance-review.js?v=8730"></script>
-<script src="./js/artwork.js?v=8730"></script>
-<script src="./js/quote-cache.js?v=8730"></script>
-<script src="./js/ui.js?v=8730"></script>
-<script src="./js/habits.js?v=8730"></script>
-<script src="./js/dual-goals.js?v=8730"></script>
-<script src="./js/version-8.js?v=8730"></script>
-<script src="./js/mission-planner.js?v=8730"></script>
-<script src="./js/coaching-pathways.js?v=8730"></script>
-<script src="./js/event-coaching.js?v=8730"></script>
-<script src="./js/how-to.js?v=8730"></script>
-<script src="./js/premium-dashboard.js?v=8730"></script>
-<script src="./js/app.js?v=8730"></script>
+<script src="./js/training-blocks.js?v=9010"></script>
+<script src="./js/mobility.js?v=9010"></script>
+<script src="./js/nutrition.js?v=9010"></script>
+<script src="./js/milestones.js?v=9010"></script>
+<script src="./js/progression.js?v=9010"></script>
+<script src="./js/workouts.js?v=9010"></script>
+<script src="./js/missed-sessions.js?v=9010"></script>
+<script src="./js/performance-review.js?v=9010"></script>
+<script src="./js/artwork.js?v=9010"></script>
+<script src="./js/quote-cache.js?v=9010"></script>
+<script src="./js/ui.js?v=9010"></script>
+<script src="./js/habits.js?v=9010"></script>
+<script src="./js/dual-goals.js?v=9010"></script>
+<script src="./js/version-8.js?v=9010"></script>
+<script src="./js/mission-planner.js?v=9010"></script>
+<script src="./js/coaching-pathways.js?v=9010"></script>
+<script src="./js/event-coaching.js?v=9010"></script>
+<script src="./js/how-to.js?v=9010"></script>
+<script src="./js/premium-dashboard.js?v=9010"></script>
+<script src="./js/app.js?v=9010"></script>
 </body>
 </html>

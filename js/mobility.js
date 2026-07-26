@@ -76,15 +76,25 @@ function mobilityDateKey(dateKey) {
 }
 
 function openMobilityRoutine(dateKey) {
+  const modal = document.getElementById("mobilityRoutineModal");
+  if (!modal) {
+    console.error("Bell Performance: mobility routine modal is missing.");
+    return;
+  }
   activeMobilityDateKey = mobilityDateKey(dateKey);
   mobilitySavedPageScroll = window.scrollY;
-  document.body.style.top = `-${mobilitySavedPageScroll}px`;
-  document.body.classList.add("workout-open", "mobility-session");
-  const modal = document.getElementById("mobilityRoutineModal");
-  if (!modal) return;
-  modal.classList.remove("hidden");
-  modal.setAttribute("aria-hidden", "false");
-  renderMobilityRoutineScreen();
+  try {
+    renderMobilityRoutineScreen();
+    document.body.style.top = `-${mobilitySavedPageScroll}px`;
+    document.body.classList.add("workout-open", "mobility-session");
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden", "false");
+  } catch (error) {
+    console.error("Bell Performance: unable to open mobility routine.", error);
+    document.body.classList.remove("workout-open", "mobility-session");
+    document.body.style.top = "";
+    activeMobilityDateKey = null;
+  }
 }
 
 function closeMobilityRoutine() {

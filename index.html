@@ -9,9 +9,8 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
-<title>Bell Performance 10 — Digital Athlete Coach</title>
-<link href="./css/app.css?v=10000" rel="stylesheet"/>
-<link href="./css/bell10.css?v=10000" rel="stylesheet"/>
+<title>Bell Performance 9.0.1 — Date-Aware Multi-Session Training</title>
+<link href="./css/app.css?v=9050" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -26,7 +25,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=10000"/><div><h1>BELL PERFORMANCE <span class="bp10-mark">10</span></h1><div class="brand-tagline">DIGITAL ATHLETE COACH</div></div></div>
+<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=9050"/><div><h1>BELL PERFORMANCE</h1></div></div>
 <div class="header-actions"><button aria-label="Open notifications" id="notificationButton" onclick="openNotificationCenter()">◌<span id="notificationBadge">0</span></button><button aria-label="Open athlete profile" id="profileButton" onclick="openAthleteProfile()">◉</button></div>
 </header>
 <main>
@@ -138,10 +137,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </div>
 </section>
 <section class="screen" id="plan"><h2 class="section-title">Training Plan</h2><div id="planProgressArea"></div><div class="list" id="planList"></div></section>
-<section class="screen" id="workouts">
-<div class="bp10-screen-hero bp10-train-hero"><div><span class="bp10-kicker">EXECUTE THE MISSION</span><h2>Train</h2><p>Start today’s prescribed session or open the training library.</p></div><button class="bp10-primary" type="button" onclick="bp10StartToday()">Start Today</button></div>
-<div class="bp10-coach-ribbon"><span>COACH</span><p id="bp10TrainCoach">Quality work first. Bell will keep your session focused and save progress as you train.</p></div>
-<div class="section-heading"><h2 class="section-title">Training Library</h2><button onclick="openExerciseLibrary()" type="button">Exercise Library ›</button></div><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div class="list" id="workoutLibrary"></div></section>
+<section class="screen" id="workouts"><div class="section-heading"><h2 class="section-title">Training Library</h2><button onclick="openExerciseLibrary()" type="button">Exercise Library ›</button></div><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div class="list" id="workoutLibrary"></div></section>
 <section class="screen" id="exerciseLibrary">
 <div class="section-heading"><div><span class="metric-label">Movement Education &amp; Substitution</span><h2 class="section-title">Exercise Intelligence Library</h2></div><button onclick="showScreen('more')" type="button">Settings ›</button></div>
 <div class="card exercise-library-intro"><div><h3>Understand it. Perform it. Replace it intelligently.</h3><p class="sub">Search every movement currently used by Bell Performance. Open an exercise for setup, execution, muscles trained, common mistakes, and purpose-matched alternatives.</p></div><div class="library-count"><strong id="exerciseLibraryCount">0</strong><span>movements</span></div></div>
@@ -175,23 +171,9 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="performance-callout" id="habitWeekSummary">No habit history yet.</div>
 </div>
 </section>
-<section class="screen" id="history">
-<div class="bp10-screen-hero"><div><span class="bp10-kicker">YOUR TRAINING STORY</span><h2>Progress</h2><p>Understand what is improving, what needs attention, and what Bell changes next.</p></div><div class="bp10-score-orb"><strong id="bp10ComplianceScore">—</strong><span>COMPLIANCE</span></div></div>
-<div class="bp10-progress-story" id="bp10ProgressStory"><div><span>Strength</span><strong>Building</strong></div><div><span>Engine</span><strong>Building</strong></div><div><span>Consistency</span><strong>Tracking</strong></div><div><span>Recovery</span><strong>Ready</strong></div></div>
-<h2 class="section-title">Performance Review</h2><div id="weeklyReview"></div><div id="blockReview"></div><div id="milestoneReview"></div><h2 class="section-title">Training History</h2><div class="list" id="historyList"></div></section>
+<section class="screen" id="history"><h2 class="section-title">Performance Review</h2><div id="weeklyReview"></div><div id="blockReview"></div><div id="milestoneReview"></div><h2 class="section-title">Training History</h2><div class="list" id="historyList"></div></section>
 <section class="screen" id="more">
-<div class="bp10-control-hero"><div><span class="bp10-kicker">ATHLETE COMMAND</span><h2>Control Center</h2><p>Manage your athlete profile, mission, training environment, coaching, and app data.</p></div><div class="bp10-athlete-badge"><strong id="bp10AthleteInitials">BP</strong><span id="bp10ControlPhase">ACTIVE</span></div></div>
-<div class="bp10-control-summary" id="bp10ControlSummary"><div><span>ATHLETE</span><strong id="bp10ControlAthlete">Athlete</strong></div><div><span>MISSION</span><strong id="bp10ControlMission">Build your mission</strong></div><div><span>PHASE</span><strong id="bp10ControlCurrentPhase">Foundation</strong></div><div><span>NEXT SESSION</span><strong id="bp10ControlNext">View Home</strong></div></div>
-<div class="bp10-control-grid">
-<button type="button" onclick="bp10OpenControl('athlete')"><b>◉</b><span><strong>Athlete</strong><small>Profile and body metrics</small></span><i>›</i></button>
-<button type="button" onclick="bp10OpenControl('mission')"><b>⚑</b><span><strong>Mission</strong><small>Goal, event, and block</small></span><i>›</i></button>
-<button type="button" onclick="bp10OpenControl('training')"><b>↟</b><span><strong>Training</strong><small>Schedule and equipment</small></span><i>›</i></button>
-<button type="button" onclick="bp10OpenControl('coach')"><b>◍</b><span><strong>Coach</strong><small>Readiness and progression</small></span><i>›</i></button>
-<button type="button" onclick="bp10OpenControl('help')"><b>?</b><span><strong>Help</strong><small>Guided tour and library</small></span><i>›</i></button>
-<button type="button" onclick="bp10OpenControl('data')"><b>⇩</b><span><strong>Data</strong><small>Backup, restore, and reset</small></span><i>›</i></button>
-</div>
-<div class="bp10-settings-divider"><span>DETAILED CONTROLS</span></div>
-<h2 class="section-title bp10-legacy-settings-title">Athlete &amp; App Controls</h2>
+<h2 class="section-title">Settings &amp; Data</h2>
 <div class="settings-section-heading"><span class="metric-label">Support</span><h3>Help</h3></div>
 <div class="card how-to-card">
 <div class="how-to-copy">
@@ -547,7 +529,13 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
 <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
 </div>
-<div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=9050"/><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
+<div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=10000"/><div><span class="metric-label">Today's Mission</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Hard</span><span id="workoutHeroWeek">Week 1 • Training</span></div></div></div>
+<div class="mission-briefing-grid" id="missionBriefing">
+  <section class="card mission-coach-brief"><span class="metric-label">Coach's Brief</span><h3 id="workoutBriefHeading">Why today matters</h3><p id="workoutCoachBrief">Your briefing will appear here.</p><div class="mission-focus-list" id="workoutFocusList"></div></section>
+  <section class="card mission-session-breakdown"><span class="metric-label">Session Breakdown</span><div id="workoutSectionList"></div><div class="mission-total"><span>Total estimated time</span><strong id="workoutBreakdownTotal">—</strong></div></section>
+  <section class="card mission-success-card"><span class="metric-label">Success Today</span><div id="workoutSuccessList"></div></section>
+  <section class="card mission-details-card"><span class="metric-label">Mission Details</span><div class="mission-detail-metrics"><div><strong id="workoutSetCount">—</strong><span>Work Sets</span></div><div><strong id="workoutIntensity">—</strong><span>Intensity</span></div></div><div class="mission-equipment"><span>Equipment</span><p id="workoutEquipment">—</p></div><div class="mission-next"><span>Next Session</span><strong id="workoutNextTitle">No session scheduled</strong><small id="workoutNextDetail"></small></div></section>
+</div>
 <div class="card workout-control-card">
 <h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
 <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
@@ -572,12 +560,12 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="card"><label>Session RPE</label><input id="sessionRpe" max="10" min="1" type="number"/><label>Training Notes</label><textarea id="sessionNotes"></textarea><button class="good" onclick="completeWorkout()">Finish Training</button></div>
 </div>
 </div>
-<nav class="bp10-nav" aria-label="Primary navigation">
+<nav>
 <button class="active" data-screen="home"><span class="icon">⌂</span>Home</button>
-<button data-screen="plan"><span class="icon">▦</span>Plan</button>
-<button data-screen="workouts"><span class="icon bp10-train-icon">▶</span>Train</button>
-<button data-screen="history"><span class="icon">↗</span>Progress</button>
-<button data-screen="more"><span class="icon">◉</span>Control</button>
+<button data-screen="plan"><span class="icon">☷</span>Plan</button>
+<button data-screen="workouts"><span class="icon">⚒</span>Training</button>
+<button data-screen="history"><span class="icon">◷</span>History</button>
+<button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
 <script>window.BELL_APP_VERSION = "10.0.0-foundation";</script>
 <script src="./data/workouts.js?v=9050"></script>
@@ -591,7 +579,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/nutrition.js?v=9050"></script>
 <script src="./js/milestones.js?v=9050"></script>
 <script src="./js/progression.js?v=9050"></script>
-<script src="./js/workouts.js?v=9050"></script>
+<script src="./js/workout-model.js?v=10000"></script>
+<script src="./js/workouts.js?v=10000"></script>
 <script src="./js/missed-sessions.js?v=9050"></script>
 <script src="./js/performance-review.js?v=9050"></script>
 <script src="./js/artwork.js?v=9050"></script>
@@ -608,7 +597,6 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/block-lifecycle.js?v=9050"></script>
 <script src="./js/weekly-debrief.js?v=9050"></script>
 <script src="./js/plan-progress.js?v=9050"></script>
-<script src="./js/app.js?v=10000"></script>
-<script src="./js/bell10.js?v=10000"></script>
+<script src="./js/app.js?v=9050"></script>
 </body>
 </html>

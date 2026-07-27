@@ -21,10 +21,13 @@ function premiumDisplayLabel(session){
       .replace(/\s*[-–—:|•]*\s*(?:engine|conditioning|cardio)\s*$/i,'')
       .trim()||String(data.settings?.cardioType||'Engine');
   }
+  const parts=raw.split(/\s+[—–|:]\s+/).map(x=>x.trim()).filter(Boolean);
+  if(parts.length>1&&/\b(?:upper|lower|full body|strength|hypertrophy|power|powerbuilding|bodybuilding|session|workout)\b/i.test(parts[0])){
+    return parts.slice(1).join(' — ');
+  }
   return raw
-    .replace(/^\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|training|workout|session)\s*[-–—:|•]*\s*/i,'')
+    .replace(/^\s*(?:upper|lower|full body)?\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|training|workout|session)(?:\s+[A-Z])?\s*[-–—:|•]*\s*/i,'')
     .replace(/\s*[-–—:|•]*\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|training|workout|session)\s*$/i,'')
-    .replace(/\b(?:strength|hypertrophy|powerbuilding|bodybuilding)\b\s*[-–—:|•]\s*/ig,'')
     .trim()||'Full Body';
 }
 function premiumInlineIcon(kind){
@@ -62,9 +65,7 @@ function premiumSessionAction(session){
 }
 function premiumSessionRow(session){
   const type=premiumSessionType(session), template=scaledTemplate(session.mission),duration=Number(session.prescribedDuration)||Number(template?.duration)||30;
-  const date=localDateFromKey(selectedDashboardDateKey());
-  const day=date.toLocaleDateString('en-US',{weekday:'long'});
-  return `<article class="premium-session-row compact-mission ${type} ${session.completed?'completed':''}" onclick="${session.completed?"showScreen('history')":`beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\'")}')`}"><div class="premium-session-copy"><strong>${escapeHtml(premiumDisplayLabel(session))}</strong><small>${day} · ◷ ${duration} min</small></div>${premiumSessionAction(session)}</article>`;
+  return `<article class="premium-session-row compact-mission ${type} ${session.completed?'completed':''}" onclick="${session.completed?"showScreen('history')":`beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\'")}')`}"><div class="premium-session-copy"><strong>${escapeHtml(premiumDisplayLabel(session))}</strong><small>◷ ${duration} min estimated</small></div>${premiumSessionAction(session)}</article>`;
 }
 function premiumOptionalCoreRow(){
   const key=selectedDashboardDateKey(),done=optionalCoreCompletedForDate(key),name=coreSessionName(key),template=coreTemplate(name),art=premiumSessionArtwork('core');
@@ -122,9 +123,10 @@ function premiumReadinessMetric(value){return `${Math.max(1,Math.min(5,Math.roun
 function premiumSleepDuration(r){const h=Math.max(0,Number(r.sleepHours)||0),m=Math.max(0,Number(r.sleepMinutes)||0);return `${h}h ${String(m).padStart(2,'0')}m`;}
 function renderPremiumReadiness(){
   const score=readinessScore(),status=readinessStatus(score),r=data.settings.readiness||{};
-  setText('premiumReadinessScore',String(score));setText('premiumReadinessStatus',status);setText('premiumReadinessDetail',trainingStatusText(status));
-  setText('premiumSleep',premiumSleepDuration(r));setText('premiumEnergy',premiumReadinessMetric(r.energy));setText('premiumSoreness',premiumReadinessMetric(r.recoveryStatus));setText('premiumMotivation',premiumReadinessMetric(r.motivation));
   const checkedIn=r.lastPromptDate===todayKey();
+  const descriptions={GREEN:'High readiness. You are recovered and ready for the full training prescription.',YELLOW:'Moderate readiness. Train with purpose and let quality lead the day.',RED:'Low readiness. Recovery comes first, so today’s demand has been adjusted.'};
+  setText('premiumReadinessScore',checkedIn?String(score):'—');setText('premiumReadinessStatus',checkedIn?status:'CHECK IN');setText('premiumReadinessDetail',checkedIn?descriptions[status]:'Complete today’s check-in to personalize your training.');
+  setText('premiumSleep',premiumSleepDuration(r));setText('premiumEnergy',premiumReadinessMetric(r.energy));setText('premiumSoreness',premiumReadinessMetric(r.recoveryStatus));setText('premiumMotivation',premiumReadinessMetric(r.motivation));
   const card=byId('premiumReadinessCard');if(card){card.dataset.status=status.toLowerCase();card.dataset.complete=checkedIn?'true':'false';card.setAttribute('aria-label',checkedIn?`Readiness ${score}, ${status}`:'Readiness check-in not completed');}
   const btn=card?.querySelector('.premium-readiness-update');if(btn)btn.textContent=(checkedIn?'Update':'Check In');
 }

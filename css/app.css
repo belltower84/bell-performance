@@ -675,3 +675,29 @@ nav{left:50%;right:auto;bottom:12px;width:min(720px,calc(100vw - 24px));transfor
   .premium-session-stack.is-scrollable{grid-auto-columns:92%!important}
   .premium-session-row.compact-mission{align-items:stretch!important}
 }
+
+
+/* Bell Performance 10.0.8 — coaching-first hierarchy and simplified mission names */
+.premium-readiness-card{order:0!important;padding:0 18px 17px!important;display:flex!important;flex-direction:column!important;gap:0!important;min-height:0!important;text-align:center!important}
+.premium-quote-card{order:1!important}
+.premium-coach-card{order:2!important}
+.premium-standards-card{order:3!important}
+.premium-mission-card{order:4!important}
+.premium-next-card{order:5!important}
+.premium-readiness-banner{align-self:stretch;margin:0 -18px 15px;padding:12px 16px;background:linear-gradient(90deg,#d0a12d,#f0c75c);color:#171107;font-size:13px;font-weight:950;letter-spacing:.13em;text-align:center;text-transform:uppercase}
+.premium-readiness-score{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;width:100%!important;max-width:680px!important;margin:0 auto!important;text-align:center!important}
+.premium-readiness-score>div{display:flex!important;align-items:baseline!important;justify-content:center!important;gap:13px!important}
+.premium-readiness-score strong{font-size:58px!important;line-height:.9!important;justify-self:auto!important;color:#fff!important}
+.premium-readiness-score b{font-size:16px!important;letter-spacing:.12em!important;align-self:auto!important;color:#fff!important}
+.premium-readiness-score p{max-width:600px!important;margin:4px auto 0!important;font-size:13px!important;line-height:1.5!important;text-align:center!important;color:rgba(255,255,255,.86)!important}
+.premium-readiness-update{margin:13px auto 0!important;min-width:150px!important;align-self:center!important}
+.premium-readiness-card[data-complete="true"] .premium-readiness-banner{background:rgba(255,255,255,.92)!important;color:#111!important}
+.compact-mission .premium-session-copy small{letter-spacing:.01em}
+@media(max-width:600px){
+  .premium-readiness-card{padding:0 14px 15px!important}
+  .premium-readiness-banner{margin:0 -14px 14px}
+  .premium-readiness-score strong{font-size:50px!important}
+  .premium-readiness-score b{font-size:13px!important}
+  .premium-readiness-score p{font-size:12px!important}
+  .premium-readiness-update{width:auto!important;min-width:150px!important}
+}

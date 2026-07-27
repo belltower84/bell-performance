@@ -1,4 +1,4 @@
-# Bell Performance 9.0.2
+# Bell Performance 9.0.3
 
 ## Sunday Weekly Debrief
 
@@ -27,3 +27,12 @@ This focused UI release streamlines page 1 of First Flight by removing the outda
 ## 9.0.1.1 Hotfix
 - Restored the missing full-screen Recovery Mobility routine markup.
 - Prevented page scroll locking when the mobility modal is unavailable or fails to render.
+
+
+## 9.0.3 Athlete Lifecycle
+- First Flight and Edit Mission/Goal now require a Start Today or Start Following Monday choice.
+- Future blocks are stored as Upcoming blocks and activate automatically on their scheduled Monday.
+- The dashboard includes an Upcoming Training Block card.
+- Complete Week is available any day and uses the same required debrief/check-in/build flow as Sunday.
+- Early completion warns about all remaining scheduled sessions.
+- Replaced and completed blocks are archived without deleting workout history.

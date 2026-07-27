@@ -68,14 +68,21 @@ function hasIncompleteSundayTraining(){
   const type=weeklySessionType(sunday);
   return type==="Strength"||type==="Engine"||type==="Core";
 }
+function remainingWeekSessions(){return(data.plan||[]).filter(x=>x.status!=="replaced"&&!x.done&&x.status!=="completed");}
 function openWeeklyDebrief(manual=false){
-  if(!data.trainingBlock?.enabled){alert("Create a training block first.");return false;}
-  if(new Date().getDay()!==0){if(manual)alert("Your Weekly Debrief opens Sunday after the training week is complete.");return false;}
-  if(hasIncompleteSundayTraining()){if(manual)alert("Complete today’s scheduled training before opening the Weekly Debrief.");return false;}
+  if(!data.trainingBlock?.enabled){alert("Create or activate a training block first.");return false;}
+  const isSunday=new Date().getDay()===0;
+  if(!manual&& !isSunday)return false;
+  if(!manual&&hasIncompleteSundayTraining())return false;
   const seen=(data.performanceReviews?.weeklyDebriefs||[]).some(x=>x.id===weeklyDebriefId()&&x.completed);
   if(seen&&!manual)return false;
-  weeklyDebriefState={difficulty:"",summary:null};
+  if(manual){
+    const remaining=remainingWeekSessions();
+    if(remaining.length){const list=remaining.slice(0,4).map(x=>`• ${x.day||"Scheduled"} — ${x.label||x.mission||"Training"}`).join("\n");const more=remaining.length>4?`\n• and ${remaining.length-4} more`:"";if(!confirm(`Complete Week now?\n\nYou still have ${remaining.length} scheduled session${remaining.length===1?"":"s"} remaining:\n${list}${more}\n\nContinuing will move these sessions into the weekly review as incomplete and require the full athlete check-in before next week is built.`))return false;}
+  }
+  weeklyDebriefState={difficulty:"",summary:null,manual};
   resetWeeklyDebriefSteps();renderWeeklyDebriefSummary();
+  const kicker=document.getElementById("weeklyDebriefKicker");if(kicker)kicker.textContent=isSunday&&!manual?"Sunday Coach’s Debrief":"Complete Week";
   document.getElementById("weeklyDebriefModal")?.classList.remove("hidden");document.body.classList.add("modal-open");
   return true;
 }
@@ -108,6 +115,6 @@ function confirmAdvanceTrainingWeek(){
   const summary=weeklyDebriefState.summary||weeklyDebriefSummary(),entry={id:weeklyDebriefId(),week:data.trainingBlock.currentWeek,completedAt:new Date().toISOString(),completed:true,summary,difficulty:weeklyDebriefState.difficulty,painArea:document.getElementById("weeklyPainArea").value,energy:Number(document.getElementById("weeklyEnergy").value)||3,notes:document.getElementById("weeklyNotes").value.trim()};
   data.performanceReviews.weeklyDebriefs=data.performanceReviews.weeklyDebriefs||[];const old=data.performanceReviews.weeklyDebriefs.findIndex(x=>x.id===entry.id);if(old>=0)data.performanceReviews.weeklyDebriefs[old]=entry;else data.performanceReviews.weeklyDebriefs.push(entry);
   if(data.trainingBlock.currentWeek<data.trainingBlock.lengthWeeks){if(typeof archiveUnresolvedPlanSessions==="function")archiveUnresolvedPlanSessions("weekly_debrief");data.trainingBlock.currentWeek++;buildCurrentWeekPlan();}
-  else{data.trainingBlock.completedAt=new Date().toISOString();}
+  else{data.trainingBlock.completedAt=new Date().toISOString();data.trainingBlock.status="completed";if(typeof bpArchiveBlock==="function")bpArchiveBlock(data.trainingBlock,"block_completed");data.trainingBlock.enabled=false;data.plan=[];}
   saveData();closeWeeklyDebrief();renderApp();showScreen("home");
 }

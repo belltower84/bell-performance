@@ -1,4 +1,4 @@
-# Bell Performance 9.0.2 Validation
+# Bell Performance 9.0.3 Validation
 
 ## Automated checks
 
@@ -38,3 +38,13 @@ Test scenario: Week 3 with seven scheduled sessions, six completed, one skipped.
 - Verify scrolling and keyboard behavior on iPhone Safari/Chrome.
 - Complete a Sunday training session and confirm the debrief opens after session feedback.
 - Confirm the next week dashboard and weekly schedule load correctly after advancement.
+
+
+## 9.0.3 Lifecycle test coverage
+- Verified visible Start Today / Start Following Monday choice in First Flight and Edit Mission/Goal.
+- Verified scheduled blocks do not overwrite an active block.
+- Verified scheduled blocks activate when the local date reaches the stored Monday.
+- Verified dashboard Upcoming Block rendering and Start Today / Cancel actions.
+- Verified Complete Week opens on any day, warns about remaining sessions, and cannot bypass the athlete check-in.
+- Verified Sunday auto-prompt still uses the same weekly review flow.
+- Verified block replacement and completion preserve archived block data and workout history.

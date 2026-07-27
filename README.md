@@ -1,3 +1,14 @@
+# Bell Performance 9.0.2
+
+## Sunday Weekly Debrief
+
+- Opens on Sunday for an active training block.
+- Reviews completion, modality balance, readiness, and schedule changes.
+- Collects a brief difficulty, pain, energy, and notes check-in.
+- Shows a next-week coaching preview before progression.
+- Advances the training block only after the athlete confirms **Begin Next Week**.
+- The dashboard button opens the same review manually.
+
 # Bell Performance 9.0.1.1
 
 GitHub Pages-ready Bell Performance build.

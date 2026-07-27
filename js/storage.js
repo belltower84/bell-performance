@@ -28,7 +28,7 @@ const defaults = {
   sessionFeedbackLog: [],
   pendingFeedbackSessionId: null,
   dayNavigation: { selectedDate: "", lastLocalDate: "" },
-  performanceReviews: { weeklySeen:[], blockReviews:[], milestones:[] },
+  performanceReviews: { weeklySeen:[], blockReviews:[], milestones:[], weeklyDebriefs:[] },
   missedSessionLog: [],
   habits: {
     items: [
@@ -140,6 +140,11 @@ function normalizeData() {
   data.mobility.checks = data.mobility.checks || {};
   data.readinessLog = Array.isArray(data.readinessLog) ? data.readinessLog : [];
   data.sessionFeedbackLog = Array.isArray(data.sessionFeedbackLog) ? data.sessionFeedbackLog : [];
+  data.performanceReviews = data.performanceReviews && typeof data.performanceReviews === "object" ? data.performanceReviews : {weeklySeen:[],blockReviews:[],milestones:[],weeklyDebriefs:[]};
+  data.performanceReviews.weeklySeen = Array.isArray(data.performanceReviews.weeklySeen) ? data.performanceReviews.weeklySeen : [];
+  data.performanceReviews.blockReviews = Array.isArray(data.performanceReviews.blockReviews) ? data.performanceReviews.blockReviews : [];
+  data.performanceReviews.milestones = Array.isArray(data.performanceReviews.milestones) ? data.performanceReviews.milestones : [];
+  data.performanceReviews.weeklyDebriefs = Array.isArray(data.performanceReviews.weeklyDebriefs) ? data.performanceReviews.weeklyDebriefs : [];
   data.pendingFeedbackSessionId = data.pendingFeedbackSessionId || null;
   data.dayNavigation = { ...defaults.dayNavigation, ...(data.dayNavigation || {}) };
   data.dayNavigation.selectedDate = /^\d{4}-\d{2}-\d{2}$/.test(data.dayNavigation.selectedDate || "") ? data.dayNavigation.selectedDate : "";

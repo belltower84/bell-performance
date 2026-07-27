@@ -1,28 +1,40 @@
-# Bell Performance 9.0.1.1 Validation
+# Bell Performance 9.0.2 Validation
 
-## Changes verified
-- Removed the page 1 setup kicker and outdated required-field guidance.
-- Page 1 now moves directly from “Welcome to Bell Performance” and “Let’s build your first mission.” into the athlete profile fields.
-- Tightened only the welcome-page spacing.
-- Existing required-field validation and all other First Flight logic remain unchanged.
+## Automated checks
 
-## Static checks
-- All JavaScript files pass `node --check`.
-- No duplicate HTML IDs detected.
-- Service-worker cache and asset query versions updated to 9.0.1.1 / 9010.
-- ZIP integrity validated after packaging.
+- JavaScript syntax: PASS for all application scripts, workout data, and service worker.
+- Duplicate HTML IDs: PASS (none found).
+- Required Weekly Debrief elements: PASS.
+- Service-worker cache paths: PASS (all 45 cached resources exist).
+- ZIP integrity: PASS.
 
+## Weekly Debrief logic tests
 
-## 9.0.1.1 regression checklist
-- First Flight advances through all six screens.
-- Training Style repopulates Training Focus cards.
-- Target date appears only for date-driven focuses.
-- Schedule and environment persist before launch.
-- Starting Point saves limitations and readiness.
-- Build New Training Block may open at step 2 without clearing profile data.
-- No duplicate HTML IDs and all JavaScript files pass syntax checks.
+Test scenario: Week 3 with seven scheduled sessions, six completed, one skipped.
 
+- Completion calculation: PASS (86%).
+- Grade calculation: PASS (B+).
+- Strength totals: PASS (3 of 3).
+- Engine totals: PASS (2 of 3).
+- Coach assessment selection: PASS.
+- Next-week coaching recommendation: PASS.
+- Progression stores the completed debrief before advancing: PASS by code-path inspection.
 
-## 9.0.1.1 Mobility hotfix
-- Verified `mobilityRoutineModal` and all referenced child IDs exist.
-- Verified opening and closing mobility cannot leave `body.workout-open` stuck after a render failure.
+## UX flow audit
+
+- Sunday-only gate: PASS.
+- Incomplete Sunday Strength, Engine, or Core session defers the debrief: PASS.
+- Sunday recovery-only day does not block the debrief: PASS.
+- One primary action on the summary screen: PASS.
+- Difficulty selection is required before preview: PASS.
+- Pain, energy, and optional notes are clearly labeled: PASS.
+- Next-week plan is previewed before progression: PASS.
+- Training week advances only after “Begin Next Week”: PASS.
+- Mobile layout rules included for single-column cards, full-height modal, and sticky actions: PASS.
+
+## Manual device checks recommended after deployment
+
+- Open on an actual Sunday with an active block.
+- Verify scrolling and keyboard behavior on iPhone Safari/Chrome.
+- Complete a Sunday training session and confirm the debrief opens after session feedback.
+- Confirm the next week dashboard and weekly schedule load correctly after advancement.

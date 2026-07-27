@@ -10,7 +10,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <title>Bell Performance 9.0.1 — Date-Aware Multi-Session Training</title>
-<link href="./css/app.css?v=9011" rel="stylesheet"/>
+<link href="./css/app.css?v=9020" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -25,7 +25,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=9011"/><div><h1>BELL PERFORMANCE</h1></div></div>
+<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=9020"/><div><h1>BELL PERFORMANCE</h1></div></div>
 <div class="header-actions"><button aria-label="Open notifications" id="notificationButton" onclick="openNotificationCenter()">◌<span id="notificationBadge">0</span></button><button aria-label="Open athlete profile" id="profileButton" onclick="openAthleteProfile()">◉</button></div>
 </header>
 <main>
@@ -62,7 +62,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="premium-section-heading"><div><span class="premium-kicker">Weekly Schedule</span><h2 id="premiumWeekTitle">This Week</h2></div><button class="premium-text-button" onclick="showScreen('plan')">Full Plan ›</button></div>
 <div class="premium-week-days" id="premiumWeekDays"></div>
 <div class="premium-week-selected-summary" id="premiumWeekSelectedSummary"></div>
-<div class="premium-week-legend"><span><b class="strength">↟</b> Strength</span><span><b class="engine"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=9011"/></b> Engine</span><span><b class="rest">○</b> Rest</span></div>
+<div class="premium-week-legend"><span><b class="strength">↟</b> Strength</span><span><b class="engine"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=9020"/></b> Engine</span><span><b class="rest">○</b> Rest</span></div>
 </section>
 <section class="premium-coach-card">
 <div class="premium-coach-icon">◍</div><div><span class="premium-kicker">Coach Briefing</span><strong id="premiumCoachTitle">Current phase guidance</strong><p id="premiumCoachText">Your programming guidance will appear here.</p></div>
@@ -120,15 +120,15 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div aria-label="Training day navigation" class="day-navigator"><button aria-label="Previous day" class="secondary compact-button" onclick="navigateDashboardDay(-1)">‹</button><button class="day-nav-current" id="dashboardDayButton" onclick="resetDashboardToToday()">Today</button><button aria-label="Next day" class="secondary compact-button" onclick="navigateDashboardDay(1)">›</button></div>
 <div class="card no-training-day hidden" id="noTrainingForDay"><strong id="noTrainingDayTitle">No prescribed training</strong><div class="hint" id="noTrainingDayDetail">Recovery, mobility, and daily standards remain available.</div></div>
 <div class="training-pair">
-<article class="training-card strength-card" id="strengthTrainingCard"><img alt="Strength athlete" id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=9011"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type">🏋 <span>STRENGTH</span></div><label class="training-quick-control strength-location-control" title="Change the equipment location used for strength substitutions"><span>Training at</span><select aria-label="Strength workout location" id="activeLocationQuick" onchange="switchEquipmentLocation(this.value);renderApp()"></select></label></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength &amp; Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
-<article class="training-card engine-card" id="engineTrainingCard"><img alt="Endurance athlete" id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=9011"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=9011"/> <span>ENGINE</span></div><label class="training-quick-control engine-mode-control" title="Choose today's engine modality"><span>Engine mode</span><select aria-label="Today's engine mode" id="engineModeQuick" onchange="switchQuickEngineMode(this.value)"></select></label></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
+<article class="training-card strength-card" id="strengthTrainingCard"><img alt="Strength athlete" id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=9020"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type">🏋 <span>STRENGTH</span></div><label class="training-quick-control strength-location-control" title="Change the equipment location used for strength substitutions"><span>Training at</span><select aria-label="Strength workout location" id="activeLocationQuick" onchange="switchEquipmentLocation(this.value);renderApp()"></select></label></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength &amp; Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
+<article class="training-card engine-card" id="engineTrainingCard"><img alt="Endurance athlete" id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=9020"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=9020"/> <span>ENGINE</span></div><label class="training-quick-control engine-mode-control" title="Choose today's engine modality"><span>Engine mode</span><select aria-label="Today's engine mode" id="engineModeQuick" onchange="switchQuickEngineMode(this.value)"></select></label></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
 </div>
 <div class="card single-session-option hidden" id="singleSessionOption"></div>
 <div class="hidden" id="todayPreview"></div>
 <div class="recovery-prescription-card" id="recoveryPrescriptionCard"><div class="recovery-icon">♿</div><div><span class="metric-label">Today's Recovery Prescription</span><strong id="mobilityDashboardTitle">10 min Mobility Flow</strong><div class="hint" id="mobilityDashboardDetail">Matched to today's training • Complete morning or evening</div></div><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">›</button></div>
 <div class="quick-actions"><button onclick="document.getElementById('nutritionMode').scrollIntoView({behavior:'smooth'})"><span>🍴</span><strong>Nutrition</strong><small>Fuel the mission</small></button><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})"><span>♡</span><strong>Recovery</strong><small>Rest. Recover. Rebuild.</small></button><button onclick="showScreen('history')"><span>▥</span><strong>Progress</strong><small>Track results</small></button><button onclick="showScreen('habits')"><span>◎</span><strong>Habits</strong><small>Build consistency</small></button></div>
 <div class="card readiness-access-note"><div><span class="metric-label">Daily Readiness</span><strong>Check-in available at the top of your dashboard</strong><div class="hint">Use the Update Check-In button inside Mission Status whenever your readiness changes.</div></div><button class="secondary" onclick="window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=&gt;document.getElementById('dailyReadinessModal').classList.remove('hidden'),350)">Open Check-In</button></div>
-<div class="card"><h3>Current Training Block</h3><div class="status-line"><div><div class="mission-title" id="blockTitle">No active block</div><div class="sub" id="blockStatus">Build a goal-based plan in More.</div></div><div class="pill" id="blockWeekPill">—</div></div><div class="mini-progress"><div id="blockProgressBar"></div></div><div class="hint" id="blockRunSummary"></div><button class="secondary" id="advanceBlockButton" onclick="advanceBlockWeek()">Complete Week &amp; Build Next</button></div>
+<div class="card"><h3>Current Training Block</h3><div class="status-line"><div><div class="mission-title" id="blockTitle">No active block</div><div class="sub" id="blockStatus">Build a goal-based plan in More.</div></div><div class="pill" id="blockWeekPill">—</div></div><div class="mini-progress"><div id="blockProgressBar"></div></div><div class="hint" id="blockRunSummary"></div><button class="secondary" id="advanceBlockButton" onclick="openWeeklyDebrief(true)">Review Week &amp; Build Next</button></div>
 <div class="card"><h3>Coach Guidance</h3><div class="mission-title" id="coachHeadline">Today's guidance</div><div class="hint" id="coachRecommendation"></div></div>
 <div class="card"><h3>Engine Mode</h3><label for="cardioType">Choose today's Engine modality</label><select id="cardioType" onchange="saveCardioType()"><option value="Running">Running / Walking</option><option value="Cycling">Outdoor / Stationary Bike</option><option value="Rower">Rower</option><option value="Swimming">Swimming</option><option value="Hiking / Rucking">Hiking / Rucking</option><option value="Sprint / Field">Sprint / Field</option><option value="Air Bike">Air Bike</option><option value="Elliptical">Elliptical</option><option value="Stair Climber">Stair Climber</option></select><div class="hint" id="cardioModeNote"></div></div>
 <div class="card" id="dailyMobilityCard"><h3>Daily Mobility</h3><div class="row"><div><label>Focus area</label><select id="mobilityFocus" onchange="saveMobilityFocus()"><option value="Auto">Auto — match today's training</option><option value="Full Body">Full Body</option><option value="Hips">Hips</option><option value="Shoulders">Shoulders</option><option value="Low Back">Low Back</option><option value="Ankles">Ankles</option></select></div><div><label>Time</label><select id="mobilityMinutes" onchange="saveMobilityFocus()"><option value="6">6 minutes</option><option selected="" value="10">10 minutes</option><option value="15">15 minutes</option></select></div></div><div class="hint" id="mobilityReason"></div><div class="mobility-list" id="mobilityList"></div><button class="good" id="mobilityCompleteButton" onclick="completeMobility()">Complete Daily Mobility</button></div>
@@ -440,6 +440,44 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="modal hidden" id="historyEditModal"><div class="modal-box onboarding-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Training History</span><h2>Edit Workout Record</h2></div><button class="modal-close" onclick="closeHistoryEditor()">×</button></div><input id="historyEditIndex" type="hidden"/><div class="feedback-grid"><label>Workout name<input id="historyEditLabel"/></label><label>Completed date<input id="historyEditDate" type="datetime-local"/></label><label>Official time<input id="historyEditTime" placeholder="HH:MM:SS or MM:SS"/></label><label>Distance<input id="historyEditDistance" min="0" step="0.01" type="number"/></label><label>Distance unit<select id="historyEditDistanceUnit"><option value="mi">Miles</option><option value="km">Kilometers</option><option value="m">Meters</option><option value="yd">Yards</option></select></label><label>Average heart rate<input id="historyEditHeartRate" max="240" min="0" type="number"/></label><label>Elevation gain<input id="historyEditElevation" min="0" step="1" type="number"/></label><label>Session RPE<input id="historyEditRpe" max="10" min="1" type="number"/></label></div><label>Training notes<textarea id="historyEditNotes"></textarea></label><div class="row"><button class="good" onclick="saveHistoryEdit()">Save Changes</button><button class="secondary" onclick="closeHistoryEditor()">Cancel</button></div><button class="danger" onclick="deleteHistoryRecord()">Delete Workout Record</button><div class="hint" style="margin-top:10px">Changes immediately update weekly reviews, milestones, mileage, pace, and block summaries.</div></div></div></div>
 <div class="modal hidden" id="notificationModal"><div class="modal-box notification-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Bell Performance</span><h2>Coach Notifications</h2></div><button class="modal-close" onclick="closeNotificationCenter()">×</button></div><div class="notification-list" id="notificationList"></div><button class="secondary" onclick="markNotificationsReviewed()">Mark Reviewed</button></div></div></div>
 <div aria-labelledby="exerciseDetailTitle" aria-modal="true" class="modal hidden" id="exerciseDetailModal" role="dialog"><div class="modal-box exercise-detail-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Exercise Intelligence</span><h2 id="exerciseDetailTitle">Exercise</h2></div><button class="modal-close" onclick="closeExerciseDetail()">×</button></div><div id="exerciseDetailContent"></div></div></div></div>
+<div aria-labelledby="weeklyDebriefTitle" aria-modal="true" class="modal hidden" id="weeklyDebriefModal" role="dialog">
+  <div class="modal-box weekly-debrief-box">
+    <div class="card weekly-debrief-card">
+      <div class="notification-header">
+        <div><span class="metric-label">Sunday Coach’s Debrief</span><h2 id="weeklyDebriefTitle">Week Complete</h2></div>
+        <button class="modal-close" onclick="closeWeeklyDebrief()" aria-label="Close weekly debrief">×</button>
+      </div>
+      <div id="weeklyDebriefSummaryStep">
+        <p class="weekly-debrief-lead" id="weeklyDebriefLead">Review your week before Bell builds the next one.</p>
+        <div class="weekly-score-hero"><div class="weekly-score-ring" id="weeklyScoreRing"><strong id="weeklyScoreOut">0%</strong><span>complete</span></div><div><span class="metric-label">Overall Grade</span><div class="weekly-grade" id="weeklyGradeOut">—</div><div class="hint" id="weeklyGradeDetail"></div></div></div>
+        <div class="weekly-debrief-grid" id="weeklyCategorySummary"></div>
+        <div class="coach-note-card"><span class="metric-label">Coach Assessment</span><p id="weeklyCoachAssessment"></p></div>
+        <button class="good premium-primary-button" onclick="showWeeklyCheckIn()">Continue to Athlete Check-In</button>
+      </div>
+      <div class="hidden" id="weeklyDebriefCheckInStep">
+        <span class="metric-label">Athlete Check-In</span><h3>How did this week feel?</h3>
+        <div class="weekly-choice-grid" id="weeklyDifficultyChoices">
+          <button type="button" data-value="easy" onclick="selectWeeklyDifficulty(this)"><strong>😊 Easier</strong><span>than expected</span></button>
+          <button type="button" data-value="right" onclick="selectWeeklyDifficulty(this)"><strong>😐 Just right</strong><span>productive and manageable</span></button>
+          <button type="button" data-value="hard" onclick="selectWeeklyDifficulty(this)"><strong>🥵 Very hard</strong><span>fatigue was high</span></button>
+        </div>
+        <label>Any pain or problem areas?<select id="weeklyPainArea"><option value="none">None</option><option value="knees">Knees</option><option value="hips">Hips</option><option value="low_back">Low back</option><option value="shoulders">Shoulders</option><option value="other">Other</option></select></label>
+        <label>Energy across the week <span class="range-value" id="weeklyEnergyOut">3 / 5</span><input id="weeklyEnergy" type="range" min="1" max="5" value="3" oninput="document.getElementById('weeklyEnergyOut').textContent=this.value+' / 5'"></label>
+        <label>Notes for your coach (optional)<textarea id="weeklyNotes" placeholder="What went well? What needs attention?"></textarea></label>
+        <div class="weekly-step-actions"><button class="secondary" onclick="showWeeklySummary()">Back</button><button class="good" onclick="buildWeeklyPreview()">Build Next Week</button></div>
+      </div>
+      <div class="hidden" id="weeklyDebriefPreviewStep">
+        <span class="metric-label">Next Week Preview</span><h3 id="nextWeekPreviewTitle">Week 2</h3>
+        <div class="building-week-state" id="buildingWeekState"><div class="building-pulse"></div><strong>Building your next training week…</strong><span>Reviewing completion, readiness, and your check-in.</span></div>
+        <div class="hidden" id="nextWeekPreviewContent">
+          <div class="weekly-preview-grid" id="nextWeekPreviewGrid"></div>
+          <div class="coach-note-card"><span class="metric-label">Coach’s Plan</span><p id="nextWeekCoachPlan"></p></div>
+          <button class="good premium-primary-button" id="beginNextWeekButton" onclick="confirmAdvanceTrainingWeek()">Begin Next Week</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <div aria-labelledby="exerciseSwapTitle" aria-modal="true" class="modal hidden" id="exerciseSwapModal" role="dialog"><div class="modal-box exercise-swap-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Purpose-Matched Replacement</span><h2 id="exerciseSwapTitle">Replace Exercise</h2></div><button class="modal-close" onclick="closeExerciseSwap()">×</button></div><div class="performance-callout" id="exerciseSwapOriginal"></div><div class="feedback-grid"><label>Why are you replacing it?<select id="exerciseSwapReason" onchange="renderExerciseSwapOptions()"><option value="preference">Exercise preference</option><option value="equipment">Equipment unavailable</option><option value="pain">Pain or discomfort</option><option value="crowded">Gym is crowded</option><option value="setup">Need a faster setup</option><option value="space">Limited space</option><option value="noise">Need a quieter option</option><option value="skill">Need a simpler variation</option><option value="other">Other constraint</option></select></label><label>Apply replacement to<select id="exerciseSwapScope"><option value="today">Today’s workout only</option><option value="block">Current training block</option><option value="always">All future workouts</option></select></label></div><div class="exercise-swap-options" id="exerciseSwapOptions"></div><div class="hint">Pain-based swaps should remain pain-free and are not a diagnosis or medical clearance.</div></div></div></div>
 
 <div aria-labelledby="mobilityRoutineTitle" aria-modal="true" class="modal hidden mobility-routine-modal" id="mobilityRoutineModal" role="dialog" aria-hidden="true">
@@ -479,7 +517,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
 <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
 </div>
-<div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=9011"/><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
+<div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=9020"/><div><span class="metric-label">Today's Session</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Green Zone</span></div></div></div>
 <div class="card workout-control-card">
 <h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
 <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
@@ -511,32 +549,33 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="history"><span class="icon">◷</span>History</button>
 <button data-screen="more"><span class="icon">⚙</span>More</button>
 </nav>
-<script>window.BELL_APP_VERSION = "9.0.1.1";</script>
-<script src="./data/workouts.js?v=9011"></script>
-<script src="./js/exercise-library.js?v=9011"></script>
-<script src="./js/storage.js?v=9011"></script>
-<script src="./js/readiness.js?v=9011"></script>
-<script src="./js/equipment.js?v=9011"></script>
+<script>window.BELL_APP_VERSION = "9.0.2";</script>
+<script src="./data/workouts.js?v=9020"></script>
+<script src="./js/exercise-library.js?v=9020"></script>
+<script src="./js/storage.js?v=9020"></script>
+<script src="./js/readiness.js?v=9020"></script>
+<script src="./js/equipment.js?v=9020"></script>
 <script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");</script>
-<script src="./js/training-blocks.js?v=9011"></script>
-<script src="./js/mobility.js?v=9011"></script>
-<script src="./js/nutrition.js?v=9011"></script>
-<script src="./js/milestones.js?v=9011"></script>
-<script src="./js/progression.js?v=9011"></script>
-<script src="./js/workouts.js?v=9011"></script>
-<script src="./js/missed-sessions.js?v=9011"></script>
-<script src="./js/performance-review.js?v=9011"></script>
-<script src="./js/artwork.js?v=9011"></script>
-<script src="./js/quote-cache.js?v=9011"></script>
-<script src="./js/ui.js?v=9011"></script>
-<script src="./js/habits.js?v=9011"></script>
-<script src="./js/dual-goals.js?v=9011"></script>
-<script src="./js/version-8.js?v=9011"></script>
-<script src="./js/mission-planner.js?v=9011"></script>
-<script src="./js/coaching-pathways.js?v=9011"></script>
-<script src="./js/event-coaching.js?v=9011"></script>
-<script src="./js/how-to.js?v=9011"></script>
-<script src="./js/premium-dashboard.js?v=9011"></script>
-<script src="./js/app.js?v=9011"></script>
+<script src="./js/training-blocks.js?v=9020"></script>
+<script src="./js/mobility.js?v=9020"></script>
+<script src="./js/nutrition.js?v=9020"></script>
+<script src="./js/milestones.js?v=9020"></script>
+<script src="./js/progression.js?v=9020"></script>
+<script src="./js/workouts.js?v=9020"></script>
+<script src="./js/missed-sessions.js?v=9020"></script>
+<script src="./js/performance-review.js?v=9020"></script>
+<script src="./js/artwork.js?v=9020"></script>
+<script src="./js/quote-cache.js?v=9020"></script>
+<script src="./js/ui.js?v=9020"></script>
+<script src="./js/habits.js?v=9020"></script>
+<script src="./js/dual-goals.js?v=9020"></script>
+<script src="./js/version-8.js?v=9020"></script>
+<script src="./js/mission-planner.js?v=9020"></script>
+<script src="./js/coaching-pathways.js?v=9020"></script>
+<script src="./js/event-coaching.js?v=9020"></script>
+<script src="./js/how-to.js?v=9020"></script>
+<script src="./js/premium-dashboard.js?v=9020"></script>
+<script src="./js/weekly-debrief.js?v=9020"></script>
+<script src="./js/app.js?v=9020"></script>
 </body>
 </html>

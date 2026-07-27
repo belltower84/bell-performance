@@ -1,6 +1,6 @@
 "use strict";
 
-const BELL_APP_VERSION = window.BELL_APP_VERSION || "8.7.1";
+const BELL_APP_VERSION = window.BELL_APP_VERSION || "9.0.2";
 
 function renderAppVersion() {
   document.querySelectorAll("[data-app-version]").forEach(element => {
@@ -29,7 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderAppVersion();
   renderApp();
-  setTimeout(() => { maybePromptDailyReadiness(); openPendingSessionFeedback(); }, 250);
+  setTimeout(() => {
+    if (typeof maybeOpenSundayDebrief === "function" && maybeOpenSundayDebrief()) return;
+    maybePromptDailyReadiness();
+    openPendingSessionFeedback();
+  }, 250);
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(error => {

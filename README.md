@@ -1,3 +1,24 @@
+# Bell Performance 10.0.0 — Foundation
+
+## Workout Experience Refresh
+
+- Adds a canonical workout metadata model in `js/workout-model.js`.
+- Stores one authoritative `duration` when the workout is generated.
+- Keeps `prescribedDuration` synchronized for backward compatibility.
+- Removes the workout landing page exercise-count time estimate.
+- Adds the Mission Briefing with Coach’s Brief, training focus, session breakdown, success criteria, work-set count, intensity, equipment, and next-session preview.
+- Preserves existing athlete data, training plans, history, onboarding, and workout execution behavior.
+
+## Test focus
+
+1. Start a planned Strength session and confirm its time matches Home and Plan.
+2. Start a planned Engine session and confirm the same duration appears everywhere.
+3. Close and reopen an active workout; metadata should remain consistent.
+4. Confirm the Mission Briefing collapses to one column on mobile.
+5. Complete a workout and confirm history and plan completion still update.
+
+---
+
 # Bell Performance 9.0.3
 
 ## Sunday Weekly Debrief

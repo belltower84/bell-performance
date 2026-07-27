@@ -39,11 +39,13 @@ function premiumEngineSelector(){
 function premiumSessionAction(session){
   if(session.completed)return `<button class="premium-session-status completed" onclick="showScreen('history')">Completed ›</button>`;
   const active=data.activeWorkout?.planSessionKey===session.sessionKey;
-  return `<button class="premium-start-button" onclick="beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\\'")}')">${active?'Resume Workout':'Start Workout'} ›</button>`;
+  return `<div class="premium-mission-actions"><button class="premium-preview-button" onclick="event.stopPropagation();previewPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\\'")}')">Preview</button><button class="premium-start-button" onclick="event.stopPropagation();beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\\'")}')">${active?'Resume':'Start Workout'} ›</button></div>`;
 }
 function premiumSessionRow(session){
-  const type=premiumSessionType(session), template=scaledTemplate(session.mission),duration=Number(session.prescribedDuration)||Number(template?.duration)||30,art=premiumSessionArtwork(type,session);
-  return `<article class="premium-session-row premium-session-hero ${type} ${session.completed?'completed':''}" style="--session-art:url('${art}')"><div class="premium-session-shade"></div><div class="premium-session-icon">${session.completed?'<span class="premium-complete-check">✓</span>':premiumSessionIcon(type)}</div><div class="premium-session-copy"><div class="premium-session-titleline"><span>${type==='engine'?'Engine':'Strength'}</span>${type==='engine'?premiumEngineSelector():premiumLocationSelector()}</div><strong>${escapeHtml(session.label||template?.label||session.mission)}</strong><small>◷ ${duration} min${session.detail?` · ${escapeHtml(session.detail)}`:''}</small></div>${premiumSessionAction(session)}</article>`;
+  const type=premiumSessionType(session), template=scaledTemplate(session.mission),duration=Number(session.prescribedDuration)||Number(template?.duration)||30;
+  const date=localDateFromKey(selectedDashboardDateKey());
+  const day=date.toLocaleDateString('en-US',{weekday:'long'});
+  return `<article class="premium-session-row compact-mission ${type} ${session.completed?'completed':''}" onclick="${session.completed?"showScreen('history')":`beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\'")}')`}"><div class="premium-session-copy"><span>${day}</span><strong>${escapeHtml(session.label||template?.label||session.mission)}</strong><small>◷ ${duration} min</small></div>${premiumSessionAction(session)}</article>`;
 }
 function premiumOptionalCoreRow(){
   const key=selectedDashboardDateKey(),done=optionalCoreCompletedForDate(key),name=coreSessionName(key),template=coreTemplate(name),art=premiumSessionArtwork('core');
@@ -58,7 +60,7 @@ function renderPremiumMission(){
   const ring=byId('premiumCompletionRing');if(ring)ring.style.setProperty('--mission-progress',`${pct*3.6}deg`);
   const stack=byId('premiumSessionStack');if(!stack)return;
   const eligible=sessions.length<=1;
-  stack.innerHTML=sessions.map(premiumSessionRow).join('')+(eligible?premiumOptionalCoreRow():'');
+  stack.innerHTML=sessions.slice(0,1).map(premiumSessionRow).join('');
   if(!sessions.length)stack.insertAdjacentHTML('afterbegin','<article class="premium-session-row rest"><div class="premium-session-icon">☾</div><div class="premium-session-copy"><span>Recovery</span><strong>No prescribed training</strong><small>Mobility, walking, and daily standards remain available.</small></div></article>');
 }
 
@@ -103,7 +105,7 @@ function renderPremiumReadiness(){
   const score=readinessScore(),status=readinessStatus(score),r=data.settings.readiness||{};
   setText('premiumReadinessScore',String(score));setText('premiumReadinessStatus',status);setText('premiumReadinessDetail',trainingStatusText(status));
   setText('premiumSleep',premiumSleepDuration(r));setText('premiumEnergy',premiumReadinessMetric(r.energy));setText('premiumSoreness',premiumReadinessMetric(r.recoveryStatus));setText('premiumMotivation',premiumReadinessMetric(r.motivation));
-  const card=byId('premiumReadinessCard');if(card)card.dataset.status=status.toLowerCase();
+  const card=byId('premiumReadinessCard');if(card)card.dataset.status=status.toLowerCase(); const btn=card?.querySelector('.premium-readiness-update');if(btn)btn.textContent=(r.lastPromptDate===todayKey()?'Update':'Check In');
 }
 function rotatePremiumQuote(){premiumQuoteOffset++;renderPremiumQuote();}
 function renderPremiumQuote(){
@@ -130,7 +132,21 @@ function renderPremiumStandards(){
   const host=byId('premiumStandardsGrid');if(!host)return;const items=(data.habits?.items||[]).slice(0,4),done=new Set(typeof habitCompletedIds==='function'?habitCompletedIds(todayKey()):[]);
   host.innerHTML=items.length?items.map(item=>{const copy=habitDisplay(item),complete=done.has(item.id);return `<button class="${complete?'complete':''}" onclick="toggleHabit('${escapeHtml(item.id)}');renderPremiumStandards()"><i>${complete?'✓':'○'}</i><span>${escapeHtml(copy.title)}</span><strong>${complete?'Complete':escapeHtml(copy.detail||'Today')}</strong></button>`}).join(''):'<button onclick="showScreen(\'habits\')"><i>+</i><span>Set Daily Standards</span><strong>Open Habits</strong></button>';
 }
-function renderPremiumDashboard(){renderPremiumQuote();renderPremiumReadiness();renderPremiumMission();renderPremiumWeek();renderPremiumSupport();renderPremiumProgress();renderPremiumCoach();renderPremiumStandards();}
+
+function renderPremiumNext(){
+  const current=selectedDashboardDateKey();
+  let found=null;
+  for(let i=1;i<=7&&!found;i++){
+    const key=addLocalDays(current,i);
+    const sessions=(data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status)).flatMap(sessionsFromPlanItem);
+    if(sessions.length)found={key,session:sessions[0]};
+  }
+  if(!found){setText('premiumNextTitle','No upcoming session');setText('premiumNextDetail','Open the full schedule to plan ahead.');return;}
+  const date=localDateFromKey(found.key), template=scaledTemplate(found.session.mission);
+  setText('premiumNextTitle',`${date.toLocaleDateString('en-US',{weekday:'long'})} · ${found.session.label||template?.label||found.session.mission}`);
+  setText('premiumNextDetail',`${Number(found.session.prescribedDuration)||Number(template?.duration)||30} min · Tap for full schedule`);
+}
+function renderPremiumDashboard(){renderPremiumQuote();renderPremiumReadiness();renderPremiumMission();renderPremiumNext();renderPremiumSupport();renderPremiumProgress();renderPremiumCoach();renderPremiumStandards();}
 
 const premiumBaseRenderApp=renderApp;
 renderApp=function(){premiumBaseRenderApp();renderPremiumDashboard();};

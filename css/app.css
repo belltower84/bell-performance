@@ -478,16 +478,29 @@ nav{left:50%;right:auto;bottom:12px;width:min(720px,calc(100vw - 24px));transfor
 @media(max-width:760px){.mission-briefing-grid{grid-template-columns:1fr}.mission-briefing-grid>.card{padding:16px}}
 
 
-/* Bell Performance 10.0.3 — navigation and Settings cleanup */
-nav{left:0!important;right:0!important;bottom:0!important;width:100%!important;transform:none!important;padding:5px max(8px,env(safe-area-inset-bottom))!important;border:0!important;border-top:1px solid #303840!important;border-radius:0!important;background:rgba(7,10,13,.97)!important;box-shadow:0 -8px 24px rgba(0,0,0,.28)!important;backdrop-filter:blur(16px)}
-nav button{min-height:52px!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:#929ca5!important}
-nav button.active{color:#fff!important;background:transparent!important;box-shadow:none!important;border-top:2px solid #d8a632!important}
-nav button.active:after{display:none!important}
-nav button .icon,nav button.active .icon{color:currentColor!important;transform:none!important}
-nav .nav-dumbbell{position:relative;width:25px;height:18px;margin:0 auto 2px!important;display:block;font-size:0!important}
-nav .nav-dumbbell:before,nav .nav-dumbbell:after{content:"";position:absolute;top:4px;width:5px;height:11px;border:1.5px solid currentColor;border-radius:2px}
-nav .nav-dumbbell:before{left:1px}nav .nav-dumbbell:after{right:1px}
-nav .nav-dumbbell i{position:absolute;left:5px;right:5px;top:8px;height:2px;background:currentColor;border-radius:2px}
-#more>.section-title{margin-bottom:18px!important}
-#more:before,#more:after{display:none!important;content:none!important}
-@media(max-width:760px){nav{bottom:0!important;width:100%!important;border-radius:0!important}}
+/* Bell 10.0.4 simplified daily coaching experience */
+.premium-dashboard{display:flex!important;flex-direction:column;gap:12px}
+.premium-standards-card{order:1;padding:12px 14px!important}
+.premium-mission-card{order:2;padding:14px!important}
+.premium-readiness-card{order:3;padding:12px 14px!important;min-height:0!important}
+.premium-next-card{order:4}
+.premium-quote-card,.premium-support-card,.premium-support-panel,.premium-coach-card,.premium-progress-card{display:none!important}
+.premium-standards-card .premium-section-heading h2,.premium-standards-card .premium-text-button{display:none}
+.premium-standards-grid{display:flex!important;gap:8px;overflow-x:auto;padding:2px 0}
+.premium-standards-grid button{min-width:auto!important;flex:0 0 auto;padding:8px 10px!important;border-radius:999px!important;display:flex!important;gap:6px;align-items:center}
+.premium-standards-grid button strong{display:none}.premium-standards-grid button i{margin:0!important}
+.premium-readiness-metrics{display:none!important}.premium-readiness-card{display:grid!important;grid-template-columns:1fr auto;align-items:center}
+.premium-readiness-score>div{display:flex;gap:10px;align-items:baseline}.premium-readiness-score p{margin:2px 0 0!important}
+.premium-readiness-update{position:static!important;margin:0!important}
+.premium-mission-card .premium-section-heading,.premium-completion-ring,.premium-session-legend{display:none!important}
+.premium-mission-layout{display:block!important}.premium-session-stack{gap:0!important}
+.premium-session-row.compact-mission{min-height:0!important;background:transparent!important;padding:4px 0!important;display:flex!important;align-items:center;gap:12px;cursor:pointer}
+.premium-session-row.compact-mission:before,.premium-session-row.compact-mission .premium-session-shade,.premium-session-row.compact-mission .premium-session-icon{display:none!important}
+.compact-mission .premium-session-copy{flex:1}.compact-mission .premium-session-copy span{font-size:12px;text-transform:uppercase;letter-spacing:.14em}.compact-mission .premium-session-copy strong{font-size:22px;margin:3px 0}.compact-mission .premium-session-copy small{font-size:13px}
+.premium-mission-actions{display:flex;gap:8px;align-items:center}.premium-preview-button{background:transparent!important;border:1px solid rgba(255,255,255,.18)!important;color:inherit!important}
+.premium-next-card{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid var(--line,#2a2d31);border-radius:16px;background:var(--card,#111418)}
+.premium-next-card strong,.premium-next-card small{display:block}.premium-next-card strong{margin:3px 0}.premium-next-card small{color:var(--muted,#9ca3af)}
+.workout-stage-actions{display:flex;gap:10px;padding:0 14px 14px}.workout-stage-actions button{flex:1}.hidden{display:none!important}
+.preview-workout-box{max-width:620px}.preview-workout-box h3{margin:18px 0 8px}.preview-exercise-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}.preview-exercise-row>span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08)}.preview-exercise-row strong,.preview-exercise-row small{display:block}.preview-exercise-row small{color:var(--muted,#9ca3af);margin-top:3px}
+.strength-nav-icon{font-weight:900;font-size:22px}
+@media(max-width:600px){.premium-mission-actions{flex-direction:column;align-items:stretch}.premium-mission-actions button{width:100%}.compact-mission{align-items:stretch!important;flex-direction:column}.premium-next-card{align-items:flex-start}.premium-readiness-card{grid-template-columns:1fr auto}}

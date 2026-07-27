@@ -478,13 +478,16 @@ nav{left:50%;right:auto;bottom:12px;width:min(720px,calc(100vw - 24px));transfor
 @media(max-width:760px){.mission-briefing-grid{grid-template-columns:1fr}.mission-briefing-grid>.card{padding:16px}}
 
 
-/* Bell Performance 10.0.2 — simplified primary navigation and Settings cleanup */
-nav{left:0;right:0;bottom:0;width:100%;transform:none;padding:7px 7px calc(env(safe-area-inset-bottom) + 7px);border:0;border-top:1px solid #303840;border-radius:0;background:rgba(8,11,14,.98);box-shadow:0 -10px 28px rgba(0,0,0,.28);backdrop-filter:blur(16px)}
-nav button{min-height:52px;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-nav button.active{background:transparent!important;color:#e9bd4b!important}
-nav button.active:after{left:18%;right:18%;top:-7px;bottom:auto;width:auto;height:2px;transform:none;background:#e0b13b}
-nav button[data-screen="workouts"],nav button[data-screen="workouts"].active{transform:none!important}
-nav button[data-screen="workouts"]:before{content:none!important;display:none!important}
-nav button[data-screen="workouts"] .icon{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:none!important}
-#more:before,#more:after,#more>.section-title:before,#more>.section-title .foundation-badge,#more .athlete-command-badge,#more .control-center-badge{content:none!important;display:none!important}
-@media(max-width:760px){nav{bottom:0;width:100%;border-radius:0}}
+/* Bell Performance 10.0.3 — navigation and Settings cleanup */
+nav{left:0!important;right:0!important;bottom:0!important;width:100%!important;transform:none!important;padding:5px max(8px,env(safe-area-inset-bottom))!important;border:0!important;border-top:1px solid #303840!important;border-radius:0!important;background:rgba(7,10,13,.97)!important;box-shadow:0 -8px 24px rgba(0,0,0,.28)!important;backdrop-filter:blur(16px)}
+nav button{min-height:52px!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:#929ca5!important}
+nav button.active{color:#fff!important;background:transparent!important;box-shadow:none!important;border-top:2px solid #d8a632!important}
+nav button.active:after{display:none!important}
+nav button .icon,nav button.active .icon{color:currentColor!important;transform:none!important}
+nav .nav-dumbbell{position:relative;width:25px;height:18px;margin:0 auto 2px!important;display:block;font-size:0!important}
+nav .nav-dumbbell:before,nav .nav-dumbbell:after{content:"";position:absolute;top:4px;width:5px;height:11px;border:1.5px solid currentColor;border-radius:2px}
+nav .nav-dumbbell:before{left:1px}nav .nav-dumbbell:after{right:1px}
+nav .nav-dumbbell i{position:absolute;left:5px;right:5px;top:8px;height:2px;background:currentColor;border-radius:2px}
+#more>.section-title{margin-bottom:18px!important}
+#more:before,#more:after{display:none!important;content:none!important}
+@media(max-width:760px){nav{bottom:0!important;width:100%!important;border-radius:0!important}}

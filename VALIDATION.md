@@ -1,4 +1,4 @@
-# Bell Performance 9.0.4 Validation
+# Bell Performance 9.0.3 Validation
 
 ## Automated checks
 
@@ -40,7 +40,7 @@ Test scenario: Week 3 with seven scheduled sessions, six completed, one skipped.
 - Confirm the next week dashboard and weekly schedule load correctly after advancement.
 
 
-## 9.0.4 Lifecycle test coverage
+## 9.0.3 Lifecycle test coverage
 - Verified visible Start Today / Start Following Monday choice in First Flight and Edit Mission/Goal.
 - Verified scheduled blocks do not overwrite an active block.
 - Verified scheduled blocks activate when the local date reaches the stored Monday.

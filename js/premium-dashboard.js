@@ -69,20 +69,31 @@ function premiumWeekSessionChip(session){
 function premiumWeekRestChip(){return `<div class="premium-week-chip rest" title="Rest day">${premiumInlineIcon('rest')}</div>`;}
 
 function renderPremiumWeek(){
-  const selected=selectedDashboardDateKey(),monday=mondayKeyFor(selected),days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  setText('premiumWeekTitle',localDateFromKey(monday).toLocaleDateString('en-US',{month:'long',day:'numeric'})+' Week');
+  const block=typeof bpResolvePlanBlock==='function'?bpResolvePlanBlock():data.trainingBlock;
+  if(!block){return;}
+  if(typeof bpPrepareBlockPlan==='function')bpPrepareBlockPlan(block);
+  const week=typeof bpCurrentTimelineWeek==='function'?bpCurrentTimelineWeek(block):Number(block.currentWeek||1);
+  const plan=typeof bpWeekPlan==='function'?bpWeekPlan(block,week):(data.plan||[]);
+  const monday=typeof bpWeekStartKey==='function'?bpWeekStartKey(block,week):mondayKeyFor(selectedDashboardDateKey());
+  const selected=week===Number(data.trainingBlock?.currentWeek||1)&&block===data.trainingBlock?selectedDashboardDateKey():monday;
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],fullDays=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const phase=typeof bpPhaseForWeek==='function'?bpPhaseForWeek(week,Number(block.lengthWeeks)||12):{name:'Training'};
+  setText('premiumWeekKicker',typeof bpWeekStatus==='function'&&bpWeekStatus(block,week)==='active'?'Weekly Schedule':typeof bpWeekStatus==='function'&&bpWeekStatus(block,week)==='complete'?'Completed Week':'Plan Preview');
+  setText('premiumWeekTitle',`Week ${week} · ${phase.name}`);
   const host=byId('premiumWeekDays');if(!host)return;
   host.innerHTML=days.map((day,index)=>{
-    const key=addLocalDays(monday,index),items=(data.plan||[]).filter(x=>planDateKey(x)===key&&!['skipped','replaced'].includes(x.status)),sessions=items.flatMap(sessionsFromPlanItem),allDone=sessions.length&&sessions.every(x=>x.completed),chips=sessions.length? sessions.slice(0,2).map(premiumWeekSessionChip).join('') : premiumWeekRestChip();
+    const key=addLocalDays(monday,index),items=plan.filter(x=>(x.day===fullDays[index]||planDateKey(x)===key)&&!['skipped','replaced'].includes(x.status)),sessions=items.flatMap(sessionsFromPlanItem),allDone=sessions.length&&sessions.every(x=>x.completed),chips=sessions.length?sessions.slice(0,2).map(premiumWeekSessionChip).join(''):premiumWeekRestChip();
     const label=sessions.length?sessions.map(x=>x.label||scaledTemplate(x.mission)?.label||x.mission).join(', '):'Rest / recovery';
-    return `<button class="premium-week-day-card ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''} ${sessions.length>1?'two-a-day':''}" onclick="setDashboardDate('${key}')" aria-label="${day} ${localDateFromKey(key).getDate()}: ${escapeHtml(label)}"><span>${day}</span><strong>${localDateFromKey(key).getDate()}</strong><div class="premium-week-chips">${chips}</div></button>`;
+    const isActive=block===data.trainingBlock&&week===Number(block.currentWeek||1);
+    const action=isActive?`setDashboardDate('${key}')`:`bpPreviewWeek(${week})`;
+    return `<button class="premium-week-day-card ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''} ${sessions.length>1?'two-a-day':''}" onclick="${action}" aria-label="${day} ${localDateFromKey(key).getDate()}: ${escapeHtml(label)}"><span>${day}</span><strong>${localDateFromKey(key).getDate()}</strong><div class="premium-week-chips">${chips}</div></button>`;
   }).join('');
-  const selectedItems=(data.plan||[]).filter(x=>planDateKey(x)===selected&&!['skipped','replaced'].includes(x.status)).flatMap(sessionsFromPlanItem);
+  const selectedItems=plan.filter(x=>(x.day===fullDays[0]||planDateKey(x)===selected)&&!['skipped','replaced'].includes(x.status)).flatMap(sessionsFromPlanItem);
   const summary=byId('premiumWeekSelectedSummary');
   if(summary){
-    const selectedDate=localDateFromKey(selected).toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
-    const selectedCopy=selectedItems.length?selectedItems.map(x=>escapeHtml(x.label||scaledTemplate(x.mission)?.label||x.mission)).join(' · '):'Rest and recovery';
-    summary.innerHTML=`<span>${selectedDate}</span><strong>${selectedCopy}</strong><button type="button" onclick="showScreen('plan')">View plan ›</button>`;
+    const status=typeof bpWeekStatus==='function'?bpWeekStatus(block,week):'planned';
+    const copy=status==='active'?'Tap a day to view today’s mission.':'Tap any day to open the full week preview.';
+    summary.innerHTML=`<span>${status==='active'?'Current week':status==='complete'?'Completed week':'Future week preview'}</span><strong>${copy}</strong><button type="button" onclick="bpPreviewWeek(${week})">Preview week ›</button>`;
   }
 }
 

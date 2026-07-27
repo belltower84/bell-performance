@@ -114,7 +114,7 @@ function buildWeeklyPreview(){
 function confirmAdvanceTrainingWeek(){
   const summary=weeklyDebriefState.summary||weeklyDebriefSummary(),entry={id:weeklyDebriefId(),week:data.trainingBlock.currentWeek,completedAt:new Date().toISOString(),completed:true,summary,difficulty:weeklyDebriefState.difficulty,painArea:document.getElementById("weeklyPainArea").value,energy:Number(document.getElementById("weeklyEnergy").value)||3,notes:document.getElementById("weeklyNotes").value.trim()};
   data.performanceReviews.weeklyDebriefs=data.performanceReviews.weeklyDebriefs||[];const old=data.performanceReviews.weeklyDebriefs.findIndex(x=>x.id===entry.id);if(old>=0)data.performanceReviews.weeklyDebriefs[old]=entry;else data.performanceReviews.weeklyDebriefs.push(entry);
-  if(data.trainingBlock.currentWeek<data.trainingBlock.lengthWeeks){if(typeof archiveUnresolvedPlanSessions==="function")archiveUnresolvedPlanSessions("weekly_debrief");data.trainingBlock.currentWeek++;buildCurrentWeekPlan();}
+  if(data.trainingBlock.currentWeek<data.trainingBlock.lengthWeeks){if(typeof archiveUnresolvedPlanSessions==="function")archiveUnresolvedPlanSessions("weekly_debrief");data.trainingBlock.currentWeek++;if(typeof bpPrepareBlockPlan==="function")bpPrepareBlockPlan(data.trainingBlock);if(typeof bpLoadActiveWeekFromPlan==="function")bpLoadActiveWeekFromPlan();else buildCurrentWeekPlan();}
   else{data.trainingBlock.completedAt=new Date().toISOString();data.trainingBlock.status="completed";if(typeof bpArchiveBlock==="function")bpArchiveBlock(data.trainingBlock,"block_completed");data.trainingBlock.enabled=false;data.plan=[];}
   saveData();closeWeeklyDebrief();renderApp();showScreen("home");
 }

@@ -21,7 +21,8 @@ function bpActivateBlock(block,reason="scheduled_start"){
   if(data.trainingBlock?.enabled&&data.trainingBlock.generatedAt!==block.generatedAt)bpArchiveBlock(data.trainingBlock,reason);
   data.trainingBlock={...bpClone(block),enabled:true,status:"active",currentWeek:Math.max(1,Number(block.currentWeek)||1),activatedAt:new Date().toISOString()};
   data.upcomingTrainingBlock=null;
-  if(typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();
+  if(typeof bpPrepareBlockPlan==="function")bpPrepareBlockPlan(data.trainingBlock);
+  if(typeof bpLoadActiveWeekFromPlan==="function")bpLoadActiveWeekFromPlan();else if(typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();
   return true;
 }
 function maybeActivateScheduledBlock(){
@@ -60,11 +61,13 @@ completeOnboarding=function(){
   data.settings.firstFlightStage="complete";data.settings.firstFlightTourComplete=true;data.settings.firstBlockLaunchMode=choice;
   if(choice==="nextMonday"){
     data.upcomingTrainingBlock={...candidate,enabled:true,status:"scheduled"};
+    if(typeof bpPrepareBlockPlan==="function")bpPrepareBlockPlan(data.upcomingTrainingBlock);
     if(hadActive)data.trainingBlock=previousBlock;else{data.trainingBlock={enabled:false,status:"scheduled",currentWeek:0};data.plan=[];}
   }else{
     if(hadActive&&isEditing)bpArchiveBlock(previousBlock,"mission_updated");
     data.trainingBlock={...candidate,enabled:true,status:"active",activatedAt:new Date().toISOString()};data.upcomingTrainingBlock=null;
-    if(typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();
+    if(typeof bpPrepareBlockPlan==="function")bpPrepareBlockPlan(data.trainingBlock);
+    if(typeof bpLoadActiveWeekFromPlan==="function")bpLoadActiveWeekFromPlan();else if(typeof buildCurrentWeekPlan==="function")buildCurrentWeekPlan();
   }
   saveData({render:false});byId("onboardingModal").classList.add("hidden");document.body.classList.remove("modal-open");renderApp();showScreen("home");
   const msg=choice==="nextMonday"?`Your new training block is scheduled for ${bpDateLabel(startDate)}.`:`Your new training block starts today.`;

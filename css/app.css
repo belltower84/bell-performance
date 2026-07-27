@@ -599,3 +599,79 @@ nav{left:50%;right:auto;bottom:12px;width:min(720px,calc(100vw - 24px));transfor
   .premium-session-stack.is-scrollable{grid-auto-columns:92%}
   .premium-session-stack.is-scrollable .compact-mission{display:flex!important;flex-direction:column!important;align-items:stretch!important}
 }
+
+/* Bell Performance 10.0.7 — readiness-first dashboard and complete daily mission banner */
+.premium-readiness-card{order:0!important}
+.premium-standards-card{order:1!important}
+.premium-mission-card{order:2!important}
+.premium-coach-card{order:3!important}
+.premium-quote-card{order:4!important}
+.premium-next-card{order:5!important}
+
+/* Center readiness content and use the full card width without dead space. */
+.premium-readiness-card{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:18px!important;
+  min-height:132px!important;
+  padding:18px 22px!important;
+}
+.premium-readiness-score{
+  display:grid!important;
+  grid-template-columns:auto minmax(150px,1fr)!important;
+  grid-template-areas:"kicker kicker" "score status" "score detail"!important;
+  justify-content:center!important;
+  align-content:center!important;
+  column-gap:22px!important;
+  width:100%!important;
+  text-align:left!important;
+}
+.premium-readiness-score>.premium-kicker{grid-area:kicker;text-align:center;margin-bottom:9px!important}
+.premium-readiness-score strong{grid-area:score;justify-self:end;align-self:center;font-size:58px!important;line-height:.9!important}
+.premium-readiness-score b{grid-area:status;align-self:end;font-size:17px!important;letter-spacing:.12em!important}
+.premium-readiness-score p{grid-area:detail;align-self:start;margin:4px 0 0!important;font-size:13px!important;line-height:1.35!important;max-width:420px!important}
+.premium-readiness-update{align-self:center!important;min-width:104px!important}
+
+/* Restore a clear title banner and keep every prescribed session inside it. */
+.premium-mission-card{padding:0 15px 15px!important;overflow:hidden!important}
+.premium-mission-banner{
+  margin:0 -15px 12px;
+  padding:12px 16px;
+  background:linear-gradient(90deg,#d0a12d,#f0c75c);
+  color:#171107;
+  font-size:13px;
+  font-weight:950;
+  letter-spacing:.13em;
+  text-align:center;
+  text-transform:uppercase;
+}
+.premium-mission-card .premium-section-heading.premium-mission-heading{
+  display:flex!important;
+  margin-bottom:10px;
+}
+.premium-mission-heading h2{margin:0!important;font-size:17px!important}
+.premium-mission-layout{display:block!important;margin-top:0!important}
+.premium-session-stack{display:grid!important;gap:10px!important}
+.premium-session-stack.is-scrollable{grid-auto-columns:minmax(86%,1fr)!important}
+.premium-session-row.compact-mission{
+  min-height:92px!important;
+  padding:14px!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:14px!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012))!important;
+}
+.compact-mission .premium-session-copy strong{display:block;font-size:22px!important;line-height:1.15;margin:0 0 5px!important}
+.compact-mission .premium-session-copy small{font-size:12px!important;color:#aeb7c0!important}
+.dashboard-mission-progress{margin-top:12px!important}
+
+@media(max-width:600px){
+  .premium-readiness-card{grid-template-columns:1fr!important;gap:12px!important;text-align:center!important;padding:16px!important}
+  .premium-readiness-score{grid-template-columns:auto minmax(120px,1fr)!important;column-gap:14px!important;max-width:390px;margin:auto}
+  .premium-readiness-score strong{font-size:50px!important}
+  .premium-readiness-score b{font-size:14px!important}
+  .premium-readiness-score p{font-size:12px!important}
+  .premium-readiness-update{width:100%!important;max-width:260px!important;justify-self:center!important}
+  .premium-session-stack.is-scrollable{grid-auto-columns:92%!important}
+  .premium-session-row.compact-mission{align-items:stretch!important}
+}

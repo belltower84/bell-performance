@@ -10,7 +10,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <title>Bell Performance 10.0.6 — Dashboard Refinement</title>
-<link href="./css/app.css?v=10006" rel="stylesheet"/>
+<link href="./css/app.css?v=10007" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -25,21 +25,13 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=10006"/><div><h1>BELL PERFORMANCE</h1></div></div>
+<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=10007"/><div><h1>BELL PERFORMANCE</h1></div></div>
 <div class="header-actions"><button aria-label="Open notifications" id="notificationButton" onclick="openNotificationCenter()">◌<span id="notificationBadge">0</span></button><button aria-label="Open athlete profile" id="profileButton" onclick="openAthleteProfile()">◉</button></div>
 </header>
 <main>
 <section class="screen active" id="home">
 <div class="dashboard-greeting"><div><div class="mission-title" id="greetingOut">Good Morning</div><div class="hint">Discipline today. Freedom tomorrow.</div></div><div class="premium-greeting-chips"><div class="streak-chip">🔥 <strong id="streakDaysOut">0</strong> <span id="streakLabelOut">DAY STREAK</span></div><div class="week-chip" id="premiumWeekChip">Week 1 of 12</div></div></div>
 <div class="premium-dashboard" id="premiumDashboard">
-<section class="premium-quote-card" id="premiumQuoteCard">
-<div><span class="premium-kicker">Word for Today</span><blockquote id="premiumQuoteText">Consistency beats perfection. Win today.</blockquote><cite id="premiumQuoteSource">Bell Performance Coach</cite></div>
-<button aria-label="Show another quote" class="premium-icon-button" onclick="rotatePremiumQuote()" type="button">↻</button>
-</section>
-<section class="premium-standards-card">
-<div class="premium-section-heading"><div><span class="premium-kicker">Daily Standards</span><h2 id="premiumStandardsTitle">Today</h2></div><button class="premium-text-button" onclick="showScreen('habits')">Manage ›</button></div>
-<div class="premium-standards-grid" id="premiumStandardsGrid"></div>
-</section>
 <section class="premium-readiness-card" id="premiumReadinessCard">
 <div class="premium-readiness-score"><span class="premium-kicker">Readiness</span><div><strong id="premiumReadinessScore">—</strong><b id="premiumReadinessStatus">GREEN</b></div><p id="premiumReadinessDetail">Ready for full prescription</p></div>
 <div class="premium-readiness-metrics">
@@ -50,8 +42,18 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </div>
 <button class="premium-outline-button premium-readiness-update" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')" type="button">Update</button>
 </section>
+<section class="premium-quote-card" id="premiumQuoteCard">
+<div><span class="premium-kicker">Word for Today</span><blockquote id="premiumQuoteText">Consistency beats perfection. Win today.</blockquote><cite id="premiumQuoteSource">Bell Performance Coach</cite></div>
+<button aria-label="Show another quote" class="premium-icon-button" onclick="rotatePremiumQuote()" type="button">↻</button>
+</section>
+<section class="premium-standards-card">
+<div class="premium-section-heading"><div><span class="premium-kicker">Daily Standards</span><h2 id="premiumStandardsTitle">Today</h2></div><button class="premium-text-button" onclick="showScreen('habits')">Manage ›</button></div>
+<div class="premium-standards-grid" id="premiumStandardsGrid"></div>
+</section>
+
 <section class="premium-mission-card">
-<div class="premium-section-heading"><div><span class="premium-kicker">Today’s Mission</span><h2 id="premiumMissionDate">Today</h2></div><div class="premium-day-nav"><button aria-label="Previous day" onclick="navigateDashboardDay(-1)">‹</button><button id="premiumTodayButton" onclick="resetDashboardToToday()">Today</button><button aria-label="Next day" onclick="navigateDashboardDay(1)">›</button></div></div>
+<div class="premium-mission-banner">Today’s Mission</div>
+<div class="premium-section-heading premium-mission-heading"><div><h2 id="premiumMissionDate">Today</h2></div><div class="premium-day-nav"><button aria-label="Previous day" onclick="navigateDashboardDay(-1)">‹</button><button id="premiumTodayButton" onclick="resetDashboardToToday()">Today</button><button aria-label="Next day" onclick="navigateDashboardDay(1)">›</button></div></div>
 <div class="premium-mission-layout">
 <div class="premium-completion-ring" id="premiumCompletionRing"><div><strong id="premiumCompletionCount">0</strong><span id="premiumCompletionTotal">of 0</span><small id="premiumCompletionLabel">REST DAY</small></div></div>
 <div class="premium-session-stack" id="premiumSessionStack"></div>
@@ -574,7 +576,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="more"><span class="icon">⚙</span>Settings</button>
 </nav>
 <script>window.BELL_APP_VERSION = "10.0.6-dashboard-refinement";</script>
-<script src="./data/workouts.js?v=10006"></script>
+<script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=10006"></script>
 <script src="./js/storage.js?v=10006"></script>
 <script src="./js/readiness.js?v=10006"></script>
@@ -586,7 +588,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/milestones.js?v=10006"></script>
 <script src="./js/progression.js?v=10006"></script>
 <script src="./js/workout-model.js?v=10006"></script>
-<script src="./js/workouts.js?v=10006"></script>
+<script src="./js/workouts.js?v=10007"></script>
 <script src="./js/missed-sessions.js?v=10006"></script>
 <script src="./js/performance-review.js?v=10006"></script>
 <script src="./js/artwork.js?v=10006"></script>
@@ -599,7 +601,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/coaching-pathways.js?v=10006"></script>
 <script src="./js/event-coaching.js?v=10006"></script>
 <script src="./js/how-to.js?v=10006"></script>
-<script src="./js/premium-dashboard.js?v=10006"></script>
+<script src="./js/premium-dashboard.js?v=10007"></script>
 <script src="./js/block-lifecycle.js?v=10006"></script>
 <script src="./js/weekly-debrief.js?v=10006"></script>
 <script src="./js/plan-progress.js?v=10006"></script>

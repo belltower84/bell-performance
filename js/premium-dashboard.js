@@ -9,9 +9,23 @@ function premiumSelectedItems(){
 function premiumAllSessions(){return premiumSelectedItems().flatMap(sessionsFromPlanItem);}
 function premiumSessionType(session){return scheduleTypeForMission(session?.mission,session?.label,session?.detail)||'strength';}
 function premiumDisplayLabel(session){
-  const raw=String(session?.label||scaledTemplate(session?.mission)?.label||session?.mission||'Training');
-  if(premiumSessionType(session)!=='engine')return raw;
-  return raw.replace(/^\s*(?:PM|P\.?M\.?)\s*[-–—:|•]*\s*/i,'').replace(/\s*[-–—:|•]*\s*(?:PM|P\.?M\.?)\s*$/i,'').replace(/\s*\((?:PM|P\.?M\.?)\)\s*/ig,' ').trim()||'Engine Training';
+  const raw=String(session?.label||scaledTemplate(session?.mission)?.label||session?.mission||'Training')
+    .replace(/^\s*(?:AM|A\.?M\.?|PM|P\.?M\.?)\s*[-–—:|•]*\s*/i,'')
+    .replace(/\s*[-–—:|•]*\s*(?:AM|A\.?M\.?|PM|P\.?M\.?)\s*$/i,'')
+    .replace(/\s*\((?:AM|A\.?M\.?|PM|P\.?M\.?)\)\s*/ig,' ')
+    .trim();
+  const type=premiumSessionType(session);
+  if(type==='engine'){
+    return raw
+      .replace(/^\s*(?:engine|conditioning|cardio)\s*[-–—:|•]*\s*/i,'')
+      .replace(/\s*[-–—:|•]*\s*(?:engine|conditioning|cardio)\s*$/i,'')
+      .trim()||String(data.settings?.cardioType||'Engine');
+  }
+  return raw
+    .replace(/^\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|training|workout|session)\s*[-–—:|•]*\s*/i,'')
+    .replace(/\s*[-–—:|•]*\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|training|workout|session)\s*$/i,'')
+    .replace(/\b(?:strength|hypertrophy|powerbuilding|bodybuilding)\b\s*[-–—:|•]\s*/ig,'')
+    .trim()||'Full Body';
 }
 function premiumInlineIcon(kind){
   const icons={
@@ -50,7 +64,7 @@ function premiumSessionRow(session){
   const type=premiumSessionType(session), template=scaledTemplate(session.mission),duration=Number(session.prescribedDuration)||Number(template?.duration)||30;
   const date=localDateFromKey(selectedDashboardDateKey());
   const day=date.toLocaleDateString('en-US',{weekday:'long'});
-  return `<article class="premium-session-row compact-mission ${type} ${session.completed?'completed':''}" onclick="${session.completed?"showScreen('history')":`beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\'")}')`}"><div class="premium-session-copy"><span>${day}</span><strong>${escapeHtml(premiumDisplayLabel(session))}</strong><small>◷ ${duration} min</small></div>${premiumSessionAction(session)}</article>`;
+  return `<article class="premium-session-row compact-mission ${type} ${session.completed?'completed':''}" onclick="${session.completed?"showScreen('history')":`beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\'")}')`}"><div class="premium-session-copy"><strong>${escapeHtml(premiumDisplayLabel(session))}</strong><small>${day} · ◷ ${duration} min</small></div>${premiumSessionAction(session)}</article>`;
 }
 function premiumOptionalCoreRow(){
   const key=selectedDashboardDateKey(),done=optionalCoreCompletedForDate(key),name=coreSessionName(key),template=coreTemplate(name),art=premiumSessionArtwork('core');

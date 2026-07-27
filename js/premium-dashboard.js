@@ -91,7 +91,7 @@ function premiumOptionalCoreRow(){
   return `<article class="premium-session-row premium-session-hero optional core ${done?'completed':''}" style="--session-art:url('${art}')"><div class="premium-session-shade"></div><div class="premium-session-icon">${done?'<span class="premium-complete-check">✓</span>':premiumInlineIcon('core')}</div><div class="premium-session-copy"><span>Optional Core</span><strong>${escapeHtml(template.label)}</strong><small>${template.duration} min · Does not affect completion</small></div><button class="premium-session-status" ${done?'disabled':''} onclick="beginOptionalCore('${key}')">${done?'Completed':'Start ›'}</button></article>`;
 }
 function renderPremiumMission(){
-  const key=selectedDashboardDateKey(),date=localDateFromKey(key),today=localDateKey(),sessions=premiumAllSessions();
+  const key=selectedDashboardDateKey(),date=localDateFromKey(key),today=localDateKey(),sessions=premiumAllSessions().sort((a,b)=>{const order={strength:0,engine:1};return (order[premiumSessionType(a)]??2)-(order[premiumSessionType(b)]??2);});
   const completed=sessions.filter(x=>x.completed).length,total=sessions.length,pct=total?Math.round(completed/total*100):100;
   setText('premiumMissionDate',key===today?'Today':date.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}));
   const todayButton=byId('premiumTodayButton');if(todayButton)todayButton.textContent=key===today?'Today':'Return to Today';
@@ -99,7 +99,7 @@ function renderPremiumMission(){
   const ring=byId('premiumCompletionRing');if(ring)ring.style.setProperty('--mission-progress',`${pct*3.6}deg`);
   const stack=byId('premiumSessionStack');if(!stack)return;
   stack.innerHTML=sessions.map(premiumSessionRow).join('');
-  stack.classList.toggle('is-scrollable',sessions.length>1);
+  stack.classList.remove('is-scrollable');
   if(!sessions.length)stack.insertAdjacentHTML('afterbegin','<article class="premium-session-row rest"><div class="premium-session-icon">☾</div><div class="premium-session-copy"><span>Recovery</span><strong>No prescribed training</strong><small>Mobility, walking, and daily standards remain available.</small></div></article>');
 }
 
@@ -176,6 +176,8 @@ function renderPremiumCoach(){
   const pct=enabled?Math.max(0,Math.min(100,Math.round((week/total)*100))):0;
   setText('premiumMissionProgressText',enabled?`Week ${week} of ${total}`:'No active plan');
   const bar=byId('premiumMissionProgressBar');if(bar)bar.style.width=`${pct}%`;
+  const greeting=byId('bell11Greeting');if(greeting){const hour=new Date().getHours();greeting.textContent=`Good ${hour<12?'Morning':hour<18?'Afternoon':'Evening'}, ${data.settings?.athleteName||'Athlete'}`;}
+  const statusLine=byId('bell11MissionStatus');if(statusLine){const sessions=premiumAllSessions();const complete=sessions.filter(x=>x.completed).length;statusLine.textContent=sessions.length?`${complete} of ${sessions.length} prescribed sessions complete today.`:'Recovery day. Keep the daily standards and prepare for the next mission.';}
 }
 function renderPremiumStandards(){
   const host=byId('premiumStandardsGrid');if(!host)return;const items=(data.habits?.items||[]).slice(0,4),done=new Set(typeof habitCompletedIds==='function'?habitCompletedIds(todayKey()):[]);

@@ -9,8 +9,8 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
-<title>Bell Performance 10.0.9 — Polished Dashboard</title>
-<link href="./css/app.css?v=10009" rel="stylesheet"/>
+<title>Bell Performance 11.0 — Daily Coach</title>
+<link href="./css/app.css?v=11000" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -25,66 +25,88 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=10009"/><div><h1>BELL PERFORMANCE</h1></div></div>
+<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=11000"/><div><h1>BELL PERFORMANCE</h1></div></div>
 <div class="header-actions"><button aria-label="Open notifications" id="notificationButton" onclick="openNotificationCenter()">◌<span id="notificationBadge">0</span></button><button aria-label="Open athlete profile" id="profileButton" onclick="openAthleteProfile()">◉</button></div>
 </header>
 <main>
 <section class="screen active" id="home">
 <div class="dashboard-greeting"><div><div class="mission-title" id="greetingOut">Good Morning</div><div class="hint">Discipline today. Freedom tomorrow.</div></div><div class="premium-greeting-chips"><div class="streak-chip">🔥 <strong id="streakDaysOut">0</strong> <span id="streakLabelOut">DAY STREAK</span></div><div class="week-chip" id="premiumWeekChip">Week 1 of 12</div></div></div>
-<div class="premium-dashboard" id="premiumDashboard">
-<section class="premium-readiness-card" id="premiumReadinessCard">
-<div class="premium-readiness-score"><span class="premium-kicker">Readiness</span><div><strong id="premiumReadinessScore">—</strong><b id="premiumReadinessStatus">GREEN</b></div><p id="premiumReadinessDetail">Ready for full prescription</p></div>
-<div class="premium-readiness-metrics">
-<div><i class="sleep">☾</i><strong id="premiumSleep">—</strong><span>Sleep</span></div>
-<div><i class="energy">ϟ</i><strong id="premiumEnergy">—</strong><span>Energy</span></div>
-<div><i class="soreness">◌</i><strong id="premiumSoreness">—</strong><span>Recovery</span></div>
-<div><i class="motivation">◉</i><strong id="premiumMotivation">—</strong><span>Motivation</span></div>
-</div>
-<button class="premium-outline-button premium-readiness-update" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')" type="button">Update</button>
-</section>
-<section class="premium-quote-card" id="premiumQuoteCard">
-<div><span class="premium-kicker">Word for Today</span><blockquote id="premiumQuoteText">Consistency beats perfection. Win today.</blockquote><cite id="premiumQuoteSource">Bell Performance Coach</cite></div>
-<button aria-label="Show another quote" class="premium-icon-button" onclick="rotatePremiumQuote()" type="button">↻</button>
-</section>
-<section class="premium-standards-card">
-<div class="premium-section-heading"><div><span class="premium-kicker">Daily Standards</span><h2 id="premiumStandardsTitle">Today</h2></div><button class="premium-text-button" onclick="showScreen('habits')">Manage ›</button></div>
-<div class="premium-standards-grid" id="premiumStandardsGrid"></div>
+<div class="premium-dashboard bell11-dashboard" id="premiumDashboard">
+<section class="bell11-hero" aria-label="Mission status">
+  <div>
+    <span class="premium-kicker">Daily Performance Briefing</span>
+    <h2 id="bell11Greeting">Ready for today</h2>
+    <p id="bell11MissionStatus">Stay consistent and execute the next useful action.</p>
+  </div>
+  <div class="bell11-plan-progress">
+    <div><span>Mission Plan</span><strong id="premiumMissionProgressText">Week 1 of 12</strong></div>
+    <div class="dashboard-mission-progress-track"><i id="premiumMissionProgressBar"></i></div>
+  </div>
 </section>
 
-<section class="premium-mission-card">
-<div class="premium-mission-banner">Today’s Mission</div>
-<div class="premium-section-heading premium-mission-heading"><div><h2 id="premiumMissionDate">Today</h2></div><div class="premium-day-nav"><button aria-label="Previous day" onclick="navigateDashboardDay(-1)">‹</button><button id="premiumTodayButton" onclick="resetDashboardToToday()">Today</button><button aria-label="Next day" onclick="navigateDashboardDay(1)">›</button></div></div>
-<div class="premium-mission-layout">
-<div class="premium-completion-ring" id="premiumCompletionRing"><div><strong id="premiumCompletionCount">0</strong><span id="premiumCompletionTotal">of 0</span><small id="premiumCompletionLabel">REST DAY</small></div></div>
-<div class="premium-session-stack" id="premiumSessionStack"></div>
-</div>
-<div class="dashboard-mission-progress" aria-label="Mission plan progress">
-  <div class="dashboard-mission-progress-copy"><span>Mission Plan</span><strong id="premiumMissionProgressText">Week 1 of 12</strong></div>
-  <div class="dashboard-mission-progress-track"><i id="premiumMissionProgressBar"></i></div>
-</div>
-<div class="premium-session-legend"><span><i class="complete"></i>Completed</span><span><i class="prescribed"></i>Prescribed</span><span><i class="optional"></i>Optional</span></div>
+<section class="premium-readiness-card bell11-readiness" id="premiumReadinessCard">
+  <div class="bell11-section-banner">Readiness</div>
+  <div class="bell11-readiness-body">
+    <strong class="bell11-readiness-score" id="premiumReadinessScore">—</strong>
+    <b class="bell11-readiness-status" id="premiumReadinessStatus">CHECK IN</b>
+    <p id="premiumReadinessDetail">Complete today’s check-in to personalize your training.</p>
+    <button class="premium-outline-button premium-readiness-update" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')" type="button">Check In</button>
+  </div>
 </section>
-<section class="premium-support-card">
-<div class="premium-support-icon">✚</div><div><span class="premium-kicker">Optional Support</span><strong>Recovery Mobility · Optional Core</strong><p>Does not affect mission completion</p></div><button class="premium-outline-button" onclick="togglePremiumSupport()" type="button">View Options ›</button>
+
+<section class="bell11-brief-card">
+  <div class="bell11-section-banner">Today’s Brief</div>
+  <div class="bell11-brief-grid">
+    <div class="bell11-word">
+      <span class="premium-kicker">Word for Today</span>
+      <blockquote id="premiumQuoteText">Consistency beats perfection. Win today.</blockquote>
+      <cite id="premiumQuoteSource">Bell Performance Coach</cite>
+      <button aria-label="Show another quote" class="premium-icon-button" onclick="rotatePremiumQuote()" type="button">↻</button>
+    </div>
+    <div class="bell11-coach">
+      <span class="premium-kicker">Coach’s Instruction</span>
+      <strong id="premiumCoachTitle">Current phase guidance</strong>
+      <p id="premiumCoachText">Your programming guidance will appear here.</p>
+    </div>
+  </div>
 </section>
-<section class="premium-support-panel hidden" id="premiumSupportPanel"><div id="premiumSupportContent"></div></section>
+
+<section class="premium-mission-card bell11-mission-card">
+  <div class="premium-mission-banner">Today’s Mission</div>
+  <div class="premium-section-heading premium-mission-heading">
+    <div><h2 id="premiumMissionDate">Today</h2><p>Complete the prescribed sessions in the order shown.</p></div>
+    <div class="premium-day-nav"><button aria-label="Previous day" onclick="navigateDashboardDay(-1)">‹</button><button id="premiumTodayButton" onclick="resetDashboardToToday()">Today</button><button aria-label="Next day" onclick="navigateDashboardDay(1)">›</button></div>
+  </div>
+  <div class="premium-session-stack bell11-session-stack" id="premiumSessionStack"></div>
+  <div class="bell11-mission-summary" aria-hidden="true">
+    <div class="premium-completion-ring" id="premiumCompletionRing"><div><strong id="premiumCompletionCount">0</strong><span id="premiumCompletionTotal">of 0</span><small id="premiumCompletionLabel">REST DAY</small></div></div>
+  </div>
+</section>
+
+<section class="bell11-optional-card">
+  <div class="bell11-section-heading-row"><div><span class="premium-kicker">Optional Training</span><h2>Core & Mobility</h2></div><small>Does not affect mission completion</small></div>
+  <div class="premium-support-panel bell11-support-panel" id="premiumSupportPanel"><div id="premiumSupportContent"></div></div>
+</section>
+
+<section class="premium-standards-card bell11-standards-card">
+  <div class="premium-section-heading"><div><span class="premium-kicker">Daily Standards</span><h2 id="premiumStandardsTitle">Today’s Checklist</h2></div><button class="premium-text-button" onclick="showScreen('habits')">Manage ›</button></div>
+  <div class="premium-standards-grid" id="premiumStandardsGrid"></div>
+</section>
+
 <section class="premium-next-card" id="premiumNextCard">
-<div><span class="premium-kicker">Next Up</span><strong id="premiumNextTitle">Tomorrow · Recovery</strong><small id="premiumNextDetail">View your upcoming schedule</small></div>
-<button class="premium-text-button" onclick="showScreen('plan')">Full Schedule ›</button>
-</section>
-<section class="premium-coach-card">
-<div class="premium-coach-icon">◍</div><div><span class="premium-kicker">Coach Briefing</span><strong id="premiumCoachTitle">Current phase guidance</strong><p id="premiumCoachText">Your programming guidance will appear here.</p></div>
-</section>
-<section class="premium-progress-card">
-<div class="premium-section-heading"><div><span class="premium-kicker">Progress Snapshot</span><h2>Last Four Weeks</h2></div><button class="premium-text-button" onclick="showScreen('history')">Details ›</button></div>
-<div class="premium-progress-grid">
-<button onclick="showScreen('history')"><i>↗</i><span>Consistency</span><strong id="premiumConsistency">—</strong><small id="premiumConsistencyNote">Building</small></button>
-<button onclick="showScreen('history')"><i>🏋</i><span>Strength Volume</span><strong id="premiumStrengthTrend">—</strong><small>vs prior 4 weeks</small></button>
-<button onclick="showScreen('history')"><i>♡</i><span>Zone 2</span><strong id="premiumEngineTrend">—</strong><small>vs prior 4 weeks</small></button>
-<button onclick="showScreen('more')"><i>⚖</i><span>Body Weight</span><strong id="premiumWeightTrend">—</strong><small>Current profile</small></button>
-</div>
+  <div><span class="premium-kicker">Next Up</span><strong id="premiumNextTitle">Tomorrow · Recovery</strong><small id="premiumNextDetail">View your upcoming schedule</small></div>
+  <button class="premium-text-button" onclick="showScreen('plan')">Full Schedule ›</button>
 </section>
 
+<section class="premium-progress-card bell11-progress-card">
+  <div class="premium-section-heading"><div><span class="premium-kicker">Progress Snapshot</span><h2>Last Four Weeks</h2></div><button class="premium-text-button" onclick="showScreen('history')">Details ›</button></div>
+  <div class="premium-progress-grid">
+    <button onclick="showScreen('history')"><i>↗</i><span>Consistency</span><strong id="premiumConsistency">—</strong><small id="premiumConsistencyNote">Building</small></button>
+    <button onclick="showScreen('history')"><i>🏋</i><span>Strength Volume</span><strong id="premiumStrengthTrend">—</strong><small>vs prior 4 weeks</small></button>
+    <button onclick="showScreen('history')"><i>♡</i><span>Zone 2</span><strong id="premiumEngineTrend">—</strong><small>vs prior 4 weeks</small></button>
+    <button onclick="showScreen('more')"><i>⚖</i><span>Body Weight</span><strong id="premiumWeightTrend">—</strong><small>Current profile</small></button>
+  </div>
+</section>
 </div>
 <div class="legacy-dashboard">
 <section aria-labelledby="weeklyScheduleTitle" class="weekly-schedule-strip">
@@ -575,7 +597,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button data-screen="history"><span class="icon">◷</span>History</button>
 <button data-screen="more"><span class="icon">⚙</span>Settings</button>
 </nav>
-<script>window.BELL_APP_VERSION = "10.0.6-dashboard-refinement";</script>
+<script>window.BELL_APP_VERSION = "11.0.0-daily-coach";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=10006"></script>
 <script src="./js/storage.js?v=10006"></script>
@@ -588,7 +610,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/milestones.js?v=10006"></script>
 <script src="./js/progression.js?v=10006"></script>
 <script src="./js/workout-model.js?v=10006"></script>
-<script src="./js/workouts.js?v=10007"></script>
+<script src="./js/workouts.js?v=11000"></script>
 <script src="./js/missed-sessions.js?v=10006"></script>
 <script src="./js/performance-review.js?v=10006"></script>
 <script src="./js/artwork.js?v=10006"></script>
@@ -601,7 +623,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/coaching-pathways.js?v=10006"></script>
 <script src="./js/event-coaching.js?v=10006"></script>
 <script src="./js/how-to.js?v=10006"></script>
-<script src="./js/premium-dashboard.js?v=10009"></script>
+<script src="./js/premium-dashboard.js?v=11000"></script>
 <script src="./js/block-lifecycle.js?v=10006"></script>
 <script src="./js/weekly-debrief.js?v=10006"></script>
 <script src="./js/plan-progress.js?v=10006"></script>

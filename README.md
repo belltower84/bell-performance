@@ -1,4 +1,4 @@
-# Bell Performance 10.0.0 — Foundation
+# Bell Performance 11.0.0 — Daily Coach
 
 ## Workout Experience Refresh
 
@@ -57,3 +57,6 @@ This focused UI release streamlines page 1 of First Flight by removing the outda
 - Complete Week is available any day and uses the same required debrief/check-in/build flow as Sunday.
 - Early completion warns about all remaining scheduled sessions.
 - Replaced and completed blocks are archived without deleting workout history.
+
+
+See `RELEASE_NOTES_11_0_0.md` for the Bell 11 dashboard overhaul.

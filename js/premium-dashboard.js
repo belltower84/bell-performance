@@ -58,6 +58,24 @@ function premiumEngineSelector(){
   const options=["Running","Cycling","Rower","Swimming","Hiking / Rucking","Sprint / Field","Air Bike","Elliptical","Stair Climber"],active=data.settings.cardioType||"Running";
   return `<label class="premium-session-selector engine-selector"><span>Engine mode</span><select onchange="switchQuickEngineMode(this.value)">${options.map(x=>`<option ${x===active?'selected':''}>${x}</option>`).join('')}</select></label>`;
 }
+function premiumSessionDescription(session){
+  const template=scaledTemplate(session?.mission)||{};
+  const raw=String(
+    session?.description||
+    session?.detail||
+    template.description||
+    template.detail||
+    template.summary||
+    template.coachBrief||
+    ''
+  ).replace(/\s+/g,' ').trim();
+  if(raw) return raw;
+  const type=premiumSessionType(session);
+  if(type==='engine') return 'Build the engine with controlled, purposeful work at the prescribed effort.';
+  const title=premiumDisplayLabel(session);
+  return `Focused ${title.toLowerCase()} training with quality reps, controlled effort, and steady progression.`;
+}
+
 function premiumSessionAction(session){
   if(session.completed)return `<button class="premium-session-status completed" onclick="showScreen('history')">Completed ›</button>`;
   const active=data.activeWorkout?.planSessionKey===session.sessionKey;
@@ -65,7 +83,8 @@ function premiumSessionAction(session){
 }
 function premiumSessionRow(session){
   const type=premiumSessionType(session), template=scaledTemplate(session.mission),duration=Number(session.prescribedDuration)||Number(template?.duration)||30;
-  return `<article class="premium-session-row compact-mission ${type} ${session.completed?'completed':''}" onclick="${session.completed?"showScreen('history')":`beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\'")}')`}"><div class="premium-session-copy"><strong>${escapeHtml(premiumDisplayLabel(session))}</strong><small>◷ ${duration} min estimated</small></div>${premiumSessionAction(session)}</article>`;
+  const description=premiumSessionDescription(session);
+  return `<article class="premium-session-row compact-mission ${type} ${session.completed?'completed':''}" onclick="${session.completed?"showScreen('history')":`beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\'")}')`}"><div class="premium-session-copy"><strong>${escapeHtml(premiumDisplayLabel(session))}</strong><p>${escapeHtml(description)}</p><small>◷ ${duration} min estimated</small></div>${premiumSessionAction(session)}</article>`;
 }
 function premiumOptionalCoreRow(){
   const key=selectedDashboardDateKey(),done=optionalCoreCompletedForDate(key),name=coreSessionName(key),template=coreTemplate(name),art=premiumSessionArtwork('core');

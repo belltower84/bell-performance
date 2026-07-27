@@ -1,7 +1,3 @@
-# Bell Performance 10.0.8
-
-This release refines the home dashboard hierarchy, centers readiness guidance, and simplifies strength mission labels. See `RELEASE_NOTES_10_0_8.md`.
-
 # Bell Performance 10.0.0 — Foundation
 
 ## Workout Experience Refresh

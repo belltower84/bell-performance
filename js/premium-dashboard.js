@@ -127,7 +127,14 @@ function renderPremiumProgress(){
   setText('premiumConsistency',`${consistency}%`);setText('premiumConsistencyNote',consistency>=80?'On Track':consistency>=60?'Building':'Needs Attention');
   setText('premiumStrengthTrend',`${strength>=0?'+':''}${strength}%`);setText('premiumEngineTrend',`${engine>=0?'+':''}${engine} min`);setText('premiumWeightTrend',`${Number(data.settings.weight)||'—'} lb`);
 }
-function renderPremiumCoach(){const title=data.trainingBlock?.enabled?`${dualBlockPhase()} · Week ${blockWeek()} of ${data.trainingBlock.lengthWeeks}`:'Build your first mission';setText('premiumCoachTitle',title);setText('premiumCoachText',coachRecommendation());setText('premiumWeekChip',data.trainingBlock?.enabled?`Week ${blockWeek()} of ${data.trainingBlock.lengthWeeks}`:'Open Plan');}
+function renderPremiumCoach(){
+  const enabled=Boolean(data.trainingBlock?.enabled),week=enabled?Math.max(1,Number(blockWeek())||1):0,total=enabled?Math.max(1,Number(data.trainingBlock.lengthWeeks)||12):0;
+  const title=enabled?`${dualBlockPhase()} · Week ${week} of ${total}`:'Build your first mission';
+  setText('premiumCoachTitle',title);setText('premiumCoachText',coachRecommendation());setText('premiumWeekChip',enabled?`Week ${week} of ${total}`:'Open Plan');
+  const pct=enabled?Math.max(0,Math.min(100,Math.round((week/total)*100))):0;
+  setText('premiumMissionProgressText',enabled?`Week ${week} of ${total}`:'No active plan');
+  const bar=byId('premiumMissionProgressBar');if(bar)bar.style.width=`${pct}%`;
+}
 function renderPremiumStandards(){
   const host=byId('premiumStandardsGrid');if(!host)return;const items=(data.habits?.items||[]).slice(0,4),done=new Set(typeof habitCompletedIds==='function'?habitCompletedIds(todayKey()):[]);
   host.innerHTML=items.length?items.map(item=>{const copy=habitDisplay(item),complete=done.has(item.id);return `<button class="${complete?'complete':''}" onclick="toggleHabit('${escapeHtml(item.id)}');renderPremiumStandards()"><i>${complete?'✓':'○'}</i><span>${escapeHtml(copy.title)}</span><strong>${complete?'Complete':escapeHtml(copy.detail||'Today')}</strong></button>`}).join(''):'<button onclick="showScreen(\'habits\')"><i>+</i><span>Set Daily Standards</span><strong>Open Habits</strong></button>';

@@ -504,3 +504,58 @@ nav{left:50%;right:auto;bottom:12px;width:min(720px,calc(100vw - 24px));transfor
 .preview-workout-box{max-width:620px}.preview-workout-box h3{margin:18px 0 8px}.preview-exercise-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}.preview-exercise-row>span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08)}.preview-exercise-row strong,.preview-exercise-row small{display:block}.preview-exercise-row small{color:var(--muted,#9ca3af);margin-top:3px}
 .strength-nav-icon{font-weight:900;font-size:22px}
 @media(max-width:600px){.premium-mission-actions{flex-direction:column;align-items:stretch}.premium-mission-actions button{width:100%}.compact-mission{align-items:stretch!important;flex-direction:column}.premium-next-card{align-items:flex-start}.premium-readiness-card{grid-template-columns:1fr auto}}
+
+/* Bell Performance 10.0.5 — clean daily dashboard */
+.premium-dashboard{gap:10px!important}
+.premium-standards-card{order:1!important}
+.premium-mission-card{order:2!important}
+.premium-readiness-card{order:3!important}
+.dashboard-mission-progress{order:4}
+.premium-coach-card{order:4!important;display:grid!important}
+.premium-quote-card{order:5!important;display:flex!important}
+.premium-next-card{order:6!important}
+.premium-support-card,.premium-support-panel,.premium-progress-card{display:none!important}
+
+/* Compact checkbox standards */
+.premium-standards-card{padding:11px 13px!important}
+.premium-standards-card .premium-section-heading{margin-bottom:8px}
+.premium-standards-card .premium-section-heading h2{display:none!important}
+.premium-standards-card .premium-text-button{display:block!important;font-size:10px}
+.premium-standards-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important;overflow:visible!important;margin-top:0!important;padding:0!important}
+.premium-standards-grid button{min-width:0!important;width:100%!important;padding:9px 7px!important;border-radius:10px!important;display:grid!important;grid-template-columns:22px minmax(0,1fr)!important;grid-template-rows:1fr!important;gap:7px!important;align-items:center!important;background:#0c1116!important;border:1px solid #343b43!important;color:#c9d0d6!important}
+.premium-standards-grid button.complete{border-color:rgba(92,190,91,.55)!important;background:rgba(72,170,74,.10)!important;color:#89d56f!important}
+.premium-standards-grid button i{grid-row:auto!important;width:20px!important;height:20px!important;border-radius:5px!important;margin:0!important;font-size:13px!important;background:rgba(255,255,255,.025)}
+.premium-standards-grid button span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px!important;font-weight:800}
+.premium-standards-grid button strong{display:none!important}
+
+/* Mission remains the dominant action */
+.premium-mission-card{padding:15px!important;border-color:rgba(216,166,50,.4)!important}
+.dashboard-mission-progress{margin-top:13px;padding-top:11px;border-top:1px solid rgba(255,255,255,.08)}
+.dashboard-mission-progress-copy{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:7px}
+.dashboard-mission-progress-copy span{font-size:9px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#9ea7af}
+.dashboard-mission-progress-copy strong{font-size:11px;color:#e8c15c}
+.dashboard-mission-progress-track{height:6px;overflow:hidden;border-radius:999px;background:#242b31}
+.dashboard-mission-progress-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#b78927,#efca63);transition:width .25s ease}
+
+/* Keep readiness, coach instruction and word of the day compact */
+.premium-readiness-card{padding:11px 13px!important}
+.premium-readiness-score strong{font-size:38px!important}
+.premium-readiness-score b{font-size:10px!important}
+.premium-readiness-score p{font-size:11px!important}
+.premium-coach-card{grid-template-columns:38px 1fr!important;gap:11px!important;min-height:0!important;padding:13px 15px!important}
+.premium-coach-icon{width:34px!important;height:34px!important;font-size:17px!important}
+.premium-coach-card strong{font-size:14px!important;margin:3px 0!important}
+.premium-coach-card p{font-size:11px!important;line-height:1.45!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.premium-quote-card{padding:13px 48px 13px 15px!important;min-height:0!important}
+.premium-quote-card blockquote{margin:4px 0!important;font-size:13px!important;line-height:1.4!important}
+.premium-quote-card cite{font-size:9px!important}
+.premium-quote-card .premium-icon-button{width:31px!important;height:31px!important;right:10px!important}
+
+.strength-nav-icon svg{display:block;width:23px;height:23px;margin:auto}
+
+@media(max-width:600px){
+  .premium-standards-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .premium-standards-grid button{padding:8px!important}
+  .premium-mission-actions{flex-direction:row!important}
+  .premium-mission-actions button{width:auto!important;flex:1}
+}

@@ -9,8 +9,8 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
-<title>Bell Performance 10.0.4 — Simplified Daily Coach</title>
-<link href="./css/app.css?v=10004" rel="stylesheet"/>
+<title>Bell Performance 10.0.5 — Clean Daily Dashboard</title>
+<link href="./css/app.css?v=10005" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -25,7 +25,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </head>
 <body>
 <header class="brand-header">
-<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=10004"/><div><h1>BELL PERFORMANCE</h1></div></div>
+<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=10005"/><div><h1>BELL PERFORMANCE</h1></div></div>
 <div class="header-actions"><button aria-label="Open notifications" id="notificationButton" onclick="openNotificationCenter()">◌<span id="notificationBadge">0</span></button><button aria-label="Open athlete profile" id="profileButton" onclick="openAthleteProfile()">◉</button></div>
 </header>
 <main>
@@ -55,6 +55,10 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="premium-mission-layout">
 <div class="premium-completion-ring" id="premiumCompletionRing"><div><strong id="premiumCompletionCount">0</strong><span id="premiumCompletionTotal">of 0</span><small id="premiumCompletionLabel">REST DAY</small></div></div>
 <div class="premium-session-stack" id="premiumSessionStack"></div>
+</div>
+<div class="dashboard-mission-progress" aria-label="Mission plan progress">
+  <div class="dashboard-mission-progress-copy"><span>Mission Plan</span><strong id="premiumMissionProgressText">Week 1 of 12</strong></div>
+  <div class="dashboard-mission-progress-track"><i id="premiumMissionProgressBar"></i></div>
 </div>
 <div class="premium-session-legend"><span><i class="complete"></i>Completed</span><span><i class="prescribed"></i>Prescribed</span><span><i class="optional"></i>Optional</span></div>
 </section>
@@ -118,8 +122,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div aria-label="Training day navigation" class="day-navigator"><button aria-label="Previous day" class="secondary compact-button" onclick="navigateDashboardDay(-1)">‹</button><button class="day-nav-current" id="dashboardDayButton" onclick="resetDashboardToToday()">Today</button><button aria-label="Next day" class="secondary compact-button" onclick="navigateDashboardDay(1)">›</button></div>
 <div class="card no-training-day hidden" id="noTrainingForDay"><strong id="noTrainingDayTitle">No prescribed training</strong><div class="hint" id="noTrainingDayDetail">Recovery, mobility, and daily standards remain available.</div></div>
 <div class="training-pair">
-<article class="training-card strength-card" id="strengthTrainingCard"><img alt="Strength athlete" id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=10004"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type">🏋 <span>STRENGTH</span></div><label class="training-quick-control strength-location-control" title="Change the equipment location used for strength substitutions"><span>Training at</span><select aria-label="Strength workout location" id="activeLocationQuick" onchange="switchEquipmentLocation(this.value);renderApp()"></select></label></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength &amp; Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
-<article class="training-card engine-card" id="engineTrainingCard"><img alt="Endurance athlete" id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=10004"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=10004"/> <span>ENGINE</span></div><label class="training-quick-control engine-mode-control" title="Choose today's engine modality"><span>Engine mode</span><select aria-label="Today's engine mode" id="engineModeQuick" onchange="switchQuickEngineMode(this.value)"></select></label></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
+<article class="training-card strength-card" id="strengthTrainingCard"><img alt="Strength athlete" id="strengthArtwork" src="./assets/artwork/strength/powerlifting.jpg?v=10005"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type">🏋 <span>STRENGTH</span></div><label class="training-quick-control strength-location-control" title="Change the equipment location used for strength substitutions"><span>Training at</span><select aria-label="Strength workout location" id="activeLocationQuick" onchange="switchEquipmentLocation(this.value);renderApp()"></select></label></div><h3 id="todayMission">Lower Body</h3><p id="todayFocusOut">Strength &amp; Power</p><div class="training-meta">◷ <span id="todayDuration">75 minutes</span></div><button onclick="beginToday()">Start Strength</button></div></article>
+<article class="training-card engine-card" id="engineTrainingCard"><img alt="Endurance athlete" id="engineArtwork" src="./assets/artwork/engine/mountain-trail.jpg?v=10005"/><div class="training-overlay"><div class="training-card-topline"><div class="training-type"><img alt="" aria-hidden="true" class="engine-mark-icon" src="./assets/icons/engine-mark.svg?v=10005"/> <span>ENGINE</span></div><label class="training-quick-control engine-mode-control" title="Choose today's engine modality"><span>Engine mode</span><select aria-label="Today's engine mode" id="engineModeQuick" onchange="switchQuickEngineMode(this.value)"></select></label></div><h3 id="engineSessionTitle">Zone 2 Run</h3><p id="engineSessionPurpose">Build your base. Fuel your engine.</p><div class="training-meta">◷ 30 minutes</div><button onclick="beginWorkout('R-2 Easy Run')">Start Engine</button></div></article>
 </div>
 <div class="card single-session-option hidden" id="singleSessionOption"></div>
 <div class="hidden" id="todayPreview"></div>
@@ -529,7 +533,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
 <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
 </div>
-<div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=10004"/><div><span class="metric-label">Today's Mission</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Hard</span><span id="workoutHeroWeek">Week 1 • Training</span></div></div></div>
+<div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=10005"/><div><span class="metric-label">Today's Mission</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Hard</span><span id="workoutHeroWeek">Week 1 • Training</span></div></div></div>
 <div class="mission-briefing-grid" id="missionBriefing">
   <section class="card mission-coach-brief"><span class="metric-label">Coach's Brief</span><h3 id="workoutBriefHeading">Why today matters</h3><p id="workoutCoachBrief">Your briefing will appear here.</p><div class="mission-focus-list" id="workoutFocusList"></div></section>
   <section class="card mission-session-breakdown"><span class="metric-label">Session Breakdown</span><div id="workoutSectionList"></div><div class="mission-total"><span>Total estimated time</span><strong id="workoutBreakdownTotal">—</strong></div></section>
@@ -565,40 +569,40 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <nav>
 <button class="active" data-screen="home"><span class="icon">⌂</span>Home</button>
 <button data-screen="plan"><span class="icon">☷</span>Plan</button>
-<button data-screen="workouts"><span class="icon strength-nav-icon">↟</span>Training</button>
+<button data-screen="workouts"><span class="icon strength-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6"/><path d="M6 7v10"/><path d="M9 6v12"/><path d="M15 6v12"/><path d="M18 7v10"/><path d="M21 9v6"/><path d="M9 12h6"/></svg></span>Training</button>
 <button data-screen="history"><span class="icon">◷</span>History</button>
 <button data-screen="more"><span class="icon">⚙</span>Settings</button>
 </nav>
-<script>window.BELL_APP_VERSION = "10.0.4-simplified-dashboard";</script>
-<script src="./data/workouts.js?v=10004"></script>
-<script src="./js/exercise-library.js?v=10004"></script>
-<script src="./js/storage.js?v=10004"></script>
-<script src="./js/readiness.js?v=10004"></script>
-<script src="./js/equipment.js?v=10004"></script>
+<script>window.BELL_APP_VERSION = "10.0.5-clean-dashboard";</script>
+<script src="./data/workouts.js?v=10005"></script>
+<script src="./js/exercise-library.js?v=10005"></script>
+<script src="./js/storage.js?v=10005"></script>
+<script src="./js/readiness.js?v=10005"></script>
+<script src="./js/equipment.js?v=10005"></script>
 <script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");</script>
-<script src="./js/training-blocks.js?v=10004"></script>
-<script src="./js/mobility.js?v=10004"></script>
-<script src="./js/nutrition.js?v=10004"></script>
-<script src="./js/milestones.js?v=10004"></script>
-<script src="./js/progression.js?v=10004"></script>
-<script src="./js/workout-model.js?v=10004"></script>
-<script src="./js/workouts.js?v=10004"></script>
-<script src="./js/missed-sessions.js?v=10004"></script>
-<script src="./js/performance-review.js?v=10004"></script>
-<script src="./js/artwork.js?v=10004"></script>
-<script src="./js/quote-cache.js?v=10004"></script>
-<script src="./js/ui.js?v=10004"></script>
-<script src="./js/habits.js?v=10004"></script>
-<script src="./js/dual-goals.js?v=10004"></script>
-<script src="./js/version-8.js?v=10004"></script>
-<script src="./js/mission-planner.js?v=10004"></script>
-<script src="./js/coaching-pathways.js?v=10004"></script>
-<script src="./js/event-coaching.js?v=10004"></script>
-<script src="./js/how-to.js?v=10004"></script>
-<script src="./js/premium-dashboard.js?v=10004"></script>
-<script src="./js/block-lifecycle.js?v=10004"></script>
-<script src="./js/weekly-debrief.js?v=10004"></script>
-<script src="./js/plan-progress.js?v=10004"></script>
-<script src="./js/app.js?v=10004"></script>
+<script src="./js/training-blocks.js?v=10005"></script>
+<script src="./js/mobility.js?v=10005"></script>
+<script src="./js/nutrition.js?v=10005"></script>
+<script src="./js/milestones.js?v=10005"></script>
+<script src="./js/progression.js?v=10005"></script>
+<script src="./js/workout-model.js?v=10005"></script>
+<script src="./js/workouts.js?v=10005"></script>
+<script src="./js/missed-sessions.js?v=10005"></script>
+<script src="./js/performance-review.js?v=10005"></script>
+<script src="./js/artwork.js?v=10005"></script>
+<script src="./js/quote-cache.js?v=10005"></script>
+<script src="./js/ui.js?v=10005"></script>
+<script src="./js/habits.js?v=10005"></script>
+<script src="./js/dual-goals.js?v=10005"></script>
+<script src="./js/version-8.js?v=10005"></script>
+<script src="./js/mission-planner.js?v=10005"></script>
+<script src="./js/coaching-pathways.js?v=10005"></script>
+<script src="./js/event-coaching.js?v=10005"></script>
+<script src="./js/how-to.js?v=10005"></script>
+<script src="./js/premium-dashboard.js?v=10005"></script>
+<script src="./js/block-lifecycle.js?v=10005"></script>
+<script src="./js/weekly-debrief.js?v=10005"></script>
+<script src="./js/plan-progress.js?v=10005"></script>
+<script src="./js/app.js?v=10005"></script>
 </body>
 </html>

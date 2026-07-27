@@ -1,10 +1,10 @@
 "use strict";
-const CACHE_NAME = "bell-performance-10.0.0-foundation";
+const CACHE_NAME = "bell-performance-10.0.2-navigation-cleanup";
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/app.css?v=9050",
+  "./css/app.css?v=10002",
   "./assets/logo-shield.svg?v=9050",
   "./assets/icons/engine-shoe.svg?v=9050",
   "./assets/artwork/strength/powerlifting.jpg?v=9050",

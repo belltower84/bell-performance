@@ -230,7 +230,7 @@ function attachEngineSession(plan,days,index,kind,coord){
   if(plan[target].mission==="M-1 Daily Reset")plan[target]={day:days[target],...engine,done:false};
   else{
     plan[target].secondaryMission=engine.mission;plan[target].secondaryLabel=prescription.label;plan[target].secondaryDuration=prescription.duration;plan[target].secondaryDetail=prescription.detail;
-    plan[target].detail=`${plan[target].detail||""} • ${kind==="easy"?"Easy Engine support":"PM Engine"}: ${prescription.label}`;
+    plan[target].detail=`${plan[target].detail||""} • ${kind==="easy"?"Easy Engine support":"Engine session"}: ${prescription.label}`;
   }
 }
 
@@ -293,7 +293,7 @@ function handleNotification(action){closeNotificationCenter();if(action==="readi
 function openAthleteProfile(){showScreen("more");setTimeout(()=>document.getElementById("athleteNameInput")?.scrollIntoView({behavior:"smooth",block:"center"}),100);}
 
 const originalRenderApp=renderApp;
-renderApp=function(){originalRenderApp();renderDualGoals();const planList=document.getElementById("planList");if(planList){[...planList.children].forEach((row,i)=>{const item=data.plan[i];if(item?.secondaryLabel){const target=row.querySelector(".hint")||row.querySelector(".sub");target?.insertAdjacentHTML("afterend",`<div class="two-a-day-tag">PM ENGINE • ${item.secondaryLabel}<br><small>${item.secondaryDetail}</small></div>`);}});}};
+renderApp=function(){originalRenderApp();renderDualGoals();const planList=document.getElementById("planList");if(planList){[...planList.children].forEach((row,i)=>{const item=data.plan[i];if(item?.secondaryLabel){const target=row.querySelector(".hint")||row.querySelector(".sub");target?.insertAdjacentHTML("afterend",`<div class="two-a-day-tag">ENGINE • ${item.secondaryLabel}<br><small>${item.secondaryDetail}</small></div>`);}});}};
 
 document.addEventListener("DOMContentLoaded",()=>{document.getElementById("blockStrengthDays")?.addEventListener("change",e=>e.target.dataset.touched="1");document.getElementById("blockRunDays")?.addEventListener("change",e=>e.target.dataset.touched="1");["blockTrainingDays","trainingCoordination"].forEach(id=>document.getElementById(id)?.addEventListener("change",applyHybridScheduleRecommendation));setTimeout(()=>{updateDualGoalBuilder();renderDualGoals();applyHybridScheduleRecommendation();},80);});
 

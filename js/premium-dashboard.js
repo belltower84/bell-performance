@@ -8,6 +8,11 @@ function premiumSelectedItems(){
 }
 function premiumAllSessions(){return premiumSelectedItems().flatMap(sessionsFromPlanItem);}
 function premiumSessionType(session){return scheduleTypeForMission(session?.mission,session?.label,session?.detail)||'strength';}
+function premiumDisplayLabel(session){
+  const raw=String(session?.label||scaledTemplate(session?.mission)?.label||session?.mission||'Training');
+  if(premiumSessionType(session)!=='engine')return raw;
+  return raw.replace(/^\s*(?:PM|P\.?M\.?)\s*[-–—:|•]*\s*/i,'').replace(/\s*[-–—:|•]*\s*(?:PM|P\.?M\.?)\s*$/i,'').replace(/\s*\((?:PM|P\.?M\.?)\)\s*/ig,' ').trim()||'Engine Training';
+}
 function premiumInlineIcon(kind){
   const icons={
     strength:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6"/><path d="M6 7v10"/><path d="M9 6v12"/><path d="M15 6v12"/><path d="M18 7v10"/><path d="M21 9v6"/><path d="M9 12h6"/></svg>`,
@@ -45,7 +50,7 @@ function premiumSessionRow(session){
   const type=premiumSessionType(session), template=scaledTemplate(session.mission),duration=Number(session.prescribedDuration)||Number(template?.duration)||30;
   const date=localDateFromKey(selectedDashboardDateKey());
   const day=date.toLocaleDateString('en-US',{weekday:'long'});
-  return `<article class="premium-session-row compact-mission ${type} ${session.completed?'completed':''}" onclick="${session.completed?"showScreen('history')":`beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\'")}')`}"><div class="premium-session-copy"><span>${day}</span><strong>${escapeHtml(session.label||template?.label||session.mission)}</strong><small>◷ ${duration} min</small></div>${premiumSessionAction(session)}</article>`;
+  return `<article class="premium-session-row compact-mission ${type} ${session.completed?'completed':''}" onclick="${session.completed?"showScreen('history')":`beginPlannedWorkout('${session.planId}','${session.sessionKey}','${String(session.mission).replaceAll("'","\'")}')`}"><div class="premium-session-copy"><span>${day}</span><strong>${escapeHtml(premiumDisplayLabel(session))}</strong><small>◷ ${duration} min</small></div>${premiumSessionAction(session)}</article>`;
 }
 function premiumOptionalCoreRow(){
   const key=selectedDashboardDateKey(),done=optionalCoreCompletedForDate(key),name=coreSessionName(key),template=coreTemplate(name),art=premiumSessionArtwork('core');
@@ -59,8 +64,8 @@ function renderPremiumMission(){
   setText('premiumCompletionCount',String(completed));setText('premiumCompletionTotal',`of ${total}`);setText('premiumCompletionLabel',total?(completed===total?'MISSION COMPLETE':'COMPLETE'):'REST DAY');
   const ring=byId('premiumCompletionRing');if(ring)ring.style.setProperty('--mission-progress',`${pct*3.6}deg`);
   const stack=byId('premiumSessionStack');if(!stack)return;
-  const eligible=sessions.length<=1;
-  stack.innerHTML=sessions.slice(0,1).map(premiumSessionRow).join('');
+  stack.innerHTML=sessions.map(premiumSessionRow).join('');
+  stack.classList.toggle('is-scrollable',sessions.length>1);
   if(!sessions.length)stack.insertAdjacentHTML('afterbegin','<article class="premium-session-row rest"><div class="premium-session-icon">☾</div><div class="premium-session-copy"><span>Recovery</span><strong>No prescribed training</strong><small>Mobility, walking, and daily standards remain available.</small></div></article>');
 }
 
@@ -105,7 +110,9 @@ function renderPremiumReadiness(){
   const score=readinessScore(),status=readinessStatus(score),r=data.settings.readiness||{};
   setText('premiumReadinessScore',String(score));setText('premiumReadinessStatus',status);setText('premiumReadinessDetail',trainingStatusText(status));
   setText('premiumSleep',premiumSleepDuration(r));setText('premiumEnergy',premiumReadinessMetric(r.energy));setText('premiumSoreness',premiumReadinessMetric(r.recoveryStatus));setText('premiumMotivation',premiumReadinessMetric(r.motivation));
-  const card=byId('premiumReadinessCard');if(card)card.dataset.status=status.toLowerCase(); const btn=card?.querySelector('.premium-readiness-update');if(btn)btn.textContent=(r.lastPromptDate===todayKey()?'Update':'Check In');
+  const checkedIn=r.lastPromptDate===todayKey();
+  const card=byId('premiumReadinessCard');if(card){card.dataset.status=status.toLowerCase();card.dataset.complete=checkedIn?'true':'false';card.setAttribute('aria-label',checkedIn?`Readiness ${score}, ${status}`:'Readiness check-in not completed');}
+  const btn=card?.querySelector('.premium-readiness-update');if(btn)btn.textContent=(checkedIn?'Update':'Check In');
 }
 function rotatePremiumQuote(){premiumQuoteOffset++;renderPremiumQuote();}
 function renderPremiumQuote(){

@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 8.7.1",
-  "short_name": "Bell Performance",
+  "name": "Bell Performance 10",
+  "short_name": "Bell 10",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#050709",
-  "theme_color": "#050709",
-  "description": "Equipment-aware Strength and Engine coaching with a built-in guided tour, daily readiness, adaptive progression, and rolling seven-day autoregulation."
+  "background_color": "#07090b",
+  "theme_color": "#07090b",
+  "description": "Digital athlete coaching platform"
 }

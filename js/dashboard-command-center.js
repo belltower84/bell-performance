@@ -152,6 +152,37 @@ function openCommandTile(type){
   commandSetText('commandDrawerTitle',title);commandSetText('commandDrawerKicker',kicker);body.innerHTML=html;commandDrawerActionButtons(actions);drawer.classList.remove('hidden');drawer.setAttribute('aria-hidden','false');document.body.classList.add('command-drawer-open');setTimeout(()=>drawer.querySelector('.command-drawer-close')?.focus(),20);
 }
 
+
+function commandWeeklyTypeCode(type){return type==='strength'?'STR':type==='engine'?'ENG':'REST';}
+function commandRenderCleanWeek(){
+  const block=typeof bpResolvePlanBlock==='function'?bpResolvePlanBlock():data.trainingBlock;if(!block)return;
+  if(typeof bpPrepareBlockPlan==='function')bpPrepareBlockPlan(block);
+  const week=typeof bpCurrentTimelineWeek==='function'?bpCurrentTimelineWeek(block):Number(block.currentWeek||1);
+  const plan=typeof bpWeekPlan==='function'?bpWeekPlan(block,week):(data.plan||[]);
+  const monday=typeof bpWeekStartKey==='function'?bpWeekStartKey(block,week):mondayKeyFor(selectedDashboardDateKey());
+  const selected=block===data.trainingBlock&&week===Number(data.trainingBlock?.currentWeek||1)?selectedDashboardDateKey():monday;
+  const shortDays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],fullDays=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const phase=typeof bpPhaseForWeek==='function'?bpPhaseForWeek(week,Number(block.lengthWeeks)||12):{name:'Training'};
+  const host=document.getElementById('premiumWeekDays');if(!host)return;
+  let strengthCount=0,engineCount=0;
+  host.innerHTML=shortDays.map((day,index)=>{
+    const key=addLocalDays(monday,index);
+    const items=plan.filter(x=>(x.day===fullDays[index]||(typeof planDateKey==='function'&&planDateKey(x)===key))&&!['skipped','replaced'].includes(x.status));
+    const sessions=items.flatMap(item=>typeof sessionsFromPlanItem==='function'?sessionsFromPlanItem(item):[item]).filter(Boolean);
+    const types=[];sessions.forEach(session=>{const type=typeof premiumSessionType==='function'?premiumSessionType(session):'rest';if((type==='strength'||type==='engine')&&!types.includes(type))types.push(type);});
+    strengthCount+=types.includes('strength')?1:0;engineCount+=types.includes('engine')?1:0;
+    const allDone=sessions.length&&sessions.every(x=>x.completed);
+    const badges=types.length?types.map(type=>`<span class="premium-week-chip ${type}">${commandWeeklyTypeCode(type)}</span>`).join(''):'<span class="premium-week-chip rest">REST</span>';
+    const label=types.length?types.map(commandWeeklyTypeCode).join(' + '):'Rest';
+    const action=block===data.trainingBlock&&week===Number(data.trainingBlock?.currentWeek||1)?`setDashboardDate('${key}')`:`bpPreviewWeek(${week})`;
+    return `<button class="premium-week-day-card ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''}" onclick="${action}" aria-label="${day} ${localDateFromKey(key).getDate()}: ${label}"><span>${day}</span><strong>${localDateFromKey(key).getDate()}</strong><div class="premium-week-chips">${badges}</div></button>`;
+  }).join('');
+  commandSetText('premiumWeekTitle',`Week ${week} · ${phase.name}`);
+  commandSetText('premiumWeekKicker',`${strengthCount} strength · ${engineCount} engine`);
+}
+
+renderPremiumWeek=commandRenderCleanWeek;
+
 const commandOriginalRenderPremiumDashboard=renderPremiumDashboard;
 renderPremiumDashboard=function(){
   renderPremiumQuote();renderPremiumReadiness();renderPremiumMission();renderPremiumNext();renderPremiumProgress();renderPremiumCoach();renderPremiumStandards();renderPremiumWeek();renderCommandStatus();renderCommandTiles();

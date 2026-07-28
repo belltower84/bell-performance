@@ -1,10 +1,10 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-12.2.8-midweek-launch-availability';
+const CACHE_NAME = 'bell-performance-12.2.9-weekly-plan-ui-cleanup-availability';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/app.css?v=12280",
+  "./css/app.css?v=12290",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/icons/engine-shoe.svg?v=10006",
   "./assets/icons/engine-mark.svg?v=10006",
@@ -50,10 +50,10 @@ const CORE = [
   "./js/block-lifecycle.js?v=10006",
   "./js/plan-progress.js?v=10006",
   "./js/weekly-debrief.js?v=10006",
-  "./js/bell-api.js?v=12280",
+  "./js/bell-api.js?v=12290",
   "./js/api-integration.js?v=12101",
-  "./js/dashboard-command-center.js?v=12280",
-  "./js/adaptive-weekly-schedule.js?v=12280",
+  "./js/dashboard-command-center.js?v=12290",
+  "./js/adaptive-weekly-schedule.js?v=12290",
   "./js/app.js?v=12101"
 ];
 self.addEventListener("install", event => {

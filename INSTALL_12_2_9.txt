@@ -1,0 +1,19 @@
+Bell Performance 12.2.9 — Weekly Plan UI Cleanup
+
+1. Confirm GitHub Desktop is on bell-core-live.
+2. Commit or stash any uncommitted work.
+3. Extract this ZIP.
+4. Copy everything inside the extracted patch folder into the root of the bell-performance repository.
+5. Choose Replace the files in the destination.
+6. Commit with: Build 12.2.9 weekly plan UI cleanup
+7. Push bell-core-live.
+8. Start the frontend locally with: py -m http.server 5173
+9. Open http://localhost:5173 and hard refresh with Ctrl + Shift + R.
+
+VERIFY
+- Weekly Plan tile has seven clean day cells.
+- Each day shows only STR, ENG, STR + ENG, or REST.
+- Mobility and core do not appear in the mini strip.
+- Week/phase and weekly strength/engine counts are readable.
+- Today/selected day is visibly highlighted.
+- Open still launches the full Weekly Plan drawer.

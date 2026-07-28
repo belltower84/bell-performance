@@ -198,3 +198,25 @@ def test_discipline_exposure_targets_running_six_days():
     from app.services.core import _discipline_exposure_targets
     request = {"goal": "10K race performance", "constraints": {"training_days": 6}}
     assert _discipline_exposure_targets(request, 6) == {"strength": 3, "engine": 4}
+
+
+def test_powerlifting_week_uses_competition_lift_roles_and_only_easy_engine(tmp_path):
+    engine = _weekly_engine(tmp_path)
+    try:
+        result = engine.build_week({
+            "goal": "Powerlifting: improve competition squat, bench press, and deadlift",
+            "available_days": ["Monday", "Tuesday", "Thursday", "Friday", "Saturday"],
+            "strength_days": 4,
+            "engine_days": 1,
+            "training_days": 5,
+            "phase": "Build",
+        })
+        names = [x["session_name"] for x in result["schedule"] if x.get("session_name")]
+        assert "Powerlifting Squat Focus" in names
+        assert "Powerlifting Bench Focus" in names
+        assert "Powerlifting Deadlift Focus" in names
+        assert "Powerlifting Secondary Squat + Bench" in names
+        assert "Powerlifting Aerobic Recovery" in names
+        assert not any(name in names for name in ("Threshold", "Intervals", "Long Run", "Mixed Modal"))
+    finally:
+        engine.close()

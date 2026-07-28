@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-12.2.11-weekly-plan-list';
+const CACHE_NAME = 'bell-performance-12.2.12-legit-powerlifting-programming';
 const CORE = [
   "./",
   "./index.html",

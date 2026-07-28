@@ -8,7 +8,7 @@ from typing import Any
 
 from .session_builder import BellSessionBuilder
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
@@ -30,6 +30,8 @@ class BellWeeklyPlanningEngine:
 
     def _mission_key(self, request: dict[str, Any]) -> str:
         text = _norm(" ".join(str(request.get(k, "")) for k in ("mission", "goal", "specialization", "event")))
+        if "powerlifting" in text:
+            return "powerlifting"
         if "10k" in text:
             return "10k"
         if any(x in text for x in ("recomp", "body composition", "fat loss")):
@@ -61,6 +63,8 @@ class BellWeeklyPlanningEngine:
     def _preferred_order(session_names: list[str]) -> list[str]:
         # Place high-fatigue lower and engine days apart before filling moderate sessions.
         priorities = {
+            "Powerlifting Squat Focus": 8, "Powerlifting Bench Focus": 12,
+            "Powerlifting Deadlift Focus": 22, "Powerlifting Secondary Squat + Bench": 38,
             "Lower Strength": 10, "Threshold": 20, "Intervals": 20, "Long Run": 30,
             "Long Aerobic": 30, "Upper Strength": 40, "Lower Volume": 50,
             "Legs": 50, "Upper Volume": 60, "Push": 60, "Pull": 60,
@@ -78,8 +82,8 @@ class BellWeeklyPlanningEngine:
         def profile(name: str) -> dict[str, bool]:
             template = self._resolve_template(name)
             kind = template.get("session_type", "strength")
-            lower = kind != "engine" and ("Lower" in name or name == "Legs")
-            upper = kind != "engine" and any(x in name for x in ("Upper", "Push", "Pull"))
+            lower = kind != "engine" and any(x in name for x in ("Lower", "Squat", "Deadlift", "Legs"))
+            upper = kind != "engine" and any(x in name for x in ("Upper", "Bench", "Push", "Pull"))
             long_engine = kind == "engine" and "Long" in name
             hard_engine = kind == "engine" and any(x in name for x in ("Threshold", "Intervals", "Tempo", "Sprint", "Quality"))
             easy_engine = kind == "engine" and not long_engine and not hard_engine
@@ -215,6 +219,15 @@ class BellWeeklyPlanningEngine:
         if recovery_days < limits["minimum_recovery_days"]:
             warnings.append("Minimum weekly recovery-day rule not met.")
 
+        if any(name.startswith("Powerlifting") for name in names):
+            required = {"Powerlifting Squat Focus", "Powerlifting Bench Focus", "Powerlifting Deadlift Focus"}
+            missing = sorted(required.difference(names))
+            if missing:
+                warnings.append("Powerlifting week is missing required competition-lift roles: " + ", ".join(missing))
+            prohibited = [name for name in names if any(token in name for token in ("Intervals", "Threshold", "Long Run", "Mixed Modal"))]
+            if prohibited:
+                warnings.append("Powerlifting engine work must remain low-intensity aerobic support: " + ", ".join(prohibited))
+
         alignment = 100 if objectives else 70
         recovery = max(0, 100 - 18 * len(warnings))
         schedule_fit = round(100 * len(training_indices) / max(1, min(len(available_days), len(training_indices)))) if training_indices else 0
@@ -241,6 +254,9 @@ class BellWeeklyPlanningEngine:
         available_days = self._available_days(request)
         strength_target = max(0, int(request.get("strength_days", 0) or 0))
         engine_target = max(0, int(request.get("engine_days", 0) or 0))
+        if mission_key == "powerlifting":
+            strength_target = min(4, strength_target or 4)
+            engine_target = min(2, engine_target if engine_target else 1)
         defaults = list(profile["default_sessions"])
         strength_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") != "engine"]
         engine_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") == "engine"]
@@ -250,8 +266,11 @@ class BellWeeklyPlanningEngine:
         else:
             sessions = []
             # Build distinct exposure roles. Never satisfy a target by cycling the same template.
-            strength_fallback = ["Upper Strength", "Lower Strength", "Upper Volume", "Lower Volume", "Full Body Hypertrophy", "Push", "Pull", "Legs", "Upper", "Lower"]
-            engine_fallback = ["Easy Run", "Threshold", "Aerobic Base", "Intervals", "Long Run", "Mixed Modal", "Long Aerobic"]
+            strength_fallback = (["Powerlifting Squat Focus", "Powerlifting Bench Focus", "Powerlifting Deadlift Focus", "Powerlifting Secondary Squat + Bench"]
+                                 if mission_key == "powerlifting" else
+                                 ["Upper Strength", "Lower Strength", "Upper Volume", "Lower Volume", "Full Body Hypertrophy", "Push", "Pull", "Legs", "Upper", "Lower"])
+            engine_fallback = (["Powerlifting Aerobic Recovery", "Aerobic Base"] if mission_key == "powerlifting" else
+                               ["Easy Run", "Threshold", "Aerobic Base", "Intervals", "Long Run", "Mixed Modal", "Long Aerobic"])
             def unique_pool(primary: list[str], fallback: list[str]) -> list[str]:
                 result: list[str] = []
                 for name in [*primary, *fallback]:

@@ -1,0 +1,15 @@
+Bell Performance 12.2.10 — Three-Day Weekly Plan Carousel
+
+Copy these files into your repo and replace the existing versions:
+- index.html
+- css/app.css
+- sw.js
+
+Then commit and push.
+
+Suggested commit message:
+Build 12.2.10 three-day weekly plan carousel
+
+After pushing:
+1. Refresh the browser.
+2. If the old dashboard still appears, clear site data or do a hard refresh because the service worker cache changed.

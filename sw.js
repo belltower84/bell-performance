@@ -1,10 +1,10 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-12.2.9-weekly-plan-ui-cleanup-availability';
+const CACHE_NAME = 'bell-performance-12.2.11-weekly-plan-list';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/app.css?v=12290",
+  "./css/app.css?v=12211",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/icons/engine-shoe.svg?v=10006",
   "./assets/icons/engine-mark.svg?v=10006",

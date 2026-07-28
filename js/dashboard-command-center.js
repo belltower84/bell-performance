@@ -153,7 +153,13 @@ function openCommandTile(type){
 }
 
 
-function commandWeeklyTypeCode(type){return type==='strength'?'STR':type==='engine'?'ENG':'REST';}
+function commandWeeklyTypeCode(type){return type==='strength'?'Strength':type==='engine'?'Engine':'Rest';}
+function commandWeeklySessionLabel(session){
+  if(!session)return '';
+  const type=typeof premiumSessionType==='function'?premiumSessionType(session):'rest';
+  const label=typeof premiumDisplayLabel==='function'?premiumDisplayLabel(session):(session.label||session.mission||commandWeeklyTypeCode(type));
+  return String(label||commandWeeklyTypeCode(type)).replace(/^S-\d+\s*/i,'').replace(/^R-\d+\s*/i,'').trim();
+}
 function commandRenderCleanWeek(){
   const block=typeof bpResolvePlanBlock==='function'?bpResolvePlanBlock():data.trainingBlock;if(!block)return;
   if(typeof bpPrepareBlockPlan==='function')bpPrepareBlockPlan(block);
@@ -169,16 +175,20 @@ function commandRenderCleanWeek(){
     const key=addLocalDays(monday,index);
     const items=plan.filter(x=>(x.day===fullDays[index]||(typeof planDateKey==='function'&&planDateKey(x)===key))&&!['skipped','replaced'].includes(x.status));
     const sessions=items.flatMap(item=>typeof sessionsFromPlanItem==='function'?sessionsFromPlanItem(item):[item]).filter(Boolean);
-    const types=[];sessions.forEach(session=>{const type=typeof premiumSessionType==='function'?premiumSessionType(session):'rest';if((type==='strength'||type==='engine')&&!types.includes(type))types.push(type);});
-    strengthCount+=types.includes('strength')?1:0;engineCount+=types.includes('engine')?1:0;
+    const types=sessions.map(session=>typeof premiumSessionType==='function'?premiumSessionType(session):'rest');
+    strengthCount+=types.filter(type=>type==='strength').length;engineCount+=types.filter(type=>type==='engine').length;
+    const labels=sessions.filter((session,i)=>['strength','engine'].includes(types[i])).map(commandWeeklySessionLabel);
+    const description=labels.length?labels.join(' + '):'Rest / Recovery';
     const allDone=sessions.length&&sessions.every(x=>x.completed);
-    const badges=types.length?types.map(type=>`<span class="premium-week-chip ${type}">${commandWeeklyTypeCode(type)}</span>`).join(''):'<span class="premium-week-chip rest">REST</span>';
-    const label=types.length?types.map(commandWeeklyTypeCode).join(' + '):'Rest';
     const action=block===data.trainingBlock&&week===Number(data.trainingBlock?.currentWeek||1)?`setDashboardDate('${key}')`:`bpPreviewWeek(${week})`;
-    return `<button class="premium-week-day-card ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''}" onclick="${action}" aria-label="${day} ${localDateFromKey(key).getDate()}: ${label}"><span>${day}</span><strong>${localDateFromKey(key).getDate()}</strong><div class="premium-week-chips">${badges}</div></button>`;
+    return `<button class="command-week-list-row ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''}" onclick="${action}" aria-label="${fullDays[index]} ${localDateFromKey(key).getDate()}: ${escapeHtml(description)}"><span class="command-week-list-day"><b>${day}</b><small>${localDateFromKey(key).getDate()}</small></span><strong>${escapeHtml(description)}</strong><i>${allDone?'✓':'›'}</i></button>`;
   }).join('');
   commandSetText('premiumWeekTitle',`Week ${week} · ${phase.name}`);
   commandSetText('premiumWeekKicker',`${strengthCount} strength · ${engineCount} engine`);
+  requestAnimationFrame(()=>{
+    const todayRow=host.querySelector('.today')||host.querySelector('.selected');
+    if(todayRow&&typeof todayRow.scrollIntoView==='function')todayRow.scrollIntoView({block:'nearest'});
+  });
 }
 
 renderPremiumWeek=commandRenderCleanWeek;

@@ -863,3 +863,50 @@ nav button .strength-nav-icon svg{width:23px!important;height:23px!important;dis
   .command-drawer-panel{top:auto;bottom:0;width:100%;height:min(78vh,650px);border-left:0;border-top:1px solid var(--command-line);border-radius:18px 18px 0 0;animation:commandSheetIn .22s ease}.command-drawer-panel>header{padding:17px}.command-drawer-body{padding:16px}@keyframes commandSheetIn{from{transform:translateY(100%)}to{transform:none}}
 }
 @media(max-width:430px){.command-center{padding-bottom:4px!important}.command-topbar{margin-top:-3px}.command-brief-strip{gap:4px}.command-card{min-height:142px;padding:7px}.command-mission-heading{margin-bottom:6px}.command-mission-heading h2{font-size:17px}.command-session-summary .command-session-block:nth-child(n+4){display:none}.command-tile-grid{gap:6px}.command-tile{min-height:108px}.command-week-days .premium-week-day-card>strong{display:none}}
+
+
+/* 12.2.1 brand refresh */
+.brand-header{border-bottom:1px solid rgba(220,170,55,.3)!important;background:rgba(6,8,10,.96)!important;box-shadow:0 12px 28px rgba(0,0,0,.28)}
+.brand-lockup{gap:14px!important;min-width:0}
+.brand-lockup>img{width:56px!important;height:54px!important;max-width:56px!important;flex-basis:56px!important;object-fit:contain!important}
+.brand-copy{display:grid;gap:3px;min-width:0}
+.brand-lockup h1{margin:0!important;font-size:28px!important;line-height:.88!important;letter-spacing:.18em!important;color:#e0b13b!important;text-transform:uppercase}
+.brand-subline{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:800;line-height:1;letter-spacing:.42em;text-transform:uppercase;color:#ece8e0;white-space:nowrap}
+.brand-subline:before,.brand-subline:after{content:"";display:block;width:18px;height:1px;background:linear-gradient(90deg,transparent,#c79a2d)}
+.brand-subline:after{background:linear-gradient(90deg,#c79a2d,transparent)}
+.brand-tagline{display:block!important;font-size:10px;font-weight:500;letter-spacing:.11em;color:#d9a629;white-space:nowrap}
+.header-actions button{border-color:#6a5118!important;background:linear-gradient(180deg,#13181d,#090d11)!important;color:#e0b13b!important}
+.command-kicker,.command-card header h2,.command-tile header h3,.command-open-label,.command-detail-section h3,.command-quick-actions>strong{letter-spacing:.16em!important;text-transform:uppercase!important}
+.command-card header h2,.command-tile header h3,.command-detail-section h3{color:#e5b64b!important;font-weight:800!important}
+.command-mission-heading h2,.command-tile .command-tile-title,.command-drawer-panel h2{letter-spacing:.04em;font-weight:800}
+.command-card p,.command-tile p,.command-detail-section p,.command-daily-brief cite,.command-mission-purpose{color:#cfd3d6}
+.command-text-action,.command-secondary-actions button,.command-sync-status,.command-athlete-button,.command-return-today{letter-spacing:.04em;font-weight:700}
+.command-date-line strong,#commandDayOut{letter-spacing:.08em;text-transform:uppercase}
+@media(min-width:980px){
+  .brand-header{width:236px!important;height:108px!important;padding:18px 18px 14px!important}
+  .brand-header .brand-lockup{align-items:flex-start!important;gap:10px!important}
+  .brand-header .brand-lockup>img{width:54px!important;height:52px!important;flex-basis:54px!important;margin-top:2px}
+  .brand-header .brand-lockup h1{font-size:24px!important}
+  .brand-header .brand-subline{font-size:9px;letter-spacing:.34em;gap:6px}
+  .brand-header .brand-subline:before,.brand-header .brand-subline:after{width:12px}
+  .brand-header .brand-tagline{font-size:9px;letter-spacing:.08em}
+  main{margin-left:236px!important}
+  .app-nav{width:236px!important;top:108px!important;padding-bottom:118px!important}
+}
+@media(max-width:979px){
+  .brand-header{padding-left:14px!important;padding-right:14px!important}
+  .brand-lockup>img{width:48px!important;height:46px!important;max-width:48px!important;flex-basis:48px!important}
+  .brand-lockup h1{font-size:22px!important}
+  .brand-subline{font-size:9px;letter-spacing:.32em;gap:6px}
+  .brand-subline:before,.brand-subline:after{width:12px}
+  .brand-tagline{font-size:9px;letter-spacing:.08em}
+}
+@media(max-width:430px){
+  .brand-header{padding-top:calc(env(safe-area-inset-top) + 9px)!important}
+  .brand-lockup{gap:10px!important}
+  .brand-lockup>img{width:42px!important;height:40px!important;max-width:42px!important;flex-basis:42px!important}
+  .brand-lockup h1{font-size:18px!important;letter-spacing:.16em!important}
+  .brand-subline{font-size:8px;letter-spacing:.24em;gap:4px}
+  .brand-subline:before,.brand-subline:after{width:8px}
+  .brand-tagline{display:none!important}
+}

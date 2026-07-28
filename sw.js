@@ -1,11 +1,11 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-12.2.0-command-center';
+const CACHE_NAME = 'bell-performance-12.2.1-logo-typography-refresh';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/app.css?v=12200",
-  "./assets/logo-shield.svg?v=12200",
+  "./css/app.css?v=12210",
+  "./assets/logo-bell-emblem.png?v=12210",
   "./assets/icons/engine-shoe.svg?v=10006",
   "./assets/icons/engine-mark.svg?v=10006",
   "./assets/artwork/strength/powerlifting.jpg?v=10006",
@@ -52,7 +52,7 @@ const CORE = [
   "./js/weekly-debrief.js?v=10006",
   "./js/bell-api.js?v=12101",
   "./js/api-integration.js?v=12101",
-  "./js/dashboard-command-center.js?v=12200",
+  "./js/dashboard-command-center.js?v=12210",
   "./js/app.js?v=12101"
 ];
 self.addEventListener("install", event => {

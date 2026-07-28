@@ -155,3 +155,34 @@ def test_today_does_not_pull_tomorrows_session_forward(client, auth):
     next_day = client.get(f'/api/v1/athletes/{aid}/today?date={date_two}', headers=headers)
     assert next_day.status_code == 200
     assert next_day.json()['session']['session']['session_id'] == next_id
+
+
+def test_concurrent_scheduler_uses_friday_for_strength_and_layers_mobility():
+    from app.services.core import _optimize_concurrent_schedule
+    schedule = [
+        {"session_name": "S-1 Upper Strength", "session": {"session_type": "strength", "session": {"title": "S-1 Upper Strength"}}},
+        {"session_name": "S-2 Lower Strength", "session": {"session_type": "strength", "session": {"title": "S-2 Lower Strength"}}},
+        {"session_name": "S-3 Athletic Upper", "session": {"session_type": "strength", "session": {"title": "S-3 Athletic Upper"}}},
+        {"session_name": "Run Quality", "session": {"session_type": "engine", "session": {"title": "Run Quality"}}},
+        {"session_name": "M-1 Daily Reset", "session": {"session_type": "mobility", "session": {"title": "M-1 Daily Reset"}}},
+        {"session_name": "Long Run", "session": {"session_type": "engine", "session": {"title": "Long Run"}}},
+    ]
+    result = _optimize_concurrent_schedule(schedule, ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])
+    strength_days = [x["day"] for x in result if "Strength" in x.get("session_name", "") or "Athletic Upper" in x.get("session_name", "")]
+    assert strength_days == ["Monday", "Tuesday", "Friday"]
+    assert next(x for x in result if x["session_name"] == "Long Run")["day"] == "Saturday"
+    mobility = next(x for x in result if x["session_name"] == "M-1 Daily Reset")
+    assert mobility.get("support_component") is True
+    assert mobility["day"] in strength_days + ["Thursday", "Saturday"]
+
+
+def test_concurrent_scheduler_never_uses_unselected_days():
+    from app.services.core import _optimize_concurrent_schedule
+    schedule = [
+        {"session_name": "Upper Strength", "session": {"session_type": "strength", "session": {"title": "Upper Strength"}}},
+        {"session_name": "Lower Strength", "session": {"session_type": "strength", "session": {"title": "Lower Strength"}}},
+        {"session_name": "Tempo Run", "session": {"session_type": "engine", "session": {"title": "Tempo Run"}}},
+    ]
+    selected = ["Monday", "Wednesday", "Friday", "Saturday"]
+    result = _optimize_concurrent_schedule(schedule, selected)
+    assert all(item["day"] in selected for item in result)

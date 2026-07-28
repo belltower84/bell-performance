@@ -170,6 +170,115 @@ def _default_available_days(training_days: int) -> list[str]:
     return maps.get(max(2, min(6, training_days)), maps[4])
 
 
+
+
+def _session_schedule_profile(item: dict[str, Any]) -> dict[str, Any]:
+    """Classify a weekly-planner item for concurrent-training scheduling."""
+    session = item.get("session") or {}
+    meta = session.get("session") or {}
+    title = " ".join(str(x or "") for x in (
+        item.get("session_name"), item.get("name"), meta.get("title"), meta.get("name"),
+        session.get("name"), item.get("detail")
+    )).lower()
+    session_type = str(session.get("session_type") or meta.get("session_type") or meta.get("type") or "").lower()
+    mobility = bool(session_type in {"mobility", "recovery"} or any(x in title for x in ("mobility", "daily reset", "recovery reset")))
+    engine = bool(session_type == "engine" or any(x in title for x in ("run", "engine", "interval", "tempo", "threshold", "zone 2", "aerobic", "ruck", "bike", "row"))) and not mobility
+    strength = not engine and not mobility
+    lower = strength and any(x in title for x in ("lower", "squat", "deadlift", "leg", "hinge"))
+    upper = strength and any(x in title for x in ("upper", "bench", "press", "pull")) and not lower
+    full = strength and not lower and not upper
+    long_engine = engine and any(x in title for x in ("long run", "long aerobic", "long endurance"))
+    hard_engine = engine and any(x in title for x in ("interval", "tempo", "threshold", "quality", "sprint", "hill", "vo2"))
+    easy_engine = engine and not long_engine and not hard_engine
+    return {"mobility": mobility, "engine": engine, "strength": strength, "lower": lower,
+            "upper": upper, "full": full, "long_engine": long_engine,
+            "hard_engine": hard_engine, "easy_engine": easy_engine}
+
+
+def _optimize_concurrent_schedule(schedule: list[dict[str, Any]], available_days: list[str]) -> list[dict[str, Any]]:
+    """Place primary work before mobility and use evidence-aligned strength/engine pairings."""
+    week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    days = [day for day in week if day in available_days]
+    if not days:
+        return schedule
+    day_index = {day: index for index, day in enumerate(week)}
+    primary = [item for item in schedule if not _session_schedule_profile(item)["mobility"]]
+    support = [item for item in schedule if _session_schedule_profile(item)["mobility"]]
+    assigned: dict[str, list[dict[str, Any]]] = {day: [] for day in days}
+
+    def profiles(day: str) -> list[dict[str, Any]]:
+        return [_session_schedule_profile(x) for x in assigned[day]]
+
+    def place(item: dict[str, Any], candidates: list[str], scorer) -> None:
+        candidates = candidates or days
+        chosen = min(candidates, key=lambda d: scorer(d))
+        item["day"] = chosen
+        assigned[chosen].append(item)
+
+    # Long endurance gets a dedicated late-week slot whenever possible.
+    long_items = [x for x in primary if _session_schedule_profile(x)["long_engine"]]
+    remaining = [x for x in primary if x not in long_items]
+    for item in long_items:
+        target = "Saturday" if "Saturday" in days else days[-1]
+        place(item, [target], lambda d: 0)
+
+    # Place strength before engine. Friday is a meaningful strength opportunity when selected.
+    strength_items = [x for x in remaining if _session_schedule_profile(x)["strength"]]
+    engine_items = [x for x in remaining if _session_schedule_profile(x)["engine"]]
+    anchor_templates = {
+        2: ["Monday", "Friday"],
+        3: ["Monday", "Tuesday", "Friday"],
+        4: ["Monday", "Tuesday", "Thursday", "Friday"],
+        5: ["Monday", "Tuesday", "Wednesday", "Friday", "Saturday"],
+    }
+    anchors = [
+        day for day in anchor_templates.get(min(5, len(strength_items)), week)
+        if day in days and not any(q["long_engine"] for q in profiles(day))
+    ]
+    for index, item in enumerate(strength_items):
+        candidates = [day for day in days if not any(q["long_engine"] for q in profiles(day))]
+        target = anchors[index] if index < len(anchors) else next(
+            (day for day in candidates if not assigned[day]), candidates[index % len(candidates)]
+        )
+        place(item, [target], lambda day: 0)
+
+    # Then place engine according to compatibility: upper+engine preferred; lower+hard blocked.
+    for item in engine_items:
+        p = _session_schedule_profile(item)
+        def engine_score(day: str) -> float:
+            existing = profiles(day)
+            score = len(existing) * 35
+            if any(q["long_engine"] for q in existing): score += 500
+            if any(q["upper"] for q in existing): score -= 28
+            if any(q["lower"] for q in existing):
+                score += 18 if p["easy_engine"] else 160
+            if any(q["full"] for q in existing): score += 8 if p["easy_engine"] else 75
+            # Hard engine should avoid the day immediately before/after lower strength.
+            if p["hard_engine"]:
+                idx = day_index[day]
+                for other in days:
+                    if any(q["lower"] for q in profiles(other)) and abs(day_index[other] - idx) <= 1:
+                        score += 45
+            # Empty midweek days are useful for quality engine sessions.
+            if not existing and day in {"Wednesday", "Thursday"}: score -= 8
+            return score
+        place(item, days, engine_score)
+
+    # Mobility is layered onto an existing training day and never consumes a primary slot.
+    for index, item in enumerate(support):
+        target = days[min(index, len(days)-1)]
+        occupied = [d for d in days if assigned[d]]
+        if occupied:
+            target = occupied[index % len(occupied)]
+        item["day"] = target
+        item["support_component"] = True
+        assigned[target].append(item)
+
+    optimized: list[dict[str, Any]] = []
+    for day in days:
+        optimized.extend(assigned[day])
+    return optimized
+
 def _phase_name(phase: str) -> str:
     value = str(phase or "build").lower()
     if value == "foundation":
@@ -413,6 +522,7 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
                 "weekly_objectives": week_detail.get("objectives") or block.get("objectives"),
                 "recent_exercise_ids": recent_exercise_ids[-12:],
             })
+            weekly["schedule"] = _optimize_concurrent_schedule(weekly["schedule"], available_days)
             sessions: list[dict[str, Any]] = []
             for index, item in enumerate((x for x in weekly["schedule"] if x.get("session_name")), start=1):
                 session_id = f"W{week_number:02d}-S{index:02d}"

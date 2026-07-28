@@ -1,0 +1,20 @@
+Bell Performance 12.2.4 — Concurrent Scheduling Intelligence
+
+1. In GitHub Desktop, confirm the current branch is bell-core-live.
+2. Commit or stash any uncommitted work.
+3. Extract the 12.2.4 patch ZIP.
+4. Copy everything inside the extracted patch folder into the root of the bell-performance repository.
+5. Choose Replace the files in the destination when Windows prompts.
+6. Commit with: Build 12.2.4 concurrent scheduling intelligence
+7. Push bell-core-live.
+8. Wait for Render to redeploy and verify /ready reports database true.
+9. Start the local frontend with: py -m http.server 5173
+10. Open http://localhost:5173 and hard refresh with Ctrl + Shift + R.
+
+TEST SCENARIO
+- Reset or edit the athlete mission.
+- Select Monday through Saturday as available.
+- Confirm Friday receives meaningful training when strength work remains.
+- Confirm mobility appears inside an occupied weekday instead of creating a recovery-only Friday.
+- Confirm Saturday long run and mobility appear under one Saturday card.
+- Confirm hard engine work is not paired with lower strength unless no better schedule is possible.

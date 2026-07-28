@@ -44,14 +44,55 @@ function bellSaveOnboardingDays(){
   if(days.length<2){alert("Select at least two normal training days.");return false;}
   bellSetNormalTrainingDays(days);return true;
 }
-function bellApplyDaysToPlan(plan,days){
+function bellSessionProfile(item){
+  const text=[item?.mission,item?.customLabel].filter(Boolean).join(" ").toLowerCase();
+  const mobility=/mobility|daily reset|recovery reset/.test(text);
+  const engine=!mobility&&/^r-|run|engine|interval|tempo|threshold|zone 2|aerobic|ruck|bike|row/.test(text);
+  const strength=!mobility&&!engine;
+  const lower=strength&&/lower|squat|deadlift|leg|hinge/.test(text);
+  const upper=strength&&!lower&&/upper|bench|press|pull/.test(text);
+  const full=strength&&!lower&&!upper;
+  const longEngine=engine&&/long run|long aerobic|long endurance/.test(text);
+  const hardEngine=engine&&/interval|tempo|threshold|quality|sprint|hill|vo2/.test(text);
+  return {mobility,engine,strength,lower,upper,full,longEngine,hardEngine,easyEngine:engine&&!longEngine&&!hardEngine};
+}
+function bellOptimizeConcurrentPlan(plan,days){
   if(!Array.isArray(plan))return plan;
   const allowed=bellOrderedDays(days);if(!allowed.length)return [];
-  const groups=[];
-  plan.forEach(item=>{let group=groups.find(x=>x.original===item.day);if(!group){group={original:item.day,items:[]};groups.push(group);}group.items.push(item);});
-  groups.forEach((group,index)=>group.items.forEach(item=>{item.day=allowed[Math.min(index,allowed.length-1)];}));
-  return plan;
+  const dayIndex=Object.fromEntries(BELL_WEEKDAYS.map((d,i)=>[d,i]));
+  const assigned=Object.fromEntries(allowed.map(d=>[d,[]]));
+  const primary=plan.filter(x=>!bellSessionProfile(x).mobility),support=plan.filter(x=>bellSessionProfile(x).mobility);
+  const profiles=day=>(assigned[day]||[]).map(bellSessionProfile);
+  const place=(item,candidates,score)=>{const pool=candidates.length?candidates:allowed;const day=[...pool].sort((a,b)=>score(a)-score(b))[0];item.day=day;assigned[day].push(item);};
+  const longItems=primary.filter(x=>bellSessionProfile(x).longEngine),remaining=primary.filter(x=>!bellSessionProfile(x).longEngine);
+  longItems.forEach(item=>place(item,[allowed.includes("Saturday")?"Saturday":allowed.at(-1)],()=>0));
+  const strengthItems=remaining.filter(x=>bellSessionProfile(x).strength);
+  const anchorTemplates={2:["Monday","Friday"],3:["Monday","Tuesday","Friday"],4:["Monday","Tuesday","Thursday","Friday"],5:["Monday","Tuesday","Wednesday","Friday","Saturday"]};
+  const anchors=(anchorTemplates[Math.min(5,strengthItems.length)]||BELL_WEEKDAYS).filter(d=>allowed.includes(d)&&!profiles(d).some(q=>q.longEngine));
+  strengthItems.forEach((item,index)=>{
+    const candidates=allowed.filter(d=>!profiles(d).some(q=>q.longEngine));
+    const target=anchors[index]||candidates.find(d=>!assigned[d].length)||candidates[index%candidates.length];
+    place(item,[target],()=>0);
+  });
+  remaining.filter(x=>bellSessionProfile(x).engine).forEach(item=>{
+    const p=bellSessionProfile(item);
+    place(item,allowed,day=>{
+      const existing=profiles(day);let score=existing.length*35;
+      if(existing.some(q=>q.longEngine))score+=500;
+      if(existing.some(q=>q.upper))score-=28;
+      if(existing.some(q=>q.lower))score+=p.easyEngine?18:160;
+      if(existing.some(q=>q.full))score+=p.easyEngine?8:75;
+      if(p.hardEngine)Object.keys(assigned).forEach(other=>{if(profiles(other).some(q=>q.lower)&&Math.abs(dayIndex[other]-dayIndex[day])<=1)score+=45;});
+      if(!existing.length&&["Wednesday","Thursday"].includes(day))score-=8;
+      return score;
+    });
+  });
+  const occupied=()=>allowed.filter(d=>assigned[d].length);
+  support.forEach((item,index)=>{const daysWithTraining=occupied();const day=daysWithTraining.length?daysWithTraining[index%daysWithTraining.length]:allowed[index%allowed.length];item.day=day;item.supportComponent=true;assigned[day].push(item);});
+  return allowed.flatMap(day=>assigned[day]);
 }
+function bellApplyDaysToPlan(plan,days){return bellOptimizeConcurrentPlan(plan,days);}
+
 function bellApplyAvailabilityToWeek(block,week,plan){
   const choice=bellWeekAvailability(block,week);
   if(choice.mode==="vacation")return [];
@@ -134,6 +175,26 @@ function bellOpenMobilityFromMission(){showScreen("home");setTimeout(()=>documen
 
 const bellBaseRenderAppAdaptive=typeof renderApp==="function"?renderApp:null;
 if(bellBaseRenderAppAdaptive){renderApp=function(){const result=bellBaseRenderAppAdaptive.apply(this,arguments);bellInjectSettingsAvailability();bellRenderMissionSupportRows();bellMaybePromptNextWeek();return result;};}
+
+
+const bellBaseRenderPlan=typeof renderPlan==="function"?renderPlan:null;
+if(bellBaseRenderPlan){
+  renderPlan=function(){
+    const container=byId("planList");if(!container)return;
+    container.innerHTML="";
+    const groups=BELL_WEEKDAYS.map(day=>({day,items:(data.plan||[]).map((item,index)=>({item,index})).filter(x=>x.item.day===day)})).filter(g=>g.items.length);
+    groups.forEach(group=>{
+      const row=document.createElement("div");row.className="plan-row bell-grouped-day-card";
+      const components=group.items.map(({item,index})=>{
+        const status=item.status||(item.done?"completed":"planned"),statusLabel={planned:"Planned",completed:"Completed",rescheduled:"Rescheduled",skipped:"Skipped",replaced:"Replaced"}[status]||status;
+        const support=bellSessionProfile(item).mobility||item.supportComponent;
+        return `<div class="bell-day-component ${support?"support":"primary"}"><div class="grow"><div class="sub">${item.customLabel||item.mission}</div>${item.detail?`<div class="hint">${item.detail}</div>`:""}${support?`<div class="hint">Recovery component — does not consume the training day.</div>`:""}</div><div class="plan-actions"><span class="plan-status-chip">${statusLabel}</span>${status==="completed"?"":`<button class="secondary compact-button" onclick="openMissedSessionManager(${index})">Manage</button>`}</div></div>`;
+      }).join("");
+      row.innerHTML=`<div class="bell-grouped-day-heading"><strong>${group.day}</strong><span>${group.items.length} component${group.items.length===1?"":"s"}</span></div>${components}`;
+      container.appendChild(row);
+    });
+  };
+}
 
 document.addEventListener("DOMContentLoaded",()=>{
   bellScheduleState();

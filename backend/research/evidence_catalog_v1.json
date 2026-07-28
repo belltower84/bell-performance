@@ -1,0 +1,22 @@
+{
+  "catalog_version": "1.0.0",
+  "claims": [
+    {"id":"EV-SAFETY-001","claim":"Training should stop when a red-flag symptom is present.","grade":"A","confidence":0.99,"source_type":"clinical safety consensus","population":["all"],"limitations":"Not a diagnosis; appropriate medical evaluation remains necessary."},
+    {"id":"EV-SLEEP-001","claim":"Acute severe sleep restriction can impair performance and recovery.","grade":"B","confidence":0.88,"source_type":"systematic evidence summary","population":["adults","athletes"],"limitations":"Individual response varies."},
+    {"id":"EV-PAIN-001","claim":"Exercise selection and loading should be modified when pain is high or worsening.","grade":"B","confidence":0.90,"source_type":"clinical practice synthesis","population":["adults","athletes"],"limitations":"Pain severity alone does not identify tissue damage."},
+    {"id":"EV-FATIGUE-001","claim":"Accumulated fatigue can reduce performance and increase the need for load management.","grade":"B","confidence":0.87,"source_type":"training theory synthesis","population":["trained adults"],"limitations":"No single fatigue marker is definitive."},
+    {"id":"EV-DELOAD-001","claim":"Temporary reductions in training load can restore performance when fatigue exceeds adaptive capacity.","grade":"C","confidence":0.78,"source_type":"coach consensus and observational evidence","population":["trained adults"],"limitations":"Optimal timing and magnitude are individual."},
+    {"id":"EV-AUTOREG-001","claim":"Autoregulation using readiness and performance feedback can guide daily load adjustments.","grade":"B","confidence":0.84,"source_type":"controlled studies and reviews","population":["resistance-trained adults"],"limitations":"Requires reliable athlete reporting."},
+    {"id":"EV-ADHERENCE-001","claim":"Simpler plans may improve adherence when schedule capacity or compliance is low.","grade":"B","confidence":0.82,"source_type":"behavioral evidence synthesis","population":["general population","athletes"],"limitations":"Preference and context affect adherence."},
+    {"id":"EV-PROGRESSION-001","claim":"Progression should be based on successful performance rather than automatic load increases alone.","grade":"B","confidence":0.86,"source_type":"training research synthesis","population":["resistance-trained adults"],"limitations":"Progression criteria vary by goal."}
+  ],
+  "rule_links": {
+    "RED_FLAG":["EV-SAFETY-001"],
+    "PAIN_HIGH":["EV-PAIN-001"],
+    "READINESS_LOW":["EV-SLEEP-001","EV-AUTOREG-001"],
+    "FATIGUE_HIGH":["EV-FATIGUE-001","EV-DELOAD-001"],
+    "COMPLIANCE_LOW":["EV-ADHERENCE-001"],
+    "PLATEAU":["EV-PROGRESSION-001","EV-DELOAD-001"],
+    "RECOVERY_TREND":["EV-SLEEP-001","EV-FATIGUE-001"]
+  }
+}

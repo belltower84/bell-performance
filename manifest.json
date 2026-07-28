@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 8.7.1",
+  "name": "Bell Performance 12.1.0",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Equipment-aware Strength and Engine coaching with a built-in guided tour, daily readiness, adaptive progression, and rolling seven-day autoregulation."
+  "description": "AI-orchestrated Strength and Engine coaching with mission compilation, periodization, exercise selection, adaptive reasoning, athlete memory, simulation, nutrition, competition planning, and personalized learning."
 }

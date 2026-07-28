@@ -1,0 +1,32 @@
+{
+  "athlete_state_rulebook_version": "1.0.0",
+  "projection_version": "0.1.0",
+  "fatigue": {
+    "dimensions": ["neural", "muscular", "joint", "tendon", "aerobic", "psychological"],
+    "daily_decay": {"neural": 0.22, "muscular": 0.18, "joint": 0.10, "tendon": 0.07, "aerobic": 0.24, "psychological": 0.28},
+    "session_load_weights": {"neural": 0.18, "muscular": 0.24, "joint": 0.12, "tendon": 0.10, "aerobic": 0.22, "psychological": 0.14},
+    "high_intensity_bonus": {"neural": 10, "joint": 5, "tendon": 4},
+    "endurance_bonus": {"aerobic": 12, "muscular": 3},
+    "pain_multiplier": 1.35,
+    "soreness_multiplier": 1.20
+  },
+  "adaptation": {
+    "dimensions": ["max_strength", "hypertrophy", "power", "aerobic_base", "lactate_threshold", "speed", "mobility", "work_capacity"],
+    "daily_decay": {"max_strength": 0.002, "hypertrophy": 0.0015, "power": 0.004, "aerobic_base": 0.001, "lactate_threshold": 0.003, "speed": 0.005, "mobility": 0.004, "work_capacity": 0.002},
+    "session_gain": {"strength": {"max_strength": 2.2, "hypertrophy": 1.0, "power": 0.5, "work_capacity": 0.4}, "hypertrophy": {"hypertrophy": 2.2, "max_strength": 0.7, "work_capacity": 0.5}, "power": {"power": 2.4, "speed": 1.0, "max_strength": 0.5}, "easy_aerobic": {"aerobic_base": 2.0, "work_capacity": 0.7}, "threshold": {"lactate_threshold": 2.3, "aerobic_base": 0.8, "work_capacity": 0.8}, "interval": {"lactate_threshold": 1.6, "speed": 0.8, "work_capacity": 1.1}, "sprint": {"speed": 2.4, "power": 1.2}, "mobility": {"mobility": 2.0}}
+  },
+  "momentum": {
+    "weights": {"compliance": 0.30, "performance": 0.25, "recovery": 0.20, "readiness": 0.15, "body_composition": 0.10},
+    "lookback_days": 28,
+    "minimum_events_for_confidence": 8
+  },
+  "risk": {
+    "high_fatigue": 75,
+    "low_readiness": 45,
+    "pain_warning": 5,
+    "pain_high": 7,
+    "missed_session_streak": 3,
+    "underperformance_streak": 3
+  },
+  "state_quality": {"fresh_days": 2, "stale_days": 7, "minimum_confidence_events": 10}
+}

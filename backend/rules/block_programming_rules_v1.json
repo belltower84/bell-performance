@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "supported_phases": [
+    "foundation",
+    "accumulation",
+    "intensification",
+    "specificity",
+    "realization",
+    "taper",
+    "deload"
+  ],
+  "max_consecutive_loading_weeks": 4,
+  "minimum_deload_volume_factor": 0.45,
+  "event_taper_days": {
+    "powerlifting": 7,
+    "10k": 7,
+    "marathon": 14,
+    "tactical_games": 7
+  }
+}

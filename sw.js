@@ -1,10 +1,10 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-11.0.0-daily-coach';
+const CACHE_NAME = 'bell-performance-12.1.0-full-intelligence';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/app.css?v=11000",
+  "./css/app.css?v=12100",
   "./assets/logo-shield.svg?v=9050",
   "./assets/icons/engine-shoe.svg?v=9050",
   "./assets/artwork/strength/powerlifting.jpg?v=9050",
@@ -49,7 +49,9 @@ const CORE = [
   "./js/block-lifecycle.js?v=9050",
   "./js/plan-progress.js?v=9050",
   "./js/weekly-debrief.js?v=9050",
-  "./js/app.js?v=9050"
+  "./js/bell-api.js?v=12100",
+  "./js/api-integration.js?v=12100",
+  "./js/app.js?v=12100"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

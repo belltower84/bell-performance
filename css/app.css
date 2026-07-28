@@ -815,3 +815,14 @@ nav{left:50%;right:auto;bottom:12px;width:min(720px,calc(100vw - 24px));transfor
 .bell11-progress-card{padding:22px}.bell11-dashboard .premium-next-card{padding:20px 22px}
 nav button .strength-nav-icon svg{width:23px!important;height:23px!important;display:block}
 @media(max-width:720px){.bell11-dashboard{gap:14px}.bell11-hero{grid-template-columns:1fr;padding:19px}.bell11-brief-grid{grid-template-columns:1fr}.bell11-word{border-right:0;border-bottom:1px solid var(--bell-border)}.bell11-readiness-body{min-height:225px;padding:22px}.bell11-session-stack{padding:0 14px 14px!important}.bell11-mission-card .premium-mission-heading{padding:17px 15px}.bell11-session-stack .premium-session-row{padding:18px}.bell11-session-stack .premium-mission-actions{display:grid;grid-template-columns:1fr 1.35fr}.bell11-support-panel #premiumSupportContent{grid-template-columns:1fr}.bell11-standards-card .premium-standards-grid{grid-template-columns:1fr 1fr}.bell11-section-heading-row{align-items:flex-start;flex-direction:column}.bell11-optional-card,.bell11-standards-card,.bell11-progress-card{padding:16px}}
+
+/* Bell Core cloud connection */
+.bell-cloud-card .status-line{align-items:flex-start}.cloud-dot{width:12px;height:12px;border-radius:50%;background:#777;box-shadow:0 0 0 4px rgba(255,255,255,.05);margin-top:8px}.cloud-dot.connected{background:#55d68b;box-shadow:0 0 0 4px rgba(85,214,139,.15)}.bell-cloud-card input{width:100%}.bell-cloud-card .performance-callout{text-transform:capitalize}
+
+/* Bell Performance 12.1.0 — full intelligence integration */
+.bell-cloud-today-card{margin-top:18px;border:1px solid rgba(217,166,41,.38);box-shadow:0 18px 48px rgba(0,0,0,.24)}
+.bell-cloud-today-card .performance-callout{margin:0 18px 16px}
+.bell-cloud-today-card>.row{padding:0 18px 18px;margin:0;display:flex;gap:10px}
+.bell-cloud-today-card>.row button{flex:1}
+.bell-cloud-card #bellCloudIntelligence{margin-top:10px}
+@media(max-width:600px){.bell-cloud-today-card>.row{flex-direction:column}.bell-cloud-today-card>.row button{width:100%}}

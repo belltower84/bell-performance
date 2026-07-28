@@ -1,10 +1,10 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-12.2.6-unique-session-generation';
+const CACHE_NAME = 'bell-performance-12.2.7-integrated-mobility-core';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/app.css?v=12260",
+  "./css/app.css?v=12270",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/icons/engine-shoe.svg?v=10006",
   "./assets/icons/engine-mark.svg?v=10006",
@@ -50,10 +50,10 @@ const CORE = [
   "./js/block-lifecycle.js?v=10006",
   "./js/plan-progress.js?v=10006",
   "./js/weekly-debrief.js?v=10006",
-  "./js/bell-api.js?v=12260",
+  "./js/bell-api.js?v=12270",
   "./js/api-integration.js?v=12101",
-  "./js/dashboard-command-center.js?v=12260",
-  "./js/adaptive-weekly-schedule.js?v=12260",
+  "./js/dashboard-command-center.js?v=12270",
+  "./js/adaptive-weekly-schedule.js?v=12270",
   "./js/app.js?v=12101"
 ];
 self.addEventListener("install", event => {

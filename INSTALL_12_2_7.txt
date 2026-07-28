@@ -1,0 +1,17 @@
+Bell Performance 12.2.7 — Integrated Mobility and Core
+
+1. Confirm GitHub Desktop is on bell-core-live.
+2. Commit or stash any current changes.
+3. Extract this ZIP and copy its contents into the repository root.
+4. Allow Windows to replace matching files.
+5. Commit with: Build 12.2.7 integrated mobility and core
+6. Push bell-core-live and wait for Render to redeploy.
+7. Start the local frontend with: py -m http.server 5173
+8. Open http://localhost:5173 and hard refresh with Ctrl+Shift+R.
+
+TEST
+- Weekly plan contains no M-1 Daily Reset entries on formal training days.
+- Each formal workout shows cooldown mobility in its included sections.
+- Core is required or optional depending on session demands.
+- Long-run days do not receive required core.
+- Today's Mission presents one workout flow rather than separate mobility/core mission rows.

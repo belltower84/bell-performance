@@ -281,8 +281,23 @@ class BellWeeklyPlanningEngine:
                 built = self._build_engine_session(name, template, request)
             else:
                 built = self._build_strength_session(name, template, request)
+            name_lower = name.lower()
+            is_engine = template.get("session_type") == "engine"
+            is_long = "long" in name_lower
+            is_lower = any(token in name_lower for token in ("lower", "squat", "deadlift", "legs"))
+            is_upper = any(token in name_lower for token in ("upper", "bench", "push", "pull"))
+            mobility_focus = "Hips, Ankles & Posterior Chain" if (is_engine or is_lower) else "Shoulders & Thoracic Spine" if is_upper else "Full Body Reset"
+            core_required = (not is_engine) and (not is_long)
+            core_optional = is_engine and (not is_long)
+            integrated_support = {
+                "mobility": {"included": True, "placement": "cooldown", "minutes": 8 if is_long else 10, "focus": mobility_focus},
+                "core": {"included": core_required or core_optional, "required": core_required, "optional": core_optional, "minutes": 8 if core_required else 6 if core_optional else 0, "focus": "Trunk stability and bracing"},
+            }
+            built["integrated_support"] = integrated_support
+            item["integrated_support"] = integrated_support
             item["session"] = built
-            item["estimated_minutes"] = built.get("estimated_total_minutes", built.get("estimated_minutes", request.get("session_minutes", 60)))
+            base_minutes = built.get("estimated_total_minutes", built.get("estimated_minutes", request.get("session_minutes", 60)))
+            item["estimated_minutes"] = base_minutes + integrated_support["mobility"]["minutes"] + integrated_support["core"]["minutes"]
             built_sessions.append(built)
 
         validation = self._validate_week(schedule, objectives, built_sessions, available_days)

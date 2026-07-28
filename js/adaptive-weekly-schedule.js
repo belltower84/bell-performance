@@ -123,6 +123,29 @@ function bellValidateGeneratedWeek(plan,targets){
     strength:strength.length,engine:engine.length,duplicates:[...duplicateKeys]};
 }
 
+
+function bellIntegratedSupportForItem(item){
+  const p=bellSessionProfile(item);
+  const text=`${item?.customLabel||""} ${item?.mission||""}`.toLowerCase();
+  let mobilityFocus="Full Body Reset";
+  if(p.lower||/run|sprint|interval|long/.test(text))mobilityFocus="Hips, Ankles & Posterior Chain";
+  else if(p.upper)mobilityFocus="Shoulders & Thoracic Spine";
+  const hardDay=p.longEngine||p.hardEngine||(p.lower&&/primary|heavy/.test(text));
+  const coreRequired=p.strength&&!hardDay;
+  const coreOptional=!coreRequired&&!p.longEngine;
+  return {
+    mobility:{included:true,placement:"cooldown",minutes:p.longEngine?8:10,focus:mobilityFocus},
+    core:{included:coreRequired||coreOptional,required:coreRequired,optional:coreOptional,minutes:coreRequired?8:coreOptional?6:0,focus:p.upper?"Anti-extension & carry stability":p.lower?"Anti-rotation & bracing":"Trunk stability"}
+  };
+}
+function bellIntegrateMobilityAndCore(plan){
+  if(!Array.isArray(plan))return plan;
+  return plan.filter(item=>!bellSessionProfile(item).mobility).map(item=>{
+    const support=bellIntegratedSupportForItem(item);
+    return {...item,integratedSupport:support,supportComponent:false};
+  });
+}
+
 function bellOptimizeConcurrentPlan(plan,days){
   if(!Array.isArray(plan))return plan;
   const allowed=bellOrderedDays(days);if(!allowed.length)return [];
@@ -164,7 +187,8 @@ function bellApplyAvailabilityToWeek(block,week,plan){
   const choice=bellWeekAvailability(block,week);
   if(choice.mode==="vacation")return [];
   const targets=typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2};
-  const generated=bellEnsureDisciplineExposures(plan,block);
+  const integrated=bellIntegrateMobilityAndCore(plan);
+  const generated=bellEnsureDisciplineExposures(integrated,block);
   const validation=bellValidateGeneratedWeek(generated,targets);
   if(!validation.passed)console.warn("Bell weekly exposure validation failed",validation);
   return bellApplyDaysToPlan(generated,choice.days);
@@ -233,16 +257,8 @@ function bellMaybePromptNextWeek(){
   s.lastPromptedWeek=key;saveData({render:false});setTimeout(()=>bellOpenWeeklyCheckIn(),250);
 }
 function bellRenderMissionSupportRows(){
-  const card=document.querySelector(".bell11-mission-card");if(!card)return;
-  let host=document.getElementById("bellMissionSupportRows");if(!host){host=document.createElement("div");host.id="bellMissionSupportRows";host.className="bell-mission-support-rows";card.appendChild(host);}
-  const key=typeof selectedDashboardDateKey==="function"?selectedDashboardDateKey():todayKey();
-  const mobilityDone=(data.mobility?.completedDates||[]).includes(key),minutes=Number(data.mobility?.minutes)||10,focus=typeof resolvedMobilityFocus==="function"?resolvedMobilityFocus():"Mobility";
-  const coreDone=typeof optionalCoreCompletedForDate==="function"?optionalCoreCompletedForDate(key):false;
-  const coreName=typeof coreSessionName==="function"?coreSessionName(key):"Optional Core";
-  const coreTemplateData=typeof coreTemplate==="function"?coreTemplate(coreName):{label:"Optional Core",duration:10};
-  host.innerHTML=`<div class="bell-support-row ${mobilityDone?"complete":""}"><div><span class="metric-label">${mobilityDone?"Completed ✓":"Recovery"}</span><strong>${minutes} min ${focus} Mobility</strong><small>Complete morning, post-workout, or evening.</small></div><button class="secondary" type="button" onclick="bellOpenMobilityFromMission()">${mobilityDone?"View":"Start Mobility"}</button></div><div class="bell-support-row optional ${coreDone?"complete":""}"><div><span class="metric-label">Optional${coreDone?" • Completed ✓":""}</span><strong>${coreTemplateData.label}</strong><small>${coreTemplateData.duration||10} minutes • Does not block mission completion.</small></div><button class="secondary" type="button" ${coreDone?"disabled":""} onclick="beginOptionalCore('${key}')">${coreDone?"Core Complete":"Start Core"}</button></div>`;
+  document.getElementById("bellMissionSupportRows")?.remove();
 }
-function bellOpenMobilityFromMission(){showScreen("home");setTimeout(()=>document.getElementById("dailyMobilityCard")?.scrollIntoView({behavior:"smooth",block:"start"}),50);}
 
 const bellBaseRenderAppAdaptive=typeof renderApp==="function"?renderApp:null;
 if(bellBaseRenderAppAdaptive){renderApp=function(){const result=bellBaseRenderAppAdaptive.apply(this,arguments);bellInjectSettingsAvailability();bellRenderMissionSupportRows();bellMaybePromptNextWeek();return result;};}
@@ -259,7 +275,11 @@ if(bellBaseRenderPlan){
       const components=group.items.map(({item,index})=>{
         const status=item.status||(item.done?"completed":"planned"),statusLabel={planned:"Planned",completed:"Completed",rescheduled:"Rescheduled",skipped:"Skipped",replaced:"Replaced"}[status]||status;
         const support=bellSessionProfile(item).mobility||item.supportComponent;
-        return `<div class="bell-day-component ${support?"support":"primary"}"><div class="grow"><div class="sub">${item.customLabel||item.mission}</div>${item.detail?`<div class="hint">${item.detail}</div>`:""}${support?`<div class="hint">Recovery component — does not consume the training day.</div>`:""}</div><div class="plan-actions"><span class="plan-status-chip">${statusLabel}</span>${status==="completed"?"":`<button class="secondary compact-button" onclick="openMissedSessionManager(${index})">Manage</button>`}</div></div>`;
+        const integrated=item.integratedSupport||bellIntegratedSupportForItem(item);
+        const additions=[];
+        if(integrated?.core?.included)additions.push(`${integrated.core.required?"Core":"Optional Core"} · ${integrated.core.minutes} min`);
+        if(integrated?.mobility?.included)additions.push(`Cooldown Mobility · ${integrated.mobility.minutes} min`);
+        return `<div class="bell-day-component primary"><div class="grow"><div class="sub">${item.customLabel||item.mission}</div>${item.detail?`<div class="hint">${item.detail}</div>`:""}${additions.length?`<div class="hint bell-integrated-support">Includes: ${additions.join(" • ")}</div>`:""}</div><div class="plan-actions"><span class="plan-status-chip">${statusLabel}</span>${status==="completed"?"":`<button class="secondary compact-button" onclick="openMissedSessionManager(${index})">Manage</button>`}</div></div>`;
       }).join("");
       row.innerHTML=`<div class="bell-grouped-day-heading"><strong>${group.day}</strong><span>${group.items.length} component${group.items.length===1?"":"s"}</span></div>${components}`;
       container.appendChild(row);

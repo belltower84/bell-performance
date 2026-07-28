@@ -330,7 +330,14 @@ function bellCloudWorkoutModel(payload = bellCloud.today?.session) {
   });
   const warmupMinutes = Number(payload.warmup?.minutes) || 5;
   const cooldownMinutes = Number(payload.cooldown?.minutes) || 5;
-  const duration = Math.max(10, Number(meta.estimated_minutes) || Number(meta.requested_minutes) || 45);
+  const baseDuration = Math.max(10, Number(meta.estimated_minutes) || Number(meta.requested_minutes) || 45);
+  const integratedSupport = payload.integrated_support || payload.integratedSupport || {
+    mobility: { included: true, placement: "cooldown", minutes: 10, focus: isEngine ? "Hips, Ankles & Posterior Chain" : "Training-specific mobility" },
+    core: { included: !isEngine, required: !isEngine, optional: false, minutes: !isEngine ? 8 : 0, focus: "Trunk stability" }
+  };
+  const mobilityMinutes = integratedSupport?.mobility?.included ? Number(integratedSupport.mobility.minutes || 10) : 0;
+  const coreMinutes = integratedSupport?.core?.included ? Number(integratedSupport.core.minutes || 0) : 0;
+  const duration = baseDuration + mobilityMinutes + coreMinutes;
   const selectionEquipment = (payload.selection_trace?.selected_exercises || [])
     .flatMap(item => item?.metadata?.required_equipment || []);
   const targetRpes = blocks.map(block => Number(block?.prescription?.target_rpe)).filter(Number.isFinite);
@@ -351,7 +358,8 @@ function bellCloudWorkoutModel(payload = bellCloud.today?.session) {
     cloudSessionId: meta.session_id,
     cloudGenerated: true,
     scheduledDate: bellCloud.today?.scheduled_date || todayKey(),
-    optionalCore: false,
+    optionalCore: Boolean(integratedSupport?.core?.optional),
+    integratedSupport,
     elapsed: 0,
     rpe: "",
     notes: "",
@@ -376,8 +384,9 @@ function bellCloudWorkoutModel(payload = bellCloud.today?.session) {
     coachBrief: explanation || payload.coach_notes?.session_focus || payload.coach_summary || "Bell generated this session from your mission, current phase, equipment, readiness, and training history.",
     sections: [
       { title: "Warm-Up", minutes: warmupMinutes },
-      { title: isEngine ? "Engine Work" : "Primary Training", minutes: Math.max(1, duration - warmupMinutes - cooldownMinutes) },
-      { title: "Cooldown", minutes: cooldownMinutes }
+      { title: isEngine ? "Engine Work" : "Primary Training", minutes: Math.max(1, baseDuration - warmupMinutes - cooldownMinutes) },
+      ...(integratedSupport?.core?.included ? [{ title: integratedSupport.core.required ? "Core" : "Optional Core", minutes: coreMinutes, optional: Boolean(integratedSupport.core.optional), focus: integratedSupport.core.focus }] : []),
+      { title: "Cooldown Mobility", minutes: mobilityMinutes || cooldownMinutes, focus: integratedSupport?.mobility?.focus || "Training-specific mobility" }
     ],
     successCriteria: isEngine ? [
       "Stay within the prescribed effort.",

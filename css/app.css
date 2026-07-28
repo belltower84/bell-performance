@@ -910,3 +910,12 @@ nav button .strength-nav-icon svg{width:23px!important;height:23px!important;dis
   .brand-subline:before,.brand-subline:after{width:8px}
   .brand-tagline{display:none!important}
 }
+
+
+/* 12.2.2 unified mission flow */
+.command-mission-card[data-mission-source="bell-core"]{border-color:rgba(228,177,61,.48);box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 16px 38px rgba(0,0,0,.22)}
+.command-mission-card[data-mission-source="bell-core"] .command-kicker:after{content:" • Synced Prescription";color:#8bd49c;font-size:.82em;letter-spacing:.08em}
+.command-session-block.complete{background:rgba(69,181,104,.055)}
+.command-session-block.complete span{color:#68ce86}
+.command-session-block.complete strong:before{content:"✓ ";color:#68ce86}
+.command-mission-card[data-mission-source="bell-core"] .command-adjustment{border-color:rgba(228,177,61,.46)}

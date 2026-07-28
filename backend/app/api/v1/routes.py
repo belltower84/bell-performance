@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Query
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -94,9 +94,14 @@ def get_plan(athlete_id: str, db: Session = Depends(get_db), user: User = Depend
 
 
 @router.get("/athletes/{athlete_id}/today", tags=["Sessions"])
-def get_today(athlete_id: str, db: Session = Depends(get_db), user: User = Depends(current_user)):
+def get_today(
+    athlete_id: str,
+    date_key: str | None = Query(default=None, alias="date"),
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
     athlete_for_user(db, athlete_id, user)
-    data = today_payload(db, athlete_id)
+    data = today_payload(db, athlete_id, date_key)
     if data is None:
         raise HTTPException(404, "Plan not found")
     return data

@@ -155,9 +155,10 @@ async function bellCompleteCurrentSession(completed) {
 
 async function bellRefreshCloudState() {
   if (!bellCloudConnected() || !bellCloud.athleteId) return null;
+  const localDate = typeof todayKey === "function" ? todayKey() : new Date().toISOString().slice(0, 10);
   const [state, today, intelligence] = await Promise.all([
     bellApiRequest(`/athletes/${bellCloud.athleteId}/state`),
-    bellApiRequest(`/athletes/${bellCloud.athleteId}/today`).catch(error => error.status === 404 ? null : Promise.reject(error)),
+    bellApiRequest(`/athletes/${bellCloud.athleteId}/today?date=${encodeURIComponent(localDate)}`).catch(error => error.status === 404 ? null : Promise.reject(error)),
     bellApiRequest(`/athletes/${bellCloud.athleteId}/intelligence`).catch(error => error.status === 404 ? null : Promise.reject(error))
   ]);
   bellCloud.state = state; bellCloud.today = today; bellCloud.intelligence = intelligence;
@@ -257,7 +258,7 @@ function bellRunInBackground(task) {
   Promise.resolve().then(task).catch(error => { bellCloud.lastError = error.message; saveBellCloud(); renderBellCloudCard(); console.warn("Bell Core sync failed", error); });
 }
 
-document.addEventListener("DOMContentLoaded", () => { ensureBellCloudCard(); ensureBellCloudTodayCard(); renderBellCloudCard(); if (bellCloudConnected() && bellCloud.athleteId) bellRunInBackground(bellRefreshCloudState); });
+document.addEventListener("DOMContentLoaded", () => { ensureBellCloudCard(); renderBellCloudCard(); if (bellCloudConnected() && bellCloud.athleteId) bellRunInBackground(bellRefreshCloudState); });
 
 function bellCloudWorkoutModel(payload = bellCloud.today?.session) {
   if (!payload?.session) return null;
@@ -319,7 +320,7 @@ function bellCloudWorkoutModel(payload = bellCloud.today?.session) {
     planSessionKey: `cloud:${meta.session_id}`,
     cloudSessionId: meta.session_id,
     cloudGenerated: true,
-    scheduledDate: todayKey(),
+    scheduledDate: bellCloud.today?.scheduled_date || todayKey(),
     optionalCore: false,
     elapsed: 0,
     rpe: "",
@@ -367,6 +368,10 @@ function bellCloudWorkoutModel(payload = bellCloud.today?.session) {
 }
 
 function bellStartCloudWorkout() {
+  if (bellCloud.today?.status === "today_complete" || !bellCloud.today?.session) {
+    alert("Today’s Bell Core mission is complete. The next session is available as a preview only.");
+    return;
+  }
   const workout = bellCloudWorkoutModel();
   if (!workout) {
     alert("Bell Core does not have a current session ready yet. Sync or generate a plan first.");
@@ -383,41 +388,36 @@ function bellStartCloudWorkout() {
   openWorkoutUI();
 }
 
-function ensureBellCloudTodayCard() {
-  const dashboard = document.getElementById("premiumDashboard");
-  if (!dashboard || document.getElementById("bellCloudTodayCard")) return;
-  const card = document.createElement("section");
-  card.id = "bellCloudTodayCard";
-  card.className = "premium-mission-card bell-cloud-today-card hidden";
-  card.innerHTML = `<div class="premium-mission-banner">Bell Core AI Mission</div>
-    <div class="premium-section-heading"><div><span class="premium-kicker" id="bellCloudTodayKicker">Cloud Coaching</span><h2 id="bellCloudTodayTitle">Syncing Bell Core</h2><p id="bellCloudTodayMeta">Your server-generated workout will appear here.</p></div></div>
-    <div class="performance-callout" id="bellCloudTodayReason">Bell will explain any readiness-driven change before you train.</div>
-    <div class="row"><button class="good premium-primary-button" type="button" onclick="bellStartCloudWorkout()">Start AI Workout</button><button class="secondary" type="button" onclick="bellManualSync()">Sync Bell Core</button></div>`;
-  const missionCard = dashboard.querySelector(".bell11-mission-card");
-  dashboard.insertBefore(card, missionCard || dashboard.firstChild);
+function bellPreviewCloudWorkout() {
+  const workout = bellCloudWorkoutModel();
+  if (!workout) {
+    alert("Bell Core does not have a current session ready yet.");
+    return;
+  }
+  openWorkoutPreview(workout, () => { closeWorkoutPreview(); bellStartCloudWorkout(); });
+  const button = document.getElementById("previewBeginButton");
+  if (button) button.textContent = data.activeWorkout?.cloudSessionId === workout.cloudSessionId ? "Resume Workout" : "Start Workout";
 }
 
+function bellPreviewNextCloudWorkout() {
+  const payload = bellCloud.today?.next_session;
+  const preview = bellCloud.today?.next_session_preview;
+  const workout = bellCloudWorkoutModel(payload);
+  if (!workout) {
+    alert("No upcoming Bell Core session is available to preview.");
+    return;
+  }
+  if (preview?.scheduled_date) workout.scheduledDate = preview.scheduled_date;
+  openWorkoutPreview(workout, closeWorkoutPreview);
+  const button = document.getElementById("previewBeginButton");
+  if (button) button.textContent = "Close Preview";
+}
+
+/* 12.2.2: Bell Core no longer inserts a second mission card.
+   Cloud coaching is rendered through the main Today’s Mission card. */
+function ensureBellCloudTodayCard() {
+  document.getElementById("bellCloudTodayCard")?.remove();
+}
 function renderBellCloudTodayCard() {
   ensureBellCloudTodayCard();
-  const card = document.getElementById("bellCloudTodayCard");
-  if (!card) return;
-  const payload = bellCloud.today?.session;
-  const connected = bellCloudConnected();
-  card.classList.toggle("hidden", !connected || !payload?.session);
-  if (!connected || !payload?.session) return;
-  const meta = payload.session;
-  const title = document.getElementById("bellCloudTodayTitle");
-  const kicker = document.getElementById("bellCloudTodayKicker");
-  const detail = document.getElementById("bellCloudTodayMeta");
-  const reason = document.getElementById("bellCloudTodayReason");
-  if (title) title.textContent = meta.title || meta.name || "Bell Core Training";
-  if (kicker) kicker.textContent = bellCloud.today?.status === "adapted" ? "AI-Adjusted Session" : "Server-Generated Session";
-  if (detail) detail.textContent = `${String(payload.session_type || meta.type || "training").replaceAll("_", " ")} • ${meta.estimated_minutes || meta.requested_minutes || 45} min • Week ${meta.week || 1} • ${String(payload.programming?.block_phase || meta.phase || "training").replaceAll("_", " ")}`;
-  if (reason) reason.textContent = bellCloud.today?.adaptation?.explanation || payload.coach_notes?.session_focus || payload.coach_summary || "This workout was selected from your mission, phase, readiness, equipment, and athlete history.";
 }
-
-const bellOriginalRenderCloudCard = renderBellCloudCard;
-renderBellCloudCard = function renderBellCloudCardWithToday() {
-  bellOriginalRenderCloudCard();
-  renderBellCloudTodayCard();
-};

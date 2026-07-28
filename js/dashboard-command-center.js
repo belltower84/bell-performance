@@ -1,7 +1,7 @@
 
 "use strict";
 
-/* Bell Performance 12.2.0 — Dashboard Command Center view layer.
+/* Bell Performance 12.2.2 — Unified Mission Flow view layer.
    This file intentionally reuses the existing Bell planning, readiness,
    workout, nutrition, history, and Bell Core functions. */
 
@@ -35,6 +35,30 @@ function commandSessionSummary(sessions){
   return blocks.slice(0,3).join('');
 }
 
+function commandUnifiedCloudMission(key=selectedDashboardDateKey()){
+  if(typeof bellCloudConnected!=="function"||!bellCloudConnected()||key!==todayKey())return null;
+  const state=bellCloud?.today;if(!state)return null;
+  if((state.status==='planned'||state.status==='adapted')&&state.session?.session)return {mode:'active',state,payload:state.session};
+  if(state.status==='today_complete')return {mode:'complete',state,payload:null};
+  if(state.status==='program_complete')return {mode:'program-complete',state,payload:null};
+  return null;
+}
+function commandCloudSessionType(payload){const raw=String(payload?.session_type||payload?.session?.session_type||payload?.session?.type||'training').toLowerCase();return raw==='engine'?'Engine':raw==='recovery'?'Recovery':raw==='strength'?'Strength':raw.replaceAll('_',' ').replace(/\b\w/g,x=>x.toUpperCase());}
+function commandCloudSessionSummary(payload){
+  if(!payload?.session)return '<div class="command-session-block"><span>Recovery</span><strong>No remaining training</strong><small>Today’s prescribed work is complete.</small></div>';
+  const meta=payload.session||{},type=commandCloudSessionType(payload),blocks=[];
+  if(type==='Engine'){const engine=payload.engine_prescription||{};blocks.push(`<div class="command-session-block"><span>Engine</span><strong>${escapeHtml(engine.mode||meta.title||'Conditioning')}</strong><small>${Number(engine.duration_minutes)||Number(meta.estimated_minutes)||30} min · ${escapeHtml(engine.intensity||'prescribed effort')}</small></div>`);if(engine.structure||engine.description)blocks.push(`<div class="command-session-block"><span>Prescription</span><strong>${escapeHtml(engine.structure||'Controlled work')}</strong><small>${escapeHtml(engine.description||payload.coach_summary||'Execute the prescribed effort with control.')}</small></div>`);}
+  else{(payload.exercise_blocks||[]).slice(0,3).forEach((block,index)=>{const rx=block.prescription||{},label=index===0?'Main Strength':block.role||block.slot_name||'Training';blocks.push(`<div class="command-session-block"><span>${escapeHtml(String(label).replaceAll('_',' '))}</span><strong>${escapeHtml(block.name||'Training Exercise')}</strong><small>${Number(rx.sets)||1} × ${escapeHtml(String(rx.reps||'As prescribed'))}${Number.isFinite(Number(rx.target_rpe))?` · RPE ${Number(rx.target_rpe)}`:''}</small></div>`);});}
+  if(!blocks.length)blocks.push(`<div class="command-session-block"><span>${escapeHtml(type)}</span><strong>${escapeHtml(meta.title||meta.name||'Bell Core Training')}</strong><small>${Number(meta.estimated_minutes)||Number(meta.requested_minutes)||45} min</small></div>`);
+  return blocks.slice(0,3).join('');
+}
+function commandCloudCompleteSummary(state){
+  const completed=Array.isArray(state?.completed_today)?state.completed_today:[],next=state?.next_session_preview;const blocks=[];
+  completed.slice(0,2).forEach(item=>blocks.push(`<div class="command-session-block complete"><span>Completed</span><strong>${escapeHtml(item?.title||'Training Session')}</strong><small>${escapeHtml(commandCloudSessionType({session_type:item?.session_type}))} · recorded in Bell Core</small></div>`));
+  blocks.push(`<div class="command-session-block"><span>${next?'Next Session':'Recovery'}</span><strong>${escapeHtml(next?.title||'Recover and prepare')}</strong><small>${next?`${Number(next.estimated_minutes)||45} min · preview only`:'No additional training is prescribed today.'}</small></div>`);
+  return blocks.slice(0,3).join('');
+}
+
 renderPremiumReadiness=function(){
   const score=readinessScore(),status=readinessStatus(score),r=data.settings.readiness||{},checkedIn=r.lastPromptDate===todayKey();
   const descriptions={GREEN:'High readiness. You are recovered and ready for the full training prescription.',YELLOW:'Moderate readiness. Quality leads today and nonessential volume can be trimmed.',RED:'Low readiness. Bell has reduced demand and placed recovery first.'};
@@ -46,22 +70,54 @@ renderPremiumReadiness=function(){
 };
 
 renderPremiumMission=function(){
-  const key=selectedDashboardDateKey(),date=localDateFromKey(key),today=localDateKey(),sessions=premiumAllSessions().sort((a,b)=>({strength:0,engine:1}[premiumSessionType(a)]??2)-({strength:0,engine:1}[premiumSessionType(b)]??2));
-  const completed=sessions.filter(x=>x.completed).length,total=sessions.length,pct=total?Math.round(completed/total*100):100;const target=commandFirstIncompleteSession(sessions);
+  const key=selectedDashboardDateKey(),date=localDateFromKey(key),today=localDateKey(),cloudMission=commandUnifiedCloudMission(key);
+  const missionCard=document.querySelector('.command-mission-card');if(missionCard)missionCard.dataset.missionSource=cloudMission?'bell-core':'local';
   commandSetText('premiumMissionDate',key===today?'Today':date.toLocaleDateString('en-US',{month:'short',day:'numeric'}));const todayButton=document.getElementById('premiumTodayButton');if(todayButton)todayButton.textContent=key===today?'Today':'Return';
+  const start=document.getElementById('commandStartWorkout'),view=document.getElementById('commandViewSession'),modify=document.getElementById('commandModifySession'),stack=document.getElementById('premiumSessionStack');
+
+  if(cloudMission?.mode==='active'){
+    const state=cloudMission.state,payload=cloudMission.payload,meta=payload.session||{},completedCount=Array.isArray(state.completed_today)?state.completed_today.length:0,remaining=Math.max(1,Number(state.remaining_today)||1),total=completedCount+remaining;
+    commandSetText('premiumCompletionCount',completedCount);commandSetText('premiumCompletionTotal',`of ${total}`);commandSetText('premiumCompletionLabel',completedCount?'IN PROGRESS':'BELL CORE');
+    commandSetText('commandMissionTitle',meta.title||meta.name||'Bell Core Training');
+    commandSetText('commandMissionPurpose',state.adaptation?.explanation||payload.coach_notes?.session_focus||payload.coach_summary||'Bell selected this session from your mission, current phase, readiness, equipment, and training history.');
+    commandSetText('commandMissionDuration',`${Number(meta.estimated_minutes)||Number(meta.requested_minutes)||45} min`);commandSetText('commandMissionType',commandCloudSessionType(payload));commandSetText('commandMissionPriority',state.status==='adapted'?'Readiness Adjusted':'Primary Session');
+    if(stack)stack.innerHTML=commandCloudSessionSummary(payload);
+    if(start){start.disabled=false;const active=data.activeWorkout?.cloudSessionId===meta.session_id;start.textContent=active?'▶ Resume Workout':'▶ Start Workout';start.onclick=()=>bellStartCloudWorkout();}
+    if(view){view.disabled=false;view.textContent='☷ View Session';view.onclick=()=>bellPreviewCloudWorkout();}
+    if(modify){modify.disabled=false;modify.textContent='✎ View Rationale';modify.onclick=()=>openCommandTile('coaching');}
+    commandSetText('commandAdjustmentTitle',state.status==='adapted'?'Adjusted for today':'Bell Core prescription');
+    commandSetText('commandAdjustmentDetail',state.adaptation?.explanation||'The final prescription is synchronized with Bell Core.');
+    return;
+  }
+
+  if(cloudMission?.mode==='complete'||cloudMission?.mode==='program-complete'){
+    const state=cloudMission.state,next=state.next_session_preview,completedCount=Array.isArray(state.completed_today)?state.completed_today.length:0;
+    commandSetText('premiumCompletionCount',completedCount);commandSetText('premiumCompletionTotal',completedCount?`of ${completedCount}`:'Complete');commandSetText('premiumCompletionLabel',cloudMission.mode==='program-complete'?'PROGRAM COMPLETE':'MISSION COMPLETE');
+    commandSetText('commandMissionTitle',cloudMission.mode==='program-complete'?'Training Program Complete':'Today’s Mission Complete');
+    commandSetText('commandMissionPurpose',cloudMission.mode==='program-complete'?'Your current Bell Core plan is complete. Review your results before building the next mission.':'Training is complete for today. Recover, refuel, and prepare for the next prescribed session.');
+    commandSetText('commandMissionDuration',completedCount?`${completedCount} session${completedCount===1?'':'s'} complete`:'Complete');commandSetText('commandMissionType','Recovery & Review');commandSetText('commandMissionPriority','Recover & Refuel');
+    if(stack)stack.innerHTML=commandCloudCompleteSummary(state);
+    if(start){start.disabled=false;start.textContent='✓ View Results';start.onclick=()=>showScreen('history');}
+    if(view){view.disabled=!next;view.textContent=next?'☷ Preview Next Session':'☷ Open Full Plan';view.onclick=next?()=>bellPreviewNextCloudWorkout():()=>showScreen('plan');}
+    if(modify){modify.disabled=false;modify.textContent='♥ Recovery';modify.onclick=()=>openCommandTile('recovery');}
+    commandSetText('commandAdjustmentTitle',cloudMission.mode==='program-complete'?'Program complete':'Mission complete');commandSetText('commandAdjustmentDetail',next?'The next workout is preview-only and cannot be started from today’s dashboard.':'No additional workout will be pulled forward today.');
+    return;
+  }
+
+  const sessions=premiumAllSessions().sort((a,b)=>({strength:0,engine:1}[premiumSessionType(a)]??2)-({strength:0,engine:1}[premiumSessionType(b)]??2));
+  const completed=sessions.filter(x=>x.completed).length,total=sessions.length,target=commandFirstIncompleteSession(sessions),futureDay=key>today;
   commandSetText('premiumCompletionCount',completed);commandSetText('premiumCompletionTotal',`of ${total}`);commandSetText('premiumCompletionLabel',total?(completed===total?'MISSION COMPLETE':'COMPLETE'):'REST DAY');
   const strength=sessions.find(x=>premiumSessionType(x)==='strength'),engine=sessions.find(x=>premiumSessionType(x)==='engine');
   const title=!sessions.length?'Recovery Day':strength&&engine?`${premiumDisplayLabel(strength)} + ${premiumDisplayLabel(engine)}`:sessions.map(premiumDisplayLabel).join(' + ');
   const purpose=!sessions.length?'Recover, move well, and prepare for the next prescribed session.':premiumSessionDescription(strength||engine||sessions[0]);
-  const duration=sessions.reduce((sum,session)=>sum+(Number(session.prescribedDuration)||Number(scaledTemplate(session.mission)?.duration)||30),0);const types=[strength?'Strength':'',engine?'Engine':''].filter(Boolean).join(' + ')||'Recovery';
-  commandSetText('commandMissionTitle',title);commandSetText('commandMissionPurpose',purpose);commandSetText('commandMissionDuration',sessions.length?`${duration} min`:'Recovery');commandSetText('commandMissionType',types);commandSetText('commandMissionPriority',readinessStatus(readinessScore())==='RED'?'Recovery Priority':sessions.length>1?'High Priority':'Primary Session');
-  const stack=document.getElementById('premiumSessionStack');if(stack)stack.innerHTML=commandSessionSummary(sessions);
-  const start=document.getElementById('commandStartWorkout'),view=document.getElementById('commandViewSession'),modify=document.getElementById('commandModifySession');
-  if(start){start.disabled=false;if(!sessions.length){start.textContent='Open Recovery';start.onclick=()=>openCommandTile('recovery');}else if(completed===total){start.textContent='✓ Mission Complete';start.onclick=()=>showScreen('history');}else{const active=data.activeWorkout?.planSessionKey===target?.sessionKey;start.textContent=active?'▶ Resume Workout':'▶ Start Workout';start.onclick=()=>commandSessionCall(target,'start');}}
-  if(view){view.disabled=!target;view.onclick=target?()=>commandSessionCall(target,'preview'):()=>openCommandTile('weekly');}
-  if(modify){modify.disabled=!target;modify.onclick=target?()=>commandSessionCall(target,'preview'):()=>showScreen('more');}
-  const status=readinessStatus(readinessScore()),action=String(commandCloudAction()).toLowerCase(),cloudCopy=commandCloudExplanation();let adjustmentTitle='Normal prescription',adjustmentDetail='Execute the planned work with quality.';
-  if(status==='YELLOW'||/reduce|trim|modify|adjust/.test(action)){adjustmentTitle='Adjusted for readiness';adjustmentDetail='Quality-first volume and controlled effort.';}if(status==='RED'||/replace|recovery|rest|skip/.test(action)){adjustmentTitle='Recovery adjustment';adjustmentDetail='Demand reduced to protect recovery.';}if(cloudCopy)adjustmentDetail=cloudCopy.split(/[.!?]/)[0].slice(0,88)+(cloudCopy.length>88?'…':'');
+  const duration=sessions.reduce((sum,session)=>sum+(Number(session.prescribedDuration)||Number(scaledTemplate(session.mission)?.duration)||30),0),types=[strength?'Strength':'',engine?'Engine':''].filter(Boolean).join(' + ')||'Recovery';
+  commandSetText('commandMissionTitle',title);commandSetText('commandMissionPurpose',purpose);commandSetText('commandMissionDuration',sessions.length?`${duration} min`:'Recovery');commandSetText('commandMissionType',types);commandSetText('commandMissionPriority',futureDay?'Preview Only':readinessStatus(readinessScore())==='RED'?'Recovery Priority':sessions.length>1?'High Priority':'Primary Session');
+  if(stack)stack.innerHTML=commandSessionSummary(sessions);
+  if(start){start.disabled=false;if(!sessions.length){start.textContent='Open Recovery';start.onclick=()=>openCommandTile('recovery');}else if(futureDay){start.textContent='☷ Preview Workout';start.onclick=()=>commandSessionCall(target,'preview');}else if(completed===total){start.textContent='✓ Mission Complete';start.onclick=()=>showScreen('history');}else{const active=data.activeWorkout?.planSessionKey===target?.sessionKey;start.textContent=active?'▶ Resume Workout':'▶ Start Workout';start.onclick=()=>commandSessionCall(target,'start');}}
+  if(view){view.disabled=!target;view.textContent='☷ View Session';view.onclick=target?()=>commandSessionCall(target,'preview'):()=>openCommandTile('weekly');}
+  if(modify){modify.disabled=!target||futureDay;modify.textContent='✎ Modify';modify.onclick=target&&!futureDay?()=>commandSessionCall(target,'preview'):()=>showScreen('more');}
+  const status=readinessStatus(readinessScore()),action=String(commandCloudAction()).toLowerCase(),cloudCopy=commandCloudExplanation();let adjustmentTitle=futureDay?'Future session preview':'Normal prescription',adjustmentDetail=futureDay?'Future workouts can be reviewed here but cannot be started early.':'Execute the planned work with quality.';
+  if(!futureDay&&(status==='YELLOW'||/reduce|trim|modify|adjust/.test(action))){adjustmentTitle='Adjusted for readiness';adjustmentDetail='Quality-first volume and controlled effort.';}if(!futureDay&&(status==='RED'||/replace|recovery|rest|skip/.test(action))){adjustmentTitle='Recovery adjustment';adjustmentDetail='Demand reduced to protect recovery.';}if(!futureDay&&cloudCopy)adjustmentDetail=cloudCopy.split(/[.!?]/)[0].slice(0,88)+(cloudCopy.length>88?'…':'');
   commandSetText('commandAdjustmentTitle',adjustmentTitle);commandSetText('commandAdjustmentDetail',adjustmentDetail);
 };
 

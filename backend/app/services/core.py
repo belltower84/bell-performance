@@ -4,7 +4,7 @@ import copy
 import json
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -512,20 +512,93 @@ def _session_from_plan(plan_data: dict[str, Any], session_id: str) -> dict[str, 
     return None
 
 
-def _next_session(db: Session, athlete_id: str, plan_data: dict[str, Any]) -> dict[str, Any] | None:
-    completed = {
+def _completed_session_ids(db: Session, athlete_id: str) -> set[str]:
+    return {
         row.session_id for row in db.scalars(
             select(SessionCompletion).where(SessionCompletion.athlete_id == athlete_id)
         ).all()
     }
+
+
+def _next_session(
+    db: Session, athlete_id: str, plan_data: dict[str, Any],
+    *, exclude_session_ids: set[str] | None = None,
+) -> dict[str, Any] | None:
+    completed = _completed_session_ids(db, athlete_id)
+    excluded = exclude_session_ids or set()
     for week in plan_data.get("weeks", []):
         for session in week.get("sessions", []):
-            if session.get("session", {}).get("session_id") not in completed:
+            session_id = session.get("session", {}).get("session_id")
+            if session_id and session_id not in completed and session_id not in excluded:
                 return session
     return None
 
 
-def _ensure_planned_event(db: Session, athlete_id: str, session: dict[str, Any]) -> None:
+def _normalize_target_date(value: str | None) -> str:
+    if value:
+        try:
+            return date.fromisoformat(value).isoformat()
+        except ValueError:
+            pass
+    return now().date().isoformat()
+
+
+def _planned_session_ids_for_date(db: Session, athlete_id: str, target_date: str) -> list[str]:
+    rows = db.scalars(
+        select(AthleteEvent)
+        .where(
+            AthleteEvent.athlete_id == athlete_id,
+            AthleteEvent.event_type == "workout_planned",
+        )
+        .order_by(AthleteEvent.occurred_at, AthleteEvent.id)
+    ).all()
+    session_ids: list[str] = []
+    legacy_date_seen = False
+    for row in rows:
+        payload = loads(row.payload_json)
+        planned_date = payload.get("scheduled_date")
+        is_legacy = not planned_date
+        if is_legacy:
+            occurred = row.occurred_at
+            if occurred.tzinfo is None:
+                occurred = occurred.replace(tzinfo=timezone.utc)
+            planned_date = occurred.date().isoformat()
+        session_id = payload.get("session_id")
+        if planned_date != target_date or not session_id:
+            continue
+        # Before 12.2.2 every /today refresh could mark the next unfinished
+        # session as planned on the same date. Honor only the first legacy
+        # event for a date so existing beta accounts do not inherit that bug.
+        if is_legacy:
+            if legacy_date_seen:
+                continue
+            legacy_date_seen = True
+        if session_id not in session_ids:
+            session_ids.append(session_id)
+    return session_ids
+
+
+def _session_preview(session: dict[str, Any] | None, scheduled_date: str | None = None) -> dict[str, Any] | None:
+    if not session:
+        return None
+    meta = session.get("session", {})
+    return {
+        "session_id": meta.get("session_id"),
+        "title": meta.get("title") or meta.get("name") or "Training",
+        "session_type": session.get("session_type") or meta.get("session_type") or meta.get("type") or "training",
+        "estimated_minutes": meta.get("estimated_minutes") or meta.get("requested_minutes"),
+        "week": meta.get("week"),
+        "day": meta.get("day"),
+        "phase": session.get("programming", {}).get("block_phase") or meta.get("phase"),
+        "scheduled_date": scheduled_date,
+        "preview_only": True,
+    }
+
+
+def _ensure_planned_event(
+    db: Session, athlete_id: str, session: dict[str, Any],
+    *, scheduled_date: str, plan_id: str | None = None,
+) -> None:
     session_id = session.get("session", {}).get("session_id")
     rows = db.scalars(
         select(AthleteEvent).where(
@@ -533,11 +606,22 @@ def _ensure_planned_event(db: Session, athlete_id: str, session: dict[str, Any])
             AthleteEvent.event_type == "workout_planned",
         )
     ).all()
-    if any(loads(row.payload_json).get("session_id") == session_id for row in rows):
-        return
+    for row in rows:
+        payload = loads(row.payload_json)
+        existing_date = payload.get("scheduled_date")
+        if not existing_date:
+            occurred = row.occurred_at
+            if occurred.tzinfo is None:
+                occurred = occurred.replace(tzinfo=timezone.utc)
+            existing_date = occurred.date().isoformat()
+        if payload.get("session_id") == session_id and existing_date == scheduled_date:
+            return
     event(db, athlete_id, "workout_planned", {
         "session_id": session_id,
+        "plan_id": plan_id,
+        "scheduled_date": scheduled_date,
         "week": session.get("session", {}).get("week"),
+        "day": session.get("session", {}).get("day"),
         "session_type": session.get("session_type"),
     })
     db.flush()
@@ -668,22 +752,71 @@ def _daily_bcl(mission_row: Mission, checkin: dict[str, Any], readiness: dict[st
     return {"program": program, "context": context, "fired_rules": engine.evaluate_rules(program, context)}
 
 
-def today_payload(db: Session, athlete_id: str) -> dict[str, Any] | None:
+def today_payload(db: Session, athlete_id: str, target_date: str | None = None) -> dict[str, Any] | None:
     plan = latest_plan(db, athlete_id)
     if not plan:
         return None
+    scheduled_date = _normalize_target_date(target_date)
     plan_data = loads(plan.plan_json)
-    original = _next_session(db, athlete_id, plan_data)
-    if original is None:
-        return {"status": "program_complete"}
-    _ensure_planned_event(db, athlete_id, original)
-    db.commit()
+    completed = _completed_session_ids(db, athlete_id)
+    planned_ids = _planned_session_ids_for_date(db, athlete_id, scheduled_date)
+    planned_sessions = [
+        session for session_id in planned_ids
+        if (session := _session_from_plan(plan_data, session_id)) is not None
+    ]
+
+    if not planned_sessions:
+        original = _next_session(db, athlete_id, plan_data)
+        if original is None:
+            return {
+                "status": "program_complete", "scheduled_date": scheduled_date,
+                "session": None, "original_session": None, "adaptation": None,
+                "next_session": None, "next_session_preview": None,
+            }
+        _ensure_planned_event(
+            db, athlete_id, original, scheduled_date=scheduled_date, plan_id=plan.id,
+        )
+        db.commit()
+        planned_sessions = [original]
+        planned_ids = [original.get("session", {}).get("session_id")]
+
+    remaining_sessions = [
+        session for session in planned_sessions
+        if session.get("session", {}).get("session_id") not in completed
+    ]
+    completed_today = [
+        session for session in planned_sessions
+        if session.get("session", {}).get("session_id") in completed
+    ]
+
+    if not remaining_sessions:
+        next_session = _next_session(db, athlete_id, plan_data, exclude_session_ids=set(planned_ids))
+        try:
+            preview_date = (date.fromisoformat(scheduled_date) + timedelta(days=1)).isoformat()
+        except ValueError:
+            preview_date = None
+        return {
+            "status": "today_complete", "scheduled_date": scheduled_date,
+            "session": None, "original_session": None, "adaptation": None,
+            "completed_today": [_session_preview(session, scheduled_date) for session in completed_today],
+            "remaining_today": 0,
+            "next_session": next_session,
+            "next_session_preview": _session_preview(next_session, preview_date),
+        }
+
+    original = remaining_sessions[0]
 
     check = db.scalar(
         select(CheckIn).where(CheckIn.athlete_id == athlete_id).order_by(CheckIn.created_at.desc())
     )
     if not check:
-        return {"status": "planned", "original_session": original, "session": original, "adaptation": None}
+        return {
+            "status": "planned", "scheduled_date": scheduled_date,
+            "original_session": original, "session": original, "adaptation": None,
+            "completed_today": [_session_preview(session, scheduled_date) for session in completed_today],
+            "remaining_today": len(remaining_sessions),
+            "next_session": None, "next_session_preview": None,
+        }
 
     # Reuse the audited decision for this exact check-in/session pair.
     prior_rows = db.scalars(
@@ -696,9 +829,12 @@ def today_payload(db: Session, athlete_id: str) -> dict[str, Any] | None:
         payload = loads(row.payload_json)
         if payload.get("checkin_id") == check.id and payload.get("original_session_id") == session_id:
             return {
-                "status": payload.get("status", "adapted"), "original_session": original,
-                "session": payload.get("revised_session", original),
+                "status": payload.get("status", "adapted"), "scheduled_date": scheduled_date,
+                "original_session": original, "session": payload.get("revised_session", original),
                 "adaptation": {"decision_id": row.id, **payload.get("public", {})},
+                "completed_today": [_session_preview(session, scheduled_date) for session in completed_today],
+                "remaining_today": len(remaining_sessions),
+                "next_session": None, "next_session_preview": None,
             }
 
     checkin = loads(check.payload_json)
@@ -767,8 +903,12 @@ def today_payload(db: Session, athlete_id: str) -> dict[str, Any] | None:
     db.add(decision)
     db.commit()
     return {
-        "status": status, "original_session": original, "session": revised,
+        "status": status, "scheduled_date": scheduled_date,
+        "original_session": original, "session": revised,
         "adaptation": {"decision_id": decision.id, **public},
+        "completed_today": [_session_preview(session, scheduled_date) for session in completed_today],
+        "remaining_today": len(remaining_sessions),
+        "next_session": None, "next_session_preview": None,
     }
 
 

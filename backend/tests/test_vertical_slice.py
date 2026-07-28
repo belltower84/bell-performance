@@ -111,3 +111,47 @@ THEN stop_or_swap'''
     body = intelligence.json()
     assert body['engine_manifest'] == manifest
     assert body['learning_parameters'] != {'volume_response': 1.0, 'intensity_response': 1.0, 'recovery_response': 1.0}
+
+def test_today_does_not_pull_tomorrows_session_forward(client, auth):
+    headers, _ = auth('unified-mission@example.com')
+    athlete = client.post('/api/v1/athletes', headers=headers, json={
+        'name': 'Unified Mission Athlete',
+        'profile': {'age': 41, 'training_experience': 'Intermediate'},
+    })
+    aid = athlete.json()['id']
+    mission = client.post(f'/api/v1/athletes/{aid}/missions', headers=headers, json={
+        'goal': 'Build strength and conditioning',
+        'timeline_weeks': 4,
+        'constraints': {'training_days': 4, 'session_minutes': 60},
+    })
+    assert mission.status_code == 201
+    assert client.post(f'/api/v1/athletes/{aid}/plans', headers=headers).status_code == 201
+
+    date_one = '2026-07-28'
+    first = client.get(f'/api/v1/athletes/{aid}/today?date={date_one}', headers=headers)
+    assert first.status_code == 200
+    first_body = first.json()
+    assert first_body['status'] in ('planned', 'adapted')
+    first_id = first_body['session']['session']['session_id']
+
+    completed = client.post(
+        f'/api/v1/athletes/{aid}/sessions/{first_id}/complete',
+        headers={**headers, 'Idempotency-Key': 'unified-mission-complete-001'},
+        json={'duration_minutes': 50, 'session_rpe': 7, 'performance_ratio': 1.0},
+    )
+    assert completed.status_code == 201
+
+    same_day = client.get(f'/api/v1/athletes/{aid}/today?date={date_one}', headers=headers)
+    assert same_day.status_code == 200
+    same_day_body = same_day.json()
+    assert same_day_body['status'] == 'today_complete'
+    assert same_day_body['session'] is None
+    assert same_day_body['remaining_today'] == 0
+    assert same_day_body['next_session_preview']['preview_only'] is True
+    next_id = same_day_body['next_session_preview']['session_id']
+    assert next_id and next_id != first_id
+
+    date_two = '2026-07-29'
+    next_day = client.get(f'/api/v1/athletes/{aid}/today?date={date_two}', headers=headers)
+    assert next_day.status_code == 200
+    assert next_day.json()['session']['session']['session_id'] == next_id

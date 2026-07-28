@@ -189,6 +189,14 @@ class BellWeeklyPlanningEngine:
         for session in built:
             session_scores.append(float(session.get("bell_score", session.get("validation", {}).get("bell_score", 85))))
 
+        names = [item["session_name"] for item in schedule if item.get("session_name")]
+        duplicate_names = sorted({name for name in names if names.count(name) > 1})
+        if duplicate_names:
+            warnings.append("Duplicate weekly session templates detected: " + ", ".join(duplicate_names))
+        long_sessions = [name for name in names if name in ("Long Run", "Long Aerobic")]
+        if len(long_sessions) > 1:
+            warnings.append("More than one long-endurance session was generated.")
+
         limits = self.rules["weekly_limits"]
         if len(high_days) > limits["max_high_systemic_days"]:
             warnings.append("High-systemic session limit exceeded.")
@@ -241,15 +249,23 @@ class BellWeeklyPlanningEngine:
             sessions = defaults[:requested_sessions]
         else:
             sessions = []
-            # Preserve pathway-specific order while meeting explicit exposure targets.
-            strength_fallback = ["Upper Strength", "Lower Strength", "Upper Volume", "Lower Volume", "Full Body Hypertrophy"]
-            engine_fallback = ["Easy Run", "Threshold", "Aerobic Base", "Intervals", "Long Run"]
-            strength_pool = strength_pool or [x for x in strength_fallback if x in self.rules["session_templates"]]
-            engine_pool = engine_pool or [x for x in engine_fallback if x in self.rules["session_templates"]]
-            for i in range(strength_target):
-                sessions.append(strength_pool[i % len(strength_pool)])
-            for i in range(engine_target):
-                sessions.append(engine_pool[i % len(engine_pool)])
+            # Build distinct exposure roles. Never satisfy a target by cycling the same template.
+            strength_fallback = ["Upper Strength", "Lower Strength", "Upper Volume", "Lower Volume", "Full Body Hypertrophy", "Push", "Pull", "Legs", "Upper", "Lower"]
+            engine_fallback = ["Easy Run", "Threshold", "Aerobic Base", "Intervals", "Long Run", "Mixed Modal", "Long Aerobic"]
+            def unique_pool(primary: list[str], fallback: list[str]) -> list[str]:
+                result: list[str] = []
+                for name in [*primary, *fallback]:
+                    if name in self.rules["session_templates"] and name not in result:
+                        result.append(name)
+                return result
+            strength_pool = unique_pool(strength_pool, strength_fallback)
+            engine_pool = unique_pool(engine_pool, engine_fallback)
+            if strength_target > len(strength_pool):
+                raise ValueError(f"Bell cannot create {strength_target} unique strength exposures from {len(strength_pool)} templates.")
+            if engine_target > len(engine_pool):
+                raise ValueError(f"Bell cannot create {engine_target} unique engine exposures from {len(engine_pool)} templates.")
+            sessions.extend(strength_pool[:strength_target])
+            sessions.extend(engine_pool[:engine_target])
             requested_sessions = len(sessions)
         preferred = request.get("preferred_session_days", {})
         schedule = self._assign_days(sessions, available_days, preferred)

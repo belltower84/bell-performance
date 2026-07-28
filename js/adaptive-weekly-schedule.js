@@ -56,33 +56,71 @@ function bellSessionProfile(item){
   const hardEngine=engine&&/interval|tempo|threshold|quality|sprint|hill|vo2/.test(text);
   return {mobility,engine,strength,lower,upper,full,longEngine,hardEngine,easyEngine:engine&&!longEngine&&!hardEngine};
 }
+function bellSessionRole(item){
+  const p=bellSessionProfile(item),text=`${item?.customLabel||""} ${item?.mission||""}`.toLowerCase();
+  if(p.longEngine)return "engine-long";
+  if(p.hardEngine)return "engine-quality";
+  if(p.easyEngine)return "engine-easy";
+  if(p.lower)return /secondary|volume|athletic/.test(text)?"strength-lower-secondary":"strength-lower-primary";
+  if(p.upper)return /secondary|volume|athletic/.test(text)?"strength-upper-secondary":"strength-upper-primary";
+  if(p.strength)return "strength-full-body";
+  if(p.mobility)return "mobility";
+  return "other";
+}
+function bellUniqueSessionKey(item){return `${bellSessionRole(item)}:${String(item?.customLabel||item?.mission||"").trim().toLowerCase()}`;}
+function bellCloneSessionTemplate(source,role,index){
+  const item=JSON.parse(JSON.stringify(source||{}));
+  item.done=false;item.status="planned";item.id=`bell-${role}-${Date.now()}-${index}`;
+  const definitions={
+    "strength-upper-primary":{mission:"S-1",label:"Primary Upper Strength"},
+    "strength-lower-primary":{mission:"S-2",label:"Primary Lower Strength"},
+    "strength-upper-secondary":{mission:"S-3",label:"Athletic Upper Strength"},
+    "strength-lower-secondary":{mission:"S-4",label:"Secondary Lower Strength"},
+    "strength-full-body":{mission:"S-4",label:"Full-Body Strength"},
+    "engine-easy":{mission:"R-1",label:"Easy Aerobic Support"},
+    "engine-quality":{mission:"R-2",label:"Run Quality"},
+    "engine-long":{mission:"R-3",label:"Long Run"}
+  };
+  const d=definitions[role];if(d){item.mission=d.mission;item.customLabel=d.label;}
+  item.detail=`${item.detail||"Mission-specific training"} · Unique ${d?.label||role} exposure.`;
+  return item;
+}
 function bellEnsureDisciplineExposures(plan,block=data.trainingBlock||{}){
   if(!Array.isArray(plan))return plan;
   const targets=typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2};
-  const result=plan.map(item=>({...item}));
-  const count=kind=>result.filter(item=>bellSessionProfile(item)[kind]).length;
-  const cloneFor=(kind,index)=>{
-    const pool=result.filter(item=>bellSessionProfile(item)[kind]);
-    if(!pool.length)return null;
-    const source={...pool[index%pool.length]};
-    source.done=false;source.status="planned";source.id=`bell-${kind}-${Date.now()}-${index}`;
-    if(kind==="strength"){
-      const p=bellSessionProfile(source);
-      source.mission=`S-${count("strength")+1}`;
-      source.customLabel=p.lower?"Secondary Lower Strength":p.upper?"Secondary Upper Strength":"Secondary Full-Body Strength";
-      source.detail=`${source.detail||"Mission-specific strength exposure"} · Added to meet the discipline's weekly strength target.`;
-    }else{
-      source.mission=`R-${count("engine")+1}`;
-      source.customLabel=source.customLabel||"Easy Engine Support";
-      source.detail=`${source.detail||"Aerobic support"} · Added to meet the discipline's weekly engine target.`;
+  const result=[];const seen=new Set();
+  for(const raw of plan){
+    const item={...raw},key=bellUniqueSessionKey(item),p=bellSessionProfile(item);
+    if(p.longEngine&&result.some(x=>bellSessionProfile(x).longEngine))continue;
+    if(!seen.has(key)){seen.add(key);result.push(item);}
+  }
+  const strengthSources=result.filter(x=>bellSessionProfile(x).strength);
+  const engineSources=result.filter(x=>bellSessionProfile(x).engine);
+  const preferredStrength=["strength-upper-primary","strength-lower-primary","strength-upper-secondary","strength-lower-secondary"];
+  const preferredEngine=["engine-easy","engine-quality","engine-long"];
+  const addMissing=(roles,target,sources,kind)=>{
+    let index=0;
+    while(result.filter(x=>bellSessionProfile(x)[kind]).length<target&&index<roles.length){
+      const role=roles[index++];
+      if(result.some(x=>bellSessionRole(x)===role))continue;
+      const source=sources.find(x=>{
+        const p=bellSessionProfile(x);
+        return role.includes("upper")?p.upper:role.includes("lower")?p.lower:role==="engine-long"?p.longEngine:role==="engine-quality"?p.hardEngine:role==="engine-easy"?p.easyEngine:p.strength;
+      })||sources[(index-1)%Math.max(1,sources.length)];
+      if(!source)break;
+      result.push(bellCloneSessionTemplate(source,role,index));
     }
-    return source;
   };
-  let guard=0;
-  while(count("strength")<targets.strength&&guard++<10){const item=cloneFor("strength",guard);if(!item)break;result.push(item);}
-  guard=0;
-  while(count("engine")<targets.engine&&guard++<10){const item=cloneFor("engine",guard);if(!item)break;result.push(item);}
+  addMissing(preferredStrength,targets.strength,strengthSources,"strength");
+  addMissing(preferredEngine,targets.engine,engineSources,"engine");
   return result;
+}
+function bellValidateGeneratedWeek(plan,targets){
+  const strength=plan.filter(x=>bellSessionProfile(x).strength),engine=plan.filter(x=>bellSessionProfile(x).engine);
+  const duplicateKeys=new Set(),seen=new Set();
+  for(const item of plan){const key=bellUniqueSessionKey(item);if(seen.has(key))duplicateKeys.add(key);seen.add(key);}
+  return {passed:strength.length===targets.strength&&engine.length===targets.engine&&engine.filter(x=>bellSessionProfile(x).longEngine).length<=1&&!duplicateKeys.size,
+    strength:strength.length,engine:engine.length,duplicates:[...duplicateKeys]};
 }
 
 function bellOptimizeConcurrentPlan(plan,days){
@@ -96,7 +134,7 @@ function bellOptimizeConcurrentPlan(plan,days){
   const longItems=primary.filter(x=>bellSessionProfile(x).longEngine),remaining=primary.filter(x=>!bellSessionProfile(x).longEngine);
   longItems.forEach(item=>place(item,[allowed.includes("Saturday")?"Saturday":allowed.at(-1)],()=>0));
   const strengthItems=remaining.filter(x=>bellSessionProfile(x).strength);
-  const anchorTemplates={2:["Monday","Friday"],3:["Monday","Tuesday","Friday"],4:["Monday","Tuesday","Thursday","Friday"],5:["Monday","Tuesday","Wednesday","Friday","Saturday"]};
+  const anchorTemplates={2:["Monday","Friday"],3:["Monday","Tuesday","Friday"],4:["Monday","Tuesday","Wednesday","Friday"],5:["Monday","Tuesday","Wednesday","Friday","Saturday"]};
   const anchors=(anchorTemplates[Math.min(5,strengthItems.length)]||BELL_WEEKDAYS).filter(d=>allowed.includes(d)&&!profiles(d).some(q=>q.longEngine));
   strengthItems.forEach((item,index)=>{
     const candidates=allowed.filter(d=>!profiles(d).some(q=>q.longEngine));
@@ -125,7 +163,11 @@ function bellApplyDaysToPlan(plan,days){return bellOptimizeConcurrentPlan(plan,d
 function bellApplyAvailabilityToWeek(block,week,plan){
   const choice=bellWeekAvailability(block,week);
   if(choice.mode==="vacation")return [];
-  return bellApplyDaysToPlan(bellEnsureDisciplineExposures(plan,block),choice.days);
+  const targets=typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2};
+  const generated=bellEnsureDisciplineExposures(plan,block);
+  const validation=bellValidateGeneratedWeek(generated,targets);
+  if(!validation.passed)console.warn("Bell weekly exposure validation failed",validation);
+  return bellApplyDaysToPlan(generated,choice.days);
 }
 
 const bellBaseBuildCurrentWeekPlan=typeof buildCurrentWeekPlan==="function"?buildCurrentWeekPlan:null;

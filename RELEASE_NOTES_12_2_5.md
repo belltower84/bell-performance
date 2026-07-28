@@ -1,4 +1,4 @@
-# Bell Performance 12.2.5 — Discipline Exposure Intelligence
+# Bell Performance 12.2.6 — Discipline Exposure Intelligence
 
 ## Programming dose
 - Weekly strength and engine exposure targets now come from the athlete pathway, not only the number of selected weekdays.

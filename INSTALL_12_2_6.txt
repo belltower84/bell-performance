@@ -1,0 +1,23 @@
+Bell Performance 12.2.6 — Unique Session Generation & Validation
+
+1. In GitHub Desktop, confirm the current branch is bell-core-live.
+2. Commit or stash any uncommitted changes.
+3. Extract this ZIP.
+4. Copy everything inside the extracted folder into the root of the local bell-performance repository.
+5. Choose Replace the files in the destination when Windows asks.
+6. Commit with: Build 12.2.6 unique session generation
+7. Push bell-core-live and wait for Render to redeploy.
+8. Confirm https://bell-core-api.onrender.com/ready still reports database true.
+9. Start the frontend with: py -m http.server 5173
+10. Open http://localhost:5173 and hard refresh with Ctrl + Shift + R.
+
+RETEST
+Use a Hybrid / Body Recomposition profile with Monday through Saturday selected.
+Expected weekly exposure structure:
+- 4 unique strength sessions
+- 3 unique engine sessions
+- no duplicate Long Run entries
+- no more than one long-endurance session
+- one or more intentional blended days
+- Friday used for meaningful strength work
+- mobility shown as a recovery component rather than a primary workout

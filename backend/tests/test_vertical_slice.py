@@ -186,3 +186,15 @@ def test_concurrent_scheduler_never_uses_unselected_days():
     selected = ["Monday", "Wednesday", "Friday", "Saturday"]
     result = _optimize_concurrent_schedule(schedule, selected)
     assert all(item["day"] in selected for item in result)
+
+
+def test_discipline_exposure_targets_hybrid_six_days():
+    from app.services.core import _discipline_exposure_targets
+    request = {"goal": "Hybrid Performance: Body Recomposition", "constraints": {"training_days": 6}}
+    assert _discipline_exposure_targets(request, 6) == {"strength": 4, "engine": 3}
+
+
+def test_discipline_exposure_targets_running_six_days():
+    from app.services.core import _discipline_exposure_targets
+    request = {"goal": "10K race performance", "constraints": {"training_days": 6}}
+    assert _discipline_exposure_targets(request, 6) == {"strength": 3, "engine": 4}

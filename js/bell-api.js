@@ -77,11 +77,22 @@ function bellAthleteProfile() {
   };
 }
 
+function bellDisciplineExposureTargets(block = data.trainingBlock || {}) {
+  const days = Math.max(2, Math.min(7, Number(block.trainingDays) || (typeof bellNormalTrainingDays === "function" ? bellNormalTrainingDays().length : 5)));
+  const text = [data.settings.primaryTrainingIdentity, data.settings.athleteMode, data.settings.secondaryTrainingGoal, block.primaryGoal, block.secondaryGoal].filter(Boolean).join(" ").toLowerCase();
+  if (/marathon|half marathon|10k|5k|running/.test(text)) return { strength: days >= 6 ? 3 : 2, engine: days >= 6 ? 4 : Math.min(4, days) };
+  if (/bodybuilding|physique|muscle building|hypertrophy/.test(text)) return { strength: days >= 6 ? 5 : 4, engine: 2 };
+  if (/powerlifting|olympic|strength/.test(text) && !/hybrid/.test(text)) return { strength: days >= 4 ? 4 : days, engine: days >= 5 ? 2 : 1 };
+  if (/hybrid|body composition|body recomposition|general fitness|athlete|tactical/.test(text)) return { strength: days >= 5 ? 4 : 3, engine: days >= 5 ? 3 : 2 };
+  return { strength: days >= 5 ? 4 : 3, engine: 2 };
+}
+
 function bellMissionRequest() {
   const block = data.trainingBlock || {};
   const primary = data.settings.primaryTrainingIdentity || data.settings.athleteMode || "Hybrid Performance";
   const secondary = data.settings.secondaryTrainingGoal || block.secondaryGoal || "Balanced Program";
   const date = data.settings.secondaryTargetDate || block.targetDate || null;
+  const exposures = bellDisciplineExposureTargets(block);
   return {
     goal: `${primary}: ${secondary}`,
     timeline_weeks: Math.max(4, Math.min(52, Number(block.lengthWeeks) || 12)),
@@ -89,8 +100,8 @@ function bellMissionRequest() {
     constraints: {
       training_days: Math.max(2, Math.min(7, Number(block.trainingDays) || 5)),
       available_days: (typeof bellNormalTrainingDays === "function" ? bellNormalTrainingDays() : (block.availableDays || [])),
-      strength_days: Number(block.strengthDays) || 3,
-      engine_days: Number(block.runDays) || 2,
+      strength_days: exposures.strength,
+      engine_days: exposures.engine,
       session_minutes: Math.max(20, Math.min(180, Number(block.sessionMinutes) || 60)),
       equipment_location: data.settings.equipmentSetup?.activeLocationId || "default",
       limitations: data.settings.injuryProfile || {}

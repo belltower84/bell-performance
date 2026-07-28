@@ -56,6 +56,35 @@ function bellSessionProfile(item){
   const hardEngine=engine&&/interval|tempo|threshold|quality|sprint|hill|vo2/.test(text);
   return {mobility,engine,strength,lower,upper,full,longEngine,hardEngine,easyEngine:engine&&!longEngine&&!hardEngine};
 }
+function bellEnsureDisciplineExposures(plan,block=data.trainingBlock||{}){
+  if(!Array.isArray(plan))return plan;
+  const targets=typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2};
+  const result=plan.map(item=>({...item}));
+  const count=kind=>result.filter(item=>bellSessionProfile(item)[kind]).length;
+  const cloneFor=(kind,index)=>{
+    const pool=result.filter(item=>bellSessionProfile(item)[kind]);
+    if(!pool.length)return null;
+    const source={...pool[index%pool.length]};
+    source.done=false;source.status="planned";source.id=`bell-${kind}-${Date.now()}-${index}`;
+    if(kind==="strength"){
+      const p=bellSessionProfile(source);
+      source.mission=`S-${count("strength")+1}`;
+      source.customLabel=p.lower?"Secondary Lower Strength":p.upper?"Secondary Upper Strength":"Secondary Full-Body Strength";
+      source.detail=`${source.detail||"Mission-specific strength exposure"} · Added to meet the discipline's weekly strength target.`;
+    }else{
+      source.mission=`R-${count("engine")+1}`;
+      source.customLabel=source.customLabel||"Easy Engine Support";
+      source.detail=`${source.detail||"Aerobic support"} · Added to meet the discipline's weekly engine target.`;
+    }
+    return source;
+  };
+  let guard=0;
+  while(count("strength")<targets.strength&&guard++<10){const item=cloneFor("strength",guard);if(!item)break;result.push(item);}
+  guard=0;
+  while(count("engine")<targets.engine&&guard++<10){const item=cloneFor("engine",guard);if(!item)break;result.push(item);}
+  return result;
+}
+
 function bellOptimizeConcurrentPlan(plan,days){
   if(!Array.isArray(plan))return plan;
   const allowed=bellOrderedDays(days);if(!allowed.length)return [];
@@ -96,7 +125,7 @@ function bellApplyDaysToPlan(plan,days){return bellOptimizeConcurrentPlan(plan,d
 function bellApplyAvailabilityToWeek(block,week,plan){
   const choice=bellWeekAvailability(block,week);
   if(choice.mode==="vacation")return [];
-  return bellApplyDaysToPlan(plan,choice.days);
+  return bellApplyDaysToPlan(bellEnsureDisciplineExposures(plan,block),choice.days);
 }
 
 const bellBaseBuildCurrentWeekPlan=typeof buildCurrentWeekPlan==="function"?buildCurrentWeekPlan:null;

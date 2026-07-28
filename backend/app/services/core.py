@@ -452,6 +452,30 @@ def _compact_plan_summary(intelligence: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+
+def _discipline_exposure_targets(request: dict[str, Any], training_days: int) -> dict[str, int]:
+    """Return pathway-appropriate weekly strength and engine exposure targets."""
+    constraints = request.get("constraints") or {}
+    goal = " ".join(str(x or "") for x in (
+        request.get("goal"), request.get("mission_text"), request.get("specialization"),
+        " ".join(request.get("priority_order") or [])
+    )).lower()
+    explicit_strength = int(constraints.get("strength_days") or 0)
+    explicit_engine = int(constraints.get("engine_days") or 0)
+    if explicit_strength and explicit_engine:
+        return {"strength": explicit_strength, "engine": explicit_engine}
+    if any(x in goal for x in ("marathon", "half marathon", "10k", "5k", "running")):
+        strength, engine = (3, 4) if training_days >= 6 else (2, min(4, training_days))
+    elif any(x in goal for x in ("bodybuilding", "physique", "muscle building", "hypertrophy")):
+        strength, engine = (5 if training_days >= 6 else 4, 2)
+    elif any(x in goal for x in ("powerlifting", "olympic", "strength")) and "hybrid" not in goal:
+        strength, engine = (4 if training_days >= 4 else training_days, 2 if training_days >= 5 else 1)
+    elif any(x in goal for x in ("hybrid", "body composition", "body recomposition", "general fitness", "athlete", "tactical")):
+        strength, engine = (4 if training_days >= 5 else 3, 3 if training_days >= 5 else 2)
+    else:
+        strength, engine = (4 if training_days >= 5 else 3, 2)
+    return {"strength": max(1, strength), "engine": max(0, engine)}
+
 def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
     """Generate a multiweek program through the full Bell intelligence stack."""
     profile = _profile(athlete)
@@ -487,6 +511,7 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
     training_days = max(2, min(6, int(constraints.get("training_days", 4))))
     session_minutes = max(20, min(180, int(constraints.get("session_minutes", 60))))
     available_days = constraints.get("available_days") or _default_available_days(training_days)
+    exposure_targets = _discipline_exposure_targets(request, training_days)
     equipment = _flatten_equipment(profile.get("equipment") or constraints.get("equipment"))
     simulation_selected = (orchestrated.get("simulation") or {}).get("selected") or {}
     assumptions = simulation_selected.get("assumptions", {})
@@ -513,6 +538,8 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
                 "readiness": max(1, min(10, round(float(state.get("readiness", {}).get("current", 70)) / 10))),
                 "max_systemic_fatigue": 8 if block.get("target_fatigue") == "high" else 7,
                 "training_days": training_days,
+                "strength_days": exposure_targets["strength"],
+                "engine_days": exposure_targets["engine"],
                 "session_minutes": session_minutes,
                 "available_days": available_days,
                 "preferred_session_days": {"Long Run": "Saturday", "Long Aerobic": "Saturday"},
@@ -572,7 +599,7 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
             "pattern_recognition": (orchestrated.get("patterns") or {}).get("pattern_recognition_version"),
             "digital_twin": (orchestrated.get("simulation") or {}).get("digital_twin_simulation_version"),
             "intelligence_orchestrator": orchestrated.get("intelligence_orchestrator_version"),
-            "weekly_planner": "0.1.0", "session_builder": "0.1.0", "exercise_selection": "0.1.0",
+            "weekly_planner": "0.2.0", "session_builder": "0.1.0", "exercise_selection": "0.1.0",
             "adaptive_coaching": "0.1.0", "coaching_reasoning": "0.1.0", "learning": "0.1.0",
             "athlete_state": state.get("engine_version"), "coaching_language": "0.1.0",
         },

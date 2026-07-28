@@ -70,49 +70,71 @@ class BellWeeklyPlanningEngine:
         return sorted(session_names, key=lambda x: priorities.get(x, 65))
 
     def _assign_days(self, sessions: list[str], available_days: list[str], preferred: dict[str, str]) -> list[dict[str, Any]]:
-        slots = {day: None for day in DAYS}
+        """Assign every requested exposure, allowing compatible same-day pairings."""
         available_idx = [DAYS.index(d) for d in available_days]
         ordered = self._preferred_order(sessions)
+        assigned: dict[str, list[str]] = {day: [] for day in DAYS}
 
-        # Honor explicit preferred-day mappings first.
-        remaining = []
-        for name in ordered:
-            pref = preferred.get(name)
-            if pref in slots and pref in available_days and slots[pref] is None:
-                slots[pref] = name
-            else:
-                remaining.append(name)
-
-        def score_day(day_idx: int, name: str) -> float:
+        def profile(name: str) -> dict[str, bool]:
             template = self._resolve_template(name)
-            load = template.get("systemic_load", "moderate")
-            score = 0.0
-            for other_idx, day in enumerate(DAYS):
-                other = slots[day]
-                if not other:
-                    continue
-                distance = abs(day_idx - other_idx)
-                other_load = self._resolve_template(other).get("systemic_load", "moderate")
-                if load == "high" and other_load == "high":
-                    score += 100 if distance <= 1 else 20 / distance
-                if ("Lower" in name or name == "Legs") and ("Long Run" in other or "Threshold" in other or "Intervals" in other):
-                    score += 80 if distance <= 1 else 10 / distance
-                if ("Long Run" in name or "Threshold" in name or "Intervals" in name) and ("Lower" in other or other == "Legs"):
-                    score += 80 if distance <= 1 else 10 / distance
-            # Prefer broad distribution and weekdays before weekend except long aerobic work.
-            score += sum(1 for i in available_idx if i < day_idx and slots[DAYS[i]] is not None) * 0.5
-            if "Long" in name and day_idx not in (5, 6):
-                score += 8
+            kind = template.get("session_type", "strength")
+            lower = kind != "engine" and ("Lower" in name or name == "Legs")
+            upper = kind != "engine" and any(x in name for x in ("Upper", "Push", "Pull"))
+            long_engine = kind == "engine" and "Long" in name
+            hard_engine = kind == "engine" and any(x in name for x in ("Threshold", "Intervals", "Tempo", "Sprint", "Quality"))
+            easy_engine = kind == "engine" and not long_engine and not hard_engine
+            return {"engine": kind == "engine", "strength": kind != "engine", "lower": lower,
+                    "upper": upper, "long_engine": long_engine, "hard_engine": hard_engine,
+                    "easy_engine": easy_engine}
+
+        def day_score(day: str, name: str) -> float:
+            idx = DAYS.index(day)
+            candidate = profile(name)
+            existing = [profile(x) for x in assigned[day]]
+            score = len(existing) * 35.0
+            if candidate["long_engine"]:
+                score += 0 if day == "Saturday" else 80
+                if existing:
+                    score += 400
+            if candidate["strength"]:
+                if day == "Friday":
+                    score -= 12
+                if any(x["long_engine"] for x in existing):
+                    score += 500
+            if candidate["engine"]:
+                if any(x["upper"] for x in existing):
+                    score -= 28
+                if any(x["lower"] for x in existing):
+                    score += 18 if candidate["easy_engine"] else 160
+                if any(x["strength"] and not x["lower"] and not x["upper"] for x in existing):
+                    score += 8 if candidate["easy_engine"] else 75
+            for other_day, names in assigned.items():
+                distance = abs(DAYS.index(other_day) - idx)
+                for other_name in names:
+                    other = profile(other_name)
+                    if candidate["hard_engine"] and other["lower"] and distance <= 1:
+                        score += 45
+                    if candidate["lower"] and other["hard_engine"] and distance <= 1:
+                        score += 45
+                    if candidate["lower"] and other["lower"] and distance <= 1:
+                        score += 35
+            if not existing and day in ("Wednesday", "Thursday") and candidate["engine"]:
+                score -= 6
             return score
 
-        for name in remaining:
-            open_days = [i for i in available_idx if slots[DAYS[i]] is None]
-            if not open_days:
-                break
-            best = min(open_days, key=lambda i: score_day(i, name))
-            slots[DAYS[best]] = name
+        for name in ordered:
+            pref = preferred.get(name)
+            candidates = [pref] if pref in available_days else available_days
+            chosen = min(candidates, key=lambda d: day_score(d, name))
+            assigned[chosen].append(name)
 
-        return [{"day": d, "session_name": slots[d], "status": "training" if slots[d] else "recovery"} for d in DAYS]
+        schedule: list[dict[str, Any]] = []
+        for day in DAYS:
+            if assigned[day]:
+                schedule.extend({"day": day, "session_name": name, "status": "training"} for name in assigned[day])
+            else:
+                schedule.append({"day": day, "session_name": None, "status": "recovery"})
+        return schedule
 
     def _build_engine_session(self, name: str, template: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
         rx = copy.deepcopy(template["engine_prescription"])
@@ -208,11 +230,27 @@ class BellWeeklyPlanningEngine:
         mission_key = self._mission_key(request)
         profile = self.rules["mission_profiles"][mission_key]
         objectives = request.get("weekly_objectives") or profile["objectives"]
-        requested_sessions = int(request.get("training_days", len(profile["default_sessions"])))
-        sessions = list(profile["default_sessions"][:requested_sessions])
         available_days = self._available_days(request)
-        if len(sessions) > len(available_days):
-            sessions = sessions[:len(available_days)]
+        strength_target = max(0, int(request.get("strength_days", 0) or 0))
+        engine_target = max(0, int(request.get("engine_days", 0) or 0))
+        defaults = list(profile["default_sessions"])
+        strength_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") != "engine"]
+        engine_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") == "engine"]
+        if not strength_target and not engine_target:
+            requested_sessions = int(request.get("training_days", len(defaults)))
+            sessions = defaults[:requested_sessions]
+        else:
+            sessions = []
+            # Preserve pathway-specific order while meeting explicit exposure targets.
+            strength_fallback = ["Upper Strength", "Lower Strength", "Upper Volume", "Lower Volume", "Full Body Hypertrophy"]
+            engine_fallback = ["Easy Run", "Threshold", "Aerobic Base", "Intervals", "Long Run"]
+            strength_pool = strength_pool or [x for x in strength_fallback if x in self.rules["session_templates"]]
+            engine_pool = engine_pool or [x for x in engine_fallback if x in self.rules["session_templates"]]
+            for i in range(strength_target):
+                sessions.append(strength_pool[i % len(strength_pool)])
+            for i in range(engine_target):
+                sessions.append(engine_pool[i % len(engine_pool)])
+            requested_sessions = len(sessions)
         preferred = request.get("preferred_session_days", {})
         schedule = self._assign_days(sessions, available_days, preferred)
 
@@ -245,6 +283,8 @@ class BellWeeklyPlanningEngine:
             "decision_trace": {
                 "available_days": available_days,
                 "requested_training_days": requested_sessions,
+                "requested_strength_exposures": strength_target,
+                "requested_engine_exposures": engine_target,
                 "selected_session_templates": sessions,
                 "rules_applied": ["mission profile", "phase modifiers", "recovery spacing", "weekly fatigue limits", "week scoring"],
             },

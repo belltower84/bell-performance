@@ -1,0 +1,20 @@
+Bell Performance 12.2.5 — Discipline Exposure Intelligence
+
+1. Confirm GitHub Desktop is on bell-core-live.
+2. Commit or stash current changes.
+3. Extract this ZIP.
+4. Copy everything inside the extracted folder into the repository root.
+5. Allow Windows to replace matching files.
+6. Commit with: Build 12.2.5 discipline exposure intelligence
+7. Push bell-core-live and wait for Render to redeploy.
+8. Run: py -m http.server 5173
+9. Hard refresh the browser or clear the old service worker.
+
+Primary changed files:
+- index.html
+- sw.js
+- js/bell-api.js
+- js/adaptive-weekly-schedule.js
+- backend/app/services/core.py
+- backend/intelligence/weekly_planner.py
+- backend/tests/test_vertical_slice.py

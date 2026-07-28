@@ -85,9 +85,9 @@ function bellCloneSessionTemplate(source,role,index){
   item.detail=`${item.detail||"Mission-specific training"} · Unique ${d?.label||role} exposure.`;
   return item;
 }
-function bellEnsureDisciplineExposures(plan,block=data.trainingBlock||{}){
+function bellEnsureDisciplineExposures(plan,block=data.trainingBlock||{},targetOverride=null){
   if(!Array.isArray(plan))return plan;
-  const targets=typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2};
+  const targets=targetOverride||(typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2});
   const result=[];const seen=new Set();
   for(const raw of plan){
     const item={...raw},key=bellUniqueSessionKey(item),p=bellSessionProfile(item);
@@ -164,6 +164,10 @@ function bellOptimizeConcurrentPlan(plan,days){
     const target=anchors[index]||candidates.find(d=>!assigned[d].length)||candidates[index%candidates.length];
     place(item,[target],()=>0);
   });
+  if(allowed.includes("Friday")&&strengthItems.length>=4&&!profiles("Friday").some(q=>q.strength)){
+    const donor=allowed.find(d=>d!=="Friday"&&assigned[d].filter(x=>bellSessionProfile(x).strength).length>1);
+    if(donor){const idx=assigned[donor].findIndex(x=>bellSessionProfile(x).strength);const [moved]=assigned[donor].splice(idx,1);moved.day="Friday";assigned.Friday.push(moved);}
+  }
   remaining.filter(x=>bellSessionProfile(x).engine).forEach(item=>{
     const p=bellSessionProfile(item);
     place(item,allowed,day=>{
@@ -183,15 +187,41 @@ function bellOptimizeConcurrentPlan(plan,days){
 }
 function bellApplyDaysToPlan(plan,days){return bellOptimizeConcurrentPlan(plan,days);}
 
+
+function bellWeekOneRemainingDays(block,week,days){
+  const ordered=bellOrderedDays(days);
+  if(Number(week)!==1||!block?.startDate)return ordered;
+  const start=localDateFromKey(block.startDate),today=localDateFromKey(todayKey());
+  const startKey=block.startDate;
+  if(startKey>todayKey())return ordered;
+  const jsDay=start.getDay(),mondayIndex=(jsDay+6)%7;
+  return ordered.filter(day=>BELL_WEEKDAYS.indexOf(day)>=mondayIndex);
+}
+function bellPartialWeekTargets(base,remainingDays){
+  const n=remainingDays.length;
+  if(n>=5)return base;
+  const caps={0:{strength:0,engine:0},1:{strength:1,engine:0},2:{strength:1,engine:1},3:{strength:2,engine:2},4:{strength:3,engine:2}}[n]||base;
+  return {strength:Math.min(base.strength,caps.strength),engine:Math.min(base.engine,caps.engine)};
+}
+function bellTrimPlanToTargets(plan,targets){
+  const strength=plan.filter(x=>bellSessionProfile(x).strength),engine=plan.filter(x=>bellSessionProfile(x).engine),other=plan.filter(x=>!bellSessionProfile(x).strength&&!bellSessionProfile(x).engine&&!bellSessionProfile(x).mobility);
+  const strengthOrder=['strength-upper-primary','strength-lower-primary','strength-upper-secondary','strength-lower-secondary','strength-full-body'];
+  const engineOrder=['engine-easy','engine-quality','engine-long'];
+  const pick=(items,roles,count)=>{const out=[];for(const role of roles){for(const item of items){if(out.length>=count)break;if(!out.includes(item)&&bellSessionRole(item)===role)out.push(item);}if(out.length>=count)break;}for(const item of items){if(out.length>=count)break;if(!out.includes(item))out.push(item);}return out;};
+  return [...pick(strength,strengthOrder,targets.strength),...pick(engine,engineOrder,targets.engine),...other];
+}
 function bellApplyAvailabilityToWeek(block,week,plan){
   const choice=bellWeekAvailability(block,week);
   if(choice.mode==="vacation")return [];
-  const targets=typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2};
+  const effectiveDays=bellWeekOneRemainingDays(block,week,choice.days);
+  const baseTargets=typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2};
+  const targets=bellPartialWeekTargets(baseTargets,effectiveDays);
   const integrated=bellIntegrateMobilityAndCore(plan);
-  const generated=bellEnsureDisciplineExposures(integrated,block);
-  const validation=bellValidateGeneratedWeek(generated,targets);
+  const generated=bellEnsureDisciplineExposures(integrated,block,targets);
+  const trimmed=bellTrimPlanToTargets(generated,targets);
+  const validation=bellValidateGeneratedWeek(trimmed,targets);
   if(!validation.passed)console.warn("Bell weekly exposure validation failed",validation);
-  return bellApplyDaysToPlan(generated,choice.days);
+  return bellApplyDaysToPlan(trimmed,effectiveDays);
 }
 
 const bellBaseBuildCurrentWeekPlan=typeof buildCurrentWeekPlan==="function"?buildCurrentWeekPlan:null;

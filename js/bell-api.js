@@ -87,7 +87,8 @@ function bellMissionRequest() {
     timeline_weeks: Math.max(4, Math.min(52, Number(block.lengthWeeks) || 12)),
     priority_order: [primary, secondary].filter(Boolean),
     constraints: {
-      training_days: Math.max(2, Math.min(6, Number(block.trainingDays) || 5)),
+      training_days: Math.max(2, Math.min(7, Number(block.trainingDays) || 5)),
+      available_days: (typeof bellNormalTrainingDays === "function" ? bellNormalTrainingDays() : (block.availableDays || [])),
       strength_days: Number(block.strengthDays) || 3,
       engine_days: Number(block.runDays) || 2,
       session_minutes: Math.max(20, Math.min(180, Number(block.sessionMinutes) || 60)),
@@ -141,6 +142,24 @@ async function bellSubmitReadiness() {
 function bellCloudSessionId() {
   return bellCloud.today?.session?.session?.session_id || bellCloud.today?.original_session?.session?.session_id || null;
 }
+
+function bellCompletionPerformanceRatio(completed) {
+  const exercises = Array.isArray(completed?.exercises) ? completed.exercises : [];
+  const sets = exercises.flatMap(exercise => Array.isArray(exercise.sets) ? exercise.sets : []);
+  const setCompletion = sets.length ? sets.filter(set => set.done).length / sets.length : 1;
+  const targetRpe = exercises.map(exercise => Number(exercise?.targetRpe || exercise?.bellTargetRpe)).filter(Number.isFinite);
+  const intended = targetRpe.length ? targetRpe.reduce((a,b)=>a+b,0)/targetRpe.length : 7;
+  const actual = Number(completed?.sessionRpe || completed?.rpe) || intended;
+  const effortFit = Math.max(.75, Math.min(1.15, 1 + (intended - actual) * .04));
+  let engineFit = 1;
+  if (completed?.cardioType && completed?.engineMetrics) {
+    const time = String(completed.engineMetrics.manualTime || "").trim();
+    const distance = Number(completed.engineMetrics.distance);
+    if (!time && !distance) engineFit = .9;
+  }
+  return Number(Math.max(.5, Math.min(1.25, setCompletion * effortFit * engineFit)).toFixed(3));
+}
+
 async function bellCompleteCurrentSession(completed) {
   const athleteId = bellCloud.athleteId, sessionId = completed?.cloudSessionId || bellCloudSessionId();
   if (!bellCloudConnected() || !athleteId || !sessionId) return null;
@@ -148,7 +167,7 @@ async function bellCompleteCurrentSession(completed) {
   const idempotency = `bell-${athleteId}-${sessionId}-${completed.completedAt || todayKey()}`;
   const result = await bellApiRequest(`/athletes/${athleteId}/sessions/${encodeURIComponent(sessionId)}/complete`, {
     method: "POST", headers: { "Idempotency-Key": idempotency },
-    body: JSON.stringify({ duration_minutes: duration, session_rpe: Number(completed.sessionRpe) || 7, performance_ratio: 1, notes: completed.notes || "Completed in Bell Performance" })
+    body: JSON.stringify({ duration_minutes: duration, session_rpe: Number(completed.sessionRpe) || Number(completed.rpe) || 7, performance_ratio: bellCompletionPerformanceRatio(completed), notes: completed.notes || "Completed in Bell Performance" })
   });
   await bellRefreshCloudState(); return result;
 }

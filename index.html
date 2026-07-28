@@ -10,7 +10,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <title>Bell Performance 12.2.2 — Unified Mission Flow</title>
-<link href="./css/app.css?v=12220" rel="stylesheet"/>
+<link href="./css/app.css?v=12230" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -416,7 +416,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <span class="first-flight-kicker">Flight Check 04</span><h3>Build a schedule you can sustain</h3>
 <p class="sub">Choose the weekly commitment, session length, and equipment Bell Performance should program around.</p>
 <div class="schedule-choice-panel">
-<div class="row"><div><label>Training days per week</label><select id="onboardingTrainingDays"><option>3</option><option>4</option><option selected="">5</option><option>6</option></select></div><div><label>Typical session length</label><select id="onboardingSessionMinutes"><option value="45">45 minutes</option><option selected="" value="60">60 minutes</option><option value="75">75 minutes</option><option value="90">90 minutes</option></select></div></div>
+<input id="onboardingTrainingDays" type="hidden" value="5"/><label>Which days can you normally train?</label><div class="bell-weekday-grid" id="onboardingWeekdayChoices"></div><div class="row"><div><label>Typical session length</label><select id="onboardingSessionMinutes"><option value="45">45 minutes</option><option selected="" value="60">60 minutes</option><option value="75">75 minutes</option><option value="90">90 minutes</option></select></div></div>
 <label>Primary training environment</label><div class="environment-choice-grid" id="onboardingEnvironmentChoices">
 <label><input checked="" name="onboardingSimpleEnvironment" type="radio" value="commercial"/><span><strong>Commercial Gym</strong><small>Full equipment access</small></span></label>
 <label><input name="onboardingSimpleEnvironment" type="radio" value="home"/><span><strong>Home Gym</strong><small>Rack, barbell, dumbbells, or similar</small></span></label>
@@ -603,6 +603,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="card" id="workoutCompletionCard"><label>Session RPE</label><input id="sessionRpe" max="10" min="1" type="number"/><label>Training Notes</label><textarea id="sessionNotes"></textarea><button class="good" onclick="completeWorkout()">Finish Training</button></div>
 </div>
 </div>
+
+<div class="modal hidden" id="bellWeeklyCheckInModal"><div class="modal-box bell-weekly-modal"><div class="modal-header"><div><span class="metric-label">Weekly Schedule Check-In</span><h2>Plan <span id="bellWeeklyTargetLabel">Next Week</span></h2></div><button type="button" onclick="bellCloseWeeklyCheckIn()">×</button></div><p class="sub">Keep this quick. Tell Bell whether your training days are changing.</p><div class="bell-weekly-mode-list"><label><input type="radio" name="bellWeeklyMode" value="normal" checked><span><strong>Keep my normal schedule</strong><small>Use my saved training days.</small></span></label><label><input type="radio" name="bellWeeklyMode" value="custom"><span><strong>Choose different days</strong><small>Select the days available next week.</small></span></label><label><input type="radio" name="bellWeeklyMode" value="vacation"><span><strong>Vacation / planned week off</strong><small>Pause formal training. Mobility remains optional.</small></span></label></div><div class="hidden" id="bellWeeklyCustomWrap"><label>Available next week</label><div class="bell-weekday-grid" id="bellWeeklyCustomDays"></div></div><div class="row"><button class="secondary" type="button" onclick="bellCloseWeeklyCheckIn()">Cancel</button><button class="good" type="button" onclick="bellSaveWeeklyCheckIn()">Build Next Week</button></div></div></div>
 <nav class="app-nav" aria-label="Primary navigation">
 <button class="active" data-screen="home"><span class="icon">⌂</span><span>Dashboard</span></button>
 <button data-screen="plan"><span class="icon">▣</span><span>Calendar</span></button>
@@ -614,7 +616,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "12.2.2-unified-mission";</script>
+<script>window.BELL_APP_VERSION = "12.2.3-athlete-schedule";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=10006"></script>
 <script src="./js/storage.js?v=10006"></script>
@@ -644,9 +646,10 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/block-lifecycle.js?v=10006"></script>
 <script src="./js/weekly-debrief.js?v=10006"></script>
 <script src="./js/plan-progress.js?v=10006"></script>
-<script src="./js/bell-api.js?v=12220"></script>
+<script src="./js/bell-api.js?v=12230"></script>
 <script src="./js/api-integration.js?v=12101"></script>
-<script src="./js/dashboard-command-center.js?v=12220"></script>
+<script src="./js/dashboard-command-center.js?v=12230"></script>
+<script src="./js/adaptive-weekly-schedule.js?v=12230"></script>
 <script src="./js/app.js?v=12101"></script>
 </body>
 </html>

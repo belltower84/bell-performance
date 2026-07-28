@@ -163,12 +163,12 @@ async function bellRefreshCloudState() {
   bellCloud.state = state; bellCloud.today = today; bellCloud.intelligence = intelligence;
   if (intelligence?.plan_id) bellCloud.planId = intelligence.plan_id;
   bellCloud.lastSyncAt = new Date().toISOString(); bellCloud.lastError = ""; saveBellCloud();
-  renderBellCloudCard(); return { state, today, intelligence };
+  renderBellCloudCard(); if (typeof renderPremiumDashboard === "function") renderPremiumDashboard(); return { state, today, intelligence };
 }
 
 function bellDisconnect() {
   bellCloud = { ...bellCloudDefaults, apiBaseUrl: bellCloud.apiBaseUrl || bellCloudDefaults.apiBaseUrl };
-  saveBellCloud(); renderBellCloudCard();
+  saveBellCloud(); renderBellCloudCard(); if (typeof renderPremiumDashboard === "function") renderPremiumDashboard();
 }
 
 function bellCloudStatusText() {

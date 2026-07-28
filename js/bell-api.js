@@ -6,7 +6,7 @@
  */
 const BELL_CLOUD_KEY = "bellPerformanceCloudV1";
 const bellCloudDefaults = {
-  apiBaseUrl: "http://localhost:8000/api/v1",
+  apiBaseUrl: "https://bell-core-api.onrender.com/api/v1",
   token: "",
   userId: "",
   role: "athlete",

@@ -1,7 +1,7 @@
 "use strict";
-/* Bell Performance 13.6.0 — transparent coaching explanations and athlete-controlled memory. */
+/* Bell Performance 13.6.2 — refined Bell Coach workspace and athlete-controlled memory. */
 (function(){
-  const VERSION="13.6.0";
+  const VERSION="13.6.2";
   const $=id=>document.getElementById(id);
   const coachMode=()=>typeof bellCoachModeEnabled!=="function"||bellCoachModeEnabled();
   const esc=value=>typeof window.escapeHtml==="function"?window.escapeHtml(String(value??"")):String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
@@ -125,10 +125,13 @@
   }
   function ensureModal(){
     if($("bellCoachModal"))return;
-    document.body.insertAdjacentHTML("beforeend",`<div class="modal hidden bell134-modal" id="bellCoachModal" aria-hidden="true"><div class="modal-box bell134-modal-box"><div class="modal-header"><div><span class="metric-label">Bell Performance 13.4</span><h2 id="bellCoachModalTitle">Bell Coach</h2></div><button type="button" onclick="BellCoachIntelligence.close()">×</button></div><nav class="bell134-tabs" id="bellCoachTabs"><button data-coach-tab="now" class="active">Now</button><button data-coach-tab="why">Why</button><button data-coach-tab="memory">Memory</button><button data-coach-tab="history">Decisions</button></nav><div id="bellCoachModalBody"></div></div></div>`);
+    document.body.insertAdjacentHTML("beforeend",`<div class="modal hidden bell134-modal" id="bellCoachModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="bellCoachModalTitle" onclick="if(event.target===this)BellCoachIntelligence.close()"><div class="modal-box bell134-modal-box"><div class="bell134-shell-header"><div class="notification-header bell134-modal-header"><div class="bell134-modal-titleblock"><span class="metric-label">Bell Performance</span><h2 id="bellCoachModalTitle">Bell Coach</h2></div><button class="modal-close bell134-close" id="bellCoachClose" type="button" onclick="BellCoachIntelligence.close()" aria-label="Close Bell Coach">×</button></div><div class="bell134-tabs" id="bellCoachTabs" role="tablist" aria-label="Bell Coach sections"><button data-coach-tab="now" class="active" role="tab" aria-selected="true">Today</button><button data-coach-tab="why" role="tab" aria-selected="false">Why</button><button data-coach-tab="memory" role="tab" aria-selected="false">Memory</button><button data-coach-tab="history" role="tab" aria-selected="false">Decisions</button></div></div><div class="bell134-modal-body" id="bellCoachModalBody"></div></div></div>`);
     $("bellCoachTabs").addEventListener("click",event=>{const button=event.target.closest("[data-coach-tab]");if(button)openCenter(button.dataset.coachTab);});
+    $("bellCoachTabs").addEventListener("keydown",event=>{if(!["ArrowLeft","ArrowRight"].includes(event.key))return;const tabs=[...$("bellCoachTabs").querySelectorAll("[data-coach-tab]")],current=tabs.indexOf(document.activeElement);if(current<0)return;event.preventDefault();const next=(current+(event.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;tabs[next].focus();openCenter(tabs[next].dataset.coachTab);});
   }
-  function openWhy(topic="phase"){if(!coachMode())return;ensureModal();$("bellCoachModalTitle").textContent="Bell Coach · Why";$("bellCoachTabs").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.coachTab==="why"));$("bellCoachModalBody").innerHTML=explanationHtml(explanation(topic));$("bellCoachModal").classList.remove("hidden");$("bellCoachModal").setAttribute("aria-hidden","false");}
+  function setActiveTab(tab){$("bellCoachTabs")?.querySelectorAll("button").forEach(button=>{const active=button.dataset.coachTab===tab;button.classList.toggle("active",active);button.setAttribute("aria-selected",active?"true":"false");button.tabIndex=active?0:-1;});}
+  function showCoachModal(){const modal=$("bellCoachModal"),body=$("bellCoachModalBody"),wasHidden=modal?.classList.contains("hidden");if(body)body.scrollTop=0;modal?.classList.remove("hidden");modal?.setAttribute("aria-hidden","false");if(wasHidden)requestAnimationFrame(()=>$("bellCoachClose")?.focus({preventScroll:true}));}
+  function openWhy(topic="phase"){if(!coachMode())return;ensureModal();$("bellCoachModalTitle").textContent="Bell Coach · Why";setActiveTab("why");$("bellCoachModalBody").innerHTML=explanationHtml(explanation(topic));showCoachModal();}
   function topicButtons(){return [["mission","Mission"],["phase","Phase"],["progression","Progression"],["weekly_plan","Weekly Plan"],["recovery","Recovery"],["nutrition","Nutrition"],["milestone","Milestone"],["adaptation","Latest Change"]].map(([id,label])=>`<button type="button" onclick="BellCoachIntelligence.openWhy('${id}')">${label}</button>`).join("");}
   function memoriesHtml(){
     const memories=activeMemories(),prefs=coachingPreferences();if(!prefs.memoryEnabled)return `<div class="bell134-empty"><h3>Coaching memory is off</h3><p>Turn it on in Bell Coach settings to let repeated evidence improve future decisions.</p></div>`;
@@ -139,12 +142,12 @@
   function addMemoryForm(){return `<form class="bell134-add-memory" onsubmit="BellCoachIntelligence.addMemory(event)"><label>Tell Bell a durable preference or limitation<input id="bellMemoryObservation" maxlength="1000" required placeholder="Example: Neutral-grip pressing feels better on my shoulders."></label><button class="secondary" type="submit">Add confirmed memory</button><small>Explicit athlete statements are saved immediately and can be removed at any time.</small></form>`;}
   function historyHtml(){const rows=store().decisions;if(!rows.length)return `<div class="bell134-empty"><h3>No adaptations recorded yet</h3><p>Phase changes, readiness adjustments, and schedule decisions will appear here with their reasons.</p></div>`;return `<div class="bell134-history">${rows.map(x=>`<article><time>${esc(new Date(x.createdAt||Date.now()).toLocaleString())}</time><div><span>${esc(x.source||"Bell")}</span><h3>${esc(x.title)}</h3><p>${esc(x.explanation)}</p>${x.changes?.length?`<small>${esc(x.changes.join(" · "))}</small>`:""}</div></article>`).join("")}</div>`;}
   function openCenter(tab="now"){
-    if(!coachMode())return;analyze();ensureModal();const modal=$("bellCoachModal"),body=$("bellCoachModalBody"),s=summary();$("bellCoachModalTitle").textContent="Bell Coach";$("bellCoachTabs").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.coachTab===tab));
+    if(!coachMode())return;analyze();ensureModal();const body=$("bellCoachModalBody"),s=summary();$("bellCoachModalTitle").textContent="Bell Coach";setActiveTab(tab);
     if(tab==="now")body.innerHTML=`<article class="bell134-now"><span class="metric-label">Current Coaching Direction</span><h2>${esc(s.headline)}</h2><h3>${esc(s.instruction)}</h3><p>${esc(s.reason)}</p><div><span>Next focus</span><strong>${esc(s.nextFocus)}</strong></div><small>${esc(s.memoryContext)} · ${esc(s.confidence)} confidence</small><button class="good" type="button" onclick="BellCoachIntelligence.openWhy('mission')">Why this Mission?</button></article>`;
     else if(tab==="why")body.innerHTML=`<div class="bell134-topic-grid">${topicButtons()}</div>${explanationHtml(explanation("phase"))}`;
     else if(tab==="memory")body.innerHTML=memoriesHtml();
     else body.innerHTML=historyHtml();
-    modal.classList.remove("hidden");modal.setAttribute("aria-hidden","false");
+    showCoachModal();
   }
   function close(){const modal=$("bellCoachModal");if(modal){modal.classList.add("hidden");modal.setAttribute("aria-hidden","true");}}
   function removeMemory(key,id,cloud){

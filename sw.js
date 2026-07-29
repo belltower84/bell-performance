@@ -1,12 +1,12 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13.6.1-quick-daily-check-in';
+const CACHE_NAME = 'bell-performance-13.6.2-refined-coach-workspace';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./css/app.css?v=12211",
   "./css/bell13.css?v=13300",
-  "./css/bell134.css?v=13400",
+  "./css/bell134.css?v=13620",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/icons/engine-shoe.svg?v=10006",
   "./assets/icons/engine-mark.svg?v=10006",
@@ -60,7 +60,7 @@ const CORE = [
   "./js/bell-coaching-engine.js?v=13200",
   "./js/bell13-dashboard.js?v=13200",
   "./js/bell13-athlete-experience.js?v=13600",
-  "./js/bell13-coach-intelligence.js?v=13600",
+  "./js/bell13-coach-intelligence.js?v=13620",
   "./css/bell135.css?v=13610",
   "./js/bell13-commercial-home.js?v=13610",
 ];

@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 13.6.1",
+  "name": "Bell Performance 13.6.2",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Performance training with selectable Workout Planner and adaptive Bell Coach modes, a 10-second daily check-in, readiness scoring, renewable Journeys, and Bell Core synchronization."
+  "description": "Performance training with selectable Workout Planner and adaptive Bell Coach modes, a 10-second daily check-in, readiness scoring, a refined Bell Coach workspace, renewable Journeys, and Bell Core synchronization."
 }

@@ -9,10 +9,10 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
-<title>Bell Performance 13.6.1 — 10-Second Readiness</title>
+<title>Bell Performance 13.6.2 — Refined Bell Coach</title>
 <link href="./css/app.css?v=12211" rel="stylesheet"/>
 <link href="./css/bell13.css?v=13300" rel="stylesheet"/>
-<link href="./css/bell134.css?v=13400" rel="stylesheet"/>
+<link href="./css/bell134.css?v=13620" rel="stylesheet"/>
 <link href="./css/bell135.css?v=13610" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -53,14 +53,15 @@ main{display:block}.screen{display:none}.screen.active{display:block}
         <div class="command-score-ring" id="commandReadinessRing"><div><strong id="premiumReadinessScore">—</strong><small>/100</small><b id="premiumReadinessStatus">CHECK IN</b></div></div>
         <div class="command-readiness-metrics">
           <span>Sleep <b id="premiumSleep">—</b></span>
-          <span>Body <b id="premiumBody">—</b></span>
+          <span>Soreness <b id="premiumSoreness">—</b></span>
           <span>Energy <b id="premiumEnergy">—</b></span>
+          <span>Body <b id="premiumBody">—</b></span>
           <span>Pain <b id="commandPain">—</b></span>
           <span>Time <b id="commandTime">—</b></span>
         </div>
       </div>
       <p class="command-visually-hidden" id="premiumReadinessDetail">Complete today’s check-in to personalize your training.</p>
-      <button class="command-text-action premium-readiness-update" onclick="openDailyReadiness()" type="button">Update Check-In ›</button>
+      <button class="command-text-action premium-readiness-update" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')" type="button">Update Check-In ›</button>
     </article>
 
     <article class="command-card command-briefing">
@@ -141,7 +142,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="mission-status-card green" id="trainingStatusCard">
 <div class="status-emblem"><div class="status-shield">✓</div></div>
 <div class="status-copy"><span class="metric-label">Mission Status</span><strong id="trainingStatusOut">Ready to Train</strong><p id="missionPurpose">You are recovered and cleared for a full training day.</p><button class="ghost-button" onclick="document.getElementById('readinessDetailPanel').classList.toggle('hidden')">Why am I here? ›</button></div>
-<div class="readiness-summary"><div class="readiness-summary-header"><span class="metric-label">Today's Readiness</span><button class="readiness-checkin-button" onclick="openDailyReadiness()">Update Check-In</button></div><div class="readiness-line"><span>☾ Sleep</span><b id="dashSleep">Good</b><i></i></div><div class="readiness-line"><span>♨ Body</span><b id="dashBody">Normal</b><i></i></div><div class="readiness-line"><span>ϟ Energy</span><b id="dashEnergy">High</b><i></i></div><div class="readiness-line"><span>⚠ Pain</span><b id="dashPain">None</b><i></i></div><div class="readiness-line"><span>◷ Time</span><b id="dashTime">60–75 min</b><i></i></div></div>
+<div class="readiness-summary"><div class="readiness-summary-header"><span class="metric-label">Today's Readiness</span><button class="readiness-checkin-button" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')">Update Check-In</button></div><div class="readiness-line"><span>☾ Sleep</span><b id="dashSleep">Good</b><i></i></div><div class="readiness-line"><span>♨ Soreness</span><b id="dashSoreness">Low</b><i></i></div><div class="readiness-line"><span>ϟ Energy</span><b id="dashEnergy">High</b><i></i></div><div class="readiness-line"><span>⚠ Pain</span><b id="dashPain">None</b><i></i></div><div class="readiness-line"><span>◷ Time</span><b id="dashTime">60–75 min</b><i></i></div></div>
 </div>
 <div class="card hidden" id="readinessDetailPanel"><div class="hint" id="readinessExplanation">Your readiness details will appear here.</div></div>
 <div class="dashboard-grid readiness-dashboard-grid">
@@ -159,7 +160,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="hidden" id="todayPreview"></div>
 <div class="recovery-prescription-card" id="recoveryPrescriptionCard"><div class="recovery-icon">♿</div><div><span class="metric-label">Today's Recovery Prescription</span><strong id="mobilityDashboardTitle">10 min Mobility Flow</strong><div class="hint" id="mobilityDashboardDetail">Matched to today's training • Complete morning or evening</div></div><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">›</button></div>
 <div class="quick-actions"><button onclick="document.getElementById('nutritionMode').scrollIntoView({behavior:'smooth'})"><span>🍴</span><strong>Nutrition</strong><small>Fuel the mission</small></button><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})"><span>♡</span><strong>Recovery</strong><small>Rest. Recover. Rebuild.</small></button><button onclick="showScreen('history')"><span>▥</span><strong>Progress</strong><small>Track results</small></button><button onclick="showScreen('habits')"><span>◎</span><strong>Habits</strong><small>Build consistency</small></button></div>
-<div class="card readiness-access-note"><div><span class="metric-label">Daily Readiness</span><strong>Check-in available at the top of your dashboard</strong><div class="hint">Use the Update Check-In button inside Mission Status whenever your readiness changes.</div></div><button class="secondary" onclick="window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=&gt;openDailyReadiness(),350)">Open Check-In</button></div>
+<div class="card readiness-access-note"><div><span class="metric-label">Daily Readiness</span><strong>Check-in available at the top of your dashboard</strong><div class="hint">Use the Update Check-In button inside Mission Status whenever your readiness changes.</div></div><button class="secondary" onclick="window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=&gt;document.getElementById('dailyReadinessModal').classList.remove('hidden'),350)">Open Check-In</button></div>
 <div class="card"><h3>Current Training Block</h3><div class="status-line"><div><div class="mission-title" id="blockTitle">No active block</div><div class="sub" id="blockStatus">Build a goal-based plan in More.</div></div><div class="pill" id="blockWeekPill">—</div></div><div class="mini-progress"><div id="blockProgressBar"></div></div><div class="hint" id="blockRunSummary"></div><button class="secondary" id="advanceBlockButton" onclick="openWeeklyDebrief(true)">Complete Week</button></div>
 <div class="card upcoming-block-card hidden" id="upcomingBlockCard"><div class="card-title-row"><div><span class="metric-label">Upcoming Training Block</span><h3 id="upcomingBlockTitle">New Training Block</h3></div><span class="pill">Scheduled</span></div><div class="mission-title" id="upcomingBlockFocus"></div><div class="hint" id="upcomingBlockStart"></div><div class="row"><button class="secondary" onclick="activateUpcomingBlockNow()">Start Today</button><button class="danger" onclick="cancelUpcomingBlock()">Cancel</button></div></div>
 <div class="card"><h3>Coach Guidance</h3><div class="mission-title" id="coachHeadline">Today's guidance</div><div class="hint" id="coachRecommendation"></div></div>
@@ -649,7 +650,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.6.1-quick-daily-check-in";</script>
+<script>window.BELL_APP_VERSION = "13.6.2-refined-coach-workspace";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=10006"></script>
 <script src="./js/storage.js?v=13610"></script>
@@ -669,13 +670,13 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/quote-cache.js?v=10006"></script>
 <script src="./js/ui.js?v=13610"></script>
 <script src="./js/habits.js?v=10006"></script>
-<script src="./js/dual-goals.js?v=13610"></script>
+<script src="./js/dual-goals.js?v=10006"></script>
 <script src="./js/version-8.js?v=13600"></script>
 <script src="./js/mission-planner.js?v=10006"></script>
 <script src="./js/coaching-pathways.js?v=13600"></script>
 <script src="./js/event-coaching.js?v=13600"></script>
 <script src="./js/how-to.js?v=10006"></script>
-<script src="./js/premium-dashboard.js?v=13610"></script>
+<script src="./js/premium-dashboard.js?v=11000"></script>
 <script src="./js/block-lifecycle.js?v=10006"></script>
 <script src="./js/weekly-debrief.js?v=10006"></script>
 <script src="./js/plan-progress.js?v=10006"></script>
@@ -689,7 +690,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/bell-coaching-engine.js?v=13200"></script>
 <script src="./js/bell13-dashboard.js?v=13200"></script>
 <script src="./js/bell13-athlete-experience.js?v=13600"></script>
-<script src="./js/bell13-coach-intelligence.js?v=13600"></script>
-<script src="./js/bell13-commercial-home.js?v=13610"></script>
+<script src="./js/bell13-coach-intelligence.js?v=13620"></script>
+<script src="./js/bell13-commercial-home.js?v=13600"></script>
 </body>
 </html>

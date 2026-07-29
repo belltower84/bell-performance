@@ -1,6 +1,6 @@
-# Bell Performance 13.6.1 — 10-Second Daily Check-In
+# Bell Performance 13.6.2 — Readiness, Application Control & Refined Coach
 
-Bell Performance is a local-first training application with two control modes. Version 13.6.1 replaces the long daily readiness form with a fast five-tap check-in built around sleep, body recovery, energy, pain, and time available.
+Bell Performance is a local-first training application with two control modes. Version 13.6 adds a functional readiness dashboard, lets each athlete choose between a fixed Workout Planner and adaptive Bell Coach experience, and provides a dedicated Coach workspace with stable top navigation and unobstructed scrolling.
 
 ## Product blueprint
 
@@ -54,8 +54,7 @@ Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, 
 - Register or sign in to Bell Core from Settings.
 - Create, retrieve, and partially update the normalized athlete profile.
 - Sync the current mission, discipline, Journey, and multiweek plan.
-- Submit a 10-second readiness check-in and receive discipline-aware adaptation in Bell Coach mode. Workout Planner keeps readiness local and informational.
-- Time available changes session length without lowering the readiness score. Pain is handled as a separate safety override rather than ordinary soreness.
+- Submit readiness and receive discipline-aware adaptation in Bell Coach mode. Workout Planner keeps readiness local and informational.
 - Start and complete Bell Core sessions in the guided workout player.
 - Continue using Bell locally when Bell Core is unavailable.
 
@@ -63,8 +62,8 @@ Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, 
 
 - [`BELL_ATHLETE_EXPERIENCE_13_3.md`](BELL_ATHLETE_EXPERIENCE_13_3.md)
 - [`BELL_COACHING_ENGINE_13_2.md`](BELL_COACHING_ENGINE_13_2.md)
-- [`RELEASE_NOTES_13_6_1.md`](RELEASE_NOTES_13_6_1.md)
-- [`VALIDATION_13_6_1.md`](VALIDATION_13_6_1.md)
+- [`RELEASE_NOTES_13_6_2.md`](RELEASE_NOTES_13_6_2.md)
+- [`VALIDATION_13_6_2.md`](VALIDATION_13_6_2.md)
 
 ## Local use
 

@@ -1,0 +1,13 @@
+BELL PERFORMANCE 13.6.2 INSTALLATION
+
+1. Extract Bell_Performance_13_6_2_GitHub_Ready.zip.
+2. Copy all extracted files into the root of the existing Bell Performance repository.
+3. Choose Replace files in the destination.
+4. In GitHub Desktop, review the changed files.
+5. Commit with:
+   Refine Bell Coach screen navigation and layout
+6. Push the active deployment branch.
+
+Do not place the extracted build inside an extra nested folder.
+
+No database migration is required. After deployment, refresh once or close and reopen the installed PWA so the 13.6.2 service worker replaces the previous cached interface.

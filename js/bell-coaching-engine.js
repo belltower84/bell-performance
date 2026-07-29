@@ -3,7 +3,7 @@
    This local engine mirrors the Bell Core Journey contract so Mission Control
    remains useful offline and during cloud transitions. */
 (function(){
-  const VERSION="13.1.0";
+  const VERSION="13.2.0";
   const MAX_WEEKS=52;
   const appData=()=>typeof data!=="undefined"?data:null;
   const clean=value=>String(value??"").replace(/\s+/g," ").trim();
@@ -38,13 +38,19 @@
   function objective(identity,isEvent){
     if(isEvent)return"Prepare for Competition";
     const settings=appData()?.settings||{},block=appData()?.trainingBlock||{},dual=block.dualGoals||{};
-    const text=[settings.secondaryTrainingGoal,block.secondaryGoal,block.goalType,dual.strengthGoal,dual.engineGoal,appData()?.nutrition?.goal].filter(Boolean).join(" ").toLowerCase();
-    if(/fat loss|weight loss|lose fat|cut/.test(text))return"Lose Fat";
-    if(/recomp|body composition/.test(text))return"Body Recomposition";
-    if(/muscle gain|build muscle|bodybuild|hypertrophy|size/.test(text))return"Build Muscle";
-    if(/strength|squat|bench|deadlift/.test(text))return"Increase Strength";
-    if(/conditioning|work capacity|engine/.test(text))return"Improve Conditioning";
+    const primary=[settings.secondaryTrainingGoal,block.secondaryGoal,block.goalType,appData()?.nutrition?.goal].filter(Boolean).join(" ").toLowerCase();
+    const supporting=[dual.strengthGoal,dual.engineGoal].filter(Boolean).join(" ").toLowerCase();
+    if(/fat loss|weight loss|lose fat|cut/.test(primary))return"Lose Fat";
+    if(/recomp|body composition/.test(primary))return"Body Recomposition";
+    if(/muscle gain|build muscle|bodybuild|hypertrophy|size/.test(primary))return"Build Muscle";
+    if(/conditioning|work capacity|engine/.test(primary))return"Improve Conditioning";
+    if(/maintain|readiness|longevity/.test(primary))return"Maintain Performance";
+    if(/strength|squat|bench|deadlift/.test(primary))return"Increase Strength";
+    if(identity==="Powerlifting")return"Increase Strength";
+    if(identity==="Bodybuilding")return"Build Muscle";
     if(identity==="Endurance Athlete")return"Improve Endurance";
+    if(["Tactical Athlete","Functional Fitness","Hybrid Athlete"].includes(identity))return"Improve Performance";
+    if(/recomp|body composition|fat loss/.test(supporting))return"Body Recomposition";
     return"Continuous Development";
   }
   function eventInfo(){
@@ -174,7 +180,7 @@
     let cursor=1;const ids={};
     return source.map((item,index)=>{
       const base=slug(item.name);ids[base]=(ids[base]||0)+1;const id=ids[base]===1?base:`${base}_${ids[base]}`;const length=lengths[index];
-      const out={id,name:item.name,startWeek:cursor,endWeek:cursor+length-1,durationWeeks:length,purpose:item.purpose,trainingEmphasis:item.trainingEmphasis,milestone:item.milestone,objectives:item.objectives||[],status:"upcoming"};cursor+=length;return out;
+      const out={id,name:item.name,startWeek:cursor,endWeek:cursor+length-1,durationWeeks:length,purpose:item.purpose,trainingEmphasis:item.trainingEmphasis,milestone:item.milestone,objectives:item.objectives||[],progressionRule:item.progressionRule||"Progress one meaningful variable while preserving technical quality.",loadPhase:item.loadPhase||"Build",status:"upcoming"};cursor+=length;return out;
     });
   }
   function priorities(identity,goal,isEvent){
@@ -198,7 +204,9 @@
     const eventWeeks=event.isEvent?weeksUntil(event.target):null;
     const savedLength=Number(block.lengthWeeks)||12;
     const total=event.isEvent?clamp(eventWeeks||savedLength,4,MAX_WEEKS):clamp(savedLength,8,MAX_WEEKS);
-    const templates=event.isEvent?eventTemplates(identity,total):continuousTemplates(identity,goal);
+    const discipline=window.BellDisciplineLibrary?.resolve(identity,goal,[block.goalType,block.secondaryGoal].filter(Boolean).join(" "))||null;
+    const libraryTemplates=window.BellDisciplineLibrary?.journeyTemplates(identity,goal,event.isEvent?"event_preparation":"continuous_development",total);
+    const templates=Array.isArray(libraryTemplates)&&libraryTemplates.length?libraryTemplates:(event.isEvent?eventTemplates(identity,total):continuousTemplates(identity,goal));
     const phases=allocate(templates,total);
     return {
       engineVersion:VERSION,
@@ -214,6 +222,9 @@
       totalWeeks:total,
       planningHorizonWeeks:total,
       priorities:priorities(identity,goal,event.isEvent),
+      discipline,
+      disciplineLibraryVersion:discipline?.libraryVersion||VERSION,
+      continuousPolicy:event.isEvent?null:{mode:"renewable_cycles",cycleRotation:discipline?.cycleRotation||[],renewalTrigger:"Complete assessment and recovery, then begin the next cycle without resetting completed history.",selectionRule:"Select the next bias from objective priority, weakest assessment metric, adherence, and recovery response.",extensionRule:"Extend a productive phase when progress continues and recovery remains stable.",recoveryRule:"Insert or advance recovery when readiness, pain, illness, or adherence risk exceeds tolerance."},
       phases,
       fingerprint:fingerprint(identity,goal,event,total),
       createdAt:new Date().toISOString()
@@ -222,12 +233,16 @@
   function stateForWeek(base,week){
     if(!base)return null;
     const out=JSON.parse(JSON.stringify(base));
-    const total=Math.max(1,Number(out.totalWeeks)||1),currentWeek=clamp(week,1,total)||1;
-    let current=out.phases.find(item=>currentWeek>=item.startWeek&&currentWeek<=item.endWeek)||out.phases[out.phases.length-1];
-    out.phases.forEach(item=>item.status=item.endWeek<currentWeek?"complete":item.id===current?.id?"current":"upcoming");
+    const total=Math.max(1,Number(out.totalWeeks)||1),requested=Math.max(1,Number(week)||1),continuous=out.mode==="continuous_development";
+    const cycleNumber=continuous?Math.floor((requested-1)/total)+1:1;
+    const cycleWeek=continuous?((requested-1)%total)+1:clamp(requested,1,total)||1;
+    let current=out.phases.find(item=>cycleWeek>=item.startWeek&&cycleWeek<=item.endWeek)||out.phases[out.phases.length-1];
+    out.phases.forEach(item=>item.status=item.endWeek<cycleWeek?"complete":item.id===current?.id?"current":"upcoming");
     current=out.phases.find(item=>item.id===current?.id)||current;
-    const next=out.phases.find(item=>item.startWeek>currentWeek)||null;
-    return {...out,currentWeek,progressPercent:clamp(Math.round(currentWeek/total*100),0,100),currentPhase:current,currentPhaseId:current?.id,currentPhaseName:current?.name||"Foundation",phaseWeek:current?currentWeek-current.startWeek+1:1,phaseLength:current?.durationWeeks||total,nextPhase:next,nextMilestone:current?.milestone||next?.milestone||"Complete the current phase",status:currentWeek>=total?"complete":"on_plan"};
+    let next=out.phases.find(item=>item.startWeek>cycleWeek)||null;
+    const nextCycleEmphasis=continuous?(window.BellDisciplineLibrary?.nextCycleEmphasis(out.identity,out.objective,cycleNumber+1)||null):null;
+    if(continuous&&!next&&out.phases.length)next={...out.phases[0],status:"upcoming",cycleNumber:cycleNumber+1,cycleEmphasis:nextCycleEmphasis};
+    return {...out,requestedWeek:requested,currentWeek:continuous?requested:cycleWeek,cycleNumber,cycleWeek,cycleLength:total,cycleEmphasis:continuous?(window.BellDisciplineLibrary?.nextCycleEmphasis(out.identity,out.objective,cycleNumber)||out.name):out.name,nextCycleEmphasis,progressPercent:clamp(Math.round(cycleWeek/total*100),0,100),currentPhase:current,currentPhaseId:current?.id,currentPhaseName:current?.name||"Foundation",phaseWeek:current?cycleWeek-current.startWeek+1:1,phaseLength:current?.durationWeeks||total,nextPhase:next,nextMilestone:current?.milestone||next?.milestone||"Complete the current phase",status:continuous&&cycleWeek>=total?"cycle_review":!continuous&&cycleWeek>=total?"complete":"on_plan"};
   }
   function sync(options={}){
     if(!appData())return null;
@@ -256,18 +271,22 @@
   function explain(topic="phase"){
     const state=getState({persist:false});if(!state)return"Bell is still building your coaching state.";
     const phase=state.currentPhase||{};
-    if(topic==="journey")return`${state.name} was built from your ${state.identity} identity, ${state.objective.toLowerCase()} objective, schedule, and ${state.modeLabel.toLowerCase()} timeline.`;
-    if(topic==="milestone")return`${state.nextMilestone} is the next checkpoint because it confirms whether ${phase.name} produced the intended adaptation before Bell advances the Journey.`;
-    return`You are in ${phase.name} because the current priority is ${phase.purpose?.toLowerCase()||"building the next required adaptation"} Bell will advance, extend, or recover based on progress, adherence, and readiness.`;
+    if(topic==="journey")return`${state.name} uses the ${state.discipline?.label||state.identity} coaching library because your objective is ${state.objective.toLowerCase()}. ${state.mode==="continuous_development"?`Bell will renew the Journey in cycles; this is Cycle ${state.cycleNumber}, biased toward ${state.cycleEmphasis}.`:"The event date determines how Bell builds backward from performance day."}`;
+    if(topic==="milestone")return`${state.nextMilestone} is the next checkpoint because it confirms whether ${phase.name} produced the intended adaptation before Bell advances, extends, or recovers.`;
+    if(topic==="progression")return phase.progressionRule||state.discipline?.progression||"Progress one meaningful variable while preserving technical quality.";
+    return`You are in ${phase.name} because ${phase.purpose?.toLowerCase()||"Bell is building the next required adaptation"} Progression rule: ${phase.progressionRule||state.discipline?.progression||"preserve quality before adding demand"}`;
   }
   function renderPlanTimeline(){
     const host=document.getElementById("planProgressArea");if(!host)return;
     const state=getState({persist:false});if(!state)return;
+    const discipline=state.discipline||window.BellDisciplineLibrary?.resolve(state.identity,state.objective)||{};
+    const architecture=discipline.weeklyArchitecture||{};
     host.innerHTML=`<section class="bell13-plan-overview" aria-labelledby="bellJourneyPlanTitle">
-      <div class="bell13-plan-overview-head"><div><span class="bell13-eyebrow">Current Journey</span><h3 id="bellJourneyPlanTitle">${escapeHtml(state.name)}</h3><p>${escapeHtml(state.identity)} · ${escapeHtml(state.objective)} · ${escapeHtml(state.modeLabel)}</p></div><div class="bell13-plan-week"><strong>Week ${state.currentWeek}</strong><span>of ${state.totalWeeks}</span></div></div>
+      <div class="bell13-plan-overview-head"><div><span class="bell13-eyebrow">Current Journey</span><h3 id="bellJourneyPlanTitle">${escapeHtml(state.name)}</h3><p>${escapeHtml(discipline.label||state.identity)} · ${escapeHtml(state.objective)} · ${escapeHtml(state.modeLabel)}</p></div><div class="bell13-plan-week"><strong>${state.mode==="continuous_development"?`Cycle ${state.cycleNumber}`:`Week ${state.currentWeek}`}</strong><span>${state.mode==="continuous_development"?`Week ${state.cycleWeek} of ${state.cycleLength}`:`of ${state.totalWeeks}`}</span></div></div>
       <div class="bell13-plan-progress"><i style="width:${state.progressPercent}%"></i></div>
+      <article class="bell13-discipline-card"><div><span class="bell13-eyebrow">Coaching Library</span><h4>${escapeHtml(discipline.label||state.identity)}</h4><p>${escapeHtml(discipline.promise||"")}</p></div><div class="bell13-discipline-grid"><div><span>Weekly architecture</span><strong>${architecture.strength||0} Strength · ${architecture.engine||0} Engine</strong></div><div><span>Progression</span><strong>${escapeHtml(state.currentPhase?.progressionRule||discipline.progression||"")}</strong></div><div><span>Protected first</span><strong>${escapeHtml((discipline.protectedSessions||[]).slice(0,3).join(" · "))}</strong></div><div><span>${state.mode==="continuous_development"?"Next cycle bias":"Assessment focus"}</span><strong>${escapeHtml(state.mode==="continuous_development"?(state.nextCycleEmphasis||"Assessment-driven"):(discipline.assessments||[]).slice(0,2).join(" · "))}</strong></div></div><button type="button" class="bell13-why-button" onclick="alert(BellCoachingEngine.explain('progression'))">Why this progression?</button></article>
       <div class="bell13-phase-timeline">${state.phases.map(item=>`<article class="bell13-phase-node ${item.status}" data-phase="${escapeHtml(item.id)}"><span>${item.status==="complete"?"✓":item.status==="current"?"◆":"○"}</span><div><small>Weeks ${item.startWeek}–${item.endWeek}</small><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.purpose)}</p>${item.status==="current"?`<button type="button" class="bell13-why-button" onclick="alert(BellCoachingEngine.explain('phase'))">Why this phase?</button>`:""}</div></article>`).join("")}</div>
-      <div class="bell13-plan-footer"><div><span>Next milestone</span><strong>${escapeHtml(state.nextMilestone)}</strong></div><div><span>Next phase</span><strong>${escapeHtml(state.nextPhase?.name||"Journey review")}</strong></div></div>
+      <div class="bell13-plan-footer"><div><span>Next milestone</span><strong>${escapeHtml(state.nextMilestone)}</strong></div><div><span>${state.mode==="continuous_development"&&!state.nextPhase?.name?"Next cycle":"Next phase"}</span><strong>${escapeHtml(state.nextPhase?.name||state.nextCycleEmphasis||"Journey review")}</strong></div></div>
     </section>`;
   }
   function escapeHtml(value){

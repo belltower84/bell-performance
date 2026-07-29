@@ -8,8 +8,9 @@ from pathlib import Path
 from typing import Any
 
 from .session_builder import BellSessionBuilder
+from .discipline_library import BellDisciplineLibrary
 
-VERSION = "0.1.1"
+VERSION = "13.2.0"
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
@@ -167,7 +168,7 @@ class BellWeeklyPlanningEngine:
 
     def _build_engine_session(self, name: str, template: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
         rx = copy.deepcopy(template["engine_prescription"])
-        phase = request.get("phase", "Build")
+        phase = request.get("load_phase") or request.get("phase", "Build")
         modifier = self.rules["phase_modifiers"].get(phase, self.rules["phase_modifiers"]["Build"])["volume"]
         if "duration_minutes" in rx:
             rx["duration_minutes"] = max(15, round(rx["duration_minutes"] * modifier))
@@ -187,7 +188,7 @@ class BellWeeklyPlanningEngine:
             "session_type": template.get("session_type", "strength"),
             "primary_adaptation": template.get("slots", [{}])[0].get("adaptation", "General Strength"),
             "bell_system": request.get("bell_system", "Performance"),
-            "phase": request.get("phase", "Build"),
+            "phase": request.get("load_phase") or request.get("phase", "Build"),
             "athlete_skill": request.get("athlete_skill", "Intermediate"),
             "readiness": request.get("readiness", 7),
             "max_systemic_fatigue": request.get("max_systemic_fatigue", 9),
@@ -282,15 +283,26 @@ class BellWeeklyPlanningEngine:
         profile = self.rules["mission_profiles"][mission_key]
         objectives = request.get("weekly_objectives") or profile["objectives"]
         available_days = self._available_days(request)
-        strength_target = max(0, int(request.get("strength_days", 0) or 0))
-        engine_target = max(0, int(request.get("engine_days", 0) or 0))
-        if mission_key in ("powerlifting", "powerlifting_meet"):
-            strength_target = min(4, strength_target or 4)
-            if mission_key == "powerlifting_meet" and request.get("phase") in ("Taper & Openers", "Meet Week"):
-                engine_target = 0
-            else:
-                engine_target = min(1 if mission_key == "powerlifting_meet" else 2, engine_target if engine_target else 1)
-        defaults = list(profile["default_sessions"])
+        requested_strength = max(0, int(request.get("strength_days", 0) or 0))
+        requested_engine = max(0, int(request.get("engine_days", 0) or 0))
+        identity = str(request.get("identity") or request.get("discipline") or request.get("goal") or mission_key)
+        objective = str(request.get("objective") or request.get("goal") or "Continuous Development")
+        journey_phase = str(request.get("journey_phase") or request.get("phase") or "Foundation")
+        discipline_library = BellDisciplineLibrary()
+        discipline_rules = discipline_library.weekly_rules(
+            identity, objective, journey_phase,
+            training_days=max(2, min(7, int(request.get("training_days", len(available_days)) or len(available_days)))),
+            requested_strength=requested_strength or None,
+            requested_engine=requested_engine if request.get("engine_days") is not None else None,
+        )
+        strength_target = discipline_rules["strength_target"]
+        engine_target = discipline_rules["engine_target"]
+        request = copy.deepcopy(request)
+        request["load_phase"] = discipline_rules["load_phase"]
+        defaults = [name for name in discipline_rules["session_order"] if name in self.rules["session_templates"]]
+        for name in profile["default_sessions"]:
+            if name not in defaults:
+                defaults.append(name)
         strength_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") != "engine"]
         engine_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") == "engine"]
         if not strength_target and not engine_target:
@@ -358,20 +370,35 @@ class BellWeeklyPlanningEngine:
             "rulebook_version": self.rules["rulebook_version"],
             "mission": request.get("mission") or request.get("goal") or mission_key,
             "mission_profile": mission_key,
+            "discipline": discipline_rules["discipline_id"],
+            "discipline_label": discipline_rules["discipline_label"],
             "phase": request.get("phase", "Build"),
+            "journey_phase": journey_phase,
+            "load_phase": discipline_rules["load_phase"],
             "competition_date": request.get("competition_date"),
             "weeks_to_competition": request.get("weeks_to_competition"),
             "weekly_objectives": objectives,
             "schedule": schedule,
             "validation": validation,
-            "coach_summary": f"Bell built a {len(built_sessions)}-session {mission_key.replace('_', ' ')} week with a score of {validation['bell_score']}.",
+            "coach_summary": f"Bell built a {len(built_sessions)}-session {discipline_rules['discipline_label']} week for {journey_phase} with a score of {validation['bell_score']}.",
+            "coaching_rules": {
+                "protected_sessions": discipline_rules["protected_sessions"],
+                "progression_rule": discipline_rules["progression_rule"],
+                "missed_session_rule": discipline_rules["missed_session_rule"],
+                "readiness_yellow": discipline_rules["readiness_yellow"],
+                "readiness_red": discipline_rules["readiness_red"],
+                "assessment_metrics": discipline_rules["assessment_metrics"],
+                "weekly_architecture": discipline_rules["weekly_architecture"],
+                "discipline_library_version": discipline_library.version,
+            },
             "decision_trace": {
                 "available_days": available_days,
                 "requested_training_days": requested_sessions,
                 "requested_strength_exposures": strength_target,
                 "requested_engine_exposures": engine_target,
                 "selected_session_templates": sessions,
-                "rules_applied": ["mission profile", "phase modifiers", "recovery spacing", "weekly fatigue limits", "week scoring"],
+                "rules_applied": ["discipline library", "journey phase", "mission profile", "phase modifiers", "recovery spacing", "weekly fatigue limits", "week scoring"],
+                "discipline_session_order": discipline_rules["session_order"],
             },
         }
 

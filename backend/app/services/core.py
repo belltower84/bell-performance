@@ -19,6 +19,7 @@ from intelligence.coaching_reasoning import BellCoachingReasoningEngine
 from intelligence.intelligence_orchestrator import BellIntelligenceOrchestrator
 from intelligence.learning_engine import BellLearningEngine
 from intelligence.journey_planner import BellJourneyPlanner, event_timeline_weeks
+from intelligence.discipline_library import BellDisciplineLibrary
 from intelligence.pattern_recognition import BellPatternRecognitionEngine
 from intelligence.session_builder import BellSessionBuilder
 from intelligence.weekly_planner import BellWeeklyPlanningEngine
@@ -518,7 +519,9 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
     mission = orchestrated["mission"]
     program = orchestrated["program"]
     journey_planner = BellJourneyPlanner()
+    discipline_library = BellDisciplineLibrary()
     journey = journey_planner.build(request, mission, program, profile, current_week=1)
+    discipline = journey.get("discipline") or discipline_library.get(journey.get("identity", ""), journey.get("objective", ""), request.get("goal", ""))
     constraints = mission.get("constraints", {})
     training_days = max(2, min(6, int(constraints.get("training_days", 4))))
     session_minutes = max(20, min(180, int(constraints.get("session_minutes", 60))))
@@ -546,6 +549,11 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
                 "specialization": " ".join(mission.get("required_adaptations", [])),
                 "event": competition.get("type") if competition else None,
                 "phase": phase,
+                "journey_phase": journey_phase.get("name"),
+                "journey_training_emphasis": journey_phase.get("training_emphasis"),
+                "identity": journey.get("identity"),
+                "objective": journey.get("objective"),
+                "discipline": discipline.get("id"),
                 "bell_system": "Performance",
                 "athlete_skill": str(profile.get("training_experience", "Intermediate")).title(),
                 "readiness": max(1, min(10, round(float(state.get("readiness", {}).get("current", 70)) / 10))),
@@ -595,6 +603,9 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
                 "journey_phase_length": int(journey_phase.get("duration_weeks", 1)),
                 "journey_purpose": journey_phase.get("purpose"),
                 "journey_milestone": journey_phase.get("milestone"),
+                "discipline": discipline.get("id"),
+                "discipline_label": discipline.get("label"),
+                "coaching_rules": weekly.get("coaching_rules", {}),
                 "objectives": week_detail.get("objectives") or block.get("objectives"),
                 "purpose": week_detail.get("purpose"), "testing": week_detail.get("testing", False),
                 "schedule": [{k: v for k, v in item.items() if k != "session"} for item in weekly["schedule"]],
@@ -608,6 +619,7 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
     payload = {
         "mission": mission,
         "journey": journey,
+        "discipline": discipline,
         "periodization": orchestrated["periodization"],
         "program": program,
         "weeks": weeks,
@@ -615,6 +627,7 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
         "engine_manifest": {
             "mission_compiler": mission.get("mission_compiler_version"),
             "journey_planner": journey.get("journey_engine_version"),
+            "discipline_library": discipline_library.version,
             "periodization": orchestrated["periodization"].get("periodization_engine_version"),
             "block_programming": program.get("block_programming_version"),
             "performance_forecast": (orchestrated.get("forecast") or {}).get("performance_forecast_version"),
@@ -624,7 +637,7 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
             "pattern_recognition": (orchestrated.get("patterns") or {}).get("pattern_recognition_version"),
             "digital_twin": (orchestrated.get("simulation") or {}).get("digital_twin_simulation_version"),
             "intelligence_orchestrator": orchestrated.get("intelligence_orchestrator_version"),
-            "weekly_planner": "0.2.0", "session_builder": "0.1.0", "exercise_selection": "0.1.0",
+            "weekly_planner": "13.2.0", "session_builder": "0.1.0", "exercise_selection": "0.1.0",
             "adaptive_coaching": "0.1.0", "coaching_reasoning": "0.1.0", "learning": "0.1.0",
             "athlete_state": state.get("engine_version"), "coaching_language": "0.1.0",
         },
@@ -687,7 +700,8 @@ def coaching_state(db: Session, athlete_id: str, current_week: int | None = None
     if journey:
         journey = BellJourneyPlanner().state_for_week(journey, requested_week)
     week = int(journey.get("current_week", requested_week)) if journey else requested_week
-    week_payload = next((item for item in data.get("weeks", []) if int(item.get("week", 0)) == week), None)
+    plan_week = int(journey.get("cycle_week", week)) if journey.get("mode") == "continuous_development" else week
+    week_payload = next((item for item in data.get("weeks", []) if int(item.get("week", 0)) == plan_week), None)
     return {
         "plan_id": plan.id,
         "journey": journey,
@@ -695,6 +709,8 @@ def coaching_state(db: Session, athlete_id: str, current_week: int | None = None
         "mission": data.get("mission"),
         "periodization": data.get("periodization"),
         "priorities": journey.get("priorities", []) if journey else [],
+        "discipline": data.get("discipline") or journey.get("discipline"),
+        "continuous_policy": journey.get("continuous_policy") if journey else None,
         "next_milestone": journey.get("next_milestone") if journey else None,
         "engine_manifest": data.get("engine_manifest", {}),
     }

@@ -76,6 +76,7 @@ def create_plan(athlete_id: str, db: Session = Depends(get_db), user: User = Dep
         "id": row.id,
         "weeks": len(data["weeks"]),
         "journey": data.get("journey"),
+        "discipline": data.get("discipline"),
         "periodization": data["periodization"],
         "goal_probability": data["goal_probability"],
         "selected_strategy": (data.get("simulation") or {}).get("selected"),
@@ -97,7 +98,7 @@ def get_plan(athlete_id: str, db: Session = Depends(get_db), user: User = Depend
 @router.get("/athletes/{athlete_id}/coaching-state", tags=["Plans"])
 def get_coaching_state(
     athlete_id: str,
-    week: int | None = Query(default=None, ge=1, le=52),
+    week: int | None = Query(default=None, ge=1, le=520),
     db: Session = Depends(get_db),
     user: User = Depends(current_user),
 ):

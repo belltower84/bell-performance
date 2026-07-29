@@ -353,7 +353,7 @@ def test_coaching_state_endpoint_exposes_journey(client, auth):
     assert mission.status_code == 201
     created = client.post(f"/api/v1/athletes/{aid}/plans", headers=headers)
     assert created.status_code == 201
-    assert created.json()["journey"]["journey_engine_version"] == "13.1.0"
+    assert created.json()["journey"]["journey_engine_version"] == "13.2.0"
 
     response = client.get(f"/api/v1/athletes/{aid}/coaching-state?week=5", headers=headers)
     assert response.status_code == 200
@@ -362,10 +362,106 @@ def test_coaching_state_endpoint_exposes_journey(client, auth):
     assert body["journey"]["current_phase_name"]
     assert body["journey"]["phase_week"] >= 1
     assert body["next_milestone"]
-    assert body["engine_manifest"]["journey_planner"] == "13.1.0"
+    assert body["engine_manifest"]["journey_planner"] == "13.2.0"
 
-    clamped = client.get(f"/api/v1/athletes/{aid}/coaching-state?week=52", headers=headers)
-    assert clamped.status_code == 200
-    clamped_body = clamped.json()
-    assert clamped_body["journey"]["current_week"] == clamped_body["journey"]["total_weeks"]
-    assert clamped_body["current_week"] is not None
+    renewed = client.get(f"/api/v1/athletes/{aid}/coaching-state?week=52", headers=headers)
+    assert renewed.status_code == 200
+    renewed_body = renewed.json()
+    assert renewed_body["journey"]["current_week"] == 52
+    assert renewed_body["journey"]["cycle_number"] == 7
+    assert renewed_body["journey"]["cycle_week"] == 4
+    assert renewed_body["journey"]["next_cycle_emphasis"]
+    assert renewed_body["current_week"] is not None
+
+
+def test_discipline_library_resolves_distinct_coaching_models():
+    from intelligence.discipline_library import BellDisciplineLibrary
+
+    library = BellDisciplineLibrary()
+    cases = {
+        "Powerlifting": "powerlifting",
+        "Bodybuilding": "bodybuilding",
+        "Tactical Athlete": "tactical_athlete",
+        "Functional Fitness": "functional_fitness",
+        "Endurance Athlete": "endurance_athlete",
+        "Hybrid Athlete": "hybrid_athlete",
+        "Performance & Health": "performance_health",
+    }
+    for identity, expected in cases.items():
+        profile = library.get(identity, "Continuous Development")
+        assert profile["id"] == expected
+        assert profile["progression"]
+        assert profile["protected_sessions"]
+        assert profile["assessments"]
+
+
+def test_continuous_journey_rolls_into_new_cycle_without_resetting_history():
+    from datetime import date
+    from intelligence.journey_planner import BellJourneyPlanner
+
+    planner = BellJourneyPlanner()
+    base = planner.build(
+        {"goal": "Powerlifting strength development", "timeline_weeks": 8},
+        {"timeline_weeks": 8, "required_adaptations": ["strength"]},
+        {"periodization_model": "block", "total_weeks": 8, "blocks": []},
+        {"primary_training_identity": "Powerlifting"},
+        as_of=date(2026, 7, 28),
+        current_week=1,
+    )
+    renewed = planner.state_for_week(base, 10)
+    assert renewed["current_week"] == 10
+    assert renewed["cycle_number"] == 2
+    assert renewed["cycle_week"] == 2
+    assert renewed["cycle_emphasis"] != ""
+    assert renewed["continuous_policy"]["mode"] == "renewable_cycles"
+    assert renewed["current_phase_name"] == base["phases"][0]["name"]
+
+
+def test_tactical_continuous_library_has_operational_phases():
+    from datetime import date
+    from intelligence.journey_planner import BellJourneyPlanner
+
+    journey = BellJourneyPlanner().build(
+        {"goal": "Tactical Athlete continuous readiness", "timeline_weeks": 24},
+        {"timeline_weeks": 24, "required_adaptations": ["strength", "ruck", "work_capacity"]},
+        {"periodization_model": "block", "total_weeks": 24, "blocks": []},
+        {"primary_training_identity": "Tactical Athlete"},
+        as_of=date(2026, 7, 28),
+    )
+    names = [phase["name"] for phase in journey["phases"]]
+    assert names == ["Foundation", "Strength & Armor", "Aerobic Durability", "Load & Work Capacity", "Assessment", "Recovery"]
+    assert journey["discipline"]["id"] == "tactical_athlete"
+    assert journey["phases"][1]["progression_rule"]
+
+
+def test_endurance_vo2_week_uses_endurance_library(tmp_path):
+    engine = _weekly_engine(tmp_path)
+    try:
+        result = engine.build_week({
+            "goal": "Endurance Athlete 10K development",
+            "identity": "Endurance Athlete",
+            "objective": "Improve Endurance",
+            "journey_phase": "VO2 Development",
+            "available_days": ["Monday", "Tuesday", "Wednesday", "Friday", "Saturday"],
+            "strength_days": 3,
+            "engine_days": 4,
+            "training_days": 5,
+        })
+        names = [item["session_name"] for item in result["schedule"] if item.get("session_name")]
+        assert result["discipline"] == "endurance_athlete"
+        assert "Intervals" in names
+        assert "Long Run" in names
+        assert result["coaching_rules"]["progression_rule"]
+        assert result["coaching_rules"]["discipline_library_version"] == "13.2.0"
+    finally:
+        engine.close()
+
+
+def test_transition_rules_recover_before_advancing():
+    from intelligence.discipline_library import BellDisciplineLibrary
+
+    library = BellDisciplineLibrary()
+    decision = library.evaluate_transition({}, {"readiness": 38, "pain": 8, "phase_complete": True, "progress": .9})
+    assert decision["action"] == "recover"
+    healthy = library.evaluate_transition({}, {"readiness": 80, "pain": 0, "phase_complete": True, "progress": .85})
+    assert healthy["action"] == "advance"

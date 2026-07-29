@@ -1,4 +1,4 @@
-/* Bell Performance 13.1.0 — unified coaching design system */
+/* Bell Performance 13.2.0 — unified coaching design system */
 :root{
   --bell-bg:#07090b;--bell-surface:#101317;--bell-surface-2:#161a20;--bell-surface-3:#1d2229;
   --bell-border:rgba(255,255,255,.09);--bell-border-gold:rgba(218,169,52,.32);
@@ -52,3 +52,8 @@ button{min-height:44px;border-radius:12px;font-weight:750}.good,.command-start-b
 .bell13-why-button{min-height:34px;margin-top:9px;padding:6px 10px;border:1px solid var(--bell-border-gold);background:rgba(217,166,41,.07);color:var(--bell-gold-bright);font-size:.72rem}
 .bell13-plan-footer{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.bell13-plan-footer>div{padding:11px 13px;border:1px solid var(--bell-border);border-radius:12px;background:rgba(0,0,0,.16)}.bell13-plan-footer span{display:block;color:var(--bell-muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.09em}.bell13-plan-footer strong{display:block;margin-top:4px;font-size:.86rem}
 @media(max-width:620px){.bell13-plan-overview-head{align-items:center}.bell13-plan-overview-head p{font-size:.78rem}.bell13-plan-footer{grid-template-columns:1fr}.bell13-phase-node p{font-size:.78rem}}
+
+
+/* Bell 13.2 discipline library */
+.bell13-discipline-card{margin:0 0 16px;padding:15px;border:1px solid var(--bell-border);border-radius:14px;background:linear-gradient(135deg,rgba(217,166,41,.065),rgba(255,255,255,.018))}.bell13-discipline-card h4{margin:4px 0 5px;font-size:1.08rem}.bell13-discipline-card>div>p{margin:0;color:var(--bell-muted);font-size:.84rem;line-height:1.45}.bell13-discipline-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}.bell13-discipline-grid>div{padding:10px 11px;border:1px solid var(--bell-border);border-radius:11px;background:rgba(0,0,0,.16)}.bell13-discipline-grid span{display:block;color:var(--bell-muted);font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.bell13-discipline-grid strong{display:block;margin-top:4px;font-size:.79rem;line-height:1.35}.bell13-discipline-card .bell13-why-button{margin-top:12px}
+@media(max-width:620px){.bell13-discipline-grid{grid-template-columns:1fr}.bell13-discipline-card{padding:13px}}

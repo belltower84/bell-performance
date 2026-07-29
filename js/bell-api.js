@@ -201,7 +201,37 @@ async function bellRefreshCloudState() {
   bellCloud.lastSyncAt = new Date().toISOString(); bellCloud.lastError = ""; saveBellCloud();
   if(coachingState?.journey&&window.BellCoachingEngine){
     const cloudJourney=coachingState.journey;
-    data.coachingState={...cloudJourney,engineVersion:cloudJourney.journey_engine_version||"13.1.0",modeLabel:cloudJourney.mode_label,name:cloudJourney.name,targetDate:cloudJourney.target_date,eventWeeksRemaining:cloudJourney.event_weeks_remaining,horizonLimited:cloudJourney.horizon_limited,totalWeeks:cloudJourney.total_weeks,planningHorizonWeeks:cloudJourney.planning_horizon_weeks,currentWeek:cloudJourney.current_week,progressPercent:cloudJourney.progress_percent,currentPhaseName:cloudJourney.current_phase_name,phaseWeek:cloudJourney.phase_week,phaseLength:cloudJourney.phase_length,nextMilestone:cloudJourney.next_milestone,phases:(cloudJourney.phases||[]).map(item=>({...item,startWeek:item.start_week,endWeek:item.end_week,durationWeeks:item.duration_weeks,trainingEmphasis:item.training_emphasis})),currentPhase:cloudJourney.current_phase?{...cloudJourney.current_phase,startWeek:cloudJourney.current_phase.start_week,endWeek:cloudJourney.current_phase.end_week,durationWeeks:cloudJourney.current_phase.duration_weeks,trainingEmphasis:cloudJourney.current_phase.training_emphasis}:null,nextPhase:cloudJourney.next_phase?{...cloudJourney.next_phase,startWeek:cloudJourney.next_phase.start_week,endWeek:cloudJourney.next_phase.end_week,durationWeeks:cloudJourney.next_phase.duration_weeks}:null,fingerprint:`cloud|${bellCloud.planId}|${cloudJourney.current_week}`};
+    const mapPhase=item=>item?{...item,startWeek:item.start_week,endWeek:item.end_week,durationWeeks:item.duration_weeks,trainingEmphasis:item.training_emphasis,progressionRule:item.progression_rule,loadPhase:item.load_phase}:null;
+    const cloudDiscipline=coachingState.discipline||cloudJourney.discipline||null;
+    data.coachingState={
+      ...cloudJourney,
+      engineVersion:cloudJourney.journey_engine_version||"13.2.0",
+      modeLabel:cloudJourney.mode_label,
+      name:cloudJourney.name,
+      targetDate:cloudJourney.target_date,
+      eventWeeksRemaining:cloudJourney.event_weeks_remaining,
+      horizonLimited:cloudJourney.horizon_limited,
+      totalWeeks:cloudJourney.total_weeks,
+      planningHorizonWeeks:cloudJourney.planning_horizon_weeks,
+      currentWeek:cloudJourney.current_week,
+      requestedWeek:cloudJourney.requested_week,
+      cycleNumber:cloudJourney.cycle_number,
+      cycleWeek:cloudJourney.cycle_week,
+      cycleLength:cloudJourney.cycle_length,
+      cycleEmphasis:cloudJourney.cycle_emphasis,
+      nextCycleEmphasis:cloudJourney.next_cycle_emphasis,
+      progressPercent:cloudJourney.progress_percent,
+      currentPhaseName:cloudJourney.current_phase_name,
+      phaseWeek:cloudJourney.phase_week,
+      phaseLength:cloudJourney.phase_length,
+      nextMilestone:cloudJourney.next_milestone,
+      discipline:cloudDiscipline?{...cloudDiscipline,libraryVersion:cloudDiscipline.library_version,weeklyArchitecture:cloudDiscipline.weekly_architecture,protectedSessions:cloudDiscipline.protected_sessions,missedRule:cloudDiscipline.missed_session_rule,readinessYellow:cloudDiscipline.readiness_yellow,readinessRed:cloudDiscipline.readiness_red,cycleRotation:cloudDiscipline.cycle_rotation}:null,
+      continuousPolicy:cloudJourney.continuous_policy,
+      phases:(cloudJourney.phases||[]).map(mapPhase),
+      currentPhase:mapPhase(cloudJourney.current_phase),
+      nextPhase:mapPhase(cloudJourney.next_phase),
+      fingerprint:`cloud|${bellCloud.planId}|${cloudJourney.current_week}|${cloudJourney.cycle_number||1}`
+    };
     saveData({render:false});
   }
   renderBellCloudCard(); if (typeof renderPremiumDashboard === "function") renderPremiumDashboard(); if(window.BellCoachingEngine)window.BellCoachingEngine.renderPlanTimeline(); return { state, today, intelligence, coachingState };

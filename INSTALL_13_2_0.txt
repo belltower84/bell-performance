@@ -1,0 +1,30 @@
+Bell Performance 13.2.0 — Installation
+
+OPTION A — COMPLETE BUILD
+1. Back up the current repository.
+2. Replace the repository contents with Bell_Performance_13_2_0_GitHub_Ready.zip.
+3. Preserve Render environment variables and deployment settings.
+4. Commit and push the changes.
+5. Allow Render to redeploy Bell Core.
+6. Hard-refresh the frontend or remove and reinstall the PWA so the 13.2 service-worker cache activates.
+
+OPTION B — PATCH
+1. Start from Bell Performance 13.1.0 or 13.0.1 with the 13.1 files already applied.
+2. Copy Bell_Performance_13_2_0_Discipline_Libraries_PATCH.zip into the repository root.
+3. Allow matching files to be replaced.
+4. Commit and push.
+5. Redeploy Bell Core and hard-refresh the frontend.
+
+Suggested commit message:
+Build 13.2 discipline coaching libraries
+
+TEST CHECKLIST
+- Open Plan and confirm the Coaching Library card appears.
+- Test Powerlifting and confirm the library protects squat, bench, deadlift, and secondary squat/bench roles.
+- Test Bodybuilding and confirm the progression rule uses double progression.
+- Test Endurance in a VO2 phase and confirm intervals and a long session are prioritized.
+- Test Tactical and confirm the Journey includes Strength & Armor, Aerobic Durability, and Load & Work Capacity.
+- Test Fat Loss and confirm the Journey includes recovery and diet-break phases.
+- Advance a Continuous Development Journey past its first cycle and confirm Cycle 2 appears without resetting history.
+- Connect Bell Core and confirm the cloud Coaching Library replaces the local fallback.
+- Confirm onboarding max lifts and automatic powerlifting back-off loading still work.

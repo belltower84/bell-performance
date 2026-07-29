@@ -6,7 +6,9 @@ import math
 import re
 from typing import Any, Iterable
 
-VERSION = "13.1.0"
+from .discipline_library import BellDisciplineLibrary, DisciplinePhase
+
+VERSION = "13.2.0"
 MAX_ACTIVE_HORIZON_WEEKS = 52
 
 
@@ -113,9 +115,11 @@ class BellJourneyPlanner:
             event_weeks_remaining = None
             horizon_limited = False
 
-        templates = self._templates(identity, objective, mode, total_weeks)
+        discipline_library = BellDisciplineLibrary()
+        discipline = discipline_library.get(identity, objective, _clean(request.get("goal")))
+        templates = discipline_library.journey_templates(identity, objective, mode, total_weeks)
         phases = self._allocate_phases(templates, total_weeks)
-        priorities = self._priorities(identity, objective, mode)
+        priorities = discipline_library.priorities(identity, objective, mode)
         journey = {
             "journey_engine_version": self.version,
             "mode": mode,
@@ -130,6 +134,9 @@ class BellJourneyPlanner:
             "horizon_limited": horizon_limited,
             "total_weeks": total_weeks,
             "priorities": priorities,
+            "discipline": discipline,
+            "discipline_library_version": discipline_library.version,
+            "continuous_policy": discipline_library.continuous_policy(identity, objective) if mode == "continuous_development" else None,
             "phases": phases,
             "transition_policy": {
                 "advance": "Advance when phase work is complete, adherence is acceptable, and no unresolved recovery red flags are present.",
@@ -149,7 +156,16 @@ class BellJourneyPlanner:
         result = dict(journey)
         phases = [dict(phase) for phase in journey.get("phases", [])]
         total = max(1, int(journey.get("total_weeks", 1)))
-        week = max(1, min(total, int(current_week or 1)))
+        requested_week = max(1, int(current_week or 1))
+        continuous = journey.get("mode") == "continuous_development"
+        if continuous:
+            cycle_number = ((requested_week - 1) // total) + 1
+            cycle_week = ((requested_week - 1) % total) + 1
+            week = cycle_week
+        else:
+            cycle_number = 1
+            cycle_week = max(1, min(total, requested_week))
+            week = cycle_week
         current: dict[str, Any] | None = None
         for phase in phases:
             if int(phase["start_week"]) <= week <= int(phase["end_week"]):
@@ -170,9 +186,32 @@ class BellJourneyPlanner:
         current = next((phase for phase in phases if phase["id"] == current["id"]), current)
         phase_week = week - int(current["start_week"]) + 1
         next_phase = next((phase for phase in phases if int(phase["start_week"]) > week), None)
+        library = BellDisciplineLibrary()
+        next_cycle_emphasis = library.next_cycle_emphasis(
+            journey.get("identity", "Performance & Health"),
+            journey.get("objective", "Continuous Development"),
+            cycle_number + 1,
+        ) if continuous else None
+        if continuous and next_phase is None:
+            first = dict(phases[0]) if phases else None
+            if first:
+                first["cycle_number"] = cycle_number + 1
+                first["cycle_emphasis"] = next_cycle_emphasis
+                first["status"] = "upcoming"
+                next_phase = first
         result.update({
-            "current_week": week,
-            "progress_percent": max(0, min(100, round((week / total) * 100))),
+            "requested_week": requested_week,
+            "current_week": requested_week if continuous else week,
+            "cycle_number": cycle_number,
+            "cycle_week": cycle_week,
+            "cycle_length": total,
+            "cycle_emphasis": library.next_cycle_emphasis(
+                journey.get("identity", "Performance & Health"),
+                journey.get("objective", "Continuous Development"),
+                cycle_number,
+            ) if continuous else journey.get("name"),
+            "next_cycle_emphasis": next_cycle_emphasis,
+            "progress_percent": max(0, min(100, round((cycle_week / total) * 100))),
             "current_phase": current,
             "current_phase_id": current.get("id"),
             "current_phase_name": current.get("name"),
@@ -180,8 +219,9 @@ class BellJourneyPlanner:
             "phase_length": int(current.get("duration_weeks", 1)),
             "next_phase": next_phase,
             "next_milestone": current.get("milestone") or (next_phase or {}).get("milestone") or "Complete the current phase",
-            "status": "complete" if week >= total else "on_plan",
+            "status": "cycle_review" if continuous and cycle_week >= total else "complete" if (not continuous and week >= total) else "on_plan",
             "phases": phases,
+            "transition_guidance": library.evaluate_transition(result, {}),
         })
         return result
 
@@ -217,25 +257,36 @@ class BellJourneyPlanner:
         return explicit or "Performance & Health"
 
     def _objective(self, request: dict[str, Any], mission: dict[str, Any], identity: str, mode: str) -> str:
-        text = " ".join([
-            _clean(request.get("goal")),
+        goal_text = _clean(request.get("goal")).lower()
+        supporting_text = " ".join([
             " ".join(map(str, mission.get("required_adaptations", []))),
             " ".join(map(str, request.get("priority_order", []))),
         ]).lower()
+        text = f"{goal_text} {supporting_text}"
         if mode == "event_preparation":
             return "Prepare for Competition"
-        if any(term in text for term in ("fat loss", "weight loss", "lose fat", "body fat", "cut")):
+        if any(term in goal_text for term in ("fat loss", "weight loss", "lose fat", "body fat", "cut")):
             return "Lose Fat"
-        if any(term in text for term in ("recomp", "body composition")):
+        if any(term in goal_text for term in ("recomp", "body composition")):
             return "Body Recomposition"
-        if any(term in text for term in ("muscle gain", "build muscle", "hypertrophy", "size")):
+        if any(term in goal_text for term in ("muscle gain", "build muscle", "hypertrophy", "size")):
             return "Build Muscle"
-        if any(term in text for term in ("strength", "squat", "bench", "deadlift")):
-            return "Increase Strength"
-        if any(term in text for term in ("conditioning", "work capacity", "engine")):
+        if any(term in goal_text for term in ("conditioning", "work capacity", "engine")):
             return "Improve Conditioning"
+        if any(term in goal_text for term in ("maintain", "readiness", "longevity")):
+            return "Maintain Performance"
+        if any(term in goal_text for term in ("strength", "squat", "bench", "deadlift")):
+            return "Increase Strength"
+        if identity == "Powerlifting":
+            return "Increase Strength"
+        if identity == "Bodybuilding":
+            return "Build Muscle"
         if identity == "Endurance Athlete":
             return "Improve Endurance"
+        if identity in ("Tactical Athlete", "Functional Fitness", "Hybrid Athlete"):
+            return "Improve Performance"
+        if any(term in supporting_text for term in ("fat loss", "weight loss", "body composition")):
+            return "Body Recomposition"
         return "Continuous Development"
 
     def _journey_name(self, request: dict[str, Any], identity: str, objective: str, mode: str) -> str:
@@ -253,10 +304,8 @@ class BellJourneyPlanner:
         }
         return names.get(objective, f"{identity} Development")
 
-    def _templates(self, identity: str, objective: str, mode: str, total_weeks: int) -> list[PhaseTemplate]:
-        if mode == "event_preparation":
-            return self._event_templates(identity, total_weeks)
-        return self._continuous_templates(identity, objective, total_weeks)
+    def _templates(self, identity: str, objective: str, mode: str, total_weeks: int) -> list[DisciplinePhase]:
+        return BellDisciplineLibrary().journey_templates(identity, objective, mode, total_weeks)
 
     def _event_templates(self, identity: str, weeks: int) -> list[PhaseTemplate]:
         if weeks <= 6:
@@ -373,7 +422,7 @@ class BellJourneyPlanner:
             milestone=milestone,
         )
 
-    def _allocate_phases(self, templates: list[PhaseTemplate], total_weeks: int) -> list[dict[str, Any]]:
+    def _allocate_phases(self, templates: list[DisciplinePhase | PhaseTemplate], total_weeks: int) -> list[dict[str, Any]]:
         if not templates:
             return []
         # A very short horizon cannot support more phases than weeks. Keep the
@@ -418,26 +467,14 @@ class BellJourneyPlanner:
                 "nutrition_strategy": template.nutrition_strategy,
                 "exit_criteria": list(template.exit_criteria),
                 "milestone": template.milestone,
+                "load_phase": getattr(template, "load_phase", "Build"),
+                "progression_rule": getattr(template, "progression_rule", "Progress one meaningful variable while preserving technical quality."),
+                "protected_sessions": list(getattr(template, "protected_sessions", ())),
+                "assessment_metrics": list(getattr(template, "assessment_metrics", ())),
                 "status": "upcoming",
             })
             cursor += length
         return phases
 
     def _priorities(self, identity: str, objective: str, mode: str) -> list[dict[str, Any]]:
-        if objective == "Lose Fat":
-            labels = ["Preserve muscle and strength", "Reduce body fat at a sustainable rate", "Maintain training consistency"]
-        elif objective == "Body Recomposition":
-            labels = ["Increase or preserve lean mass", "Improve body composition", "Maintain recoverable conditioning"]
-        elif identity == "Powerlifting":
-            labels = ["Improve competition-lift performance", "Manage fatigue around heavy exposures", "Maintain useful aerobic recovery"]
-        elif identity == "Endurance Athlete":
-            labels = ["Develop event-specific endurance", "Preserve strength and durability", "Control fatigue and injury risk"]
-        elif identity == "Tactical Athlete":
-            labels = ["Build operational readiness", "Develop strength and work capacity", "Maintain durability under load"]
-        elif objective == "Build Muscle":
-            labels = ["Build target muscle groups", "Progress training volume", "Protect recovery and joint tolerance"]
-        else:
-            labels = ["Develop the primary objective", "Preserve complementary qualities", "Maintain adherence and recovery"]
-        if mode == "event_preparation":
-            labels[0] = f"Arrive prepared for the event: {labels[0].lower()}"
-        return [{"rank": index + 1, "label": label} for index, label in enumerate(labels)]
+        return BellDisciplineLibrary().priorities(identity, objective, mode)

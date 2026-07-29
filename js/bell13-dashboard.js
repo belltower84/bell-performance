@@ -1,5 +1,5 @@
 "use strict";
-/* Bell Performance 13.1.0 — Mission Control powered by the Bell Coaching Engine. */
+/* Bell Performance 13.2.0 — Mission Control powered by discipline-specific coaching libraries. */
 (function(){
   const $=id=>document.getElementById(id);
   const clean=value=>String(value||"").replace(/\s+/g," ").trim();
@@ -30,7 +30,11 @@
           days:state.targetDate?safeDateDays(state.targetDate):null,
           next:state.nextMilestone,
           mode:state.modeLabel,
-          nextPhase:state.nextPhase?.name||'Journey review'
+          nextPhase:state.nextPhase?.name||'Journey review',
+          cycleNumber:state.cycleNumber||1,
+          cycleWeek:state.cycleWeek||state.currentWeek,
+          cycleLength:state.cycleLength||state.totalWeeks,
+          cycleEmphasis:state.cycleEmphasis||state.name
         };
       }
     }catch(error){console.warn('Bell 13 coaching state unavailable',error);}
@@ -88,8 +92,8 @@
     if($('bell13PhaseWeek'))$('bell13PhaseWeek').textContent=`Week ${state.phaseWeek} of ${state.phaseLength}`;
     if($('bell13JourneyPercent'))$('bell13JourneyPercent').textContent=`${state.progress}%`;
     if($('bell13JourneyProgress'))$('bell13JourneyProgress').style.width=`${state.progress}%`;
-    if($('bell13JourneyStatus'))$('bell13JourneyStatus').textContent=state.progress>=100?'Journey Review':state.isEvent?(state.days===0?'Event Day':'Building to Peak'):'On Plan';
-    if($('bell13JourneyTarget'))$('bell13JourneyTarget').textContent=state.isEvent&&state.target?state.target:(state.objective||'Continuous development');
+    if($('bell13JourneyStatus'))$('bell13JourneyStatus').textContent=state.isEvent?(state.days===0?'Event Day':'Building to Peak'):`Cycle ${state.cycleNumber||1}`;
+    if($('bell13JourneyTarget'))$('bell13JourneyTarget').textContent=state.isEvent&&state.target?state.target:(state.cycleEmphasis||state.objective||'Continuous development');
     if($('bell13NextMilestone'))$('bell13NextMilestone').textContent=state.next;
   }
   function inject(){

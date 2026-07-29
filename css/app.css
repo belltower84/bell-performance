@@ -1032,3 +1032,25 @@ nav button .strength-nav-icon svg{width:23px!important;height:23px!important;dis
 @media(max-width:1100px){.exercise-page-layout{grid-template-columns:1fr}.exercise-page-sidebar{grid-template-columns:repeat(2,minmax(0,1fr))}.professional-muscle-card{grid-row:span 2}.exercise-page-sidebar #exerciseSimilarLiftsSection{grid-column:1/-1}.professional-anatomy-svg{width:min(100%,170px)}}
 @media(max-width:820px){.exercise-page-head{grid-template-columns:1fr}.exercise-page-tools{display:none}.exercise-page-actions{grid-template-columns:1fr 1fr}.exercise-page-lower{grid-template-columns:1fr 1fr}.guide-core-card:last-of-type{grid-column:1/-1}.exercise-page-sidebar{grid-template-columns:1fr 1fr}.mistake-grid{grid-template-columns:1fr}.feel-columns{grid-template-columns:1fr}.professional-muscle-card{grid-row:auto}}
 @media(max-width:620px){.exercise-page-lower,.exercise-page-sidebar{grid-template-columns:1fr}.guide-core-card:last-of-type,.exercise-page-sidebar #exerciseSimilarLiftsSection{grid-column:auto}.exercise-page-card{padding:17px}.exercise-page-card h3{font-size:18px}.exercise-page-tag.guide-level{margin-left:0}.anatomy-pair{grid-template-columns:1fr 1fr}.professional-anatomy-svg{width:min(100%,135px)}.mistake-grid{grid-template-columns:1fr}.guide-wide-card,.guide-feel-card{grid-column:auto}.exercise-page-actions{grid-template-columns:1fr 1fr}}
+
+/* Bell Performance 13.7.1 — Production Back Squat Guide */
+#exerciseGuide .guide-artwork-panel.exact-artwork{background:#050708;border-color:#3a3528;box-shadow:0 24px 54px rgba(0,0,0,.36)}
+#exerciseGuide .guide-artwork-panel.exact-artwork img{width:100%;height:auto;aspect-ratio:auto;object-fit:contain;background:#050708}
+#exerciseGuide .production-muscle-map{display:grid;gap:14px}
+#exerciseGuide .production-muscle-map>img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid #292f34;background:#050708}
+#exerciseGuide .production-legend{grid-template-columns:1fr 1fr;margin-top:0}
+#exerciseGuide .professional-muscle-card{padding:14px}
+#exerciseGuide .professional-muscle-card .guide-card-kicker,
+#exerciseGuide .professional-muscle-card>h3{padding-left:4px;padding-right:4px}
+#exerciseGuide .exercise-page-tag.guide-level.complete{border-color:#b18a2d;background:linear-gradient(145deg,rgba(216,166,50,.18),rgba(216,166,50,.05));color:#f0c868}
+#exerciseGuide .exercise-page-main{min-width:0}
+#exerciseGuide .exercise-page-sidebar{min-width:0}
+@media(max-width:900px){
+  #exerciseGuide .guide-artwork-panel.exact-artwork img{max-height:none}
+  #exerciseGuide .production-muscle-map>img{max-height:none}
+}
+@media(max-width:640px){
+  #exerciseGuide .professional-muscle-card{padding:12px}
+  #exerciseGuide .production-legend{grid-template-columns:1fr}
+  #exerciseGuide .guide-artwork-panel.exact-artwork{border-radius:16px}
+}

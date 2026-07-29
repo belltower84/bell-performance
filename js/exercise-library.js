@@ -450,7 +450,7 @@ function renderExerciseLibrary(){
 
 function renderInstructionalHero(exercise){
   if(exercise.name==="Back Squat"){
-    return `<section class="guide-artwork-panel exact-artwork"><img alt="Back squat instructional guide with Bell coaching callouts" src="./assets/library/back-squat-instructional.png?v=13670"/></section>`;
+    return `<section class="guide-artwork-panel exact-artwork"><img alt="Back squat instructional guide with Bell coaching callouts" src="./assets/library/back-squat-production-guide.png?v=13710"/></section>`;
   }
   const callouts=(exercise.callouts||[]).map(callout=>`<div class="guide-callout ${callout.slot||"tl"}"><strong>${escapeHtml(callout.title)}</strong><span>${escapeHtml(callout.text)}</span></div>`).join("");
   return `<section class="guide-artwork-panel"><div class="guide-hero-stage" style="background-image:url('${thumbnailUrl(exercise)}')"><div class="guide-stage-overlay"></div>${callouts}</div></section>`;
@@ -600,6 +600,9 @@ function anatomyFigureSvg(exercise,view="front"){
 function renderProfessionalMuscleMap(exercise){
   const primary=(exercise.primary||[]).map(v=>canonicalMuscle(v).label);
   const secondary=(exercise.secondary||[]).map(v=>canonicalMuscle(v).label);
+  if(exercise.name==="Back Squat"){
+    return `<div class="professional-muscle-map production-muscle-map"><img alt="Back squat anatomy map highlighting quads and glutes as primary muscles and adductors and core as secondary muscles" src="./assets/library/back-squat-muscle-map.png?v=13710"/><div class="muscle-map-legend production-legend"><div><span class="legend-swatch primary"></span><strong>Primary</strong><p>${escapeHtml([...new Set(primary)].join(" · "))}</p></div><div><span class="legend-swatch secondary"></span><strong>Secondary</strong><p>${escapeHtml([...new Set(secondary)].join(" · "))}</p></div></div></div>`;
+  }
   return `<div class="professional-muscle-map"><div class="anatomy-pair"><div class="anatomy-view">${anatomyFigureSvg(exercise,"front")}</div><div class="anatomy-view">${anatomyFigureSvg(exercise,"back")}</div></div><div class="muscle-map-legend"><div><span class="legend-swatch primary"></span><strong>Primary</strong><p>${primary.length?escapeHtml([...new Set(primary)].join(" · ")):"General movement musculature"}</p></div><div><span class="legend-swatch secondary"></span><strong>Secondary</strong><p>${secondary.length?escapeHtml([...new Set(secondary)].join(" · ")):"Stabilizers as required"}</p></div></div></div>`;
 }
 

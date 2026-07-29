@@ -1,10 +1,10 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13.7.0-exercise-guide-design-system';
+const CACHE_NAME = 'bell-performance-13.7.1-production-back-squat';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/app.css?v=13700",
+  "./css/app.css?v=13710",
   "./css/bell13.css?v=13300",
   "./css/bell134.css?v=13620",
   "./css/bell135.css?v=13610",
@@ -19,6 +19,8 @@ const CORE = [
   "./assets/artwork/strength/bodybuilding.jpg?v=10006",
   "./assets/artwork/strength/strength-size.jpg?v=10006",
   "./assets/artwork/strength/gym-conditioning.jpg?v=10006",
+  "./assets/library/back-squat-production-guide.png?v=13710",
+  "./assets/library/back-squat-muscle-map.png?v=13710",
   "./assets/library/back-squat-instructional.png?v=13670",
   "./assets/artwork/engine/mountain-trail.jpg?v=10006",
   "./assets/artwork/engine/forest-trail.jpg?v=10006",
@@ -29,7 +31,7 @@ const CORE = [
   "./assets/artwork/engine/hill-country.jpg?v=10006",
   "./data/workouts.js?v=10007",
   "./js/storage.js?v=13610",
-  "./js/exercise-library.js?v=13700",
+  "./js/exercise-library.js?v=13710",
   "./js/readiness.js?v=13610",
   "./js/equipment.js?v=13640",
   "./js/training-blocks.js?v=13600",

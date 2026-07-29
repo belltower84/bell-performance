@@ -10,7 +10,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <title>Bell Performance 13.6.5 — Recovery Day Flow</title>
-<link href="./css/app.css?v=13710" rel="stylesheet"/>
+<link href="./css/app.css?v=13680" rel="stylesheet"/>
 <link href="./css/bell13.css?v=13300" rel="stylesheet"/>
 <link href="./css/bell134.css?v=13620" rel="stylesheet"/>
 <link href="./css/bell135.css?v=13610" rel="stylesheet"/>
@@ -669,7 +669,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </nav>
 <script>window.BELL_APP_VERSION = "13.6.5-recovery-day-flow";</script>
 <script src="./data/workouts.js?v=10007"></script>
-<script src="./js/exercise-library.js?v=13710"></script>
+<script src="./js/exercise-library.js?v=13680"></script>
 <script src="./js/storage.js?v=13610"></script>
 <script src="./js/readiness.js?v=13610"></script>
 <script src="./js/equipment.js?v=13640"></script>
@@ -709,5 +709,17 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/bell13-athlete-experience.js?v=13650"></script>
 <script src="./js/bell13-coach-intelligence.js?v=13620"></script>
 <script src="./js/bell13-commercial-home.js?v=13650"></script>
+
+<script>
+window.addEventListener("load",()=>setTimeout(()=>{
+  try {
+    document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    openExerciseLibrary();
+    openExerciseDetail('Back Squat');
+    window.scrollTo(0,0);
+  } catch(e) { console.error(e); }
+},1200));
+</script>
 </body>
 </html>

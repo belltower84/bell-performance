@@ -1,6 +1,6 @@
-# Bell Performance 13.6.3 — Streamlined Settings
+# Bell Performance 13.6.4 — Training Setup Refinement
 
-Bell Performance is a local-first training application with two control modes. Version 13.6.3 adds a streamlined Settings control center with focused pages for the athlete, program, training setup, recovery and nutrition, Bell behavior, help, and data.
+Bell Performance is a local-first training application with two control modes. Version 13.6.4 refines Training Setup with readable dark dropdown menus and a compact location table whose equipment checkboxes appear only while a location is being edited.
 
 ## Product blueprint
 
@@ -61,8 +61,8 @@ Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, 
 
 - [`BELL_ATHLETE_EXPERIENCE_13_3.md`](BELL_ATHLETE_EXPERIENCE_13_3.md)
 - [`BELL_COACHING_ENGINE_13_2.md`](BELL_COACHING_ENGINE_13_2.md)
-- [`RELEASE_NOTES_13_6_3.md`](RELEASE_NOTES_13_6_3.md)
-- [`VALIDATION_13_6_3.md`](VALIDATION_13_6_3.md)
+- [`RELEASE_NOTES_13_6_4.md`](RELEASE_NOTES_13_6_4.md)
+- [`VALIDATION_13_6_4.md`](VALIDATION_13_6_4.md)
 
 ## Local use
 
@@ -99,6 +99,10 @@ Bell Coach now produces structured explanations, separates known facts from infe
 ## Bell Performance 13.5.1
 13.5.1 refines the commercial Home dashboard with balanced card geometry, consistent spacing, a selectable weekly calendar with an in-card day summary, and a workflow-based desktop sidebar: Home, Train, Plan, Progress, Coach, Recovery, Nutrition, Library, and More.
 
+
+
+## Bell Performance 13.6.4
+13.6.4 fixes Settings dropdown contrast and replaces the always-open equipment checkbox wall with a responsive training-location table. Each location shows its environment, active status, and equipment summary; **Edit** opens the full equipment selector only when needed.
 
 ## Bell Performance 13.6.3
 13.6.3 replaces the long Settings page with a compact control-center home and focused pages for Athlete Profile, Mission & Program, Training Setup, Recovery & Nutrition, Bell Behavior, and Help & Data.

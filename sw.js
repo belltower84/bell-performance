@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13.6.3-streamlined-settings';
+const CACHE_NAME = 'bell-performance-13.6.4-training-setup-refinement';
 const CORE = [
   "./",
   "./index.html",
@@ -8,7 +8,7 @@ const CORE = [
   "./css/bell13.css?v=13300",
   "./css/bell134.css?v=13620",
   "./css/bell135.css?v=13610",
-  "./css/bell1363.css?v=13630",
+  "./css/bell1364.css?v=13640",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/icons/engine-shoe.svg?v=10006",
   "./assets/icons/engine-mark.svg?v=10006",
@@ -30,7 +30,7 @@ const CORE = [
   "./js/storage.js?v=13610",
   "./js/exercise-library.js?v=10006",
   "./js/readiness.js?v=13610",
-  "./js/equipment.js?v=10006",
+  "./js/equipment.js?v=13640",
   "./js/training-blocks.js?v=13600",
   "./js/mobility.js?v=10006",
   "./js/nutrition.js?v=10006",
@@ -61,7 +61,7 @@ const CORE = [
   "./js/app.js?v=12101",
   "./js/bell-coaching-engine.js?v=13200",
   "./js/bell13-dashboard.js?v=13200",
-  "./js/bell13-athlete-experience.js?v=13630",
+  "./js/bell13-athlete-experience.js?v=13640",
   "./js/bell13-coach-intelligence.js?v=13620",
   "./js/bell13-commercial-home.js?v=13610",
 ];

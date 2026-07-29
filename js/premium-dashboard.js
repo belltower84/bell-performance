@@ -139,13 +139,13 @@ function renderPremiumWeek(){
 }
 
 function premiumReadinessMetric(value){return `${Math.max(1,Math.min(5,Math.round(Number(value)||1)))}/5`;}
-function premiumSleepDuration(r){const h=Math.max(0,Number(r.sleepHours)||0),m=Math.max(0,Number(r.sleepMinutes)||0);return `${h}h ${String(m).padStart(2,'0')}m`;}
+function premiumSleepDuration(r){if(typeof readinessSleepLabel==='function'&&(r?.checkInVersion==='quick-v1'||r?.sleepState))return readinessSleepLabel(r);const h=Math.max(0,Number(r.sleepHours)||0),m=Math.max(0,Number(r.sleepMinutes)||0);return `${h}h ${String(m).padStart(2,'0')}m`;}
 function renderPremiumReadiness(){
   const score=readinessScore(),status=readinessStatus(score),r=data.settings.readiness||{};
   const checkedIn=r.lastPromptDate===todayKey();
   const descriptions={GREEN:'High readiness. You are recovered and ready for the full training prescription.',YELLOW:'Moderate readiness. Train with purpose and let quality lead the day.',RED:'Low readiness. Recovery comes first, so today’s demand has been adjusted.'};
   setText('premiumReadinessScore',checkedIn?String(score):'—');setText('premiumReadinessStatus',checkedIn?status:'CHECK IN');setText('premiumReadinessDetail',checkedIn?descriptions[status]:'Complete today’s check-in to personalize your training.');
-  setText('premiumSleep',premiumSleepDuration(r));setText('premiumEnergy',premiumReadinessMetric(r.energy));setText('premiumSoreness',premiumReadinessMetric(r.recoveryStatus));setText('premiumMotivation',premiumReadinessMetric(r.motivation));
+  setText('premiumSleep',premiumSleepDuration(r));setText('premiumBody',typeof readinessBodyLabel==='function'?readinessBodyLabel(r):premiumReadinessMetric(r.recoveryStatus));setText('premiumEnergy',typeof readinessEnergyLabel==='function'?readinessEnergyLabel(r):premiumReadinessMetric(r.energy));setText('commandPain',typeof readinessPainLabel==='function'?readinessPainLabel(r):'None');setText('commandTime',typeof readinessTimeLabel==='function'?readinessTimeLabel(r):timeAvailabilityLabel(r.timeAvailability));
   const card=byId('premiumReadinessCard');if(card){card.dataset.status=status.toLowerCase();card.dataset.complete=checkedIn?'true':'false';card.setAttribute('aria-label',checkedIn?`Readiness ${score}, ${status}`:'Readiness check-in not completed');}
   const btn=card?.querySelector('.premium-readiness-update');if(btn)btn.textContent=(checkedIn?'Update':'Check In');
 }

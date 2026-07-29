@@ -167,7 +167,7 @@ function readinessWord(value, reverse=false) {
   return v >= 4 ? "High" : v === 3 ? "Moderate" : "Low";
 }
 function timeAvailabilityLabel(value) {
-  return ({1:"20–30 min",2:"30–45 min",3:"45–60 min",4:"60–75 min",5:"75–90+ min"})[Number(value)] || "45–60 min";
+  return ({1:"20 min",2:"30 min",3:"45 min",4:"60 min",5:"75+ min"})[Number(value)] || "45 min";
 }
 function renderVisualProfile(template, status) {
   const sex = data.settings.sex || "Male";
@@ -185,11 +185,11 @@ function renderVisualProfile(template, status) {
     if (engineArt) engineArt.src = "./assets/engine-mountain-trail.jpg?v=8530";
   }
   const r = data.settings.readiness || {};
-  setText("dashSleep", readinessWord(r.sleepQuality));
-  setText("dashSoreness", readinessWord(r.recoveryStatus));
-  setText("dashEnergy", readinessWord(r.energy));
-  setText("dashMotivation", readinessWord(r.motivation));
-  setText("dashTime", timeAvailabilityLabel(r.timeAvailability));
+  setText("dashSleep", typeof readinessSleepLabel==="function"?readinessSleepLabel(r):readinessWord(r.sleepQuality));
+  setText("dashBody", typeof readinessBodyLabel==="function"?readinessBodyLabel(r):readinessWord(r.recoveryStatus));
+  setText("dashEnergy", typeof readinessEnergyLabel==="function"?readinessEnergyLabel(r):readinessWord(r.energy));
+  setText("dashPain", typeof readinessPainLabel==="function"?readinessPainLabel(r):"None");
+  setText("dashTime", typeof readinessTimeLabel==="function"?readinessTimeLabel(r):timeAvailabilityLabel(r.timeAvailability));
   setText("engineSessionTitle", cardio === "Cycling" ? "Zone 2 Cycle" : cardio === "Air Bike" ? "Zone 2 Air Bike" : cardio === "Rower" ? "Zone 2 Row" : "Zone 2 Run");
   setText("engineSessionPurpose", status === "RED" ? "Easy recovery work only." : status === "YELLOW" ? "Controlled aerobic work. Keep it easy." : "Build your base. Fuel your engine.");
   setText("mobilityDashboardTitle", `${data.mobility.minutes || 10} min ${resolvedMobilityFocus()} Mobility`);

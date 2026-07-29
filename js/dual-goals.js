@@ -289,7 +289,7 @@ function renderNotifications(){const items=currentNotifications(),badge=document
 function openNotificationCenter(){renderNotifications();document.getElementById("notificationModal")?.classList.remove("hidden");}
 function closeNotificationCenter(){document.getElementById("notificationModal")?.classList.add("hidden");}
 function markNotificationsReviewed(){data.settings.lastNotificationReview=new Date().toISOString();saveData({render:false});closeNotificationCenter();}
-function handleNotification(action){closeNotificationCenter();if(action==="readiness")document.getElementById("dailyReadinessModal")?.classList.remove("hidden");else if(action==="feedback")openPendingSessionFeedback();else if(action==="mobility"){showScreen("home");document.getElementById("mobilityFocus")?.scrollIntoView({behavior:"smooth"});}else if(action==="plan")showScreen("plan");}
+function handleNotification(action){closeNotificationCenter();if(action==="readiness")openDailyReadiness();else if(action==="feedback")openPendingSessionFeedback();else if(action==="mobility"){showScreen("home");document.getElementById("mobilityFocus")?.scrollIntoView({behavior:"smooth"});}else if(action==="plan")showScreen("plan");}
 function openAthleteProfile(){showScreen("more");setTimeout(()=>document.getElementById("athleteNameInput")?.scrollIntoView({behavior:"smooth",block:"center"}),100);}
 
 const originalRenderApp=renderApp;

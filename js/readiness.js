@@ -16,6 +16,15 @@ function sleepDurationScore(readiness = data.settings.readiness || {}) {
 }
 function rawDailyReadinessScore(readiness = data.settings.readiness || {}) {
   const five=(value,fallback=4)=>Math.max(1,Math.min(5,Number.isFinite(+value)?+value:fallback));
+  const quickCheckIn=readiness.checkInVersion==="quick-v1"||Boolean(readiness.sleepState||readiness.bodyState||readiness.energyState);
+  if(quickCheckIn){
+    const sleep=five(readiness.sleepQuality,4);
+    const body=five(readiness.recoveryStatus,4);
+    const energy=five(readiness.energy,4);
+    let score=Math.round((sleep*.35+body*.35+energy*.30)*20);
+    if(readiness.painToday===true||readiness.painToday==="yes")score=Math.min(score,45);
+    return Math.max(0,Math.min(100,score));
+  }
   const duration=sleepDurationScore(readiness);
   const sleepQuality=five(readiness.sleepQuality)*2;
   const energy=five(readiness.energy)*2;
@@ -63,6 +72,8 @@ function readinessScore() {
   let adjusted = weekly.hasData ? Math.round(today * .72 + weekly.score * .28) : today;
   if (weekly.lowFeedbackCount >= 2) adjusted = Math.min(adjusted, 68);
   if (weekly.lowFeedbackCount >= 3) adjusted = Math.min(adjusted, 50);
+  const current=data.settings.readiness||{};
+  if(current.lastPromptDate===todayKey()&&(current.painToday===true||current.painToday==="yes"))adjusted=Math.min(adjusted,45);
   return Math.max(0, Math.min(100, adjusted));
 }
 
@@ -79,7 +90,10 @@ function trainingStatusText(status = readinessStatus()) {
 }
 
 function timeCapacityMinutes() {
-  return ({1:30, 2:45, 3:60, 4:75, 5:90})[Number(data.settings.readiness?.timeAvailability) || 3];
+  const readiness=data.settings.readiness||{};
+  const direct=Number(readiness.timeMinutes);
+  if(Number.isFinite(direct)&&direct>=15)return direct;
+  return ({1:20,2:30,3:45,4:60,5:75})[Number(readiness.timeAvailability)||3];
 }
 
 function scalingProfile() {
@@ -127,7 +141,11 @@ function saveReadiness() {
 }
 
 function saveDailyReadinessPrompt() {
-  commitReadiness(collectReadinessFrom("prompt"));
+  if(!quickReadinessIsComplete()){
+    updateQuickReadinessSubmitState();
+    return;
+  }
+  commitReadiness(collectQuickReadinessFromPrompt());
   document.getElementById("dailyReadinessModal")?.classList.add("hidden");
   saveData();
   renderApp();
@@ -139,13 +157,47 @@ function readinessSliderLabel(name,value){
     energy:["","Depleted","Low","Functional","Energized","Fully energized"],
     recoveryStatus:["","Very sore","Sore","Manageable","Mostly fresh","Fresh and pain-free"],
     motivation:["","Very low","Low","Willing","Ready","Highly motivated"],
-    timeAvailability:["","20–30 min","30–45 min","45–60 min","60–75 min","90+ min"]
+    timeAvailability:["","20 min","30 min","45 min","60 min","75+ min"]
   };
   return labels[name]?.[value]||String(value);
 }
+
+let quickReadinessDraft={sleep:null,body:null,energy:null,pain:null,time:null};
+const QUICK_READINESS_MAP={
+  sleep:{poor:2,okay:4,good:5},
+  body:{"beat-up":2,normal:4,fresh:5},
+  energy:{drained:2,steady:4,"fired-up":5},
+  time:{20:1,30:2,45:3,60:4,75:5}
+};
+
+function readinessSleepLabel(readiness=data.settings.readiness||{}){
+  if(readiness.sleepState)return ({poor:"Poor",okay:"Okay",good:"Good"})[readiness.sleepState]||"Okay";
+  const value=Number(readiness.sleepQuality)||3;
+  return value>=5?"Good":value>=3?"Okay":"Poor";
+}
+function readinessBodyLabel(readiness=data.settings.readiness||{}){
+  if(readiness.bodyState)return ({"beat-up":"Beat Up",normal:"Normal",fresh:"Fresh"})[readiness.bodyState]||"Normal";
+  const value=Number(readiness.recoveryStatus)||3;
+  return value>=5?"Fresh":value>=3?"Normal":"Beat Up";
+}
+function readinessEnergyLabel(readiness=data.settings.readiness||{}){
+  if(readiness.energyState)return ({drained:"Drained",steady:"Steady","fired-up":"Fired Up"})[readiness.energyState]||"Steady";
+  const value=Number(readiness.energy)||3;
+  return value>=5?"Fired Up":value>=3?"Steady":"Drained";
+}
+function readinessPainLabel(readiness=data.settings.readiness||{}){
+  return readiness.painToday===true||readiness.painToday==="yes"?"Review":"None";
+}
+function readinessTimeLabel(readiness=data.settings.readiness||{}){
+  const minutes=Number(readiness.timeMinutes)||timeCapacityMinutes();
+  return `${minutes}${minutes>=75?"+":""} min`;
+}
+
 function updateReadinessControlModeUI(){
   const coachMode=bellCoachModeEnabled();
-  ["prompttimeAvailability","onboardingTimeAvailability"].forEach(id=>{const row=document.getElementById(id)?.closest("label");if(row)row.hidden=!coachMode;});
+  const dailyTime=document.getElementById("dailyTimeQuestion");if(dailyTime)dailyTime.hidden=!coachMode;
+  const onboardingTime=document.getElementById("onboardingTimeAvailability")?.closest("label");if(onboardingTime)onboardingTime.hidden=!coachMode;
+  const submit=document.getElementById("quickReadinessSubmit");if(submit)submit.textContent=coachMode?"Build Today’s Mission":"Save Today’s Check-In";
 }
 function updateReadinessSliderDisplay(){
   updateReadinessControlModeUI();
@@ -155,20 +207,94 @@ function updateReadinessSliderDisplay(){
     const input=document.getElementById(`prompt${name}`),output=document.getElementById(`prompt${name}Value`);if(input&&output)output.textContent=`${input.value} · ${readinessSliderLabel(name,+input.value)}`;
   });
 }
+function setQuickChoiceUI(group,value){
+  document.querySelectorAll(`[data-readiness-group="${group}"]`).forEach(button=>{
+    const selected=String(button.dataset.value)===String(value);
+    button.classList.toggle("selected",selected);
+    button.setAttribute("aria-pressed",selected?"true":"false");
+  });
+}
+function selectDailyReadinessChoice(group,value){
+  if(!["sleep","body","energy"].includes(group))return;
+  quickReadinessDraft[group]=value;
+  setQuickChoiceUI(group,value);
+  updateQuickReadinessSubmitState();
+}
+function selectDailyPain(value){
+  quickReadinessDraft.pain=value;
+  setQuickChoiceUI("pain",value);
+  const detail=document.getElementById("quickPainDetail");if(detail)detail.classList.toggle("hidden",value!=="yes");
+  if(value!=="yes"){const notes=document.getElementById("promptPainNotes");if(notes)notes.value="";}
+  updateQuickReadinessSubmitState();
+}
+function selectDailyTime(minutes){
+  quickReadinessDraft.time=Number(minutes);
+  setQuickChoiceUI("time",Number(minutes));
+  updateQuickReadinessSubmitState();
+}
+function quickReadinessIsComplete(){
+  const core=Boolean(quickReadinessDraft.sleep&&quickReadinessDraft.body&&quickReadinessDraft.energy&&quickReadinessDraft.pain);
+  const timeReady=!bellCoachModeEnabled()||Number.isFinite(Number(quickReadinessDraft.time));
+  const painNote=String(document.getElementById("promptPainNotes")?.value||"").trim();
+  const painReady=quickReadinessDraft.pain!=="yes"||painNote.length>=3;
+  return core&&timeReady&&painReady;
+}
+function updateQuickReadinessSubmitState(){
+  updateReadinessControlModeUI();
+  const submit=document.getElementById("quickReadinessSubmit"),progress=document.getElementById("quickReadinessProgress");
+  const required=bellCoachModeEnabled()?5:4;
+  const complete=[quickReadinessDraft.sleep,quickReadinessDraft.body,quickReadinessDraft.energy,quickReadinessDraft.pain].filter(Boolean).length+(bellCoachModeEnabled()&&quickReadinessDraft.time?1:0);
+  const painNote=String(document.getElementById("promptPainNotes")?.value||"").trim();
+  const needsPainNote=quickReadinessDraft.pain==="yes"&&painNote.length<3;
+  if(submit)submit.disabled=!quickReadinessIsComplete();
+  if(progress)progress.textContent=needsPainNote?"Add a short pain note so Bell knows what to protect.":complete>=required?"Check-in complete. Your score will appear on the dashboard.":`${complete} of ${required} answered`;
+}
+function collectQuickReadinessFromPrompt(){
+  const sleep=quickReadinessDraft.sleep,body=quickReadinessDraft.body,energyState=quickReadinessDraft.energy;
+  const sleepMinutes=({poor:330,okay:405,good:480})[sleep]||420;
+  const energy=QUICK_READINESS_MAP.energy[energyState]||4;
+  const time=Number(quickReadinessDraft.time)||45;
+  return {
+    checkInVersion:"quick-v1",
+    sleepState:sleep,
+    bodyState:body,
+    energyState,
+    painToday:quickReadinessDraft.pain==="yes",
+    painNotes:String(document.getElementById("promptPainNotes")?.value||"").trim(),
+    timeMinutes:time,
+    timeAvailability:QUICK_READINESS_MAP.time[time]||3,
+    sleepHours:Math.floor(sleepMinutes/60),
+    sleepMinutes:sleepMinutes%60,
+    sleepQuality:QUICK_READINESS_MAP.sleep[sleep]||4,
+    recoveryStatus:QUICK_READINESS_MAP.body[body]||4,
+    energy,
+    motivation:energy
+  };
+}
 function populateReadinessPrompt(){
   updateReadinessControlModeUI();
-  const r=data.settings.readiness||{};
-  const sleep=document.getElementById("promptSleepDurationMinutes");if(sleep)sleep.value=Math.max(180,Math.min(720,(Number(r.sleepHours)||7)*60+(Number(r.sleepMinutes)||0)));
-  const defaults={sleepQuality:4,recoveryStatus:4,energy:4,motivation:4,timeAvailability:3};
-  Object.keys(defaults).forEach(name=>{const el=document.getElementById(`prompt${name}`);if(el)el.value=r[name]??defaults[name];});
-  updateReadinessSliderDisplay();
+  const r=data.settings.readiness||{},todayComplete=r.lastPromptDate===todayKey();
+  quickReadinessDraft={
+    sleep:todayComplete?(r.sleepState||((Number(r.sleepQuality)||3)>=5?"good":(Number(r.sleepQuality)||3)>=3?"okay":"poor")):null,
+    body:todayComplete?(r.bodyState||((Number(r.recoveryStatus)||3)>=5?"fresh":(Number(r.recoveryStatus)||3)>=3?"normal":"beat-up")):null,
+    energy:todayComplete?(r.energyState||((Number(r.energy)||3)>=5?"fired-up":(Number(r.energy)||3)>=3?"steady":"drained")):null,
+    pain:todayComplete?(r.painToday?"yes":"no"):null,
+    time:todayComplete?(Number(r.timeMinutes)||({1:20,2:30,3:45,4:60,5:75})[Number(r.timeAvailability)]||45):null
+  };
+  ["sleep","body","energy","pain","time"].forEach(group=>setQuickChoiceUI(group,quickReadinessDraft[group]));
+  const notes=document.getElementById("promptPainNotes");if(notes)notes.value=todayComplete?String(r.painNotes||""):"";
+  const detail=document.getElementById("quickPainDetail");if(detail)detail.classList.toggle("hidden",quickReadinessDraft.pain!=="yes");
+  updateQuickReadinessSubmitState();
+}
+function openDailyReadiness(){
+  populateReadinessPrompt();
+  document.getElementById("dailyReadinessModal")?.classList.remove("hidden");
 }
 function maybePromptDailyReadiness() {
   if (!data.settings.coachMessages?.setupComplete || hasTodayReadiness() || !bellCoachModeEnabled()) return;
   const modal = document.getElementById("dailyReadinessModal");
   if (!modal) return;
-  populateReadinessPrompt();
-  modal.classList.remove("hidden");
+  openDailyReadiness();
 }
 
 function pendingFeedbackSession(){return (data.history||[]).find(x=>x.completedAt===data.pendingFeedbackSessionId);}

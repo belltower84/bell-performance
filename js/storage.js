@@ -12,7 +12,7 @@ const defaults = {
     appControlMode: "coach",
     rotationWeek: 1,
     maxes: { bench: null, squat: null, deadlift: null, pushPress: null },
-    readiness: { sleepHours:7, sleepMinutes:30, sleepQuality:4, energy:4, motivation:4, recoveryStatus:4, timeAvailability:3, score:null, status:"", lastPromptDate:"" },
+    readiness: { checkInVersion:"", sleepState:"", bodyState:"", energyState:"", painToday:false, painNotes:"", timeMinutes:45, sleepHours:7, sleepMinutes:30, sleepQuality:4, energy:4, motivation:4, recoveryStatus:4, timeAvailability:3, score:null, status:"", lastPromptDate:"" },
     coachMessages: { setupComplete:false, style:"Performance", scriptureFrequency:"Occasionally" },
     firstFlightStage: "profile",
     firstFlightTourComplete: false,
@@ -116,14 +116,23 @@ function normalizeData() {
     : Number.isFinite(legacySoreness)
       ? Math.max(1,Math.min(5,Math.round(5-(legacySoreness-1)*4/9)))
       : 4;
+  const normalizedTimeAvailability=Math.max(1,Math.min(5,Number.isFinite(+old.timeAvailability)?Math.round(+old.timeAvailability):3));
+  const normalizedTimeMinutes=Number.isFinite(+old.timeMinutes)&&+old.timeMinutes>=15?Math.round(+old.timeMinutes):({1:20,2:30,3:45,4:60,5:75})[normalizedTimeAvailability];
   data.settings.readiness = {
+    checkInVersion: old.checkInVersion === "quick-v1" ? "quick-v1" : "",
+    sleepState: ["poor","okay","good"].includes(old.sleepState) ? old.sleepState : "",
+    bodyState: ["beat-up","normal","fresh"].includes(old.bodyState) ? old.bodyState : "",
+    energyState: ["drained","steady","fired-up"].includes(old.energyState) ? old.energyState : "",
+    painToday: Boolean(old.painToday),
+    painNotes: typeof old.painNotes === "string" ? old.painNotes : "",
+    timeMinutes: normalizedTimeMinutes,
     sleepHours: Math.max(0,Math.min(16,Number.isFinite(+old.sleepHours)?+old.sleepHours:7)),
     sleepMinutes: Math.max(0,Math.min(59,Number.isFinite(+old.sleepMinutes)?+old.sleepMinutes:30)),
     sleepQuality: toFive(old.sleepQuality ?? old.sleep,4),
     energy: toFive(old.energy,4),
     motivation: toFive(old.motivation,4),
     recoveryStatus: migratedRecovery,
-    timeAvailability: Math.max(1,Math.min(5,Number.isFinite(+old.timeAvailability)?Math.round(+old.timeAvailability):3)),
+    timeAvailability: normalizedTimeAvailability,
     score: Number.isFinite(+old.score) ? +old.score : null,
     status: old.status || "",
     lastPromptDate: old.lastPromptDate || ""

@@ -9,11 +9,11 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
-<title>Bell Performance 13.6 — Readiness & Application Control</title>
+<title>Bell Performance 13.6.1 — 10-Second Readiness</title>
 <link href="./css/app.css?v=12211" rel="stylesheet"/>
 <link href="./css/bell13.css?v=13300" rel="stylesheet"/>
 <link href="./css/bell134.css?v=13400" rel="stylesheet"/>
-<link href="./css/bell135.css?v=13600" rel="stylesheet"/>
+<link href="./css/bell135.css?v=13610" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -53,15 +53,14 @@ main{display:block}.screen{display:none}.screen.active{display:block}
         <div class="command-score-ring" id="commandReadinessRing"><div><strong id="premiumReadinessScore">—</strong><small>/100</small><b id="premiumReadinessStatus">CHECK IN</b></div></div>
         <div class="command-readiness-metrics">
           <span>Sleep <b id="premiumSleep">—</b></span>
-          <span>Soreness <b id="premiumSoreness">—</b></span>
+          <span>Body <b id="premiumBody">—</b></span>
           <span>Energy <b id="premiumEnergy">—</b></span>
-          <span>Motivation <b id="premiumMotivation">—</b></span>
           <span>Pain <b id="commandPain">—</b></span>
           <span>Time <b id="commandTime">—</b></span>
         </div>
       </div>
       <p class="command-visually-hidden" id="premiumReadinessDetail">Complete today’s check-in to personalize your training.</p>
-      <button class="command-text-action premium-readiness-update" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')" type="button">Update Check-In ›</button>
+      <button class="command-text-action premium-readiness-update" onclick="openDailyReadiness()" type="button">Update Check-In ›</button>
     </article>
 
     <article class="command-card command-briefing">
@@ -142,7 +141,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="mission-status-card green" id="trainingStatusCard">
 <div class="status-emblem"><div class="status-shield">✓</div></div>
 <div class="status-copy"><span class="metric-label">Mission Status</span><strong id="trainingStatusOut">Ready to Train</strong><p id="missionPurpose">You are recovered and cleared for a full training day.</p><button class="ghost-button" onclick="document.getElementById('readinessDetailPanel').classList.toggle('hidden')">Why am I here? ›</button></div>
-<div class="readiness-summary"><div class="readiness-summary-header"><span class="metric-label">Today's Readiness</span><button class="readiness-checkin-button" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')">Update Check-In</button></div><div class="readiness-line"><span>☾ Sleep</span><b id="dashSleep">Good</b><i></i></div><div class="readiness-line"><span>♨ Soreness</span><b id="dashSoreness">Low</b><i></i></div><div class="readiness-line"><span>ϟ Energy</span><b id="dashEnergy">High</b><i></i></div><div class="readiness-line"><span>🔥 Motivation</span><b id="dashMotivation">High</b><i></i></div><div class="readiness-line"><span>◷ Time</span><b id="dashTime">60–75 min</b><i></i></div></div>
+<div class="readiness-summary"><div class="readiness-summary-header"><span class="metric-label">Today's Readiness</span><button class="readiness-checkin-button" onclick="openDailyReadiness()">Update Check-In</button></div><div class="readiness-line"><span>☾ Sleep</span><b id="dashSleep">Good</b><i></i></div><div class="readiness-line"><span>♨ Body</span><b id="dashBody">Normal</b><i></i></div><div class="readiness-line"><span>ϟ Energy</span><b id="dashEnergy">High</b><i></i></div><div class="readiness-line"><span>⚠ Pain</span><b id="dashPain">None</b><i></i></div><div class="readiness-line"><span>◷ Time</span><b id="dashTime">60–75 min</b><i></i></div></div>
 </div>
 <div class="card hidden" id="readinessDetailPanel"><div class="hint" id="readinessExplanation">Your readiness details will appear here.</div></div>
 <div class="dashboard-grid readiness-dashboard-grid">
@@ -160,7 +159,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="hidden" id="todayPreview"></div>
 <div class="recovery-prescription-card" id="recoveryPrescriptionCard"><div class="recovery-icon">♿</div><div><span class="metric-label">Today's Recovery Prescription</span><strong id="mobilityDashboardTitle">10 min Mobility Flow</strong><div class="hint" id="mobilityDashboardDetail">Matched to today's training • Complete morning or evening</div></div><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">›</button></div>
 <div class="quick-actions"><button onclick="document.getElementById('nutritionMode').scrollIntoView({behavior:'smooth'})"><span>🍴</span><strong>Nutrition</strong><small>Fuel the mission</small></button><button onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})"><span>♡</span><strong>Recovery</strong><small>Rest. Recover. Rebuild.</small></button><button onclick="showScreen('history')"><span>▥</span><strong>Progress</strong><small>Track results</small></button><button onclick="showScreen('habits')"><span>◎</span><strong>Habits</strong><small>Build consistency</small></button></div>
-<div class="card readiness-access-note"><div><span class="metric-label">Daily Readiness</span><strong>Check-in available at the top of your dashboard</strong><div class="hint">Use the Update Check-In button inside Mission Status whenever your readiness changes.</div></div><button class="secondary" onclick="window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=&gt;document.getElementById('dailyReadinessModal').classList.remove('hidden'),350)">Open Check-In</button></div>
+<div class="card readiness-access-note"><div><span class="metric-label">Daily Readiness</span><strong>Check-in available at the top of your dashboard</strong><div class="hint">Use the Update Check-In button inside Mission Status whenever your readiness changes.</div></div><button class="secondary" onclick="window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=&gt;openDailyReadiness(),350)">Open Check-In</button></div>
 <div class="card"><h3>Current Training Block</h3><div class="status-line"><div><div class="mission-title" id="blockTitle">No active block</div><div class="sub" id="blockStatus">Build a goal-based plan in More.</div></div><div class="pill" id="blockWeekPill">—</div></div><div class="mini-progress"><div id="blockProgressBar"></div></div><div class="hint" id="blockRunSummary"></div><button class="secondary" id="advanceBlockButton" onclick="openWeeklyDebrief(true)">Complete Week</button></div>
 <div class="card upcoming-block-card hidden" id="upcomingBlockCard"><div class="card-title-row"><div><span class="metric-label">Upcoming Training Block</span><h3 id="upcomingBlockTitle">New Training Block</h3></div><span class="pill">Scheduled</span></div><div class="mission-title" id="upcomingBlockFocus"></div><div class="hint" id="upcomingBlockStart"></div><div class="row"><button class="secondary" onclick="activateUpcomingBlockNow()">Start Today</button><button class="danger" onclick="cancelUpcomingBlock()">Cancel</button></div></div>
 <div class="card"><h3>Coach Guidance</h3><div class="mission-title" id="coachHeadline">Today's guidance</div><div class="hint" id="coachRecommendation"></div></div>
@@ -486,16 +485,36 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </div>
 </div>
 </div>
-<div class="modal hidden" id="dailyReadinessModal"><div class="modal-box onboarding-box readiness-modal-box"><div class="card premium-form-card readiness-slider-form"><div class="readiness-form-heading"><div><span class="metric-label">Daily Readiness</span><h2>How are you showing up?</h2><p class="sub">Slide each answer once. Every 1–5 scale runs in the same direction: 1 is your lowest status and 5 is your best.</p></div><button aria-label="Close readiness check-in" class="modal-close" onclick="document.getElementById('dailyReadinessModal').classList.add('hidden')" type="button">×</button></div>
-<div class="readiness-slider-list">
-<label class="readiness-slider-row sleep-slider-row" for="promptSleepDurationMinutes"><div class="readiness-slider-heading"><span>Sleep duration</span><strong id="promptSleepDurationValue">7h 30m</strong></div><input id="promptSleepDurationMinutes" max="720" min="180" oninput="updateReadinessSliderDisplay()" step="15" type="range" value="450"/><div class="readiness-slider-ends"><span>3h</span><small>15-minute increments</small><span>12h</span></div></label>
-<label class="readiness-slider-row" for="promptsleepQuality"><div class="readiness-slider-heading"><span>Sleep quality</span><strong id="promptsleepQualityValue">4 · Good</strong></div><input id="promptsleepQuality" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="4"/><div class="readiness-slider-ends"><span>1 · Poor</span><span>5 · Excellent</span></div></label>
-<label class="readiness-slider-row" for="promptenergy"><div class="readiness-slider-heading"><span>Energy</span><strong id="promptenergyValue">4 · Energized</strong></div><input id="promptenergy" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="4"/><div class="readiness-slider-ends"><span>1 · Depleted</span><span>5 · Fully energized</span></div></label>
-<label class="readiness-slider-row" for="promptrecoveryStatus"><div class="readiness-slider-heading"><span>Muscle and joint recovery</span><strong id="promptrecoveryStatusValue">4 · Mostly fresh</strong></div><input id="promptrecoveryStatus" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="4"/><div class="readiness-slider-ends"><span>1 · Very sore</span><span>5 · Fresh and pain-free</span></div></label>
-<label class="readiness-slider-row" for="promptmotivation"><div class="readiness-slider-heading"><span>Motivation</span><strong id="promptmotivationValue">4 · Ready</strong></div><input id="promptmotivation" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="4"/><div class="readiness-slider-ends"><span>1 · Very low</span><span>5 · Highly motivated</span></div></label>
-<label class="readiness-slider-row" for="prompttimeAvailability"><div class="readiness-slider-heading"><span>Time available</span><strong id="prompttimeAvailabilityValue">3 · 45–60 min</strong></div><input id="prompttimeAvailability" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="3"/><div class="readiness-slider-ends"><span>1 · 20–30 min</span><span>5 · 90+ min</span></div></label>
+<div class="modal hidden" id="dailyReadinessModal"><div class="modal-box onboarding-box readiness-modal-box"><div class="card premium-form-card quick-readiness-form"><div class="readiness-form-heading"><div><span class="metric-label">10-Second Daily Check-In</span><h2>How are you showing up?</h2><p class="sub">Choose the answer that best matches today. Bell uses sleep, body recovery, and energy to calculate readiness. Time only changes session length.</p></div><button aria-label="Close readiness check-in" class="modal-close" onclick="document.getElementById('dailyReadinessModal').classList.add('hidden')" type="button">×</button></div>
+<div class="quick-readiness-list">
+<section class="quick-readiness-question" data-question="sleep"><div class="quick-question-heading"><span>1</span><div><h3>How did you sleep?</h3><p>Think about both duration and quality.</p></div></div><div class="quick-choice-grid three" role="group" aria-label="How did you sleep?">
+<button type="button" data-readiness-group="sleep" data-value="poor" aria-pressed="false" onclick="selectDailyReadinessChoice('sleep','poor')"><strong>Poor</strong><small>Short or restless</small></button>
+<button type="button" data-readiness-group="sleep" data-value="okay" aria-pressed="false" onclick="selectDailyReadinessChoice('sleep','okay')"><strong>Okay</strong><small>Enough to function</small></button>
+<button type="button" data-readiness-group="sleep" data-value="good" aria-pressed="false" onclick="selectDailyReadinessChoice('sleep','good')"><strong>Good</strong><small>Rested and recovered</small></button>
+</div></section>
+<section class="quick-readiness-question" data-question="body"><div class="quick-question-heading"><span>2</span><div><h3>How does your body feel?</h3><p>Rate normal muscle and joint recovery—not an injury.</p></div></div><div class="quick-choice-grid three" role="group" aria-label="How does your body feel?">
+<button type="button" data-readiness-group="body" data-value="beat-up" aria-pressed="false" onclick="selectDailyReadinessChoice('body','beat-up')"><strong>Beat Up</strong><small>Very sore or stiff</small></button>
+<button type="button" data-readiness-group="body" data-value="normal" aria-pressed="false" onclick="selectDailyReadinessChoice('body','normal')"><strong>Normal</strong><small>Expected soreness</small></button>
+<button type="button" data-readiness-group="body" data-value="fresh" aria-pressed="false" onclick="selectDailyReadinessChoice('body','fresh')"><strong>Fresh</strong><small>Loose and recovered</small></button>
+</div></section>
+<section class="quick-readiness-question" data-question="energy"><div class="quick-question-heading"><span>3</span><div><h3>How is your energy?</h3><p>Choose your current physical and mental drive.</p></div></div><div class="quick-choice-grid three" role="group" aria-label="How is your energy?">
+<button type="button" data-readiness-group="energy" data-value="drained" aria-pressed="false" onclick="selectDailyReadinessChoice('energy','drained')"><strong>Drained</strong><small>Low battery</small></button>
+<button type="button" data-readiness-group="energy" data-value="steady" aria-pressed="false" onclick="selectDailyReadinessChoice('energy','steady')"><strong>Steady</strong><small>Normal day</small></button>
+<button type="button" data-readiness-group="energy" data-value="fired-up" aria-pressed="false" onclick="selectDailyReadinessChoice('energy','fired-up')"><strong>Fired Up</strong><small>Strong and motivated</small></button>
+</div></section>
+<section class="quick-readiness-question compact" data-question="pain"><div class="quick-question-heading"><span>4</span><div><h3>Any pain or injury concern today?</h3><p>Keep pain separate from ordinary training soreness.</p></div></div><div class="quick-choice-grid two" role="group" aria-label="Any pain or injury concern today?">
+<button type="button" data-readiness-group="pain" data-value="no" aria-pressed="false" onclick="selectDailyPain('no')"><strong>No</strong><small>No concern</small></button>
+<button type="button" data-readiness-group="pain" data-value="yes" aria-pressed="false" onclick="selectDailyPain('yes')"><strong>Yes</strong><small>Flag it for Bell</small></button>
+</div><div class="quick-pain-detail hidden" id="quickPainDetail"><label for="promptPainNotes">What is bothering you?<textarea id="promptPainNotes" oninput="updateQuickReadinessSubmitState()" placeholder="Example: sharp pain in my right shoulder during pressing"></textarea></label><div class="quick-safety-note">Do not train through sharp pain, chest pain, dizziness, weakness, or other concerning symptoms. Stop and seek appropriate medical guidance.</div></div></section>
+<section class="quick-readiness-question compact" data-question="time" id="dailyTimeQuestion"><div class="quick-question-heading"><span>5</span><div><h3>How much time do you have?</h3><p>This changes session length, not your readiness score.</p></div></div><div class="quick-choice-grid time" role="group" aria-label="Time available today">
+<button type="button" data-readiness-group="time" data-value="20" aria-pressed="false" onclick="selectDailyTime(20)"><strong>20</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="30" aria-pressed="false" onclick="selectDailyTime(30)"><strong>30</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="45" aria-pressed="false" onclick="selectDailyTime(45)"><strong>45</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="60" aria-pressed="false" onclick="selectDailyTime(60)"><strong>60</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="75" aria-pressed="false" onclick="selectDailyTime(75)"><strong>75+</strong><small>min</small></button>
+</div></section>
 </div>
-<div class="readiness-scale-note">Higher is always better. “Muscle and joint recovery” replaces the old soreness scale, so 5 means fresh and ready rather than highly sore.</div><button class="good premium-primary-button" onclick="saveDailyReadinessPrompt()">Set Today’s Mission Status</button></div></div></div>
+<div class="quick-readiness-footer"><p id="quickReadinessProgress" aria-live="polite">Answer each question to continue.</p><button class="good premium-primary-button" id="quickReadinessSubmit" disabled onclick="saveDailyReadinessPrompt()" type="button">Build Today’s Mission</button></div></div></div></div>
 <div class="modal hidden" id="sessionFeedbackModal"><div class="modal-box onboarding-box"><div class="card"><span class="metric-label">Training Debrief</span><h2 id="feedbackTitle">How did that session land?</h2><p class="sub" id="feedbackIntro">This feedback helps regulate future training load.</p>
 <div id="strengthFeedbackFields"><div class="feedback-grid"><label>How did the training feel?<select id="feedbackSessionQuality"><option value="1">1 — Poor</option><option value="2">2 — Below average</option><option selected="" value="3">3 — Solid</option><option value="4">4 — Very good</option><option value="5">5 — Excellent</option></select></label><label>Energy afterward<select id="feedbackPostEnergy"><option value="1">1 — Drained</option><option value="2">2 — Low</option><option selected="" value="3">3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Energized</option></select></label><label>How do you feel overall?<select id="feedbackOverallFeeling"><option value="1">1 — Rough</option><option value="2">2 — Below normal</option><option selected="" value="3">3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Great</option></select></label><label>Muscle/joint strain<select id="feedbackStrain"><option value="1">1 — None</option><option value="2">2 — Mild</option><option selected="" value="3">3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Concerning</option></select></label></div></div>
 <div class="hidden" id="engineFeedbackFields"><div class="feedback-grid"><label>Did you match the prescribed effort?<select id="engineFeedbackEffort"><option value="1">1 — Far too hard</option><option value="2">2 — Somewhat too hard</option><option selected="" value="3">3 — On target</option><option value="4">4 — Slightly easier than planned</option><option value="5">5 — Very controlled</option></select></label><label>Breathing control<select id="engineFeedbackBreathing"><option value="1">1 — Could not control</option><option value="2">2 — Struggled</option><option selected="" value="3">3 — Appropriate</option><option value="4">4 — Comfortable</option><option value="5">5 — Very comfortable</option></select></label><label>Leg freshness afterward<select id="engineFeedbackLegs"><option value="1">1 — Heavy / depleted</option><option value="2">2 — More tired than expected</option><option selected="" value="3">3 — Normal</option><option value="4">4 — Fresh</option><option value="5">5 — Very fresh</option></select></label><label>Pain or concerning symptoms<select id="engineFeedbackSymptoms"><option selected="" value="1">1 — None</option><option value="2">2 — Minor irritation</option><option value="3">3 — Noticeable discomfort</option><option value="4">4 — Significant pain</option><option value="5">5 — Stop / seek guidance</option></select></label></div></div>
@@ -630,11 +649,11 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.6.0-readiness-control-modes";</script>
+<script>window.BELL_APP_VERSION = "13.6.1-quick-daily-check-in";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=10006"></script>
-<script src="./js/storage.js?v=13600"></script>
-<script src="./js/readiness.js?v=13600"></script>
+<script src="./js/storage.js?v=13610"></script>
+<script src="./js/readiness.js?v=13610"></script>
 <script src="./js/equipment.js?v=10006"></script>
 <script>{const grid=document.getElementById("equipmentGrid");if(grid)grid.innerHTML=equipmentCheckboxesHtml("equipment");const onboardingGrid=document.getElementById("onboardingEquipmentGrid");if(onboardingGrid)onboardingGrid.innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");}</script>
 <script src="./js/training-blocks.js?v=13600"></script>
@@ -648,21 +667,21 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/performance-review.js?v=10006"></script>
 <script src="./js/artwork.js?v=10006"></script>
 <script src="./js/quote-cache.js?v=10006"></script>
-<script src="./js/ui.js?v=10006"></script>
+<script src="./js/ui.js?v=13610"></script>
 <script src="./js/habits.js?v=10006"></script>
-<script src="./js/dual-goals.js?v=10006"></script>
+<script src="./js/dual-goals.js?v=13610"></script>
 <script src="./js/version-8.js?v=13600"></script>
 <script src="./js/mission-planner.js?v=10006"></script>
 <script src="./js/coaching-pathways.js?v=13600"></script>
 <script src="./js/event-coaching.js?v=13600"></script>
 <script src="./js/how-to.js?v=10006"></script>
-<script src="./js/premium-dashboard.js?v=11000"></script>
+<script src="./js/premium-dashboard.js?v=13610"></script>
 <script src="./js/block-lifecycle.js?v=10006"></script>
 <script src="./js/weekly-debrief.js?v=10006"></script>
 <script src="./js/plan-progress.js?v=10006"></script>
 <script src="./js/bell-api.js?v=13600"></script>
 <script src="./js/api-integration.js?v=12101"></script>
-<script src="./js/dashboard-command-center.js?v=13600"></script>
+<script src="./js/dashboard-command-center.js?v=13610"></script>
 <script src="./js/adaptive-weekly-schedule.js?v=12240"></script>
 <script src="./js/powerlifting-programming.js?v=12212"></script>
 <script src="./js/powerlifting-meet-prep.js?v=12213"></script>
@@ -671,6 +690,6 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/bell13-dashboard.js?v=13200"></script>
 <script src="./js/bell13-athlete-experience.js?v=13600"></script>
 <script src="./js/bell13-coach-intelligence.js?v=13600"></script>
-<script src="./js/bell13-commercial-home.js?v=13600"></script>
+<script src="./js/bell13-commercial-home.js?v=13610"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 "use strict";
-/* Bell Performance 13.6.0 — readiness dashboard and application-control modes. */
+/* Bell Performance 13.6.1 — readiness dashboard and application-control modes. */
 (function(){
   const $=id=>document.getElementById(id);
   const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -157,7 +157,7 @@
   }
 
   function bind(){
-    $("b135ReadinessUpdate").onclick=()=>{if(typeof populateReadinessPrompt==="function")populateReadinessPrompt();document.getElementById("dailyReadinessModal")?.classList.remove("hidden");};
+    $("b135ReadinessUpdate").onclick=()=>{if(typeof openDailyReadiness==="function")openDailyReadiness();};
   }
 
   function navButtonByAction(fragment){return [...document.querySelectorAll('.app-nav button')].find(button=>(button.getAttribute('onclick')||'').includes(fragment));}

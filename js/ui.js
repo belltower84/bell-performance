@@ -644,6 +644,7 @@ function saveFirstFlightProfile(){
   if(!Number.isFinite(feet)||feet<3||feet>7||!Number.isFinite(inches)||inches<0||inches>11){byId("onboardingHeightFeet").focus();alert("Enter a valid height in feet and inches.");return false;}
   const invalidMax=Object.entries(onboardingMaxes).find(([,value])=>Number.isNaN(value));
   if(invalidMax){const id={bench:"onboardingBenchMax",squat:"onboardingSquatMax",deadlift:"onboardingDeadliftMax",pushPress:"onboardingPushPressMax"}[invalidMax[0]];byId(id).focus();alert("Enter a positive max lift or leave the field blank.");return false;}
+  if(bpPrimaryGoal()==="Powerlifting"&&![onboardingMaxes.squat,onboardingMaxes.bench,onboardingMaxes.deadlift].every(value=>Number.isFinite(Number(value))&&Number(value)>0)){byId("onboardingSquatMax").focus();alert("Powerlifting coaching requires current squat, bench press, and deadlift maxes so Bell can calculate top sets and back-off work.");return false;}
   data.settings.athleteName=name;
   data.settings.sex=byId("onboardingSex").value||"Prefer not to say";
   data.settings.athleteMode=byId("onboardingAthleteMode").value||"Hybrid Athlete";

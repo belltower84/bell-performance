@@ -99,7 +99,7 @@ function scaledTemplate(name) {
   const profile = scalingProfile();
   const isMobility = name.startsWith("M-");
   const isRun = name.startsWith("R-");
-  return {
+  const scaled = {
     ...base,
     name,
     label:getWorkoutLabel(name),
@@ -132,6 +132,24 @@ function scaledTemplate(name) {
       return true;
     })
   };
+  scaled.exercises.forEach((exercise,index)=>{
+    if(!/back[- ]?off/i.test(String(exercise.block||"")))return;
+    let sourceIndex=-1;
+    for(let i=index-1;i>=0;i--){if(scaled.exercises[i].name===exercise.name){sourceIndex=i;break;}}
+    if(sourceIndex<0)return;
+    const source=scaled.exercises[sourceIndex];
+    const percentages=String(exercise.reps||"").match(/(\d{2,3})(?:\s*[–-]\s*(\d{2,3}))?%/);
+    if(!percentages||!Number.isFinite(Number(source.recommendedWeight)))return;
+    const low=Number(percentages[1]),high=Number(percentages[2]||percentages[1]);
+    const factor=((low+high)/2)/100;
+    const backoff=roundTo5(Number(source.recommendedWeight)*factor);
+    exercise.backoffSourceIndex=sourceIndex;
+    exercise.backoffPercent=factor;
+    exercise.recommendedWeight=backoff;
+    exercise.recommendationDisplay=`${backoff} lb`;
+    exercise.recommendationNote=`Automatically calculated at ${low}${high!==low?`–${high}`:""}% of the recommended top-set load (${source.recommendedWeight} lb). Editing the top-set weight updates this block.`;
+  });
+  return scaled;
 }
 
 function warmupSetsFor(exercise) {
@@ -192,7 +210,7 @@ function beginWorkout(name, context={}) {
   const planned=context.planId?data.plan?.find(item=>item.id===context.planId):data.plan?.find(item=>!item.done&&(item.mission===name||item.secondaryMission===name));
   const plannedDuration=planned?.mission===name?planned?.prescribedDuration:planned?.secondaryDuration;
   const prescribedDuration=Math.max(10,Number(plannedDuration)||Number(template.duration)||30);
-  data.activeWorkout={name,label:template.label,rotationWeek:template.rotationWeek,duration:prescribedDuration,prescribedDuration,startedAt:null,timerStartedAt:null,timerAccumulatedSeconds:0,timerRunning:false,stage:"briefing",planId:context.planId||planned?.id||null,planSessionKey:context.sessionKey||null,scheduledDate:context.scheduledDate||planned?.scheduledDate||null,optionalCore:Boolean(context.optionalCore),elapsed:0,rpe:"",notes:"",readiness:{score:readinessScore(),status:readinessStatus()},cardioType:name.startsWith("R-")?(data.settings.cardioType||"Running"):null,engineMetrics:name.startsWith("R-")?{manualTime:"",distance:"",distanceUnit:(data.settings.cardioType==="Swimming"?"m":"mi"),avgHeartRate:"",elevationGain:"",elevationUnit:"ft"}:null,exercises:template.exercises.map(rawExercise=>{const exercise=(typeof applySavedExerciseReplacement==="function"?applySavedExerciseReplacement(rawExercise):rawExercise);return ({name:exercise.name,block:exercise.block,prescription:`${exercise.sets} × ${exercise.reps}`,originalSets:exercise.originalSets,cue:exercise.cue,equipmentAdjusted:exercise.equipmentAdjusted,injuryAdjusted:exercise.injuryAdjusted,restrictedPattern:exercise.restrictedPattern,originalExercise:exercise.originalExercise,scaleNote:exercise.scaleNote,recommendedWeight:exercise.recommendedWeight,recommendationDisplay:exercise.recommendationDisplay,recommendationNote:exercise.recommendationNote,advancedTechnique:exercise.advancedTechnique||null,bellPhase:exercise.bellPhase||null,rest:exercise.rest||0,feedback:"",feedbackSaved:false,methodology:(typeof methodologyForExercise==="function"?methodologyForExercise(exercise).name:"Progressive overload"),sets:Array.from({length:exercise.sets},(_,index)=>({set:index+1,weight:typeof exercise.recommendedWeight==="number"?exercise.recommendedWeight:"",reps:exercise.reps,done:false}))});})};
+  data.activeWorkout={name,label:template.label,rotationWeek:template.rotationWeek,duration:prescribedDuration,prescribedDuration,startedAt:null,timerStartedAt:null,timerAccumulatedSeconds:0,timerRunning:false,stage:"briefing",planId:context.planId||planned?.id||null,planSessionKey:context.sessionKey||null,scheduledDate:context.scheduledDate||planned?.scheduledDate||null,optionalCore:Boolean(context.optionalCore),elapsed:0,rpe:"",notes:"",readiness:{score:readinessScore(),status:readinessStatus()},cardioType:name.startsWith("R-")?(data.settings.cardioType||"Running"):null,engineMetrics:name.startsWith("R-")?{manualTime:"",distance:"",distanceUnit:(data.settings.cardioType==="Swimming"?"m":"mi"),avgHeartRate:"",elevationGain:"",elevationUnit:"ft"}:null,exercises:template.exercises.map(rawExercise=>{const exercise=(typeof applySavedExerciseReplacement==="function"?applySavedExerciseReplacement(rawExercise):rawExercise);return ({name:exercise.name,block:exercise.block,prescription:`${exercise.sets} × ${exercise.reps}`,originalSets:exercise.originalSets,cue:exercise.cue,equipmentAdjusted:exercise.equipmentAdjusted,injuryAdjusted:exercise.injuryAdjusted,restrictedPattern:exercise.restrictedPattern,originalExercise:exercise.originalExercise,scaleNote:exercise.scaleNote,recommendedWeight:exercise.recommendedWeight,recommendationDisplay:exercise.recommendationDisplay,recommendationNote:exercise.recommendationNote,backoffSourceIndex:exercise.backoffSourceIndex,backoffPercent:exercise.backoffPercent,advancedTechnique:exercise.advancedTechnique||null,bellPhase:exercise.bellPhase||null,rest:exercise.rest||0,feedback:"",feedbackSaved:false,methodology:(typeof methodologyForExercise==="function"?methodologyForExercise(exercise).name:"Progressive overload"),sets:Array.from({length:exercise.sets},(_,index)=>({set:index+1,weight:typeof exercise.recommendedWeight==="number"?exercise.recommendedWeight:"",reps:exercise.reps,done:false}))});})};
   if(typeof bpNormalizeWorkout==="function")bpNormalizeWorkout(data.activeWorkout);
   saveData({render:false}); openWorkoutUI();
 }
@@ -265,7 +283,7 @@ function renderActiveWorkout() {
   setText("currentExerciseOut", nextExercise ? nextExercise.name : "All working sets complete");
   document.getElementById("sessionRpe").value=active.rpe||"";document.getElementById("sessionNotes").value=active.notes||"";updateTimerDisplay();updateWorkoutProgress();
 }
-function updateSet(exerciseIndex,setIndex,field,value){const exercise=data.activeWorkout.exercises[exerciseIndex];exercise.sets[setIndex][field]=value;saveData({render:false});updateWorkoutProgress();if(field==='done'&&value){const next=exercise.sets.find(set=>!set.done);if(next){beginRestTimer(exercise.rest||60,exercise.name);}else{const nextExercise=data.activeWorkout.exercises.slice(exerciseIndex+1).find(ex=>ex.sets.some(set=>!set.done));setText('currentExerciseOut',nextExercise?nextExercise.name:'All working sets complete');if(nextExercise)beginRestTimer(Math.min(90,exercise.rest||60),nextExercise.name);}}}
+function updateSet(exerciseIndex,setIndex,field,value){const exercise=data.activeWorkout.exercises[exerciseIndex];exercise.sets[setIndex][field]=value;if(field==='weight'&&setIndex===0){const topLoad=Number(value);let changed=false;data.activeWorkout.exercises.forEach(candidate=>{if(candidate.backoffSourceIndex!==exerciseIndex||!Number.isFinite(topLoad)||topLoad<=0)return;const backoff=roundTo5(topLoad*Number(candidate.backoffPercent||0));candidate.recommendedWeight=backoff;candidate.recommendationDisplay=`${backoff} lb`;candidate.recommendationNote=`Automatically recalculated from the entered top-set load of ${topLoad} lb.`;candidate.sets.forEach(set=>{if(!set.done)set.weight=backoff;});changed=true;});if(changed){saveData({render:false});renderActiveWorkout();return;}}saveData({render:false});updateWorkoutProgress();if(field==='done'&&value){const next=exercise.sets.find(set=>!set.done);if(next){beginRestTimer(exercise.rest||60,exercise.name);}else{const nextExercise=data.activeWorkout.exercises.slice(exerciseIndex+1).find(ex=>ex.sets.some(set=>!set.done));setText('currentExerciseOut',nextExercise?nextExercise.name:'All working sets complete');if(nextExercise)beginRestTimer(Math.min(90,exercise.rest||60),nextExercise.name);}}}
 function recordExerciseFeedback(exerciseIndex, feedback){
   const exercise=data.activeWorkout?.exercises?.[exerciseIndex]; if(!exercise)return; exercise.feedback=feedback; exercise.feedbackSaved=true; saveData({render:false}); renderActiveWorkout();
 }

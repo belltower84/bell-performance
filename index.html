@@ -387,7 +387,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div><label>Bodyweight (lb)</label><input id="onboardingBodyweight" max="700" min="50" placeholder="Bodyweight" step="0.1" type="number"/></div>
 <div class="height-profile-field"><label>Height</label><div class="height-inputs"><input id="onboardingHeightFeet" max="7" min="3" placeholder="ft" type="number"/><input id="onboardingHeightInches" max="11" min="0" placeholder="in" type="number"/></div></div>
 </div>
-<input id="onboardingGoalWeight" type="hidden"/><input id="onboardingBenchMax" type="hidden"/><input id="onboardingSquatMax" type="hidden"/><input id="onboardingDeadliftMax" type="hidden"/><input id="onboardingPushPressMax" type="hidden"/>
+<input id="onboardingGoalWeight" type="hidden"/>
 <div class="first-flight-callout"><strong>Why we ask</strong><span>Age, height, and bodyweight help set sensible training volume, exercise scaling, and nutrition estimates.</span></div>
 </section>
 <section class="onboarding-step" data-onboarding-step="1">
@@ -428,6 +428,17 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <section class="onboarding-step" data-onboarding-step="4">
 <span class="first-flight-kicker">Flight Check 05</span><h3>Set your starting point</h3>
 <p class="sub">Training experience, current limitations, and readiness help Bell Performance scale the first week responsibly.</p>
+<div class="onboarding-strength-baseline" id="onboardingStrengthBaseline">
+<span class="first-flight-kicker">Strength Baseline</span><h3>Enter your current max lifts</h3>
+<p class="sub">Bell uses these numbers to calculate starting weights and automatic back-off sets. Powerlifting athletes must enter squat, bench press, and deadlift maxes.</p>
+<div class="profile-basics-grid">
+<div><label>Back Squat 1RM (lb)</label><input id="onboardingSquatMax" inputmode="decimal" min="1" placeholder="Example: 405" type="number"/></div>
+<div><label>Bench Press 1RM (lb)</label><input id="onboardingBenchMax" inputmode="decimal" min="1" placeholder="Example: 275" type="number"/></div>
+<div><label>Deadlift 1RM (lb)</label><input id="onboardingDeadliftMax" inputmode="decimal" min="1" placeholder="Example: 455" type="number"/></div>
+<div><label>Push Press 1RM (optional)</label><input id="onboardingPushPressMax" inputmode="decimal" min="1" placeholder="Optional" type="number"/></div>
+</div>
+<div class="first-flight-callout"><strong>Use a reliable training max</strong><span>Enter a recent true 1RM or a conservative estimated 1RM. These can be updated later in Athlete Settings.</span></div>
+</div>
 <label>Training experience</label><div class="experience-choice-grid">
 <label><input name="onboardingExperience" type="radio" value="Beginner"/><span><strong>Beginner</strong><small>New or returning after a long break</small></span></label>
 <label><input checked="" name="onboardingExperience" type="radio" value="Intermediate"/><span><strong>Intermediate</strong><small>Consistent training experience</small></span></label>

@@ -1,5 +1,5 @@
 "use strict";
-/* Bell Performance 13.6.1 — readiness dashboard and application-control modes. */
+/* Bell Performance 13.6.5 — streamlined recovery-day launch flow. */
 (function(){
   const $=id=>document.getElementById(id);
   const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -152,7 +152,11 @@
     let completed=0;try{completed=(data.history||[]).filter(x=>x.completed||x.status==="completed").length;}catch(_){}
     $("b135ProgressValue").textContent=completed?`${completed} sessions`:"Getting started";$("b135ProgressTrend").textContent=completed?"On track":"Building";
     const start=$("b135Start"),view=$("b135View"),modify=$("b135Modify"),legacyStart=$("commandStartWorkout"),legacyView=$("commandViewSession"),legacyModify=$("commandModifySession");
-    start.textContent=legacyStart?.textContent?.trim()||(m.sessions.length?"Start Training":"Open Recovery");start.onclick=()=>legacyStart?.click();view.onclick=()=>legacyView?.click();modify.onclick=()=>legacyModify?.click();
+    start.disabled=Boolean(legacyStart?.disabled);view.disabled=Boolean(legacyView?.disabled);modify.disabled=Boolean(legacyModify?.disabled);
+    start.textContent=legacyStart?.textContent?.trim()||(m.sessions.length?"Start Training":"Start Recovery");
+    view.textContent=legacyView?.textContent?.trim()||(m.sessions.length?"View Session":"View Recovery");
+    modify.textContent=legacyModify?.textContent?.trim()||(m.sessions.length?"Modify":"Recovery Options");
+    start.onclick=()=>legacyStart?.click();view.onclick=()=>legacyView?.click();modify.onclick=()=>legacyModify?.click();
     $("b135WhyMission").hidden=!coachMode;$("b135WhyMission").onclick=()=>{if(window.openBellCoachExplanation)openBellCoachExplanation("mission");else openCommandTile("coaching");};
   }
 

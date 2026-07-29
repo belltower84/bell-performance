@@ -1,7 +1,7 @@
 "use strict";
-/* Bell Performance 13.6.4 — refined Training Setup, equipment locations, and Settings controls. */
+/* Bell Performance 13.6.5 — streamlined recovery-day launch flow and existing Settings controls. */
 (function(){
-  const VERSION="13.6.4";
+  const VERSION="13.6.5";
   const $=id=>document.getElementById(id);
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,Number(value)||0));
   const clean=value=>String(value??"").replace(/\s+/g," ").trim();

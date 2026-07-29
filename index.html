@@ -9,8 +9,8 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
-<title>Bell Performance 13.6.4 — Training Setup Refinement</title>
-<link href="./css/app.css?v=12211" rel="stylesheet"/>
+<title>Bell Performance 13.6.5 — Recovery Day Flow</title>
+<link href="./css/app.css?v=13660" rel="stylesheet"/>
 <link href="./css/bell13.css?v=13300" rel="stylesheet"/>
 <link href="./css/bell134.css?v=13620" rel="stylesheet"/>
 <link href="./css/bell135.css?v=13610" rel="stylesheet"/>
@@ -174,13 +174,16 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <section class="screen" id="plan"><h2 class="section-title">Training Plan</h2><div id="planProgressArea"></div><div class="list" id="planList"></div></section>
 <section class="screen" id="workouts"><div class="section-heading"><h2 class="section-title">Training Library</h2><button onclick="openExerciseLibrary()" type="button">Exercise Library ›</button></div><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div class="list" id="workoutLibrary"></div></section>
 <section class="screen" id="exerciseLibrary">
-<div class="section-heading"><div><span class="metric-label">Movement Education &amp; Substitution</span><h2 class="section-title">Exercise Intelligence Library</h2></div><button onclick="showScreen('more')" type="button">Settings ›</button></div>
-<div class="card exercise-library-intro"><div><h3>Understand it. Perform it. Replace it intelligently.</h3><p class="sub">Search every movement currently used by Bell Performance. Open an exercise for setup, execution, muscles trained, common mistakes, and purpose-matched alternatives.</p></div><div class="library-count"><strong id="exerciseLibraryCount">0</strong><span>movements</span></div></div>
-<div class="card exercise-library-controls">
-<label class="library-search">Search exercises<input id="exerciseLibrarySearch" oninput="renderExerciseLibrary()" placeholder="Try squat, chest, dumbbell, running…" type="search"/></label>
-<div class="library-filter-grid"><label>Movement pattern<select id="exercisePatternFilter" onchange="renderExerciseLibrary()"><option value="all">All patterns</option></select></label><label>Equipment<select id="exerciseEquipmentFilter" onchange="renderExerciseLibrary()"><option value="all">All equipment</option></select></label><label>Training role<select id="exerciseRoleFilter" onchange="renderExerciseLibrary()"><option value="all">All roles</option><option value="strength">Strength</option><option value="hypertrophy">Hypertrophy</option><option value="power">Power</option><option value="conditioning">Conditioning</option><option value="mobility">Mobility</option></select></label></div>
+<div class="library-shell">
+<div class="library-main-column">
+<div class="section-heading library-heading"><div><span class="metric-label">Training Library</span><h2 class="section-title">Training Library</h2><p class="sub">Learn every movement with Bell-style coaching guides.</p></div><button class="secondary" onclick="showScreen('workouts')" type="button">Back to Training ›</button></div>
+<div class="library-top-controls"><label class="library-search-bar"><span aria-hidden="true">⌕</span><input id="exerciseLibrarySearch" oninput="renderExerciseLibrary()" placeholder="Search exercises..." type="search"/></label><button class="secondary" id="libraryFavoritesButton" onclick="toggleLibraryFavoritesFilter()" type="button">View My Favorites</button></div>
+<div class="library-chip-row" id="libraryCategoryChips"></div>
+<div class="card library-featured-wrap"><div class="library-block-heading"><div><span class="metric-label">Pilot Library</span><h3>Featured Guides</h3></div><div class="library-results-meta"><strong id="exerciseLibraryCount">0</strong><span>guides shown</span></div></div><div class="library-guide-grid" id="exerciseLibraryGrid"></div></div>
+<div class="card library-principles-card"><div><span class="metric-label">Bell Performance</span><h3>Built on Bell Performance principles.</h3><p class="sub">Evidence-based training. Real-world results. This pilot library lets us test the guide structure before we expand it across the full exercise catalog.</p></div><button class="secondary" onclick="showScreen('more')" type="button">Settings &amp; Data</button></div>
 </div>
-<div class="exercise-library-grid" id="exerciseLibraryGrid"></div>
+<aside class="library-sidebar-column"><button class="good" id="librarySidebarFavoritesButton" onclick="toggleLibraryFavoritesFilter()" type="button">View My Favorites</button><div class="card library-sidebar-card"><div class="library-block-heading compact"><div><span class="metric-label">Guide Structure</span><h3>Guide Template Includes</h3></div></div><ul class="library-sidebar-list"><li><strong>Instructional artwork</strong><span>Clear images with key coaching callouts.</span></li><li><strong>Setup</strong><span>Step-by-step starting position.</span></li><li><strong>Execution</strong><span>Detailed movement breakdown.</span></li><li><strong>Bell Coaching Cues</strong><span>Simple cues that improve performance fast.</span></li><li><strong>Common Mistakes</strong><span>What to avoid and why.</span></li><li><strong>Muscles Worked</strong><span>Primary and secondary focus.</span></li><li><strong>Scale or Substitute</strong><span>Options for every athlete.</span></li></ul></div><div class="card library-sidebar-card"><div class="library-block-heading compact"><div><span class="metric-label">Explore</span><h3>Browse by Pattern</h3></div><button class="small-button" onclick="setExerciseLibraryPattern('all')" type="button">Reset</button></div><div class="library-pattern-grid" id="libraryPatternButtons"></div></div></aside>
+</div>
 </section>
 <section class="screen" id="habits">
 <div class="section-heading"><div><span class="metric-label">Daily Consistency</span><h2 class="section-title">Habits</h2></div><button onclick="addCustomHabit()" type="button">+ Add Habit</button></div>
@@ -529,7 +532,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div aria-labelledby="recoveryClearanceTitle" aria-modal="true" class="modal hidden" id="recoveryClearanceModal" role="dialog"><div class="modal-box onboarding-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Movement Status</span><h2 id="recoveryClearanceTitle">Mark Injury Recovered</h2></div><button class="modal-close" onclick="closeRecoveryClearance()">×</button></div><p class="sub">This archives the current restrictions and returns workout selection to normal. Prior adjusted workouts and injury history remain saved.</p><label>Recovery / clearance date<input id="recoveryClearanceDate" type="date"/></label><label>Clearance status<select id="recoveryClearanceType"><option value="self">Symptoms resolved — self reported</option><option value="clinician">Cleared by a qualified clinician</option><option value="return-plan">Cleared for gradual return to normal training</option></select></label><label>Recovery note<textarea id="recoveryClearanceNotes" placeholder="Optional: what improved, remaining precautions, or return-to-training guidance"></textarea></label><label class="injury-status-toggle"><input id="recoveryGradualReturn" type="checkbox"/> Use a one-week gradual return with reduced volume</label><div class="row"><button class="good" onclick="confirmRecoveryClearance()">Resume Normal Movement Selection</button><button class="secondary" onclick="closeRecoveryClearance()">Cancel</button></div><div class="hint">Pain, weakness, instability, or recurring symptoms should be evaluated by an appropriate healthcare professional.</div></div></div></div>
 <div class="modal hidden" id="historyEditModal"><div class="modal-box onboarding-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Training History</span><h2>Edit Workout Record</h2></div><button class="modal-close" onclick="closeHistoryEditor()">×</button></div><input id="historyEditIndex" type="hidden"/><div class="feedback-grid"><label>Workout name<input id="historyEditLabel"/></label><label>Completed date<input id="historyEditDate" type="datetime-local"/></label><label>Official time<input id="historyEditTime" placeholder="HH:MM:SS or MM:SS"/></label><label>Distance<input id="historyEditDistance" min="0" step="0.01" type="number"/></label><label>Distance unit<select id="historyEditDistanceUnit"><option value="mi">Miles</option><option value="km">Kilometers</option><option value="m">Meters</option><option value="yd">Yards</option></select></label><label>Average heart rate<input id="historyEditHeartRate" max="240" min="0" type="number"/></label><label>Elevation gain<input id="historyEditElevation" min="0" step="1" type="number"/></label><label>Session RPE<input id="historyEditRpe" max="10" min="1" type="number"/></label></div><label>Training notes<textarea id="historyEditNotes"></textarea></label><div class="row"><button class="good" onclick="saveHistoryEdit()">Save Changes</button><button class="secondary" onclick="closeHistoryEditor()">Cancel</button></div><button class="danger" onclick="deleteHistoryRecord()">Delete Workout Record</button><div class="hint" style="margin-top:10px">Changes immediately update weekly reviews, milestones, mileage, pace, and block summaries.</div></div></div></div>
 <div class="modal hidden" id="notificationModal"><div class="modal-box notification-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Bell Performance</span><h2>Coach Notifications</h2></div><button class="modal-close" onclick="closeNotificationCenter()">×</button></div><div class="notification-list" id="notificationList"></div><button class="secondary" onclick="markNotificationsReviewed()">Mark Reviewed</button></div></div></div>
-<div aria-labelledby="exerciseDetailTitle" aria-modal="true" class="modal hidden" id="exerciseDetailModal" role="dialog"><div class="modal-box exercise-detail-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Exercise Intelligence</span><h2 id="exerciseDetailTitle">Exercise</h2></div><button class="modal-close" onclick="closeExerciseDetail()">×</button></div><div id="exerciseDetailContent"></div></div></div></div>
+<div aria-labelledby="exerciseDetailTitle" aria-modal="true" class="modal hidden" id="exerciseDetailModal" role="dialog"><div class="modal-box exercise-guide-modal"><div class="card exercise-guide-card"><div class="notification-header exercise-guide-header"><div><span class="metric-label">Training Library</span><h2 id="exerciseDetailTitle">Exercise</h2></div><div class="exercise-guide-header-actions"><button class="secondary" id="exerciseDetailFavoriteButton" onclick="toggleExerciseFavorite(currentExerciseDetailName)" type="button">☆ Save to Favorites</button><button class="secondary" onclick="scrollExerciseSimilarLifts()" type="button">View Similar Lifts</button><button class="modal-close" onclick="closeExerciseDetail()">×</button></div></div><div id="exerciseDetailContent"></div></div></div></div>
 <div aria-labelledby="weeklyDebriefTitle" aria-modal="true" class="modal hidden" id="weeklyDebriefModal" role="dialog">
   <div class="modal-box weekly-debrief-box">
     <div class="card weekly-debrief-card">
@@ -656,15 +659,15 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.6.4-training-setup-refinement";</script>
+<script>window.BELL_APP_VERSION = "13.6.5-recovery-day-flow";</script>
 <script src="./data/workouts.js?v=10007"></script>
-<script src="./js/exercise-library.js?v=10006"></script>
+<script src="./js/exercise-library.js?v=13660"></script>
 <script src="./js/storage.js?v=13610"></script>
 <script src="./js/readiness.js?v=13610"></script>
 <script src="./js/equipment.js?v=13640"></script>
 <script>{const grid=document.getElementById("equipmentGrid");if(grid)grid.innerHTML=equipmentCheckboxesHtml("equipment");const onboardingGrid=document.getElementById("onboardingEquipmentGrid");if(onboardingGrid)onboardingGrid.innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");}</script>
 <script src="./js/training-blocks.js?v=13600"></script>
-<script src="./js/mobility.js?v=10006"></script>
+<script src="./js/mobility.js?v=13650"></script>
 <script src="./js/nutrition.js?v=10006"></script>
 <script src="./js/milestones.js?v=10006"></script>
 <script src="./js/progression.js?v=10006"></script>
@@ -688,15 +691,15 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/plan-progress.js?v=10006"></script>
 <script src="./js/bell-api.js?v=13600"></script>
 <script src="./js/api-integration.js?v=12101"></script>
-<script src="./js/dashboard-command-center.js?v=13610"></script>
+<script src="./js/dashboard-command-center.js?v=13650"></script>
 <script src="./js/adaptive-weekly-schedule.js?v=12240"></script>
 <script src="./js/powerlifting-programming.js?v=12212"></script>
 <script src="./js/powerlifting-meet-prep.js?v=12213"></script>
 <script src="./js/app.js?v=12101"></script>
 <script src="./js/bell-coaching-engine.js?v=13200"></script>
 <script src="./js/bell13-dashboard.js?v=13200"></script>
-<script src="./js/bell13-athlete-experience.js?v=13640"></script>
+<script src="./js/bell13-athlete-experience.js?v=13650"></script>
 <script src="./js/bell13-coach-intelligence.js?v=13620"></script>
-<script src="./js/bell13-commercial-home.js?v=13600"></script>
+<script src="./js/bell13-commercial-home.js?v=13650"></script>
 </body>
 </html>

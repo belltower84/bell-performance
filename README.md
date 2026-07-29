@@ -1,6 +1,6 @@
-# Bell Performance 13.6.4 — Training Setup Refinement
+# Bell Performance 13.6.5 — Recovery Day Flow
 
-Bell Performance is a local-first training application with two control modes. Version 13.6.4 refines Training Setup with readable dark dropdown menus and a compact location table whose equipment checkboxes appear only while a location is being edited.
+Bell Performance is a local-first training application with two control modes. Version 13.6.5 streamlines recovery-only days so the primary dashboard action launches the recovery session directly, while recovery viewing and options remain functional and consistent.
 
 ## Product blueprint
 
@@ -61,8 +61,8 @@ Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, 
 
 - [`BELL_ATHLETE_EXPERIENCE_13_3.md`](BELL_ATHLETE_EXPERIENCE_13_3.md)
 - [`BELL_COACHING_ENGINE_13_2.md`](BELL_COACHING_ENGINE_13_2.md)
-- [`RELEASE_NOTES_13_6_4.md`](RELEASE_NOTES_13_6_4.md)
-- [`VALIDATION_13_6_4.md`](VALIDATION_13_6_4.md)
+- [`RELEASE_NOTES_13_6_5.md`](RELEASE_NOTES_13_6_5.md)
+- [`VALIDATION_13_6_5.md`](VALIDATION_13_6_5.md)
 
 ## Local use
 
@@ -100,6 +100,10 @@ Bell Coach now produces structured explanations, separates known facts from infe
 13.5.1 refines the commercial Home dashboard with balanced card geometry, consistent spacing, a selectable weekly calendar with an in-card day summary, and a workflow-based desktop sidebar: Home, Train, Plan, Progress, Coach, Recovery, Nutrition, Library, and More.
 
 
+
+
+## Bell Performance 13.6.5
+13.6.5 streamlines recovery-only days. **Start Recovery** now opens the prescribed recovery session immediately, **View Recovery** is functional, and **Recovery Options** retains access to readiness and recovery controls without forcing an extra drawer step before training.
 
 ## Bell Performance 13.6.4
 13.6.4 fixes Settings dropdown contrast and replaces the always-open equipment checkbox wall with a responsive training-location table. Each location shows its environment, active status, and equipment summary; **Edit** opens the full equipment selector only when needed.

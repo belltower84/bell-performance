@@ -1,10 +1,10 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13.6.4-training-setup-refinement';
+const CACHE_NAME = 'bell-performance-13.6.6-training-library-pilot';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/app.css?v=12211",
+  "./css/app.css?v=13660",
   "./css/bell13.css?v=13300",
   "./css/bell134.css?v=13620",
   "./css/bell135.css?v=13610",
@@ -28,11 +28,11 @@ const CORE = [
   "./assets/artwork/engine/hill-country.jpg?v=10006",
   "./data/workouts.js?v=10007",
   "./js/storage.js?v=13610",
-  "./js/exercise-library.js?v=10006",
+  "./js/exercise-library.js?v=13660",
   "./js/readiness.js?v=13610",
   "./js/equipment.js?v=13640",
   "./js/training-blocks.js?v=13600",
-  "./js/mobility.js?v=10006",
+  "./js/mobility.js?v=13650",
   "./js/nutrition.js?v=10006",
   "./js/milestones.js?v=10006",
   "./js/progression.js?v=10006",
@@ -56,14 +56,14 @@ const CORE = [
   "./js/weekly-debrief.js?v=10006",
   "./js/bell-api.js?v=13600",
   "./js/api-integration.js?v=12101",
-  "./js/dashboard-command-center.js?v=13610",
+  "./js/dashboard-command-center.js?v=13650",
   "./js/adaptive-weekly-schedule.js?v=12290",
   "./js/app.js?v=12101",
   "./js/bell-coaching-engine.js?v=13200",
   "./js/bell13-dashboard.js?v=13200",
-  "./js/bell13-athlete-experience.js?v=13640",
+  "./js/bell13-athlete-experience.js?v=13650",
   "./js/bell13-coach-intelligence.js?v=13620",
-  "./js/bell13-commercial-home.js?v=13610",
+  "./js/bell13-commercial-home.js?v=13650",
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

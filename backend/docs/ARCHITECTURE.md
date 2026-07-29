@@ -8,6 +8,7 @@ Bell Core owns authentication, persistence, orchestration, and decision auditabi
 Mission API request
   → Bell Coaching Language parse
   → Mission Compiler
+  → Journey Planning Engine
   → Periodization Engine
   → Block Programming Engine
   → Performance Forecast
@@ -23,7 +24,7 @@ Mission API request
   → plan-generation Decision trace
 ```
 
-The long-horizon Intelligence Orchestrator coordinates the engines through Digital Twin selection. Bell Core then invokes Weekly Planning, Session Builder, and Exercise Selection separately so session-level decisions remain inspectable.
+The Journey Planning Engine converts identity, objective, timeline, and program metadata into the canonical macrocycle state consumed by Mission Control. The long-horizon Intelligence Orchestrator coordinates the remaining engines through Digital Twin selection. Bell Core then invokes Weekly Planning, Session Builder, and Exercise Selection separately so session-level decisions remain inspectable.
 
 ## Daily path
 

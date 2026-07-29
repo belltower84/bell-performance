@@ -14,7 +14,7 @@ from app.repositories.access import athlete_for_user
 from app.schemas import AthleteCreate, MissionCreate, CheckInCreate, CompletionCreate
 from app.services.core import (
     dumps, loads, uid, event, project_state, generate_plan, latest_plan, today_payload,
-    compile_mission_request, learn_from_completion, intelligence_summary, session_for_completion,
+    compile_mission_request, learn_from_completion, intelligence_summary, session_for_completion, coaching_state,
 )
 from intelligence.adaptive_coaching import BellAdaptiveCoachingEngine
 from intelligence.mission_compiler import BellMissionCompiler
@@ -75,6 +75,7 @@ def create_plan(athlete_id: str, db: Session = Depends(get_db), user: User = Dep
     return {
         "id": row.id,
         "weeks": len(data["weeks"]),
+        "journey": data.get("journey"),
         "periodization": data["periodization"],
         "goal_probability": data["goal_probability"],
         "selected_strategy": (data.get("simulation") or {}).get("selected"),
@@ -91,6 +92,20 @@ def get_plan(athlete_id: str, db: Session = Depends(get_db), user: User = Depend
     if not plan:
         raise HTTPException(404, "Plan not found")
     return {"id": plan.id, **loads(plan.plan_json)}
+
+
+@router.get("/athletes/{athlete_id}/coaching-state", tags=["Plans"])
+def get_coaching_state(
+    athlete_id: str,
+    week: int | None = Query(default=None, ge=1, le=52),
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    athlete_for_user(db, athlete_id, user)
+    state = coaching_state(db, athlete_id, week)
+    if state is None:
+        raise HTTPException(404, "Plan not found")
+    return state
 
 
 @router.get("/athletes/{athlete_id}/today", tags=["Sessions"])

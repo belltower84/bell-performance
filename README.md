@@ -1,6 +1,20 @@
-# Bell Performance 12.1.0 — Full Intelligence Integration
+# Bell Performance 13.1.0 — Adaptive Journey Planning
 
-Bell Performance remains a local-first static web application and now consumes the complete Bell Core 0.3.0 coaching workflow when connected.
+Bell Performance is a local-first adaptive coaching application. Version 13.1 adds a Journey-centered planning layer shared by the offline frontend and Bell Core.
+
+## Product blueprint
+
+Bell 13 and later are governed by [`BELL_PRODUCT_BLUEPRINT.md`](BELL_PRODUCT_BLUEPRINT.md). It defines the product language, coaching architecture, design standards, adaptive-planning rules, and release roadmap. New features should be reviewed against its feature checklist before implementation.
+
+## Bell 13.1 Journey model
+
+- Event Preparation calculates the active horizon from the competition date.
+- Continuous Development creates purposeful phases without requiring an event.
+- Mission Control displays Journey, Phase, Phase Week, progress, and the next milestone.
+- The Plan page displays the full Journey timeline.
+- Bell Core exposes the authoritative state through `GET /athletes/{athlete_id}/coaching-state`.
+
+See [`BELL_COACHING_ENGINE_13_1.md`](BELL_COACHING_ENGINE_13_1.md) and [`RELEASE_NOTES_13_1_0.md`](RELEASE_NOTES_13_1_0.md).
 
 ## Connected experience
 
@@ -47,4 +61,4 @@ Bell Core must allow the exact frontend origin through `BELL_CORS_ORIGINS`.
 7. Confirm Settings displays strategy, periodization, probability, nutrition, competition, patterns, and active engines.
 8. Disconnect Bell Core and verify the local workflow still operates.
 
-See `RELEASE_NOTES_12_1_0.md` for release-specific changes. Older release notes remain in this directory for historical reference.
+See `RELEASE_NOTES_13_1_0.md` for this release. Older release notes remain for historical reference.

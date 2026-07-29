@@ -1,10 +1,11 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-12.2.13-powerlifting-meet-prep';
+const CACHE_NAME = 'bell-performance-13.1.0-adaptive-journey';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./css/app.css?v=12211",
+  "./css/bell13.css?v=13100",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/icons/engine-shoe.svg?v=10006",
   "./assets/icons/engine-mark.svg?v=10006",
@@ -23,7 +24,7 @@ const CORE = [
   "./assets/artwork/engine/winter-trail.jpg?v=10006",
   "./assets/artwork/engine/hill-country.jpg?v=10006",
   "./data/workouts.js?v=10007",
-  "./js/storage.js?v=10006",
+  "./js/storage.js?v=13100",
   "./js/exercise-library.js?v=10006",
   "./js/readiness.js?v=10006",
   "./js/equipment.js?v=10006",
@@ -50,11 +51,13 @@ const CORE = [
   "./js/block-lifecycle.js?v=10006",
   "./js/plan-progress.js?v=10006",
   "./js/weekly-debrief.js?v=10006",
-  "./js/bell-api.js?v=12290",
+  "./js/bell-api.js?v=13100",
   "./js/api-integration.js?v=12101",
   "./js/dashboard-command-center.js?v=12290",
   "./js/adaptive-weekly-schedule.js?v=12290",
-  "./js/app.js?v=12101"
+  "./js/app.js?v=12101",
+  "./js/bell-coaching-engine.js?v=13100",
+  "./js/bell13-dashboard.js?v=13100"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

@@ -23,6 +23,7 @@ const defaults = {
   exerciseProgression: {},
   exerciseIntelligence: { replacements: [], personalConstraints: [] },
   activeWorkout: null,
+  coachingState: null,
   mobility: { focus: "Auto", minutes: 10, completedDates: [], checks: {} },
   readinessLog: [],
   sessionFeedbackLog: [],
@@ -159,6 +160,7 @@ function normalizeData() {
   data.nutrition.manualGoal = ["cut","maintain","gain"].includes(data.nutrition.manualGoal) ? data.nutrition.manualGoal : (data.nutrition.goal || "maintain");
   data.trainingBlock = { ...defaults.trainingBlock, ...(data.trainingBlock || {}) };
   data.trainingBlock.currentWeek = Math.max(1, Math.min(Number(data.trainingBlock.lengthWeeks) || 12, Number(data.trainingBlock.currentWeek) || 1));
+  data.coachingState = data.coachingState && typeof data.coachingState === "object" ? data.coachingState : null;
 
   if (data.activeWorkout && !Array.isArray(data.activeWorkout.exercises)) {
     data.activeWorkout = null;
@@ -209,6 +211,7 @@ function resetApp() {
   data.history = [];
   data.exerciseProgression = {};
   data.exerciseIntelligence = { replacements:[], personalConstraints:[] };
+  data.coachingState = null;
   data.habits.targets = {proteinGrams:0,hydrationOz:0,steps:0,sleepHours:0,mobilityMinutes:0,customized:false};
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   window.location.reload();

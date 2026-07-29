@@ -1,5 +1,5 @@
 "use strict";
-/* Bell Performance 13.0.0 — Mission Control identity and navigation shell. */
+/* Bell Performance 13.1.0 — Mission Control powered by the Bell Coaching Engine. */
 (function(){
   const $=id=>document.getElementById(id);
   const clean=value=>String(value||"").replace(/\s+/g," ").trim();
@@ -11,27 +11,40 @@
     }catch(_){return null;}
   }
   function missionState(){
-    const block=window.data?.trainingBlock||{},mission=block.mission||{},dual=block.dualGoals||{};
+    try{
+      const state=window.BellCoachingEngine?.getState({persist:false});
+      if(state){
+        return {
+          journey:state.name,
+          identity:state.identity,
+          objective:state.objective,
+          phase:state.currentPhaseName,
+          phasePurpose:state.currentPhase?.purpose,
+          week:state.currentWeek,
+          length:state.totalWeeks,
+          phaseWeek:state.phaseWeek,
+          phaseLength:state.phaseLength,
+          progress:state.progressPercent,
+          isEvent:state.mode==='event_preparation',
+          target:state.targetDate||'',
+          days:state.targetDate?safeDateDays(state.targetDate):null,
+          next:state.nextMilestone,
+          mode:state.modeLabel,
+          nextPhase:state.nextPhase?.name||'Journey review'
+        };
+      }
+    }catch(error){console.warn('Bell 13 coaching state unavailable',error);}
+    const block=data?.trainingBlock||{},mission=block.mission||{},dual=block.dualGoals||{};
     const isEvent=mission.path==='event'||Boolean(mission.eventDate||block.targetDate);
     const journey=isEvent
       ? clean(mission.eventName||mission.eventType||block.goalType||'Competition Preparation')
-      : clean(mission.developmentGoal||dual.strengthGoal||block.goalType||window.data?.settings?.athleteMode||'Performance & Health');
-    let phase='Foundation';
-    try{
-      if(typeof powerliftingMeetPrepState==='function'){
-        const meet=powerliftingMeetPrepState();if(meet?.active&&meet?.phase?.label)phase=meet.phase.label;
-      }
-      if(phase==='Foundation'&&typeof blockPhase==='function')phase=blockPhase()||phase;
-    }catch(_){/* local fallback */}
-    if(phase==='Foundation')phase=clean(window.data?.settings?.phase||phase).split('•').pop().trim()||phase;
+      : clean(mission.developmentGoal||dual.strengthGoal||block.goalType||data?.settings?.athleteMode||'Performance & Health');
+    const phase=clean(data?.settings?.phase||'Foundation').split('•').pop().trim()||'Foundation';
     const week=Math.max(1,Number(block.currentWeek)||1),length=Math.max(1,Number(block.lengthWeeks)||12);
-    const phaseWeek=week; // 13.1 will replace this with macrocycle block state.
-    const phaseLength=length;
     const progress=Math.max(0,Math.min(100,Math.round((week/length)*100)));
     const target=mission.eventDate||mission.secondaryGoal?.targetDate||block.targetDate||'';
     const days=safeDateDays(target);
-    const next=isEvent&&days!=null?`${days} day${days===1?'':'s'} to ${clean(mission.eventName||mission.eventType||'event')}`:`Next review at the end of Week ${week}`;
-    return {journey,phase,week,length,phaseWeek,phaseLength,progress,isEvent,target,days,next,mode:isEvent?'Event Preparation':'Continuous Development'};
+    return {journey,phase,week,length,phaseWeek:week,phaseLength:length,progress,isEvent,target,days,next:isEvent&&days!=null?`${days} day${days===1?'':'s'} to ${journey}`:`Complete Week ${week}`,mode:isEvent?'Event Preparation':'Continuous Development'};
   }
   function cardHtml(){return `
     <section class="bell13-journey-card" id="bell13JourneyCard" aria-labelledby="bell13JourneyTitle">
@@ -66,17 +79,17 @@
     return 'Developing the qualities required for the next phase.';
   }
   function render(){
-    if(!window.data)return;
+    if(typeof data==="undefined")return;
     const state=missionState();
     if($('bell13JourneyTitle'))$('bell13JourneyTitle').textContent=state.journey;
     if($('bell13PlanningMode'))$('bell13PlanningMode').textContent=state.mode;
     if($('bell13CurrentPhase'))$('bell13CurrentPhase').textContent=state.phase;
-    if($('bell13PhasePurpose'))$('bell13PhasePurpose').textContent=phasePurpose(state.phase);
+    if($('bell13PhasePurpose'))$('bell13PhasePurpose').textContent=state.phasePurpose||phasePurpose(state.phase);
     if($('bell13PhaseWeek'))$('bell13PhaseWeek').textContent=`Week ${state.phaseWeek} of ${state.phaseLength}`;
     if($('bell13JourneyPercent'))$('bell13JourneyPercent').textContent=`${state.progress}%`;
     if($('bell13JourneyProgress'))$('bell13JourneyProgress').style.width=`${state.progress}%`;
-    if($('bell13JourneyStatus'))$('bell13JourneyStatus').textContent=state.isEvent?(state.days===0?'Event Day':'Building to Peak'):'On Plan';
-    if($('bell13JourneyTarget'))$('bell13JourneyTarget').textContent=state.isEvent&&state.target?state.target:'Continuous development';
+    if($('bell13JourneyStatus'))$('bell13JourneyStatus').textContent=state.progress>=100?'Journey Review':state.isEvent?(state.days===0?'Event Day':'Building to Peak'):'On Plan';
+    if($('bell13JourneyTarget'))$('bell13JourneyTarget').textContent=state.isEvent&&state.target?state.target:(state.objective||'Continuous development');
     if($('bell13NextMilestone'))$('bell13NextMilestone').textContent=state.next;
   }
   function inject(){

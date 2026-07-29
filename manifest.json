@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 13.0",
+  "name": "Bell Performance 13.1",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "AI-orchestrated Strength and Engine coaching with mission compilation, periodization, exercise selection, adaptive reasoning, athlete memory, simulation, nutrition, competition planning, and personalized learning."
+  "description": "Adaptive AI performance coaching with Journey planning, phase-aware Mission Control, intelligent scheduling, readiness adaptation, and Bell Core synchronization."
 }

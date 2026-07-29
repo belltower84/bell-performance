@@ -18,6 +18,7 @@ from intelligence.coaching_language import BellCoachingLanguage
 from intelligence.coaching_reasoning import BellCoachingReasoningEngine
 from intelligence.intelligence_orchestrator import BellIntelligenceOrchestrator
 from intelligence.learning_engine import BellLearningEngine
+from intelligence.journey_planner import BellJourneyPlanner, event_timeline_weeks
 from intelligence.pattern_recognition import BellPatternRecognitionEngine
 from intelligence.session_builder import BellSessionBuilder
 from intelligence.weekly_planner import BellWeeklyPlanningEngine
@@ -481,6 +482,15 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
     profile = _profile(athlete)
     state = _state_for_intelligence(project_state(db, athlete.id), profile)
     request = loads(mission_row.request_json)
+    # A dated objective owns the planning horizon. Bell no longer forces event
+    # preparation into a default 12-week container. The active horizon is
+    # capped at 52 weeks and can be regenerated for farther-away events.
+    if request.get("competition_date"):
+        timeline = event_timeline_weeks(
+            request.get("competition_date"),
+            fallback=int(request.get("timeline_weeks", 12) or 12),
+        )
+        request["timeline_weeks"] = int(timeline["planning_horizon_weeks"])
     bcl_text = request.get("coaching_language") or _auto_bcl(request)
     parameters = _learning_parameters(profile)
     competition = None
@@ -507,6 +517,8 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
 
     mission = orchestrated["mission"]
     program = orchestrated["program"]
+    journey_planner = BellJourneyPlanner()
+    journey = journey_planner.build(request, mission, program, profile, current_week=1)
     constraints = mission.get("constraints", {})
     training_days = max(2, min(6, int(constraints.get("training_days", 4))))
     session_minutes = max(20, min(180, int(constraints.get("session_minutes", 60))))
@@ -524,6 +536,7 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
     try:
         for week_number in range(1, int(mission["timeline_weeks"]) + 1):
             block, week_detail = _week_meta(program, week_number)
+            journey_phase = journey_planner.phase_for_week(journey, week_number)
             phase = _phase_name(block.get("phase"))
             volume_factor = max(0.45, min(1.30, strategy_volume * float(week_detail.get("volume_multiplier", 1.0))))
             intensity_factor = max(0.75, min(1.20, strategy_intensity * float(week_detail.get("intensity_multiplier", 1.0))))
@@ -560,6 +573,10 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
                     built, session_id, item["day"], week_number, phase,
                     {
                         "block_id": block["block_id"], "block_phase": block["phase"],
+                        "journey_phase_id": journey_phase.get("id"),
+                        "journey_phase": journey_phase.get("name"),
+                        "journey_phase_week": week_number - int(journey_phase.get("start_week", week_number)) + 1,
+                        "journey_phase_length": int(journey_phase.get("duration_weeks", 1)),
                         "week_purpose": week_detail.get("purpose"),
                         "volume_factor": round(volume_factor, 3),
                         "intensity_factor": round(intensity_factor, 3),
@@ -572,6 +589,12 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
                 )
             weeks.append({
                 "week": week_number, "phase": block["phase"],
+                "journey_phase_id": journey_phase.get("id"),
+                "journey_phase": journey_phase.get("name"),
+                "journey_phase_week": week_number - int(journey_phase.get("start_week", week_number)) + 1,
+                "journey_phase_length": int(journey_phase.get("duration_weeks", 1)),
+                "journey_purpose": journey_phase.get("purpose"),
+                "journey_milestone": journey_phase.get("milestone"),
                 "objectives": week_detail.get("objectives") or block.get("objectives"),
                 "purpose": week_detail.get("purpose"), "testing": week_detail.get("testing", False),
                 "schedule": [{k: v for k, v in item.items() if k != "session"} for item in weekly["schedule"]],
@@ -584,12 +607,14 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
 
     payload = {
         "mission": mission,
+        "journey": journey,
         "periodization": orchestrated["periodization"],
         "program": program,
         "weeks": weeks,
         **_compact_plan_summary(orchestrated),
         "engine_manifest": {
             "mission_compiler": mission.get("mission_compiler_version"),
+            "journey_planner": journey.get("journey_engine_version"),
             "periodization": orchestrated["periodization"].get("periodization_engine_version"),
             "block_programming": program.get("block_programming_version"),
             "performance_forecast": (orchestrated.get("forecast") or {}).get("performance_forecast_version"),
@@ -609,6 +634,15 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
         plan_json=dumps(payload),
     )
     db.add(row)
+    event(db, athlete.id, "journey_created", {
+        "plan_id": row.id,
+        "journey": journey.get("name"),
+        "mode": journey.get("mode"),
+        "identity": journey.get("identity"),
+        "objective": journey.get("objective"),
+        "weeks": journey.get("total_weeks"),
+        "phases": [phase.get("name") for phase in journey.get("phases", [])],
+    })
     event(db, athlete.id, "program_created", {
         "plan_id": row.id, "weeks": len(weeks),
         "strategy": simulation_selected.get("candidate_id", "balanced"),
@@ -623,6 +657,7 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
             "patterns": orchestrated.get("patterns"),
             "competition": orchestrated.get("competition"),
             "nutrition": orchestrated.get("nutrition"),
+            "journey": journey,
             "coaching_language": orchestrated.get("coaching_language"),
             "explanation": "Bell compared candidate strategies, selected a periodization model, built blocks and weeks, then selected and prescribed each exercise under athlete constraints.",
             "engines": list(payload["engine_manifest"].keys()),
@@ -639,6 +674,30 @@ def latest_plan(db: Session, athlete_id: str) -> Plan | None:
         .where(Plan.athlete_id == athlete_id, Plan.status == "active")
         .order_by(Plan.created_at.desc())
     )
+
+
+def coaching_state(db: Session, athlete_id: str, current_week: int | None = None) -> dict[str, Any] | None:
+    """Return the canonical Journey-centered state consumed by Mission Control."""
+    plan = latest_plan(db, athlete_id)
+    if not plan:
+        return None
+    data = loads(plan.plan_json)
+    journey = data.get("journey") or {}
+    requested_week = max(1, int(current_week or journey.get("current_week") or 1))
+    if journey:
+        journey = BellJourneyPlanner().state_for_week(journey, requested_week)
+    week = int(journey.get("current_week", requested_week)) if journey else requested_week
+    week_payload = next((item for item in data.get("weeks", []) if int(item.get("week", 0)) == week), None)
+    return {
+        "plan_id": plan.id,
+        "journey": journey,
+        "current_week": week_payload,
+        "mission": data.get("mission"),
+        "periodization": data.get("periodization"),
+        "priorities": journey.get("priorities", []) if journey else [],
+        "next_milestone": journey.get("next_milestone") if journey else None,
+        "engine_manifest": data.get("engine_manifest", {}),
+    }
 
 
 def _session_from_plan(plan_data: dict[str, Any], session_id: str) -> dict[str, Any] | None:

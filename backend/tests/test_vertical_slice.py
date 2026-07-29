@@ -1,3 +1,14 @@
+from pathlib import Path
+
+
+def _weekly_engine(tmp_path):
+    from intelligence.weekly_planner import BellWeeklyPlanningEngine
+    root = Path(__file__).resolve().parents[1]
+    return BellWeeklyPlanningEngine(
+        root / "database" / "bckb_v1.3.0.sqlite",
+        root / "rules" / "bell_rules_v1.yaml",
+    )
+
 def test_full_authenticated_lifecycle(client,auth):
     headers,_=auth(); athlete=client.post('/api/v1/athletes',headers=headers,json={'name':'Chris','profile':{'age':41,'experience':'intermediate'}}); assert athlete.status_code==201; aid=athlete.json()['id']
     mission=client.post(f'/api/v1/athletes/{aid}/missions',headers=headers,json={'goal':'Run a faster 10K while preserving strength','timeline_weeks':12,'constraints':{'training_days':4,'session_minutes':60}}); assert mission.status_code==201
@@ -262,3 +273,99 @@ def test_powerlifting_meet_prep_keeps_only_recovery_engine_in_strength_block(tmp
         assert not any(name in names for name in ("Threshold", "Intervals", "Long Run", "Mixed Modal"))
     finally:
         engine.close()
+
+
+def test_journey_planner_builds_continuous_fat_loss_cycle():
+    from datetime import date
+    from intelligence.journey_planner import BellJourneyPlanner
+
+    planner = BellJourneyPlanner()
+    journey = planner.build(
+        {"goal": "Performance & Health: Lose Fat", "timeline_weeks": 24},
+        {
+            "timeline_weeks": 24,
+            "required_adaptations": ["body_composition", "strength"],
+        },
+        {"periodization_model": "block", "total_weeks": 24, "blocks": []},
+        {"primary_training_identity": "Performance & Health"},
+        as_of=date(2026, 7, 28),
+        current_week=7,
+    )
+    assert journey["mode"] == "continuous_development"
+    assert journey["name"] == "Fat-Loss Transformation"
+    assert journey["objective"] == "Lose Fat"
+    assert sum(phase["duration_weeks"] for phase in journey["phases"]) == 24
+    assert [phase["name"] for phase in journey["phases"]] == [
+        "Foundation", "Fat Loss I", "Recovery", "Fat Loss II", "Diet Break", "Recomposition"
+    ]
+    assert journey["current_phase_name"] == "Fat Loss I"
+    assert journey["phase_week"] >= 1
+    assert journey["next_milestone"]
+
+
+def test_journey_planner_uses_event_date_for_powerlifting_macrocycle():
+    from datetime import date
+    from intelligence.journey_planner import BellJourneyPlanner, event_timeline_weeks
+
+    timeline = event_timeline_weeks("2027-01-26", as_of=date(2026, 7, 28), fallback=12)
+    assert timeline["planning_horizon_weeks"] == 26
+
+    journey = BellJourneyPlanner().build(
+        {
+            "goal": "Powerlifting Meet Preparation",
+            "timeline_weeks": 12,
+            "competition_date": "2027-01-26",
+            "competition_type": "Texas Powerlifting Meet",
+        },
+        {
+            "timeline_weeks": 26,
+            "deadline": "2027-01-26",
+            "required_adaptations": ["strength"],
+        },
+        {"periodization_model": "block", "total_weeks": 26, "blocks": []},
+        {"primary_training_identity": "Powerlifting"},
+        as_of=date(2026, 7, 28),
+        current_week=1,
+    )
+    assert journey["mode"] == "event_preparation"
+    assert journey["total_weeks"] == 26
+    assert journey["identity"] == "Powerlifting"
+    assert journey["name"] == "Texas Powerlifting Meet"
+    assert journey["phases"][-1]["name"] == "Taper"
+    assert sum(phase["duration_weeks"] for phase in journey["phases"]) == 26
+
+
+def test_coaching_state_endpoint_exposes_journey(client, auth):
+    headers, _ = auth("journey-state@example.com")
+    athlete = client.post("/api/v1/athletes", headers=headers, json={
+        "name": "Journey Athlete",
+        "profile": {
+            "primary_training_identity": "Powerlifting",
+            "training_experience": "Intermediate",
+        },
+    })
+    aid = athlete.json()["id"]
+    mission = client.post(f"/api/v1/athletes/{aid}/missions", headers=headers, json={
+        "goal": "Powerlifting strength development",
+        "timeline_weeks": 8,
+        "constraints": {"training_days": 4, "session_minutes": 60},
+    })
+    assert mission.status_code == 201
+    created = client.post(f"/api/v1/athletes/{aid}/plans", headers=headers)
+    assert created.status_code == 201
+    assert created.json()["journey"]["journey_engine_version"] == "13.1.0"
+
+    response = client.get(f"/api/v1/athletes/{aid}/coaching-state?week=5", headers=headers)
+    assert response.status_code == 200
+    body = response.json()
+    assert body["journey"]["current_week"] == 5
+    assert body["journey"]["current_phase_name"]
+    assert body["journey"]["phase_week"] >= 1
+    assert body["next_milestone"]
+    assert body["engine_manifest"]["journey_planner"] == "13.1.0"
+
+    clamped = client.get(f"/api/v1/athletes/{aid}/coaching-state?week=52", headers=headers)
+    assert clamped.status_code == 200
+    clamped_body = clamped.json()
+    assert clamped_body["journey"]["current_week"] == clamped_body["journey"]["total_weeks"]
+    assert clamped_body["current_week"] is not None

@@ -8,6 +8,7 @@ Bell Core v0.3.0 replaces the earlier hardcoded workout and simplified state sho
 Authenticated API
   → Mission Compiler + Bell Coaching Language
   → Intelligence Orchestrator
+  → Adaptive Journey Planning
   → Periodization + Block Programming
   → Forecast + Goal Probability
   → Competition + Nutrition
@@ -27,6 +28,7 @@ Long-horizon planning and daily coaching are separated deliberately. A plan-gene
 ## Included engines
 
 - Mission Compiler
+- Journey Planning Engine
 - Bell Coaching Language
 - Periodization Engine
 - Block Programming Engine
@@ -99,6 +101,7 @@ Login is also available through `POST /api/v1/auth/token` using OAuth2 form fiel
 - `POST /api/v1/athletes/{athlete_id}/missions`
 - `POST /api/v1/athletes/{athlete_id}/plans`
 - `GET /api/v1/athletes/{athlete_id}/plan`
+- `GET /api/v1/athletes/{athlete_id}/coaching-state`
 - `GET /api/v1/athletes/{athlete_id}/today`
 - `POST /api/v1/athletes/{athlete_id}/check-ins`
 - `POST /api/v1/athletes/{athlete_id}/sessions/{session_id}/complete`
@@ -141,7 +144,7 @@ pytest -q
 python -m compileall -q app intelligence
 ```
 
-Current result: **5 tests passed**.
+Current result: **16 tests passed**.
 
 ## Production requirements
 

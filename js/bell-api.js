@@ -20,6 +20,7 @@ const bellCloudDefaults = {
   state: null,
   today: null,
   intelligence: null,
+  coachingState: null,
   lastDecision: null
 };
 
@@ -66,6 +67,8 @@ function bellAthleteProfile() {
   return {
     sex: data.settings.sex,
     athlete_mode: data.settings.athleteMode,
+    primary_training_identity: data.settings.primaryTrainingIdentity || null,
+    primary_objective: data.settings.secondaryTrainingGoal || data.trainingBlock?.secondaryGoal || null,
     age: Number(data.nutrition.age) || null,
     height_inches: Number(data.nutrition.height) || null,
     weight_lb: Number(data.settings.weight) || null,
@@ -106,7 +109,8 @@ function bellMissionRequest() {
       equipment_location: data.settings.equipmentSetup?.activeLocationId || "default",
       limitations: data.settings.injuryProfile || {}
     },
-    competition_date: date || null
+    competition_date: date || null,
+    competition_type: date ? (secondary || primary) : null
   };
 }
 
@@ -186,15 +190,21 @@ async function bellCompleteCurrentSession(completed) {
 async function bellRefreshCloudState() {
   if (!bellCloudConnected() || !bellCloud.athleteId) return null;
   const localDate = typeof todayKey === "function" ? todayKey() : new Date().toISOString().slice(0, 10);
-  const [state, today, intelligence] = await Promise.all([
+  const [state, today, intelligence, coachingState] = await Promise.all([
     bellApiRequest(`/athletes/${bellCloud.athleteId}/state`),
     bellApiRequest(`/athletes/${bellCloud.athleteId}/today?date=${encodeURIComponent(localDate)}`).catch(error => error.status === 404 ? null : Promise.reject(error)),
-    bellApiRequest(`/athletes/${bellCloud.athleteId}/intelligence`).catch(error => error.status === 404 ? null : Promise.reject(error))
+    bellApiRequest(`/athletes/${bellCloud.athleteId}/intelligence`).catch(error => error.status === 404 ? null : Promise.reject(error)),
+    bellApiRequest(`/athletes/${bellCloud.athleteId}/coaching-state?week=${encodeURIComponent(Math.max(1,Number(data.trainingBlock?.currentWeek)||1))}`).catch(error => error.status === 404 ? null : Promise.reject(error))
   ]);
-  bellCloud.state = state; bellCloud.today = today; bellCloud.intelligence = intelligence;
+  bellCloud.state = state; bellCloud.today = today; bellCloud.intelligence = intelligence; bellCloud.coachingState = coachingState;
   if (intelligence?.plan_id) bellCloud.planId = intelligence.plan_id;
   bellCloud.lastSyncAt = new Date().toISOString(); bellCloud.lastError = ""; saveBellCloud();
-  renderBellCloudCard(); if (typeof renderPremiumDashboard === "function") renderPremiumDashboard(); return { state, today, intelligence };
+  if(coachingState?.journey&&window.BellCoachingEngine){
+    const cloudJourney=coachingState.journey;
+    data.coachingState={...cloudJourney,engineVersion:cloudJourney.journey_engine_version||"13.1.0",modeLabel:cloudJourney.mode_label,name:cloudJourney.name,targetDate:cloudJourney.target_date,eventWeeksRemaining:cloudJourney.event_weeks_remaining,horizonLimited:cloudJourney.horizon_limited,totalWeeks:cloudJourney.total_weeks,planningHorizonWeeks:cloudJourney.planning_horizon_weeks,currentWeek:cloudJourney.current_week,progressPercent:cloudJourney.progress_percent,currentPhaseName:cloudJourney.current_phase_name,phaseWeek:cloudJourney.phase_week,phaseLength:cloudJourney.phase_length,nextMilestone:cloudJourney.next_milestone,phases:(cloudJourney.phases||[]).map(item=>({...item,startWeek:item.start_week,endWeek:item.end_week,durationWeeks:item.duration_weeks,trainingEmphasis:item.training_emphasis})),currentPhase:cloudJourney.current_phase?{...cloudJourney.current_phase,startWeek:cloudJourney.current_phase.start_week,endWeek:cloudJourney.current_phase.end_week,durationWeeks:cloudJourney.current_phase.duration_weeks,trainingEmphasis:cloudJourney.current_phase.training_emphasis}:null,nextPhase:cloudJourney.next_phase?{...cloudJourney.next_phase,startWeek:cloudJourney.next_phase.start_week,endWeek:cloudJourney.next_phase.end_week,durationWeeks:cloudJourney.next_phase.duration_weeks}:null,fingerprint:`cloud|${bellCloud.planId}|${cloudJourney.current_week}`};
+    saveData({render:false});
+  }
+  renderBellCloudCard(); if (typeof renderPremiumDashboard === "function") renderPremiumDashboard(); if(window.BellCoachingEngine)window.BellCoachingEngine.renderPlanTimeline(); return { state, today, intelligence, coachingState };
 }
 
 function bellDisconnect() {

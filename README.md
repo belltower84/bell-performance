@@ -96,3 +96,6 @@ Bell Coach now produces structured explanations, separates known facts from infe
 
 ## Bell Performance 13.5.0
 13.5.0 introduces the Commercial Athlete Experience foundation: a simplified Home dashboard, familiar Home/Train/Plan/Progress/More navigation, Guided and Advanced display modes, and a clearer path from daily readiness to starting training. Bell 13.4 coaching intelligence and data contracts remain intact.
+
+## Bell Performance 13.5.1
+13.5.1 refines the commercial Home dashboard with balanced card geometry, consistent spacing, a selectable weekly calendar with an in-card day summary, and a workflow-based desktop sidebar: Home, Train, Plan, Progress, Coach, Recovery, Nutrition, Library, and More.

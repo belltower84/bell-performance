@@ -3,6 +3,8 @@
 let exerciseCatalogCache = null;
 let exerciseSwapIndex = null;
 let currentExerciseDetailName = null;
+let exerciseDetailReturnScreen = "exerciseLibrary";
+let exerciseDetailReturnSwap = false;
 let exerciseLibraryCategory = "all";
 let exerciseLibraryPattern = "all";
 let exerciseLibraryFavoritesOnly = false;
@@ -445,25 +447,91 @@ function renderExerciseLibrary(){
 }
 
 function renderInstructionalHero(exercise){
+  if(exercise.name==="Back Squat"){
+    return `<section class="guide-artwork-panel exact-artwork"><img alt="Back squat instructional guide with Bell coaching callouts" src="./assets/library/back-squat-instructional.png?v=13670"/></section>`;
+  }
   const callouts=(exercise.callouts||[]).map(callout=>`<div class="guide-callout ${callout.slot||"tl"}"><strong>${escapeHtml(callout.title)}</strong><span>${escapeHtml(callout.text)}</span></div>`).join("");
-  return `<section class="guide-media-card"><div class="guide-media-top"><div><span class="metric-label">Instructional Artwork</span><strong>Exercise Guide Visual</strong></div><span class="guide-media-status">Video demo reserved for a future update</span></div><div class="guide-hero-stage" style="background-image:url('${thumbnailUrl(exercise)}')"><div class="guide-stage-overlay"></div>${callouts}<div class="guide-hero-caption"><span>Start</span><strong>${escapeHtml(exercise.start || "Stable start position")}</strong><span>Finish</span><strong>${escapeHtml(exercise.finish || "Controlled finish position")}</strong></div></div></section>`;
+  return `<section class="guide-artwork-panel"><div class="guide-hero-stage" style="background-image:url('${thumbnailUrl(exercise)}')"><div class="guide-stage-overlay"></div>${callouts}</div></section>`;
 }
 
 function updateExerciseDetailFavoriteButton(name){
   const button=document.getElementById("exerciseDetailFavoriteButton");
-  if(button) button.textContent=`${isExerciseFavorite(name)?"★ Saved to Favorites":"☆ Save to Favorites"}`;
+  if(button){
+    button.textContent=`${isExerciseFavorite(name)?"★ Saved to Favorites":"☆ Save to Favorites"}`;
+    button.classList.toggle("saved",isExerciseFavorite(name));
+  }
+}
+
+function renderGuideCategoryChips(){
+  const target=document.getElementById("exerciseGuideCategoryChips");
+  if(!target)return;
+  target.innerHTML=["all","strength","hypertrophy","power","mobility","conditioning"].map(value=>`<button class="library-chip ${value==="all"?"active":""}" onclick="openExerciseLibraryWithCategory('${value}')" type="button">${value==="all"?"All":value.charAt(0).toUpperCase()+value.slice(1)}</button>`).join("");
+}
+function openExerciseLibraryWithCategory(category){
+  exerciseLibraryCategory=category||"all";
+  exerciseLibraryPattern="all";
+  exerciseLibraryFavoritesOnly=false;
+  showScreen("exerciseLibrary");
+  renderExerciseLibrary();
+}
+function searchExerciseGuideLibrary(){
+  const input=document.getElementById("exerciseGuideSearch");
+  const libraryInput=document.getElementById("exerciseLibrarySearch");
+  if(libraryInput) libraryInput.value=input?.value||"";
+  openExerciseLibraryWithCategory("all");
 }
 
 function openExerciseDetail(name){
-  const x=findExercise(name);currentExerciseDetailName=x.name;setText("exerciseDetailTitle",x.name);updateExerciseDetailFavoriteButton(x.name);
-  const content=document.getElementById("exerciseDetailContent");if(!content)return;
+  const active=document.querySelector(".screen.active");
+  if(active?.id!=="exerciseGuide") exerciseDetailReturnScreen=active?.id||"exerciseLibrary";
+  const swap=document.getElementById("exerciseSwapModal");
+  exerciseDetailReturnSwap=!!swap && !swap.classList.contains("hidden");
+  if(exerciseDetailReturnSwap) swap.classList.add("hidden");
+
+  const x=findExercise(name);
+  currentExerciseDetailName=x.name;
   const alternatives=rankExerciseAlternatives(x.name).slice(0,5);
   const substitutions=(x.substitutions||[]).length?(x.substitutions||[]):alternatives.map(entry=>entry.name).slice(0,3);
-  content.innerHTML=`<div class="guide-detail-shell"><div class="guide-detail-main"><div class="guide-detail-badges"><span class="guide-detail-badge primary">${escapeHtml(roleLabel(x))}</span><span class="guide-detail-badge">${escapeHtml(bodyRegionLabel(x))}</span><span class="guide-detail-badge">${escapeHtml(x.pattern)}</span></div>${renderInstructionalHero(x)}<div class="guide-detail-lower"><section class="guide-detail-panel"><h3>Setup</h3><ol>${(x.setup||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ol></section><section class="guide-detail-panel"><h3>Execution</h3><ol>${(x.steps||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ol></section><section class="guide-detail-panel"><h3>Bell Coaching Cues</h3><ul>${(x.cues||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ul></section></div></div><aside class="guide-detail-side"><section class="guide-detail-panel"><h3>What it is</h3><p>${escapeHtml(x.whatItIs || x.summary)}</p></section><section class="guide-detail-panel"><h3>Primary Muscles</h3><div class="guide-muscle-grid">${(x.primary||[]).concat((x.secondary||[]).slice(0,2)).slice(0,4).map(v=>`<span>${escapeHtml(v)}</span>`).join("")}</div></section><section class="guide-detail-panel"><h3>Equipment</h3><div class="guide-pill-grid">${(x.equipment||[]).map(v=>`<span>${escapeHtml(v)}</span>`).join("")}</div></section><section class="guide-detail-panel"><h3>Scale or Substitute</h3><div class="guide-pill-grid">${substitutions.length?substitutions.map(v=>`<button class="link-button subtle" onclick="openExerciseDetail('${escapeQuote(v)}')" type="button">${escapeHtml(v)}</button>`).join(""):`<span>Options will appear here as the library expands.</span>`}</div></section><section class="guide-detail-panel" id="exerciseSimilarLiftsSection"><h3>Common Mistakes</h3><ul>${(x.mistakes||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ul></section><section class="guide-detail-panel"><h3>Similar Lifts</h3><ul class="guide-alt-list">${alternatives.length?alternatives.map(v=>`<li><button class="link-button" onclick="openExerciseDetail('${escapeQuote(v.name)}')" type="button">${escapeHtml(v.name)}</button><span>${escapeHtml(v.reason)}</span></li>`).join(""):`<li><span>No close alternatives cataloged yet.</span></li>`}</ul></section></aside></div>`;
-  document.getElementById("exerciseDetailModal")?.classList.remove("hidden");
+
+  setText("exerciseGuideTitle",x.name);
+  const titleInput=document.getElementById("exerciseGuideSearch");
+  if(titleInput) titleInput.value="";
+  updateExerciseDetailFavoriteButton(x.name);
+  renderGuideCategoryChips();
+
+  const tagTarget=document.getElementById("exerciseGuideTags");
+  if(tagTarget) tagTarget.innerHTML=`<span class="exercise-page-tag primary">${escapeHtml(roleLabel(x))}</span><span class="exercise-page-tag">${escapeHtml(bodyRegionLabel(x))}</span><span class="exercise-page-tag">${escapeHtml(x.pattern)} Pattern</span>`;
+
+  const artwork=document.getElementById("exerciseGuideArtwork");
+  if(artwork) artwork.innerHTML=renderInstructionalHero(x);
+
+  const lower=document.getElementById("exerciseGuideLower");
+  if(lower) lower.innerHTML=`
+    <section class="exercise-page-card numbered"><h3><span>⌁</span> Setup</h3><ol>${(x.setup||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ol></section>
+    <section class="exercise-page-card numbered"><h3><span>▷</span> Execution</h3><ol>${(x.steps||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ol></section>
+    <section class="exercise-page-card"><h3><span>☆</span> Bell Coaching Cues</h3><ul>${(x.cues||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ul></section>`;
+
+  const side=document.getElementById("exerciseGuideSidebar");
+  const muscleNames=(x.primary||[]).concat((x.secondary||[]).slice(0,Math.max(0,4-(x.primary||[]).length))).slice(0,4);
+  if(side) side.innerHTML=`
+    <section class="exercise-page-card"><h3><span>ⓘ</span> What it is</h3><p>${escapeHtml(x.whatItIs||x.summary)}</p></section>
+    <section class="exercise-page-card"><h3><span>◉</span> Primary Muscles</h3><div class="exercise-muscle-row">${muscleNames.map((v,i)=>`<div><span class="muscle-figure m${i+1}">◯</span><strong>${escapeHtml(v)}</strong></div>`).join("")}</div></section>
+    <section class="exercise-page-card"><h3><span>⌘</span> Equipment</h3><div class="exercise-equipment-row">${(x.equipment||[]).map(v=>`<span>${escapeHtml(v)}</span>`).join("")}</div></section>
+    <section class="exercise-page-card"><h3><span>⇄</span> Scale or Substitute</h3><div class="exercise-substitute-row">${substitutions.length?substitutions.map(v=>`<button class="link-button" onclick="openExerciseDetail('${escapeQuote(v)}')" type="button">${escapeHtml(v)}</button>`).join(""):`<span>More options will appear as the library expands.</span>`}</div></section>
+    <section class="exercise-page-card" id="exerciseSimilarLiftsSection"><h3><span>⚠</span> Common Mistakes</h3><ul>${(x.mistakes||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ul></section>
+    <section class="exercise-page-card"><h3><span>↗</span> Similar Lifts</h3><div class="exercise-similar-list">${alternatives.length?alternatives.map(v=>`<button onclick="openExerciseDetail('${escapeQuote(v.name)}')" type="button"><strong>${escapeHtml(v.name)}</strong><span>${escapeHtml(v.reason)}</span></button>`).join(""):`<span>No close alternatives cataloged yet.</span>`}</div></section>`;
+
+  showScreen("exerciseGuide");
+  document.querySelector('.app-nav button[data-screen="exerciseLibrary"]')?.classList.add("active");
+  window.scrollTo(0,0);
 }
 function scrollExerciseSimilarLifts(){document.getElementById("exerciseSimilarLiftsSection")?.scrollIntoView({behavior:"smooth",block:"start"})}
-function closeExerciseDetail(){document.getElementById("exerciseDetailModal")?.classList.add("hidden")}
+function closeExerciseDetail(){
+  showScreen(exerciseDetailReturnScreen||"exerciseLibrary");
+  if(exerciseDetailReturnScreen==="exerciseLibrary") renderExerciseLibrary();
+  if(exerciseDetailReturnSwap) document.getElementById("exerciseSwapModal")?.classList.remove("hidden");
+  exerciseDetailReturnSwap=false;
+}
 
 function rankExerciseAlternatives(name,reason="preference"){
   const source=findExercise(name);const activeEquipment=(typeof activeEquipmentLocation==="function"?activeEquipmentLocation().equipment:[])||[];

@@ -1,0 +1,18 @@
+Bell Performance 12.2.13 — Powerlifting Meet Prep
+
+Copy the patch contents into the repository, replacing matching files.
+
+Important files:
+- index.html
+- sw.js
+- js/powerlifting-meet-prep.js
+- backend/intelligence/weekly_planner.py
+- backend/rules/bell_rules_v1.yaml
+- backend/tests/test_vertical_slice.py
+
+Deploy the Bell Core backend after pushing because this patch changes backend mission planning.
+
+Suggested commit message:
+Build 12.2.13 powerlifting meet prep
+
+After deployment, hard-refresh the frontend or clear site data so the updated service worker loads.

@@ -220,3 +220,45 @@ def test_powerlifting_week_uses_competition_lift_roles_and_only_easy_engine(tmp_
         assert not any(name in names for name in ("Threshold", "Intervals", "Long Run", "Mixed Modal"))
     finally:
         engine.close()
+
+
+def test_powerlifting_meet_prep_removes_engine_during_taper(tmp_path):
+    from datetime import date, timedelta
+    engine = _weekly_engine(tmp_path)
+    try:
+        result = engine.build_week({
+            "goal": "Powerlifting Meet Prep",
+            "event": "Powerlifting Meet",
+            "competition_date": (date.today() + timedelta(days=10)).isoformat(),
+            "available_days": ["Monday", "Tuesday", "Thursday", "Friday"],
+            "strength_days": 4,
+            "engine_days": 1,
+            "training_days": 4,
+        })
+        assert result["mission_profile"] == "powerlifting_meet"
+        assert result["phase"] == "Taper & Openers"
+        names = [x["session_name"] for x in result["schedule"] if x.get("session_name")]
+        assert len(names) == 4
+        assert not any("Aerobic" in name or "Run" in name for name in names)
+    finally:
+        engine.close()
+
+def test_powerlifting_meet_prep_keeps_only_recovery_engine_in_strength_block(tmp_path):
+    from datetime import date, timedelta
+    engine = _weekly_engine(tmp_path)
+    try:
+        result = engine.build_week({
+            "goal": "Powerlifting Meet Prep",
+            "event": "Powerlifting Meet",
+            "competition_date": (date.today() + timedelta(days=49)).isoformat(),
+            "available_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "strength_days": 4,
+            "engine_days": 2,
+            "training_days": 5,
+        })
+        assert result["phase"] == "Meet Strength Block"
+        names = [x["session_name"] for x in result["schedule"] if x.get("session_name")]
+        assert names.count("Powerlifting Aerobic Recovery") == 1
+        assert not any(name in names for name in ("Threshold", "Intervals", "Long Run", "Mixed Modal"))
+    finally:
+        engine.close()

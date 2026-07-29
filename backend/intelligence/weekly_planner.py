@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +32,10 @@ class BellWeeklyPlanningEngine:
     def _mission_key(self, request: dict[str, Any]) -> str:
         text = _norm(" ".join(str(request.get(k, "")) for k in ("mission", "goal", "specialization", "event")))
         if "powerlifting" in text:
+            competition_date = request.get("competition_date")
+            event_text = _norm(request.get("event"))
+            if competition_date and ("meet" in text or "competition" in text or "meet" in event_text):
+                return "powerlifting_meet"
             return "powerlifting"
         if "10k" in text:
             return "10k"
@@ -43,6 +48,26 @@ class BellWeeklyPlanningEngine:
         if any(x in text for x in ("hybrid", "running and strength")):
             return "hybrid"
         return "general_strength"
+
+    def _meet_phase(self, request: dict[str, Any]) -> tuple[str, int | None]:
+        raw = request.get("competition_date")
+        if not raw:
+            return str(request.get("phase") or "Build"), None
+        try:
+            target = datetime.strptime(str(raw)[:10], "%Y-%m-%d").date()
+            days = max(0, (target - date.today()).days)
+        except (TypeError, ValueError):
+            return str(request.get("phase") or "Build"), None
+        weeks = (days + 6) // 7
+        if days <= 7:
+            return "Meet Week", weeks
+        if weeks <= 2:
+            return "Taper & Openers", weeks
+        if weeks <= 5:
+            return "Competition Peak", weeks
+        if weeks <= 10:
+            return "Meet Strength Block", weeks
+        return "Meet Base Building", weeks
 
     def _resolve_template(self, name: str) -> dict[str, Any]:
         templates = self.rules["session_templates"]
@@ -249,14 +274,22 @@ class BellWeeklyPlanningEngine:
 
     def build_week(self, request: dict[str, Any]) -> dict[str, Any]:
         mission_key = self._mission_key(request)
+        if mission_key == "powerlifting_meet":
+            resolved_phase, weeks_to_competition = self._meet_phase(request)
+            request = copy.deepcopy(request)
+            request["phase"] = resolved_phase
+            request["weeks_to_competition"] = weeks_to_competition
         profile = self.rules["mission_profiles"][mission_key]
         objectives = request.get("weekly_objectives") or profile["objectives"]
         available_days = self._available_days(request)
         strength_target = max(0, int(request.get("strength_days", 0) or 0))
         engine_target = max(0, int(request.get("engine_days", 0) or 0))
-        if mission_key == "powerlifting":
+        if mission_key in ("powerlifting", "powerlifting_meet"):
             strength_target = min(4, strength_target or 4)
-            engine_target = min(2, engine_target if engine_target else 1)
+            if mission_key == "powerlifting_meet" and request.get("phase") in ("Taper & Openers", "Meet Week"):
+                engine_target = 0
+            else:
+                engine_target = min(1 if mission_key == "powerlifting_meet" else 2, engine_target if engine_target else 1)
         defaults = list(profile["default_sessions"])
         strength_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") != "engine"]
         engine_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") == "engine"]
@@ -267,9 +300,9 @@ class BellWeeklyPlanningEngine:
             sessions = []
             # Build distinct exposure roles. Never satisfy a target by cycling the same template.
             strength_fallback = (["Powerlifting Squat Focus", "Powerlifting Bench Focus", "Powerlifting Deadlift Focus", "Powerlifting Secondary Squat + Bench"]
-                                 if mission_key == "powerlifting" else
+                                 if mission_key in ("powerlifting", "powerlifting_meet") else
                                  ["Upper Strength", "Lower Strength", "Upper Volume", "Lower Volume", "Full Body Hypertrophy", "Push", "Pull", "Legs", "Upper", "Lower"])
-            engine_fallback = (["Powerlifting Aerobic Recovery", "Aerobic Base"] if mission_key == "powerlifting" else
+            engine_fallback = (["Powerlifting Aerobic Recovery", "Aerobic Base"] if mission_key in ("powerlifting", "powerlifting_meet") else
                                ["Easy Run", "Threshold", "Aerobic Base", "Intervals", "Long Run", "Mixed Modal", "Long Aerobic"])
             def unique_pool(primary: list[str], fallback: list[str]) -> list[str]:
                 result: list[str] = []
@@ -326,6 +359,8 @@ class BellWeeklyPlanningEngine:
             "mission": request.get("mission") or request.get("goal") or mission_key,
             "mission_profile": mission_key,
             "phase": request.get("phase", "Build"),
+            "competition_date": request.get("competition_date"),
+            "weeks_to_competition": request.get("weeks_to_competition"),
             "weekly_objectives": objectives,
             "schedule": schedule,
             "validation": validation,

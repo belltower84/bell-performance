@@ -176,6 +176,23 @@
         "Powerlifting Secondary Squat + Bench",
         "Powerlifting Aerobic Recovery"
       ]
+    },
+    "powerlifting_meet": {
+      "objectives": [
+        "Peak Competition Squat",
+        "Peak Competition Bench Press",
+        "Peak Competition Deadlift",
+        "Meet Command Practice",
+        "Fatigue Reduction",
+        "Attempt Readiness"
+      ],
+      "default_sessions": [
+        "Powerlifting Squat Focus",
+        "Powerlifting Bench Focus",
+        "Powerlifting Deadlift Focus",
+        "Powerlifting Secondary Squat + Bench",
+        "Powerlifting Aerobic Recovery"
+      ]
     }
   },
   "session_templates": {

@@ -1,0 +1,17 @@
+BELL PERFORMANCE 13.0.0 INSTALLATION
+
+1. Confirm you are on the bell-core-live branch.
+2. Back up or commit your current 12.2.13 build.
+3. Copy all files from this patch over the repository root.
+4. Allow index.html and manifest.json to be replaced.
+5. Commit with:
+   Build 13.0.0 Mission Control design system
+6. Test locally before deployment.
+7. Verify on mobile Chrome:
+   - Mission Control appears above Today's Mission.
+   - Journey, phase, and phase week are populated.
+   - Navigation reads Mission, Training, Plan, Progress, More.
+   - Every navigation destination opens correctly.
+   - Readiness, Today's Mission, weekly plan, and workout launch still work.
+
+This is a frontend milestone. No Render backend deployment is required for the new layout itself.

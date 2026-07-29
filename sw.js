@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13.4.0-bell-coach-intelligence';
+const CACHE_NAME = 'bell-performance-13.5.0-bell-coach-intelligence';
 const CORE = [
   "./",
   "./index.html",
@@ -60,7 +60,9 @@ const CORE = [
   "./js/bell-coaching-engine.js?v=13200",
   "./js/bell13-dashboard.js?v=13200",
   "./js/bell13-athlete-experience.js?v=13300",
-  "./js/bell13-coach-intelligence.js?v=13400"
+  "./js/bell13-coach-intelligence.js?v=13400",
+  "./css/bell135.css?v=13500",
+  "./js/bell13-commercial-home.js?v=13500",
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

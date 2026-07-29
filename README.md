@@ -93,3 +93,6 @@ Version 13.4.0 ships with **28 passing backend tests**, JavaScript and Python co
 ## Bell Coach Intelligence (13.4)
 
 Bell Coach now produces structured explanations, separates known facts from inference and missing data, maintains athlete-reviewable coaching memory, and exposes an auditable decision history. See `BELL_COACH_INTELLIGENCE_13_4.md`.
+
+## Bell Performance 13.5.0
+13.5.0 introduces the Commercial Athlete Experience foundation: a simplified Home dashboard, familiar Home/Train/Plan/Progress/More navigation, Guided and Advanced display modes, and a clearer path from daily readiness to starting training. Bell 13.4 coaching intelligence and data contracts remain intact.

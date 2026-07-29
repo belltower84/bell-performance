@@ -1,0 +1,10 @@
+BELL PERFORMANCE 13.6.3 — GITHUB PAGES INSTALL
+
+1. Back up the current repository.
+2. Extract this ZIP.
+3. Copy all extracted files and folders into the repository root, replacing matching files.
+4. Commit and push the changes.
+5. Wait for GitHub Pages to finish deployment.
+6. Reload the application. If an older version remains cached, close all Bell Performance tabs and reopen the site, or clear the site's stored cache once.
+
+No Bell Core database migration is required.

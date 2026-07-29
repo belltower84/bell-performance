@@ -1,6 +1,6 @@
-# Bell Performance 13.6.2 — Readiness, Application Control & Refined Coach
+# Bell Performance 13.6.3 — Streamlined Settings
 
-Bell Performance is a local-first training application with two control modes. Version 13.6 adds a functional readiness dashboard, lets each athlete choose between a fixed Workout Planner and adaptive Bell Coach experience, and provides a dedicated Coach workspace with stable top navigation and unobstructed scrolling.
+Bell Performance is a local-first training application with two control modes. Version 13.6.3 adds a streamlined Settings control center with focused pages for the athlete, program, training setup, recovery and nutrition, Bell behavior, help, and data.
 
 ## Product blueprint
 
@@ -35,19 +35,18 @@ The seven-step onboarding flow captures:
 
 Powerlifting requires squat, bench press, and deadlift maxes. Event Preparation requires a named event and future date.
 
-## Athlete Control Center
+## Settings Control Center
 
-Settings is organized into:
+Settings opens on six focused destinations:
 
-- Athlete
-- Journey
-- Training
-- Nutrition
-- Recovery
-- App Control
-- App
+- Athlete Profile
+- Mission & Program
+- Training Setup
+- Recovery & Nutrition
+- Bell Behavior
+- Help & Data
 
-Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, and help controls remain available inside the new structure.
+Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, and help controls remain available inside the new structure. Manual program overrides stay collapsed until the athlete deliberately opens advanced controls.
 
 ## Connected experience
 
@@ -62,8 +61,8 @@ Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, 
 
 - [`BELL_ATHLETE_EXPERIENCE_13_3.md`](BELL_ATHLETE_EXPERIENCE_13_3.md)
 - [`BELL_COACHING_ENGINE_13_2.md`](BELL_COACHING_ENGINE_13_2.md)
-- [`RELEASE_NOTES_13_6_2.md`](RELEASE_NOTES_13_6_2.md)
-- [`VALIDATION_13_6_2.md`](VALIDATION_13_6_2.md)
+- [`RELEASE_NOTES_13_6_3.md`](RELEASE_NOTES_13_6_3.md)
+- [`VALIDATION_13_6_3.md`](VALIDATION_13_6_3.md)
 
 ## Local use
 
@@ -99,3 +98,7 @@ Bell Coach now produces structured explanations, separates known facts from infe
 
 ## Bell Performance 13.5.1
 13.5.1 refines the commercial Home dashboard with balanced card geometry, consistent spacing, a selectable weekly calendar with an in-card day summary, and a workflow-based desktop sidebar: Home, Train, Plan, Progress, Coach, Recovery, Nutrition, Library, and More.
+
+
+## Bell Performance 13.6.3
+13.6.3 replaces the long Settings page with a compact control-center home and focused pages for Athlete Profile, Mission & Program, Training Setup, Recovery & Nutrition, Bell Behavior, and Help & Data.

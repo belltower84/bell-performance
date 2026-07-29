@@ -22,6 +22,13 @@ class AthleteCreate(BaseModel):
     coach_user_id: str | None = None
 
 
+
+
+class AthleteProfileUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=120)
+    profile: dict[str, Any] = Field(default_factory=dict)
+
+
 class MissionCreate(BaseModel):
     goal: str = Field(min_length=3, max_length=500)
     timeline_weeks: int = Field(default=12, ge=4, le=52)

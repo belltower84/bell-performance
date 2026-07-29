@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 13.2",
+  "name": "Bell Performance 13.3",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Adaptive AI performance coaching with discipline-specific libraries, renewable Continuous Development cycles, phase-aware Mission Control, intelligent scheduling, readiness adaptation, and Bell Core synchronization."
+  "description": "Adaptive AI performance coaching with a modern athlete profile, Journey-centered onboarding, unified Settings control center, discipline-specific coaching libraries, renewable Continuous Development cycles, and Bell Core synchronization."
 }

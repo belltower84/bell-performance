@@ -64,21 +64,81 @@ async function bellLogin(email, password) {
 }
 
 function bellAthleteProfile() {
+  const modern = data.athleteProfile || {};
+  const demographics = modern.demographics || {};
+  const identity = modern.identity || {};
+  const experience = modern.experience || {};
+  const availability = modern.availability || {};
+  const baselines = modern.baselines || {};
+  const recovery = modern.recovery || {};
+  const coaching = modern.coaching || {};
+  const maxes = baselines.maxes || data.settings.maxes || {};
   return {
-    sex: data.settings.sex,
-    athlete_mode: data.settings.athleteMode,
-    primary_training_identity: data.settings.primaryTrainingIdentity || null,
-    primary_objective: data.settings.secondaryTrainingGoal || data.trainingBlock?.secondaryGoal || null,
-    age: Number(data.nutrition.age) || null,
-    height_inches: Number(data.nutrition.height) || null,
-    weight_lb: Number(data.settings.weight) || null,
-    goal_weight_lb: Number(data.settings.goal) || null,
-    maxes: data.settings.maxes || {},
+    schema_version: 1,
+    demographics: {
+      first_name: demographics.firstName || data.settings.athleteName || "",
+      age: Number(demographics.age || data.nutrition.age) || null,
+      sex: demographics.sex || data.settings.sex || "Prefer not to say",
+      height_inches: Number(demographics.heightInches || data.nutrition.height) || null,
+      bodyweight_lb: Number(demographics.bodyweightLb || data.settings.weight) || null,
+      goal_weight_lb: Number(demographics.goalWeightLb || data.settings.goal) || null
+    },
+    identity: {
+      primary: identity.primary || data.settings.primaryTrainingIdentity || data.settings.athleteMode || "Performance & Health",
+      objective: identity.objective || data.settings.secondaryTrainingGoal || data.trainingBlock?.secondaryGoal || "Continuous Development",
+      journey_mode: identity.journeyMode || "continuous_development",
+      journey_name: identity.journeyName || "",
+      event_name: identity.eventName || "",
+      event_date: identity.eventDate || data.settings.secondaryTargetDate || data.trainingBlock?.targetDate || ""
+    },
+    experience: {
+      level: experience.level || data.settings.trainingExperience || "Intermediate",
+      training_age_years: Number(experience.trainingAgeYears) || null
+    },
+    availability: {
+      normal_days: Array.isArray(availability.normalDays) ? availability.normalDays : (typeof bellNormalTrainingDays === "function" ? bellNormalTrainingDays() : []),
+      session_minutes: Number(availability.sessionMinutes || data.trainingBlock?.sessionMinutes) || 60,
+      preferred_time: availability.preferredTime || "Flexible",
+      reliability: availability.reliability || "Mostly consistent",
+      minimum_days: Number(availability.minimumDays) || 3
+    },
+    baselines: {
+      maxes: {
+        bench: Number(maxes.bench) || null,
+        squat: Number(maxes.squat) || null,
+        deadlift: Number(maxes.deadlift) || null,
+        push_press: Number(maxes.pushPress || maxes.push_press) || null
+      }
+    },
+    recovery: {
+      sleep_target_hours: Number(recovery.sleepTargetHours) || 8,
+      deload_preference: recovery.deloadPreference || "Bell decides",
+      limitation_status: recovery.limitationStatus || (data.settings.injuryProfile?.hasLimitations ? "active" : "none")
+    },
+    coaching: {
+      style: coaching.style || data.settings.coachMessages?.style || "Performance",
+      detail_level: coaching.detailLevel || "Balanced",
+      check_in_frequency: coaching.checkInFrequency || "Weekly",
+      scripture_frequency: coaching.scriptureFrequency || data.settings.coachMessages?.scriptureFrequency || "Occasionally"
+    },
     limitations: data.settings.injuryProfile || {},
-    equipment: data.settings.equipmentSetup || {},
-    training_experience: data.settings.trainingExperience || "Intermediate"
+    equipment: data.settings.equipmentSetup || {}
   };
 }
+
+async function bellSyncAthleteProfile() {
+  if (!bellCloudConnected() || !bellCloud.athleteId) return null;
+  const name = data.athleteProfile?.demographics?.firstName || data.settings.athleteName || "Bell Athlete";
+  const result = await bellApiRequest(`/athletes/${bellCloud.athleteId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ name, profile: bellAthleteProfile() })
+  });
+  bellCloud.lastSyncAt = new Date().toISOString();
+  bellCloud.lastError = "";
+  saveBellCloud();
+  return result;
+}
+
 
 function bellDisciplineExposureTargets(block = data.trainingBlock || {}) {
   const days = Math.max(2, Math.min(7, Number(block.trainingDays) || (typeof bellNormalTrainingDays === "function" ? bellNormalTrainingDays().length : 5)));

@@ -1,60 +1,73 @@
-# Bell Performance 13.2.0 — Discipline Coaching Libraries
+# Bell Performance 13.3.0 — Athlete Experience
 
-Bell Performance is a local-first adaptive coaching application. Version 13.2 adds discipline-specific coaching libraries and renewable Continuous Development cycles to the Journey-centered Bell Coaching Engine.
+Bell Performance is a local-first adaptive coaching application. Version 13.3 rebuilds First Flight and Settings around a persistent modern athlete profile while preserving the Journey-centered Bell Coaching Engine introduced in Bell 13.1 and the discipline libraries introduced in Bell 13.2.
 
 ## Product blueprint
 
 Bell 13 and later are governed by [`BELL_PRODUCT_BLUEPRINT.md`](BELL_PRODUCT_BLUEPRINT.md). It defines the product language, coaching architecture, design standards, adaptive-planning rules, and release roadmap.
 
-## Bell 13.2 coaching model
+## Bell 13.3 coaching profile
 
 ```text
-Athlete Identity
-  → Objective
+Athlete Profile
+  → Training Identity
+  → Current Objective
+  → Journey Mode
   → Journey
-  → Discipline Coaching Library
   → Current Phase
   → Weekly Plan
   → Today's Mission
 ```
 
-Supported libraries:
+Bell separates who the athlete is becoming from the objective being pursued now. A Powerlifter can pursue Body Recomposition, a Performance & Health athlete can prepare for a race, and any identity can continue purposeful development without a dated event.
 
-- Performance & Health
-- Powerlifting
-- Bodybuilding
-- Hybrid Athlete
-- Tactical Athlete
-- Functional Fitness
-- Endurance Athlete
+## First Flight
 
-Each library defines weekly architecture, protected sessions, progression, readiness adjustments, missed-session behavior, assessments, and Continuous Development bias rotation.
+The seven-step onboarding flow captures:
 
-## Continuous Development
+- athlete baseline;
+- training identity;
+- current objective and Journey mode;
+- normal training availability;
+- experience and strength baselines;
+- recovery and Bell Coach preferences;
+- final Journey review.
 
-Athletes without a dated event move through renewable development cycles. Bell tracks the current cycle, cycle week, current bias, and next bias without resetting completed training history.
+Powerlifting requires squat, bench press, and deadlift maxes. Event Preparation requires a named event and future date.
 
-## Event Preparation
+## Athlete Control Center
 
-Dated events still build backward from competition day. Discipline-specific peaking, specificity, and taper rules control the final phases.
+Settings is organized into:
 
-## Mission Control and Plan
+- Athlete
+- Journey
+- Training
+- Nutrition
+- Recovery
+- Bell Coach
+- App
 
-Mission Control displays Journey, Phase, Phase Week, cycle status, progress, and the next milestone. The Plan page displays the full phase timeline and a Coaching Library card explaining how Bell is coaching the athlete.
-
-See [`BELL_COACHING_ENGINE_13_2.md`](BELL_COACHING_ENGINE_13_2.md) and [`RELEASE_NOTES_13_2_0.md`](RELEASE_NOTES_13_2_0.md).
+Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, and help controls remain available inside the new structure.
 
 ## Connected experience
 
 - Register or sign in to Bell Core from Settings.
-- Sync the athlete profile, mission, discipline, Journey, and multiweek plan.
+- Create, retrieve, and partially update the normalized athlete profile.
+- Sync the current mission, discipline, Journey, and multiweek plan.
 - Submit readiness and receive discipline-aware adaptation.
-- Start and complete Bell Core sessions in the existing guided workout player.
-- Preserve offline operation when Bell Core is unavailable.
+- Start and complete Bell Core sessions in the guided workout player.
+- Continue using Bell locally when Bell Core is unavailable.
+
+## Documentation
+
+- [`BELL_ATHLETE_EXPERIENCE_13_3.md`](BELL_ATHLETE_EXPERIENCE_13_3.md)
+- [`BELL_COACHING_ENGINE_13_2.md`](BELL_COACHING_ENGINE_13_2.md)
+- [`RELEASE_NOTES_13_3_0.md`](RELEASE_NOTES_13_3_0.md)
+- [`VALIDATION_13_3_0.md`](VALIDATION_13_3_0.md)
 
 ## Local use
 
-Serve the files over HTTP:
+Serve the frontend over HTTP:
 
 ```bash
 python -m http.server 5173
@@ -74,4 +87,4 @@ Run backend tests from `backend/`:
 pytest -q
 ```
 
-Version 13.2.0 ships with 21 passing backend tests plus JavaScript, HTML, manifest, and archive validation.
+Version 13.3.0 ships with **24 passing backend tests**, JavaScript and Python compilation checks, CSS/HTML/manifest validation, profile migration smoke tests, and archive-integrity checks.

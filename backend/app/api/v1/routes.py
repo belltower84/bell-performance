@@ -11,13 +11,14 @@ from app.models import (
     Athlete, Mission, CheckIn, Decision, SessionCompletion, IdempotencyRecord, User,
 )
 from app.repositories.access import athlete_for_user
-from app.schemas import AthleteCreate, MissionCreate, CheckInCreate, CompletionCreate
+from app.schemas import AthleteCreate, AthleteProfileUpdate, MissionCreate, CheckInCreate, CompletionCreate
 from app.services.core import (
     dumps, loads, uid, event, project_state, generate_plan, latest_plan, today_payload,
     compile_mission_request, learn_from_completion, intelligence_summary, session_for_completion, coaching_state,
 )
 from intelligence.adaptive_coaching import BellAdaptiveCoachingEngine
 from intelligence.mission_compiler import BellMissionCompiler
+from intelligence.athlete_profile import normalize_athlete_profile
 from pathlib import Path
 
 router = APIRouter()
@@ -27,17 +28,57 @@ ROOT = Path(__file__).resolve().parents[3]
 @router.post("/athletes", status_code=201, tags=["Athletes"])
 def create_athlete(body: AthleteCreate, db: Session = Depends(get_db), user: User = Depends(current_user)):
     coach = body.coach_user_id if user.role in ("coach", "admin") else None
+    normalized_profile = normalize_athlete_profile(body.profile, name=body.name)
     row = Athlete(
         id=uid("ath"), owner_user_id=user.id, coach_user_id=coach,
-        name=body.name, profile_json=dumps(body.profile),
+        name=body.name, profile_json=dumps(normalized_profile),
     )
     db.add(row)
-    event(db, row.id, "athlete_created", {"name": body.name, "profile": body.profile})
+    event(db, row.id, "athlete_created", {"name": body.name, "profile": normalized_profile})
     db.commit()
     return {
-        "id": row.id, "name": row.name, "profile": body.profile,
+        "id": row.id, "name": row.name, "profile": normalized_profile,
         "owner_user_id": row.owner_user_id, "coach_user_id": row.coach_user_id,
     }
+
+
+@router.get("/athletes/{athlete_id}", tags=["Athletes"])
+def get_athlete(athlete_id: str, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    athlete = athlete_for_user(db, athlete_id, user)
+    profile = normalize_athlete_profile(loads(athlete.profile_json), name=athlete.name)
+    return {
+        "id": athlete.id, "name": athlete.name, "profile": profile,
+        "owner_user_id": athlete.owner_user_id, "coach_user_id": athlete.coach_user_id,
+    }
+
+
+@router.patch("/athletes/{athlete_id}", tags=["Athletes"])
+def update_athlete_profile(
+    athlete_id: str,
+    body: AthleteProfileUpdate,
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    athlete = athlete_for_user(db, athlete_id, user)
+    current = loads(athlete.profile_json)
+    merged = {**current, **body.profile}
+    for section in ("demographics", "identity", "experience", "availability", "baselines", "recovery", "coaching"):
+        if isinstance(current.get(section), dict) and isinstance(body.profile.get(section), dict):
+            merged[section] = {**current[section], **body.profile[section]}
+    if isinstance(current.get("baselines", {}).get("maxes"), dict) and isinstance(body.profile.get("baselines", {}).get("maxes"), dict):
+        merged.setdefault("baselines", {})["maxes"] = {
+            **current["baselines"]["maxes"], **body.profile["baselines"]["maxes"]
+        }
+    name = body.name.strip() if body.name is not None else athlete.name
+    normalized = normalize_athlete_profile(merged, name=name)
+    athlete.name = name
+    athlete.profile_json = dumps(normalized)
+    event(db, athlete.id, "athlete_profile_updated", {
+        "name": name, "profile_completeness": normalized["profile_completeness"],
+        "schema_version": normalized["schema_version"],
+    })
+    db.commit()
+    return {"id": athlete.id, "name": athlete.name, "profile": normalized}
 
 
 @router.post("/athletes/{athlete_id}/missions", status_code=201, tags=["Missions"])

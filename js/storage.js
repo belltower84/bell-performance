@@ -24,6 +24,18 @@ const defaults = {
   exerciseIntelligence: { replacements: [], personalConstraints: [] },
   activeWorkout: null,
   coachingState: null,
+  athleteProfile: {
+    schemaVersion: 1,
+    demographics: { firstName:"", age:null, sex:"Prefer not to say", heightInches:null, bodyweightLb:null, goalWeightLb:null },
+    identity: { primary:"Performance & Health", objective:"Continuous Development", journeyMode:"continuous_development", journeyName:"", eventName:"", eventDate:"" },
+    experience: { level:"Intermediate", trainingAgeYears:null },
+    availability: { normalDays:[], sessionMinutes:60, preferredTime:"Flexible", reliability:"Mostly consistent", minimumDays:3 },
+    baselines: { maxes:{ bench:null, squat:null, deadlift:null, pushPress:null } },
+    recovery: { sleepTargetHours:8, deloadPreference:"Bell decides", limitationStatus:"none" },
+    coaching: { style:"Performance", detailLevel:"Balanced", checkInFrequency:"Weekly", scriptureFrequency:"Occasionally" },
+    profileCompleteness: 0,
+    updatedAt:""
+  },
   mobility: { focus: "Auto", minutes: 10, completedDates: [], checks: {} },
   readinessLog: [],
   sessionFeedbackLog: [],
@@ -161,6 +173,75 @@ function normalizeData() {
   data.trainingBlock = { ...defaults.trainingBlock, ...(data.trainingBlock || {}) };
   data.trainingBlock.currentWeek = Math.max(1, Math.min(Number(data.trainingBlock.lengthWeeks) || 12, Number(data.trainingBlock.currentWeek) || 1));
   data.coachingState = data.coachingState && typeof data.coachingState === "object" ? data.coachingState : null;
+
+  const priorProfile = data.athleteProfile && typeof data.athleteProfile === "object" ? data.athleteProfile : {};
+  const priorDemographics = priorProfile.demographics || {};
+  const priorIdentity = priorProfile.identity || {};
+  const priorExperience = priorProfile.experience || {};
+  const priorAvailability = priorProfile.availability || {};
+  const priorBaselines = priorProfile.baselines || {};
+  const priorRecovery = priorProfile.recovery || {};
+  const priorCoaching = priorProfile.coaching || {};
+  const legacyIdentity = data.settings.primaryTrainingIdentity || data.settings.athleteMode || "Performance & Health";
+  const legacyObjective = data.settings.secondaryTrainingGoal || data.trainingBlock.secondaryGoal || (data.nutrition.goal === "cut" ? "Lose Fat" : data.nutrition.goal === "gain" ? "Build Muscle" : "Continuous Development");
+  const legacyMission = data.trainingBlock.mission || {};
+  const legacyEventDate = legacyMission.eventDate || data.trainingBlock.targetDate || data.settings.secondaryTargetDate || "";
+  const legacyMode = legacyMission.path === "event" || Boolean(legacyEventDate && /meet|competition|race|marathon|5k|10k|selection|event/i.test(String(legacyMission.eventType || legacyObjective))) ? "event_preparation" : "continuous_development";
+  const normalDays = Array.isArray(priorAvailability.normalDays) && priorAvailability.normalDays.length
+    ? priorAvailability.normalDays
+    : Array.isArray(data.settings.trainingAvailability?.normalDays) ? data.settings.trainingAvailability.normalDays : Array.isArray(data.trainingBlock.availableDays) ? data.trainingBlock.availableDays : [];
+  data.athleteProfile = {
+    ...defaults.athleteProfile,
+    ...priorProfile,
+    schemaVersion: 1,
+    demographics: {
+      ...defaults.athleteProfile.demographics,
+      ...priorDemographics,
+      firstName: priorDemographics.firstName || data.settings.athleteName || "",
+      age: Number(priorDemographics.age) || Number(data.nutrition.age) || null,
+      sex: priorDemographics.sex || data.settings.sex || "Prefer not to say",
+      heightInches: Number(priorDemographics.heightInches) || Number(data.nutrition.height) || null,
+      bodyweightLb: Number(priorDemographics.bodyweightLb) || Number(data.settings.weight) || null,
+      goalWeightLb: Number(priorDemographics.goalWeightLb) || Number(data.settings.goal) || null
+    },
+    identity: {
+      ...defaults.athleteProfile.identity,
+      ...priorIdentity,
+      primary: priorIdentity.primary || legacyIdentity,
+      objective: priorIdentity.objective || legacyObjective,
+      journeyMode: priorIdentity.journeyMode || legacyMode,
+      journeyName: priorIdentity.journeyName || legacyMission.eventName || legacyMission.developmentGoal || "",
+      eventName: priorIdentity.eventName || legacyMission.eventName || legacyMission.eventType || "",
+      eventDate: priorIdentity.eventDate || legacyEventDate
+    },
+    experience: {
+      ...defaults.athleteProfile.experience,
+      ...priorExperience,
+      level: priorExperience.level || data.settings.trainingExperience || "Intermediate",
+      trainingAgeYears: Number(priorExperience.trainingAgeYears) || null
+    },
+    availability: {
+      ...defaults.athleteProfile.availability,
+      ...priorAvailability,
+      normalDays: Array.isArray(normalDays) ? normalDays : [],
+      sessionMinutes: Number(priorAvailability.sessionMinutes) || Number(data.trainingBlock.sessionMinutes) || 60,
+      minimumDays: Math.max(2, Math.min(7, Number(priorAvailability.minimumDays) || Math.min(3, Number(data.trainingBlock.trainingDays) || 3)))
+    },
+    baselines: {
+      ...defaults.athleteProfile.baselines,
+      ...priorBaselines,
+      maxes: { ...defaults.athleteProfile.baselines.maxes, ...(priorBaselines.maxes || {}), ...data.settings.maxes }
+    },
+    recovery: { ...defaults.athleteProfile.recovery, ...priorRecovery, limitationStatus: data.settings.injuryProfile?.hasLimitations ? "active" : (priorRecovery.limitationStatus || "none") },
+    coaching: {
+      ...defaults.athleteProfile.coaching,
+      ...priorCoaching,
+      style: priorCoaching.style || data.settings.coachMessages?.style || "Performance",
+      scriptureFrequency: priorCoaching.scriptureFrequency || data.settings.coachMessages?.scriptureFrequency || "Occasionally"
+    },
+    profileCompleteness: Math.max(0, Math.min(100, Number(priorProfile.profileCompleteness) || 0)),
+    updatedAt: priorProfile.updatedAt || ""
+  };
 
   if (data.activeWorkout && !Array.isArray(data.activeWorkout.exercises)) {
     data.activeWorkout = null;

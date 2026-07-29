@@ -465,3 +465,91 @@ def test_transition_rules_recover_before_advancing():
     assert decision["action"] == "recover"
     healthy = library.evaluate_transition({}, {"readiness": 80, "pain": 0, "phase_complete": True, "progress": .85})
     assert healthy["action"] == "advance"
+
+
+def test_athlete_profile_is_normalized_and_can_be_updated(client, auth):
+    headers, _ = auth("profile-modernization@example.com")
+    created = client.post("/api/v1/athletes", headers=headers, json={
+        "name": "Chris",
+        "profile": {
+            "age": 41,
+            "height_inches": 66,
+            "weight_lb": 205,
+            "primary_training_identity": "Powerlifting",
+            "objective": "Increase Strength",
+            "training_experience": "advanced",
+            "available_days": ["Monday", "Tuesday", "Thursday", "Friday", "Saturday"],
+            "session_minutes": 75,
+            "maxes": {"squat": 500, "bench": 325, "deadlift": 500},
+        },
+    })
+    assert created.status_code == 201
+    body = created.json()
+    assert body["profile"]["schema_version"] == 1
+    assert body["profile"]["identity"]["primary"] == "Powerlifting"
+    assert body["profile"]["baselines"]["maxes"]["squat"] == 500
+    assert body["profile"]["profile_completeness"] == 100
+
+    athlete_id = body["id"]
+    updated = client.patch(f"/api/v1/athletes/{athlete_id}", headers=headers, json={
+        "profile": {
+            "identity": {
+                "objective": "Prepare for Competition",
+                "journey_mode": "event_preparation",
+                "event_name": "Texas State Meet",
+                "event_date": "2027-02-20",
+            },
+            "coaching": {"detail_level": "Detailed"},
+        },
+    })
+    assert updated.status_code == 200
+    profile = updated.json()["profile"]
+    assert profile["identity"]["objective"] == "Prepare for Competition"
+    assert profile["identity"]["event_name"] == "Texas State Meet"
+    assert profile["coaching"]["detail_level"] == "Detailed"
+    assert profile["baselines"]["maxes"]["squat"] == 500
+    assert profile["availability"]["normal_days"] == ["Monday", "Tuesday", "Thursday", "Friday", "Saturday"]
+
+    fetched = client.get(f"/api/v1/athletes/{athlete_id}", headers=headers)
+    assert fetched.status_code == 200
+    assert fetched.json()["profile"]["identity"]["event_date"] == "2027-02-20"
+
+
+def test_powerlifting_profile_completeness_requires_three_lift_maxes():
+    from intelligence.athlete_profile import normalize_athlete_profile
+
+    incomplete = normalize_athlete_profile({
+        "demographics": {"first_name": "Chris", "age": 41, "height_inches": 66, "bodyweight_lb": 205},
+        "identity": {"primary": "Powerlifting", "objective": "Increase Strength"},
+        "experience": {"level": "Advanced"},
+        "availability": {"normal_days": ["Monday", "Tuesday", "Thursday", "Friday"], "session_minutes": 75},
+        "baselines": {"maxes": {"squat": 500, "bench": 325}},
+    })
+    assert incomplete["profile_completeness"] < 100
+
+    complete = normalize_athlete_profile({
+        **incomplete,
+        "baselines": {"maxes": {"squat": 500, "bench": 325, "deadlift": 500}},
+    })
+    assert complete["profile_completeness"] == 100
+
+
+def test_legacy_profile_aliases_preserve_event_intent():
+    from intelligence.athlete_profile import normalize_athlete_profile
+
+    profile = normalize_athlete_profile({
+        "name": "Runner",
+        "age": 35,
+        "height_inches": 70,
+        "weight_lb": 180,
+        "primary_training_identity": "Endurance Athlete",
+        "objective": "Prepare for Competition",
+        "experience": "intermediate",
+        "available_days": ["Monday", "Wednesday", "Friday", "Saturday"],
+        "competition_type": "10K",
+        "competition_date": "2027-03-20",
+    })
+    assert profile["identity"]["primary"] == "Endurance Athlete"
+    assert profile["identity"]["journey_mode"] == "event_preparation"
+    assert profile["identity"]["event_name"] == "10K"
+    assert profile["experience"]["level"] == "Intermediate"

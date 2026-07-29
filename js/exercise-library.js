@@ -411,7 +411,8 @@ function thumbnailUrl(exercise){return exercise.thumbnail || "./assets/artwork/s
 
 function filterFeaturedGuides(){
   const q=(document.getElementById("exerciseLibrarySearch")?.value||"").trim().toLowerCase();
-  return getFeaturedGuides().filter(x=>{
+  const source=q ? exerciseCatalog() : getFeaturedGuides();
+  return source.filter(x=>{
     const text=[x.name,x.pattern,x.summary,x.whatItIs,...(x.primary||[]),...(x.secondary||[]),...(x.equipment||[]),roleLabel(x),bodyRegionLabel(x)].join(" ").toLowerCase();
     const matchesQuery=!q || text.includes(q);
     const matchesCategory=exerciseLibraryCategory==="all" || (exerciseLibraryCategory==="core" ? roleLabel(x).toLowerCase()==="core" : (x.role||[]).map(v=>String(v).toLowerCase()).includes(exerciseLibraryCategory) || roleLabel(x).toLowerCase()===exerciseLibraryCategory);
@@ -428,8 +429,9 @@ function renderExerciseLibrary(){
   if(grid){
     grid.innerHTML=results.length ? results.map((x,index)=>{
       const favorite=isExerciseFavorite(x.name);
-      return `<button class="library-guide-card ${favorite?"is-favorite":""}" onclick="openExerciseDetail('${escapeQuote(x.name)}')" type="button"><div class="library-guide-thumb" style="background-image:url('${thumbnailUrl(x)}')"><button aria-label="${favorite?"Remove from":"Save to"} favorites" class="library-favorite-toggle" onclick="toggleExerciseFavorite('${escapeQuote(x.name)}');event.stopPropagation();" type="button">${favorite?"★":"☆"}</button><span class="guide-category-badge">${escapeHtml(roleLabel(x))}</span></div><div class="library-guide-body"><h3>${getFeaturedGuideNames().indexOf(x.name)+1}. ${escapeHtml(x.name)}</h3><div class="library-guide-meta"><span>${escapeHtml(x.pattern)}</span><span>${escapeHtml(equipmentLabel(x))}</span></div><div class="library-guide-footer"><span>${escapeHtml(levelLabel(x))}</span><span>${escapeHtml(bodyRegionLabel(x))}</span></div></div></button>`;
-    }).join("") : `<div class="card library-empty-state"><strong>No pilot guides match those filters.</strong><div class="hint">This first build focuses on the ten featured movements. Clear filters or search for one of the pilot guides.</div></div>`;
+      const guideLevel=exerciseGuideLevel(x);const pilotIndex=getFeaturedGuideNames().indexOf(x.name);
+      return `<button class="library-guide-card ${favorite?"is-favorite":""}" onclick="openExerciseDetail('${escapeQuote(x.name)}')" type="button"><div class="library-guide-thumb" style="background-image:url('${thumbnailUrl(x)}')"><button aria-label="${favorite?"Remove from":"Save to"} favorites" class="library-favorite-toggle" onclick="toggleExerciseFavorite('${escapeQuote(x.name)}');event.stopPropagation();" type="button">${favorite?"★":"☆"}</button><span class="guide-category-badge">${escapeHtml(roleLabel(x))}</span><span class="library-guide-level ${guideLevel.id}">${escapeHtml(guideLevel.label)}</span></div><div class="library-guide-body"><h3>${pilotIndex>=0?`${pilotIndex+1}. `:""}${escapeHtml(x.name)}</h3><div class="library-guide-meta"><span>${escapeHtml(x.pattern)}</span><span>${escapeHtml(equipmentLabel(x))}</span></div><div class="library-guide-footer"><span>${escapeHtml(levelLabel(x))}</span><span>${escapeHtml(bodyRegionLabel(x))}</span></div></div></button>`;
+    }).join("") : `<div class="card library-empty-state"><strong>No exercise guides match those filters.</strong><div class="hint">Clear the filters or search by exercise, muscle group, equipment, or movement pattern.</div></div>`;
   }
   const chipContainer=document.getElementById("libraryCategoryChips");
   if(chipContainer){
@@ -482,134 +484,159 @@ function searchExerciseGuideLibrary(){
 }
 
 
-function muscleMapProfile(name){
-  const key=String(name||"").toLowerCase();
-  const back=/glute|hamstring|lat|upper back|rear delt|trap|back|calf/.test(key) && !/lower back|core|quadricep|quad|adductor|chest|pec|bicep|front delt/.test(key);
-  const zones=[];
-  if(/quad/.test(key)) zones.push("quadL","quadR");
-  if(/glute/.test(key)) zones.push("gluteL","gluteR");
-  if(/adductor|inner thigh/.test(key)) zones.push("adductorL","adductorR");
-  if(/core|abdominal|oblique|trunk/.test(key)) zones.push("core","obliqueL","obliqueR");
-  if(/chest|pec/.test(key)) zones.push("pecL","pecR");
-  if(/shoulder|front delt|side delt/.test(key)) zones.push("shoulderL","shoulderR");
-  if(/tricep/.test(key)) zones.push("tricepsL","tricepsR");
-  if(/bicep/.test(key)) zones.push("bicepsL","bicepsR");
-  if(/lat/.test(key)) zones.push("latL","latR");
-  if(/upper back|back/.test(key)) zones.push("upperBack","latL","latR");
-  if(/hamstring/.test(key)) zones.push("hamL","hamR");
-  if(/calf/.test(key)) zones.push("calfL","calfR");
-  if(/grip|forearm/.test(key)) zones.push("forearmL","forearmR");
-  if(!zones.length) zones.push("core");
-  return {back,zones:[...new Set(zones)]};
+const MUSCLE_TAXONOMY = {
+  "quadriceps": {label:"Quads", view:"front", zones:["quadL","quadR"]},
+  "quads": {label:"Quads", view:"front", zones:["quadL","quadR"]},
+  "glutes": {label:"Glutes", view:"back", zones:["gluteL","gluteR"]},
+  "gluteus maximus": {label:"Glutes", view:"back", zones:["gluteL","gluteR"]},
+  "gluteus medius": {label:"Glute Medius", view:"back", zones:["gluteMedL","gluteMedR"]},
+  "hamstrings": {label:"Hamstrings", view:"back", zones:["hamL","hamR"]},
+  "adductors": {label:"Adductors", view:"front", zones:["adductorL","adductorR"]},
+  "calves": {label:"Calves", view:"back", zones:["calfL","calfR"]},
+  "tibialis anterior": {label:"Tibialis", view:"front", zones:["shinL","shinR"]},
+  "chest": {label:"Chest", view:"front", zones:["pecL","pecR"]},
+  "pectorals": {label:"Chest", view:"front", zones:["pecL","pecR"]},
+  "upper chest": {label:"Upper Chest", view:"front", zones:["upperPecL","upperPecR"]},
+  "shoulders": {label:"Shoulders", view:"front", zones:["shoulderL","shoulderR"]},
+  "front delts": {label:"Front Delts", view:"front", zones:["frontDeltL","frontDeltR"]},
+  "front deltoids": {label:"Front Delts", view:"front", zones:["frontDeltL","frontDeltR"]},
+  "side delts": {label:"Side Delts", view:"front", zones:["shoulderL","shoulderR"]},
+  "rear delts": {label:"Rear Delts", view:"back", zones:["rearDeltL","rearDeltR"]},
+  "triceps": {label:"Triceps", view:"back", zones:["tricepsL","tricepsR"]},
+  "biceps": {label:"Biceps", view:"front", zones:["bicepsL","bicepsR"]},
+  "forearms": {label:"Forearms", view:"front", zones:["forearmL","forearmR"]},
+  "grip": {label:"Grip", view:"front", zones:["forearmL","forearmR"]},
+  "lats": {label:"Lats", view:"back", zones:["latL","latR"]},
+  "upper back": {label:"Upper Back", view:"back", zones:["upperBack"]},
+  "mid-back": {label:"Mid-Back", view:"back", zones:["midBack"]},
+  "back": {label:"Back", view:"back", zones:["upperBack","midBack","latL","latR"]},
+  "traps": {label:"Traps", view:"back", zones:["traps"]},
+  "trapezius": {label:"Traps", view:"back", zones:["traps"]},
+  "rhomboids": {label:"Rhomboids", view:"back", zones:["midBack"]},
+  "abdominals": {label:"Abs", view:"front", zones:["abs"]},
+  "obliques": {label:"Obliques", view:"front", zones:["obliqueL","obliqueR"]},
+  "core": {label:"Core", view:"front", zones:["abs","obliqueL","obliqueR"]},
+  "deep core": {label:"Deep Core", view:"front", zones:["abs","obliqueL","obliqueR"]},
+  "trunk": {label:"Trunk", view:"front", zones:["abs","obliqueL","obliqueR"]},
+  "spinal erectors": {label:"Spinal Erectors", view:"back", zones:["erectors"]},
+  "lower back": {label:"Lower Back", view:"back", zones:["erectors"]},
+  "hip flexors": {label:"Hip Flexors", view:"front", zones:["hipFlexL","hipFlexR"]}
+};
+
+function canonicalMuscle(name){
+  const key=String(name||"").trim().toLowerCase();
+  if(MUSCLE_TAXONOMY[key]) return MUSCLE_TAXONOMY[key];
+  const found=Object.keys(MUSCLE_TAXONOMY).find(k=>key.includes(k)||k.includes(key));
+  return MUSCLE_TAXONOMY[found]||{label:titleWords(name)||"Supporting Muscles",view:"front",zones:["abs"]};
 }
 
-function muscleFigureSvg(name,index=0){
-  const profile=muscleMapProfile(name);
-  const uid=`muscle-${index}-${String(name||"muscle").toLowerCase().replace(/[^a-z0-9]+/g,"-")}`;
-  const active=new Set(profile.zones);
-  const zone=(id,shape)=>active.has(id)?shape:"";
-  return `<svg class="muscle-map-svg ${profile.back?"rear-view":"front-view"}" role="img" aria-label="${escapeHtml(name)} highlighted on the body" viewBox="0 0 120 188" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="${uid}-body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#17212a"/><stop offset="1" stop-color="#090d11"/></linearGradient>
-      <radialGradient id="${uid}-gold" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="#ffe085"/><stop offset=".45" stop-color="#e7ad2c"/><stop offset="1" stop-color="#9a6810"/></radialGradient>
-      <filter id="${uid}-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    </defs>
-    <g class="muscle-body" fill="url(#${uid}-body)" stroke="#52606b" stroke-width="1.4" stroke-linejoin="round">
-      <circle cx="60" cy="14" r="8.5"/>
-      <path d="M54 22h12l3 8-9 5-9-5z"/>
-      <path d="M43 30Q60 23 77 30l6 15-5 37-10 15H52L42 82l-5-37z"/>
-      <path d="M41 33Q31 36 27 48L18 82q-2 7 4 9l6-3 10-30 8-12z"/>
-      <path d="M79 33q10 3 14 15l9 34q2 7-4 9l-6-3-10-30-8-12z"/>
-      <path d="M48 94q12 8 24 0l2 17-9 10H55l-9-10z"/>
-      <path d="M47 108h13l-3 39-5 31H39l5-32z"/>
-      <path d="M60 108h13l3 38 5 32H68l-5-31z"/>
-    </g>
-    <g class="muscle-anatomy-lines" fill="none" stroke="#34414c" stroke-width="1">
-      <path d="M60 32v60M48 49q12 7 24 0M47 67q13 8 26 0M45 93q15 9 30 0M52 109l-4 38M68 109l4 38"/>
-      ${profile.back?'<path d="M45 38q15 11 30 0M49 51q11 8 22 0"/>':'<path d="M50 42q10 8 20 0M52 55h16M52 65h16M52 75h16"/>'}
-    </g>
-    <g class="muscle-targets" fill="url(#${uid}-gold)" stroke="#ffd15b" stroke-width="1" filter="url(#${uid}-glow)">
-      ${zone("pecL",'<path d="M46 39q7-6 13 0l-1 15q-8 2-13-4z"/>')}
-      ${zone("pecR",'<path d="M74 39q-7-6-13 0l1 15q8 2 13-4z"/>')}
-      ${zone("shoulderL",'<ellipse cx="40" cy="39" rx="7" ry="8"/>')}
-      ${zone("shoulderR",'<ellipse cx="80" cy="39" rx="7" ry="8"/>')}
-      ${zone("bicepsL",'<ellipse cx="34" cy="57" rx="5" ry="10" transform="rotate(15 34 57)"/>')}
-      ${zone("bicepsR",'<ellipse cx="86" cy="57" rx="5" ry="10" transform="rotate(-15 86 57)"/>')}
-      ${zone("tricepsL",'<ellipse cx="33" cy="58" rx="4.5" ry="11" transform="rotate(15 33 58)"/>')}
-      ${zone("tricepsR",'<ellipse cx="87" cy="58" rx="4.5" ry="11" transform="rotate(-15 87 58)"/>')}
-      ${zone("forearmL",'<path d="M28 68l-7 18 5 2 8-17z"/>')}
-      ${zone("forearmR",'<path d="M92 68l7 18-5 2-8-17z"/>')}
-      ${zone("core",'<path d="M50 53q10-5 20 0l-2 31q-8 8-16 0z"/>')}
-      ${zone("obliqueL",'<path d="M45 55l7 1-2 28-6-7z"/>')}
-      ${zone("obliqueR",'<path d="M75 55l-7 1 2 28 6-7z"/>')}
-      ${zone("upperBack",'<path d="M45 35q15 12 30 0l-2 18q-13 8-26 0z"/>')}
-      ${zone("latL",'<path d="M43 45q7 4 11 8l-3 29-8-9z"/>')}
-      ${zone("latR",'<path d="M77 45q-7 4-11 8l3 29 8-9z"/>')}
-      ${zone("gluteL",'<path d="M47 92q6-5 13 2v14q-8 4-14-1z"/>')}
-      ${zone("gluteR",'<path d="M73 92q-6-5-13 2v14q8 4 14-1z"/>')}
-      ${zone("quadL",'<path d="M45 112q7-5 14 0l-3 34-8 8-5-8z"/>')}
-      ${zone("quadR",'<path d="M75 112q-7-5-14 0l3 34 8 8 5-8z"/>')}
-      ${zone("adductorL",'<path d="M54 111h6l-2 35-5-2z"/>')}
-      ${zone("adductorR",'<path d="M66 111h-6l2 35 5-2z"/>')}
-      ${zone("hamL",'<path d="M45 111q7-5 14 0l-3 35-8 8-5-8z"/>')}
-      ${zone("hamR",'<path d="M75 111q-7-5-14 0l3 35 8 8 5-8z"/>')}
-      ${zone("calfL",'<path d="M45 149q7-3 11 2l-4 25H40z"/>')}
-      ${zone("calfR",'<path d="M75 149q-7-3-11 2l4 25h12z"/>')}
-    </g>
-    <text x="60" y="184" text-anchor="middle" class="muscle-view-label">${profile.back?"BACK":"FRONT"}</text>
-  </svg>`;
+function exerciseGuideLevel(exercise){
+  if(PILOT_GUIDE_ORDER.includes(exercise.name)) return {id:"complete",label:"Complete Guide"};
+  if((exercise.setup||[]).length>=3 && (exercise.steps||[]).length>=3) return {id:"written",label:"Written Guide"};
+  return {id:"basic",label:"Basic Reference"};
 }
+
+function normalizeExerciseGuideRecord(exercise){
+  const level=exerciseGuideLevel(exercise);
+  return {
+    id:String(exercise.name||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""),
+    name:exercise.name,
+    classification:{category:roleLabel(exercise).toLowerCase(),movementPattern:String(exercise.pattern||"Accessory").toLowerCase(),bodyRegions:[bodyRegionLabel(exercise)],difficulty:levelLabel(exercise)},
+    purpose:{summary:exercise.whatItIs||exercise.summary,trainingRoles:[...(exercise.role||[])]},
+    muscles:{primary:[...(exercise.primary||[])],secondary:[...(exercise.secondary||[])]},
+    equipment:{required:[...(exercise.equipment||[])],optional:[]},
+    instruction:{setup:[...(exercise.setup||[])],execution:[...(exercise.steps||[])],cues:[...(exercise.cues||[])],mistakes:[...(exercise.mistakes||[])],feel:exercise.feel||inferExerciseFeel(exercise)},
+    media:{artwork:{src:thumbnailUrl(exercise),callouts:[...(exercise.callouts||[])]},video:{status:"planned",frontView:null,sideView:null,coachingVideo:null}},
+    substitutions:[...(exercise.substitutions||[])],
+    guideLevel:level
+  };
+}
+
+function inferExerciseFeel(exercise){
+  const primary=(exercise.primary||[]).map(v=>canonicalMuscle(v).label);
+  const expected=primary.length?`You should feel ${primary.join(primary.length>1?", ":"")} working while the movement remains controlled and balanced.`:"You should feel the intended muscles working through a controlled range of motion.";
+  const concerning=`You should not feel sharp pain, pinching, sudden weakness, numbness, or loss of control.`;
+  return {expected:[expected],concerning:[concerning]};
+}
+
+function mistakeCorrection(mistake,exercise){
+  const text=String(mistake||"").replace(/[.]$/,'');
+  const lower=text.toLowerCase();
+  if(/knee.*cav|collapse/.test(lower)) return "Spread the floor and keep each knee tracking over the foot.";
+  if(/round|back/.test(lower)) return "Reduce the load or range and rebuild the brace before continuing.";
+  if(/lean|forward/.test(lower)) return "Keep pressure through the whole foot and let the hips and knees move together.";
+  if(/depth|range/.test(lower)) return "Use only the range you can control and progress it gradually.";
+  if(/momentum|rush|bounce/.test(lower)) return "Slow the rep down and own the transition before adding speed or load.";
+  if(/shrug/.test(lower)) return "Set the shoulder blade before the rep and keep the neck relaxed.";
+  return `Reset the position, reduce the load if needed, and repeat the rep with ${exercise.pattern.toLowerCase()} mechanics intact.`;
+}
+
+function anatomyZones(exercise,view){
+  const primary=new Set(),secondary=new Set();
+  (exercise.primary||[]).forEach(name=>{const m=canonicalMuscle(name);if(m.view===view)m.zones.forEach(z=>primary.add(z))});
+  (exercise.secondary||[]).forEach(name=>{const m=canonicalMuscle(name);if(m.view===view && !primary.has(m.zones[0]))m.zones.forEach(z=>secondary.add(z))});
+  return {primary,secondary};
+}
+
+function anatomyFigureSvg(exercise,view="front"){
+  const {primary,secondary}=anatomyZones(exercise,view);
+  const uid=`anatomy-${view}-${String(exercise.name||"exercise").toLowerCase().replace(/[^a-z0-9]+/g,"-")}`;
+  const cls=id=>primary.has(id)?"primary":secondary.has(id)?"secondary":"";
+  const zone=(id,shape)=>`<g class="anatomy-zone ${cls(id)}" data-zone="${id}">${shape}</g>`;
+  return `<svg class="professional-anatomy-svg ${view}" viewBox="0 0 210 350" role="img" aria-label="${escapeHtml(view)} anatomy view for ${escapeHtml(exercise.name)}" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="${uid}-body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#25313b"/><stop offset=".55" stop-color="#121a21"/><stop offset="1" stop-color="#080d11"/></linearGradient><filter id="${uid}-glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g class="anatomy-silhouette" fill="url(#${uid}-body)" stroke="#65727d" stroke-width="1.8" stroke-linejoin="round"><ellipse cx="105" cy="25" rx="17" ry="21"/><path d="M92 46h26l8 13-11 12H95L84 59z"/><path d="M68 63q37-21 74 0l13 43-9 81-23 35H87l-23-35-9-81z"/><path d="M66 69Q45 76 38 101L18 170q-5 14 7 18l12-6 22-58 19-35z"/><path d="M144 69q21 7 28 32l20 69q5 14-7 18l-12-6-22-58-19-35z"/><path d="M82 214q23 14 46 0l5 28-16 22H93l-16-22z"/><path d="M79 238h27l-7 70-10 36H62l9-39z"/><path d="M104 238h27l8 67 9 39h-27l-10-36z"/></g>
+  <g class="anatomy-detail" fill="none" stroke="#33414c" stroke-width="1.5" opacity=".9"><path d="M105 49v168M79 89q26 12 52 0M76 125q29 15 58 0M78 174q27 16 54 0M86 239l-8 67M124 239l8 67"/>${view==="front"?'<path d="M84 84q21 14 42 0M89 108h32M88 129h34M87 150h36"/>':'<path d="M78 82q27 20 54 0M86 105q19 14 38 0M88 154q17 15 34 0"/>'}</g>
+  <g class="anatomy-highlights" filter="url(#${uid}-glow)">
+  ${zone("pecL",'<path d="M77 78q14-13 27 1l-2 27q-16 6-28-7z"/>')}${zone("pecR",'<path d="M133 78q-14-13-27 1l2 27q16 6 28-7z"/>')}${zone("upperPecL",'<path d="M78 77q14-11 27 1l-1 10q-15 3-27-4z"/>')}${zone("upperPecR",'<path d="M132 77q-14-11-27 1l1 10q15 3 27-4z"/>')}
+  ${zone("shoulderL",'<ellipse cx="68" cy="79" rx="13" ry="17"/>')}${zone("shoulderR",'<ellipse cx="142" cy="79" rx="13" ry="17"/>')}${zone("frontDeltL",'<path d="M60 73q9-13 18 0l-2 17q-11 4-17-4z"/>')}${zone("frontDeltR",'<path d="M150 73q-9-13-18 0l2 17q11 4 17-4z"/>')}${zone("rearDeltL",'<path d="M61 73q8-12 17 0l-2 17q-10 4-16-4z"/>')}${zone("rearDeltR",'<path d="M149 73q-8-12-17 0l2 17q10 4 16-4z"/>')}
+  ${zone("bicepsL",'<ellipse cx="53" cy="113" rx="9" ry="20" transform="rotate(13 53 113)"/>')}${zone("bicepsR",'<ellipse cx="157" cy="113" rx="9" ry="20" transform="rotate(-13 157 113)"/>')}${zone("tricepsL",'<ellipse cx="51" cy="113" rx="8" ry="22" transform="rotate(13 51 113)"/>')}${zone("tricepsR",'<ellipse cx="159" cy="113" rx="8" ry="22" transform="rotate(-13 159 113)"/>')}${zone("forearmL",'<path d="M42 134l-16 42 10 4 19-38z"/>')}${zone("forearmR",'<path d="M168 134l16 42-10 4-19-38z"/>')}
+  ${zone("abs",'<path d="M87 107q18-9 36 0l-4 68q-14 17-28 0z"/>')}${zone("obliqueL",'<path d="M77 111l14 2-4 62-12-18z"/>')}${zone("obliqueR",'<path d="M133 111l-14 2 4 62 12-18z"/>')}${zone("latL",'<path d="M76 90q14 8 24 20l-8 65-17-24z"/>')}${zone("latR",'<path d="M134 90q-14 8-24 20l8 65 17-24z"/>')}${zone("upperBack",'<path d="M75 75q30 26 60 0l-5 42q-25 19-50 0z"/>')}${zone("midBack",'<path d="M84 109q21 18 42 0l-5 45q-16 16-32 0z"/>')}${zone("traps",'<path d="M90 51h30l16 30q-31 20-62 0z"/>')}${zone("erectors",'<path d="M96 114h9v78l-9 17-7-18zM105 114h9l7 77-7 18-9-17z"/>')}
+  ${zone("hipFlexL",'<path d="M86 181q10-8 19 2l-4 28-13 4-7-18z"/>')}${zone("hipFlexR",'<path d="M124 181q-10-8-19 2l4 28 13 4 7-18z"/>')}${zone("gluteL",'<path d="M80 182q13-14 25 4v31q-17 10-29-3z"/>')}${zone("gluteR",'<path d="M130 182q-13-14-25 4v31q17 10 29-3z"/>')}${zone("gluteMedL",'<path d="M78 179q14-10 25 2l-2 13q-15 6-25-3z"/>')}${zone("gluteMedR",'<path d="M132 179q-14-10-25 2l2 13q15 6 25-3z"/>')}
+  ${zone("quadL",'<path d="M75 235q17-13 30 1l-7 65-16 17-12-18z"/>')}${zone("quadR",'<path d="M135 235q-17-13-30 1l7 65 16 17 12-18z"/>')}${zone("adductorL",'<path d="M92 232h13l-5 66-12-4z"/>')}${zone("adductorR",'<path d="M118 232h-13l5 66 12-4z"/>')}${zone("hamL",'<path d="M75 234q17-12 30 1l-7 67-16 16-12-18z"/>')}${zone("hamR",'<path d="M135 234q-17-12-30 1l7 67 16 16 12-18z"/>')}${zone("calfL",'<path d="M72 301q15-8 25 4l-9 37H64z"/>')}${zone("calfR",'<path d="M138 301q-15-8-25 4l9 37h24z"/>')}${zone("shinL",'<path d="M83 300h12l-8 42H68z"/>')}${zone("shinR",'<path d="M127 300h-12l8 42h19z"/>')}
+  </g><text x="105" y="347" text-anchor="middle" class="anatomy-view-label">${view.toUpperCase()}</text></svg>`;
+}
+
+function renderProfessionalMuscleMap(exercise){
+  const primary=(exercise.primary||[]).map(v=>canonicalMuscle(v).label);
+  const secondary=(exercise.secondary||[]).map(v=>canonicalMuscle(v).label);
+  return `<div class="professional-muscle-map"><div class="anatomy-pair"><div class="anatomy-view">${anatomyFigureSvg(exercise,"front")}</div><div class="anatomy-view">${anatomyFigureSvg(exercise,"back")}</div></div><div class="muscle-map-legend"><div><span class="legend-swatch primary"></span><strong>Primary</strong><p>${primary.length?escapeHtml([...new Set(primary)].join(" · ")):"General movement musculature"}</p></div><div><span class="legend-swatch secondary"></span><strong>Secondary</strong><p>${secondary.length?escapeHtml([...new Set(secondary)].join(" · ")):"Stabilizers as required"}</p></div></div></div>`;
+}
+
+function updateExerciseDetailFavoriteButton(name){
+  const button=document.getElementById("exerciseDetailFavoriteButton");
+  if(button){button.textContent=`${isExerciseFavorite(name)?"★ Saved":"☆ Save"}`;button.classList.toggle("saved",isExerciseFavorite(name));}
+}
+function renderGuideCategoryChips(){return}
+function openExerciseLibraryWithCategory(category){exerciseLibraryCategory=category||"all";exerciseLibraryPattern="all";exerciseLibraryFavoritesOnly=false;showScreen("exerciseLibrary");renderExerciseLibrary()}
+function searchExerciseGuideLibrary(){const input=document.getElementById("exerciseGuideSearch");const libraryInput=document.getElementById("exerciseLibrarySearch");if(libraryInput)libraryInput.value=input?.value||"";openExerciseLibraryWithCategory("all")}
 
 function openExerciseDetail(name){
   const active=document.querySelector(".screen.active");
   if(active?.id!=="exerciseGuide") exerciseDetailReturnScreen=active?.id||"exerciseLibrary";
-  const swap=document.getElementById("exerciseSwapModal");
-  exerciseDetailReturnSwap=!!swap && !swap.classList.contains("hidden");
-  if(exerciseDetailReturnSwap) swap.classList.add("hidden");
-
-  const x=findExercise(name);
-  currentExerciseDetailName=x.name;
-  const alternatives=rankExerciseAlternatives(x.name).slice(0,5);
-  const substitutions=(x.substitutions||[]).length?(x.substitutions||[]):alternatives.map(entry=>entry.name).slice(0,3);
-
-  setText("exerciseGuideTitle",x.name);
-  const titleInput=document.getElementById("exerciseGuideSearch");
-  if(titleInput) titleInput.value="";
-  updateExerciseDetailFavoriteButton(x.name);
-
-  const tagTarget=document.getElementById("exerciseGuideTags");
-  if(tagTarget) tagTarget.innerHTML=`<span class="exercise-page-tag primary">${escapeHtml(roleLabel(x))}</span><span class="exercise-page-tag">${escapeHtml(bodyRegionLabel(x))}</span><span class="exercise-page-tag">${escapeHtml(x.pattern)} Pattern</span>`;
-
-  const artwork=document.getElementById("exerciseGuideArtwork");
-  if(artwork) artwork.innerHTML=renderInstructionalHero(x);
-
-  const lower=document.getElementById("exerciseGuideLower");
-  if(lower) lower.innerHTML=`
-    <section class="exercise-page-card numbered"><h3><span>⌁</span> Setup</h3><ol>${(x.setup||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ol></section>
-    <section class="exercise-page-card numbered"><h3><span>▷</span> Execution</h3><ol>${(x.steps||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ol></section>
-    <section class="exercise-page-card"><h3><span>☆</span> Bell Coaching Cues</h3><ul>${(x.cues||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ul></section>`;
-
-  const side=document.getElementById("exerciseGuideSidebar");
-  const muscleNames=(x.primary||[]).concat((x.secondary||[]).slice(0,Math.max(0,4-(x.primary||[]).length))).slice(0,4);
-  if(side) side.innerHTML=`
-    <section class="exercise-page-card"><h3><span>ⓘ</span> What it is</h3><p>${escapeHtml(x.whatItIs||x.summary)}</p></section>
-    <section class="exercise-page-card exercise-muscle-card"><h3><span>◉</span> Muscles Worked</h3><div class="exercise-muscle-row">${muscleNames.map((v,i)=>`<div class="exercise-muscle-item ${i<(x.primary||[]).length?"is-primary":"is-secondary"}"><div class="muscle-figure">${muscleFigureSvg(v,i)}</div><strong>${escapeHtml(v)}</strong><small>${i<(x.primary||[]).length?"Primary":"Secondary"}</small></div>`).join("")}</div></section>
-    <section class="exercise-page-card"><h3><span>⌘</span> Equipment</h3><div class="exercise-equipment-row">${(x.equipment||[]).map(v=>`<span>${escapeHtml(v)}</span>`).join("")}</div></section>
-    <section class="exercise-page-card"><h3><span>⇄</span> Scale or Substitute</h3><div class="exercise-substitute-row">${substitutions.length?substitutions.map(v=>`<button class="link-button" onclick="openExerciseDetail('${escapeQuote(v)}')" type="button">${escapeHtml(v)}</button>`).join(""):`<span>More options will appear as the library expands.</span>`}</div></section>
-    <section class="exercise-page-card" id="exerciseSimilarLiftsSection"><h3><span>⚠</span> Common Mistakes</h3><ul>${(x.mistakes||[]).map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ul></section>
-    <section class="exercise-page-card"><h3><span>↗</span> Similar Lifts</h3><div class="exercise-similar-list">${alternatives.length?alternatives.map(v=>`<button onclick="openExerciseDetail('${escapeQuote(v.name)}')" type="button"><strong>${escapeHtml(v.name)}</strong><span>${escapeHtml(v.reason)}</span></button>`).join(""):`<span>No close alternatives cataloged yet.</span>`}</div></section>`;
-
-  showScreen("exerciseGuide");
-  document.querySelector('.app-nav button[data-screen="exerciseLibrary"]')?.classList.add("active");
-  window.scrollTo(0,0);
+  const swap=document.getElementById("exerciseSwapModal");exerciseDetailReturnSwap=!!swap&&!swap.classList.contains("hidden");if(exerciseDetailReturnSwap)swap.classList.add("hidden");
+  const x=findExercise(name), guide=normalizeExerciseGuideRecord(x);currentExerciseDetailName=x.name;
+  const alternatives=rankExerciseAlternatives(x.name).slice(0,5);const substitutions=(x.substitutions||[]).length?x.substitutions:alternatives.map(v=>v.name).slice(0,3);
+  setText("exerciseGuideTitle",x.name);const search=document.getElementById("exerciseGuideSearch");if(search)search.value="";updateExerciseDetailFavoriteButton(x.name);
+  const tags=document.getElementById("exerciseGuideTags");if(tags)tags.innerHTML=`<span class="exercise-page-tag primary">${escapeHtml(roleLabel(x))}</span><span class="exercise-page-tag">${escapeHtml(bodyRegionLabel(x))}</span><span class="exercise-page-tag">${escapeHtml(x.pattern)}</span><span class="exercise-page-tag guide-level ${guide.guideLevel.id}">${escapeHtml(guide.guideLevel.label)}</span>`;
+  const artwork=document.getElementById("exerciseGuideArtwork");if(artwork)artwork.innerHTML=renderInstructionalHero(x);
+  const feel=guide.instruction.feel||inferExerciseFeel(x);
+  const lower=document.getElementById("exerciseGuideLower");if(lower)lower.innerHTML=`
+    <section class="exercise-page-card numbered guide-core-card"><div class="guide-card-kicker">Before the first rep</div><h3>Setup</h3><ol>${guide.instruction.setup.map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ol></section>
+    <section class="exercise-page-card numbered guide-core-card"><div class="guide-card-kicker">During the movement</div><h3>Execution</h3><ol>${guide.instruction.execution.map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ol></section>
+    <section class="exercise-page-card guide-core-card"><div class="guide-card-kicker">Keep it simple</div><h3>Bell Coaching Cues</h3><ul class="cue-list">${guide.instruction.cues.map(v=>`<li>${escapeHtml(v)}</li>`).join("")}</ul></section>
+    <section class="exercise-page-card guide-wide-card"><div class="guide-card-kicker">Troubleshooting</div><h3>Common Mistakes & Corrections</h3><div class="mistake-grid">${guide.instruction.mistakes.map(v=>`<article><strong>${escapeHtml(String(v).replace(/[.]$/,''))}</strong><p>${escapeHtml(mistakeCorrection(v,x))}</p></article>`).join("")}</div></section>
+    <section class="exercise-page-card guide-feel-card"><div class="guide-card-kicker">Body awareness</div><h3>What You Should Feel</h3><div class="feel-columns"><div><strong>Expected</strong>${(feel.expected||[]).map(v=>`<p>${escapeHtml(v)}</p>`).join("")}</div><div class="concerning"><strong>Stop or modify</strong>${(feel.concerning||[]).map(v=>`<p>${escapeHtml(v)}</p>`).join("")}</div></div></section>`;
+  const side=document.getElementById("exerciseGuideSidebar");if(side)side.innerHTML=`
+    <section class="exercise-page-card guide-purpose-card"><div class="guide-card-kicker">Why Bell uses it</div><h3>What It Is</h3><p>${escapeHtml(guide.purpose.summary)}</p></section>
+    <section class="exercise-page-card professional-muscle-card"><div class="guide-card-kicker">Training emphasis</div><h3>Muscles Worked</h3>${renderProfessionalMuscleMap(x)}</section>
+    <section class="exercise-page-card"><div class="guide-card-kicker">Required setup</div><h3>Equipment</h3><div class="exercise-equipment-row">${guide.equipment.required.map(v=>`<span>${escapeHtml(v)}</span>`).join("")}</div></section>
+    <section class="exercise-page-card"><div class="guide-card-kicker">Preserve the purpose</div><h3>Scale or Substitute</h3><div class="professional-substitute-list">${substitutions.length?substitutions.map((v,i)=>`<button onclick="openExerciseDetail('${escapeQuote(v)}')" type="button"><strong>${escapeHtml(v)}</strong><span>${escapeHtml(i===0?"Simpler or more accessible option":i===1?"Preserves the movement with a different setup":"Alternative loading or control strategy")}</span></button>`).join(""):`<p>More options will appear as the library expands.</p>`}</div></section>
+    <section class="exercise-page-card" id="exerciseSimilarLiftsSection"><div class="guide-card-kicker">Movement family</div><h3>Similar Lifts</h3><div class="exercise-similar-list">${alternatives.length?alternatives.map(v=>`<button onclick="openExerciseDetail('${escapeQuote(v.name)}')" type="button"><strong>${escapeHtml(v.name)}</strong><span>${escapeHtml(v.reason)}</span></button>`).join(""):`<span>No close alternatives cataloged yet.</span>`}</div></section>`;
+  showScreen("exerciseGuide");document.querySelector('.app-nav button[data-screen="exerciseLibrary"]')?.classList.add("active");window.scrollTo(0,0);
 }
 function scrollExerciseSimilarLifts(){document.getElementById("exerciseSimilarLiftsSection")?.scrollIntoView({behavior:"smooth",block:"start"})}
-function closeExerciseDetail(){
-  showScreen(exerciseDetailReturnScreen||"exerciseLibrary");
-  if(exerciseDetailReturnScreen==="exerciseLibrary") renderExerciseLibrary();
-  if(exerciseDetailReturnSwap) document.getElementById("exerciseSwapModal")?.classList.remove("hidden");
-  exerciseDetailReturnSwap=false;
-}
+function closeExerciseDetail(){showScreen(exerciseDetailReturnScreen||"exerciseLibrary");if(exerciseDetailReturnScreen==="exerciseLibrary")renderExerciseLibrary();if(exerciseDetailReturnSwap)document.getElementById("exerciseSwapModal")?.classList.remove("hidden");exerciseDetailReturnSwap=false}
 
 function rankExerciseAlternatives(name,reason="preference"){
   const source=findExercise(name);const activeEquipment=(typeof activeEquipmentLocation==="function"?activeEquipmentLocation().equipment:[])||[];

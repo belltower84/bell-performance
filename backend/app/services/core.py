@@ -11,11 +11,12 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Athlete, Mission, Plan, CheckIn, AthleteEvent, Decision, SessionCompletion
+from app.models import Athlete, Mission, Plan, CheckIn, AthleteEvent, Decision, SessionCompletion, CoachingMemory
 from intelligence.adaptive_coaching import BellAdaptiveCoachingEngine
 from intelligence.athlete_state import BellAthleteStateEngine
 from intelligence.coaching_language import BellCoachingLanguage
 from intelligence.coaching_reasoning import BellCoachingReasoningEngine
+from intelligence.coach_intelligence import infer_memory_candidates, build_explanation, build_summary
 from intelligence.intelligence_orchestrator import BellIntelligenceOrchestrator
 from intelligence.learning_engine import BellLearningEngine
 from intelligence.journey_planner import BellJourneyPlanner, event_timeline_weeks
@@ -1168,3 +1169,162 @@ def intelligence_summary(db: Session, athlete_id: str) -> dict[str, Any]:
 def session_for_completion(db: Session, athlete_id: str, session_id: str) -> dict[str, Any] | None:
     plan = latest_plan(db, athlete_id)
     return _session_from_plan(loads(plan.plan_json), session_id) if plan else None
+
+
+
+def _memory_time(value: Any, fallback: datetime | None = None) -> datetime:
+    if isinstance(value, datetime):
+        return value
+    text = str(value or "").strip().replace("Z", "+00:00")
+    if text:
+        try:
+            parsed = datetime.fromisoformat(text)
+            return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+        except ValueError:
+            pass
+    return fallback or now()
+
+
+def _memory_payload(row: CoachingMemory) -> dict[str, Any]:
+    evidence = loads(row.evidence_json)
+    return {
+        "id": row.id,
+        "memory_key": row.memory_key,
+        "category": row.category,
+        "observation": row.observation,
+        "confidence": round(float(row.confidence or 0), 3),
+        "confidence_label": "high" if float(row.confidence or 0) >= .85 else "medium" if float(row.confidence or 0) >= .65 else "low",
+        "evidence": evidence,
+        "source_type": row.source_type,
+        "is_active": bool(row.is_active),
+        "first_observed": row.first_observed.isoformat() if row.first_observed else None,
+        "last_confirmed": row.last_confirmed.isoformat() if row.last_confirmed else None,
+        "reviewable": True,
+    }
+
+
+def list_coaching_memories(db: Session, athlete_id: str, *, active_only: bool = False) -> list[dict[str, Any]]:
+    statement = select(CoachingMemory).where(CoachingMemory.athlete_id == athlete_id)
+    if active_only:
+        statement = statement.where(CoachingMemory.is_active.is_(True))
+    rows = db.scalars(statement.order_by(CoachingMemory.is_active.desc(), CoachingMemory.last_confirmed.desc())).all()
+    return [_memory_payload(row) for row in rows]
+
+
+def refresh_coaching_memories(db: Session, athlete_id: str) -> list[dict[str, Any]]:
+    athlete = db.get(Athlete, athlete_id)
+    profile = _profile(athlete) if athlete else {}
+    candidates = infer_memory_candidates(_event_rows(db, athlete_id), profile)
+    for candidate in candidates:
+        existing = db.scalar(select(CoachingMemory).where(
+            CoachingMemory.athlete_id == athlete_id,
+            CoachingMemory.memory_key == candidate["memory_key"],
+        ))
+        evidence = candidate.get("evidence") or {}
+        if existing:
+            # Athlete removal is authoritative. Refresh evidence, but never reactivate it.
+            existing.observation = candidate["observation"]
+            existing.category = candidate["category"]
+            existing.confidence = candidate["confidence"]
+            existing.evidence_json = dumps(evidence)
+            existing.last_confirmed = _memory_time(evidence.get("last_confirmed"), now())
+        else:
+            db.add(CoachingMemory(
+                id=uid("mem"), athlete_id=athlete_id,
+                memory_key=candidate["memory_key"], category=candidate["category"],
+                observation=candidate["observation"], confidence=candidate["confidence"],
+                evidence_json=dumps(evidence), source_type=candidate["source_type"],
+                is_active=True, first_observed=_memory_time(evidence.get("first_observed")),
+                last_confirmed=_memory_time(evidence.get("last_confirmed")),
+            ))
+    db.flush()
+    return list_coaching_memories(db, athlete_id)
+
+
+def create_explicit_coaching_memory(db: Session, athlete_id: str, body: dict[str, Any]) -> dict[str, Any]:
+    observation = str(body.get("observation") or "").strip()
+    supplied = str(body.get("memory_key") or "").strip()
+    memory_key = supplied or f"explicit:{re.sub(r'[^a-z0-9]+', '-', observation.lower()).strip('-')[:140]}"
+    existing = db.scalar(select(CoachingMemory).where(
+        CoachingMemory.athlete_id == athlete_id, CoachingMemory.memory_key == memory_key,
+    ))
+    evidence = {"athlete_statement": observation, **(body.get("evidence") or {})}
+    if existing:
+        existing.observation = observation
+        existing.category = str(body.get("category") or "athlete_preference")
+        existing.confidence = 1.0
+        existing.evidence_json = dumps(evidence)
+        existing.source_type = "athlete_explicit"
+        existing.is_active = True
+        existing.last_confirmed = now()
+        row = existing
+    else:
+        row = CoachingMemory(
+            id=uid("mem"), athlete_id=athlete_id, memory_key=memory_key,
+            category=str(body.get("category") or "athlete_preference"), observation=observation,
+            confidence=1.0, evidence_json=dumps(evidence), source_type="athlete_explicit",
+            is_active=True, first_observed=now(), last_confirmed=now(),
+        )
+        db.add(row)
+    event(db, athlete_id, "coaching_memory_confirmed", {"memory_key": memory_key, "observation": observation})
+    db.flush()
+    return _memory_payload(row)
+
+
+def deactivate_coaching_memory(db: Session, athlete_id: str, memory_id: str) -> dict[str, Any] | None:
+    row = db.scalar(select(CoachingMemory).where(
+        CoachingMemory.id == memory_id, CoachingMemory.athlete_id == athlete_id,
+    ))
+    if not row:
+        return None
+    row.is_active = False
+    row.last_confirmed = now()
+    event(db, athlete_id, "coaching_memory_removed", {"memory_id": memory_id, "memory_key": row.memory_key})
+    db.flush()
+    return _memory_payload(row)
+
+
+def adaptation_history(db: Session, athlete_id: str, limit: int = 25) -> list[dict[str, Any]]:
+    rows = db.scalars(
+        select(Decision).where(Decision.athlete_id == athlete_id)
+        .order_by(Decision.created_at.desc()).limit(max(1, min(100, limit)))
+    ).all()
+    history = []
+    for row in rows:
+        payload = loads(row.payload_json)
+        public = payload.get("public") or {}
+        explanation = public.get("explanation") or payload.get("explanation") or (payload.get("reasoning") or {}).get("explanation", {}).get("user")
+        history.append({
+            "id": row.id, "type": row.decision_type, "created_at": row.created_at.isoformat(),
+            "status": payload.get("status"), "explanation": explanation,
+            "changes": public.get("changes") or payload.get("changes") or [],
+            "known_inputs": [key for key in ("checkin_id", "original_session_id", "plan_id") if payload.get(key)],
+        })
+    return history
+
+
+def coach_intelligence_payload(db: Session, athlete_id: str) -> dict[str, Any]:
+    refresh_coaching_memories(db, athlete_id)
+    memories = list_coaching_memories(db, athlete_id, active_only=True)
+    state = coaching_state(db, athlete_id) or {}
+    journey = state.get("journey") or {}
+    current_today = today_payload(db, athlete_id) if latest_plan(db, athlete_id) else {}
+    context = {
+        "journey": journey, "discipline": state.get("discipline") or {},
+        "today": current_today or {}, "memories": memories,
+        "next_milestone": state.get("next_milestone"),
+    }
+    topics = ("mission", "phase", "progression", "weekly_plan", "recovery", "nutrition", "milestone", "adaptation")
+    explanations = {topic: build_explanation(topic, context) for topic in topics}
+    return {
+        "coach_engine_version": "13.4.0",
+        "summary": build_summary(context),
+        "explanations": explanations,
+        "memories": memories,
+        "adaptation_history": adaptation_history(db, athlete_id),
+        "trust": {
+            "memory_policy": "Repeated evidence is required unless the athlete explicitly states a preference or limitation.",
+            "athlete_controls": ["review", "add", "remove"],
+            "certainty_policy": "Known, inferred, and missing information are separated in every explanation.",
+        },
+    }

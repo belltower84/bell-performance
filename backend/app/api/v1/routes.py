@@ -8,13 +8,15 @@ from sqlalchemy.orm import Session
 from app.core.security import current_user
 from app.database import get_db
 from app.models import (
-    Athlete, Mission, CheckIn, Decision, SessionCompletion, IdempotencyRecord, User,
+    Athlete, Mission, CheckIn, Decision, SessionCompletion, IdempotencyRecord, User, CoachingMemory,
 )
 from app.repositories.access import athlete_for_user
-from app.schemas import AthleteCreate, AthleteProfileUpdate, MissionCreate, CheckInCreate, CompletionCreate
+from app.schemas import AthleteCreate, AthleteProfileUpdate, MissionCreate, CheckInCreate, CompletionCreate, CoachingMemoryCreate
 from app.services.core import (
     dumps, loads, uid, event, project_state, generate_plan, latest_plan, today_payload,
     compile_mission_request, learn_from_completion, intelligence_summary, session_for_completion, coaching_state,
+    coach_intelligence_payload, list_coaching_memories, refresh_coaching_memories,
+    create_explicit_coaching_memory, deactivate_coaching_memory,
 )
 from intelligence.adaptive_coaching import BellAdaptiveCoachingEngine
 from intelligence.mission_compiler import BellMissionCompiler
@@ -278,3 +280,43 @@ def decision(decision_id: str, db: Session = Depends(get_db), user: User = Depen
         "id": row.id, "athlete_id": row.athlete_id,
         "type": row.decision_type, **loads(row.payload_json),
     }
+
+
+@router.get("/athletes/{athlete_id}/coach", tags=["Bell Coach"])
+def coach_intelligence(athlete_id: str, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    athlete_for_user(db, athlete_id, user)
+    payload = coach_intelligence_payload(db, athlete_id)
+    db.commit()
+    return payload
+
+
+@router.get("/athletes/{athlete_id}/memories", tags=["Bell Coach"])
+def memories(athlete_id: str, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    athlete_for_user(db, athlete_id, user)
+    return {"items": list_coaching_memories(db, athlete_id), "athlete_controls": ["add", "review", "remove"]}
+
+
+@router.post("/athletes/{athlete_id}/memories", status_code=201, tags=["Bell Coach"])
+def add_memory(athlete_id: str, body: CoachingMemoryCreate, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    athlete_for_user(db, athlete_id, user)
+    row = create_explicit_coaching_memory(db, athlete_id, body.model_dump())
+    db.commit()
+    return row
+
+
+@router.post("/athletes/{athlete_id}/memories/refresh", tags=["Bell Coach"])
+def refresh_memories(athlete_id: str, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    athlete_for_user(db, athlete_id, user)
+    items = refresh_coaching_memories(db, athlete_id)
+    db.commit()
+    return {"items": items}
+
+
+@router.delete("/athletes/{athlete_id}/memories/{memory_id}", tags=["Bell Coach"])
+def remove_memory(athlete_id: str, memory_id: str, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    athlete_for_user(db, athlete_id, user)
+    row = deactivate_coaching_memory(db, athlete_id, memory_id)
+    if not row:
+        raise HTTPException(404, "Coaching memory not found")
+    db.commit()
+    return row

@@ -1,6 +1,6 @@
-# Bell Performance 13.3.0 — Athlete Experience
+# Bell Performance 13.4.0 — Bell Coach Intelligence
 
-Bell Performance is a local-first adaptive coaching application. Version 13.3 rebuilds First Flight and Settings around a persistent modern athlete profile while preserving the Journey-centered Bell Coaching Engine introduced in Bell 13.1 and the discipline libraries introduced in Bell 13.2.
+Bell Performance is a local-first adaptive coaching application. Version 13.4 adds transparent coaching explanations, evidence-based athlete memory, and an auditable adaptation history while preserving the modern athlete experience introduced in 13.3.
 
 ## Product blueprint
 
@@ -87,4 +87,9 @@ Run backend tests from `backend/`:
 pytest -q
 ```
 
-Version 13.3.0 ships with **24 passing backend tests**, JavaScript and Python compilation checks, CSS/HTML/manifest validation, profile migration smoke tests, and archive-integrity checks.
+Version 13.4.0 ships with **28 passing backend tests**, JavaScript and Python compilation checks, CSS/HTML/manifest validation, profile migration smoke tests, and archive-integrity checks.
+
+
+## Bell Coach Intelligence (13.4)
+
+Bell Coach now produces structured explanations, separates known facts from inference and missing data, maintains athlete-reviewable coaching memory, and exposes an auditable decision history. See `BELL_COACH_INTELLIGENCE_13_4.md`.

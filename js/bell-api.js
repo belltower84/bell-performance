@@ -21,7 +21,8 @@ const bellCloudDefaults = {
   today: null,
   intelligence: null,
   coachingState: null,
-  lastDecision: null
+  lastDecision: null,
+  coach: null
 };
 
 function loadBellCloud() {
@@ -119,7 +120,9 @@ function bellAthleteProfile() {
       style: coaching.style || data.settings.coachMessages?.style || "Performance",
       detail_level: coaching.detailLevel || "Balanced",
       check_in_frequency: coaching.checkInFrequency || "Weekly",
-      scripture_frequency: coaching.scriptureFrequency || data.settings.coachMessages?.scriptureFrequency || "Occasionally"
+      scripture_frequency: coaching.scriptureFrequency || data.settings.coachMessages?.scriptureFrequency || "Occasionally",
+      memory_enabled: coaching.memoryEnabled !== false,
+      show_confidence: coaching.showConfidence !== false
     },
     limitations: data.settings.injuryProfile || {},
     equipment: data.settings.equipmentSetup || {}
@@ -250,13 +253,14 @@ async function bellCompleteCurrentSession(completed) {
 async function bellRefreshCloudState() {
   if (!bellCloudConnected() || !bellCloud.athleteId) return null;
   const localDate = typeof todayKey === "function" ? todayKey() : new Date().toISOString().slice(0, 10);
-  const [state, today, intelligence, coachingState] = await Promise.all([
+  const [state, today, intelligence, coachingState, coach] = await Promise.all([
     bellApiRequest(`/athletes/${bellCloud.athleteId}/state`),
     bellApiRequest(`/athletes/${bellCloud.athleteId}/today?date=${encodeURIComponent(localDate)}`).catch(error => error.status === 404 ? null : Promise.reject(error)),
     bellApiRequest(`/athletes/${bellCloud.athleteId}/intelligence`).catch(error => error.status === 404 ? null : Promise.reject(error)),
-    bellApiRequest(`/athletes/${bellCloud.athleteId}/coaching-state?week=${encodeURIComponent(Math.max(1,Number(data.trainingBlock?.currentWeek)||1))}`).catch(error => error.status === 404 ? null : Promise.reject(error))
+    bellApiRequest(`/athletes/${bellCloud.athleteId}/coaching-state?week=${encodeURIComponent(Math.max(1,Number(data.trainingBlock?.currentWeek)||1))}`).catch(error => error.status === 404 ? null : Promise.reject(error)),
+    bellApiRequest(`/athletes/${bellCloud.athleteId}/coach`).catch(error => error.status === 404 ? null : Promise.reject(error))
   ]);
-  bellCloud.state = state; bellCloud.today = today; bellCloud.intelligence = intelligence; bellCloud.coachingState = coachingState;
+  bellCloud.state = state; bellCloud.today = today; bellCloud.intelligence = intelligence; bellCloud.coachingState = coachingState; bellCloud.coach = coach;
   if (intelligence?.plan_id) bellCloud.planId = intelligence.plan_id;
   bellCloud.lastSyncAt = new Date().toISOString(); bellCloud.lastError = ""; saveBellCloud();
   if(coachingState?.journey&&window.BellCoachingEngine){

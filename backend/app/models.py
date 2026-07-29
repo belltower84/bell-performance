@@ -36,3 +36,18 @@ class SessionCompletion(Base):
 class IdempotencyRecord(Base):
     __tablename__='idempotency_records'; __table_args__=(UniqueConstraint('user_id','key','route'),)
     id: Mapped[str]=mapped_column(String,primary_key=True); user_id: Mapped[str]=mapped_column(ForeignKey('users.id'),index=True); key: Mapped[str]=mapped_column(String(100)); route: Mapped[str]=mapped_column(String(255)); status_code: Mapped[float]=mapped_column(Float); response_json: Mapped[str]=mapped_column(Text); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+
+class CoachingMemory(Base):
+    __tablename__='coaching_memories'; __table_args__=(UniqueConstraint('athlete_id','memory_key'),)
+    id: Mapped[str]=mapped_column(String,primary_key=True)
+    athlete_id: Mapped[str]=mapped_column(ForeignKey('athletes.id'),index=True)
+    memory_key: Mapped[str]=mapped_column(String(180),index=True)
+    category: Mapped[str]=mapped_column(String(80),default='athlete_preference')
+    observation: Mapped[str]=mapped_column(Text)
+    confidence: Mapped[float]=mapped_column(Float,default=1.0)
+    evidence_json: Mapped[str]=mapped_column(Text,default='{}')
+    source_type: Mapped[str]=mapped_column(String(80),default='athlete_explicit')
+    is_active: Mapped[bool]=mapped_column(Boolean,default=True,index=True)
+    first_observed: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+    last_confirmed: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+    created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)

@@ -60,3 +60,9 @@ class CompletionCreate(BaseModel):
     performance_ratio: float = Field(default=1.0, ge=0, le=2)
     notes: str | None = Field(default=None, max_length=2000)
     exercise_results: list[dict[str, Any]] = Field(default_factory=list, max_length=100)
+
+class CoachingMemoryCreate(BaseModel):
+    observation: str = Field(min_length=3, max_length=1000)
+    category: str = Field(default="athlete_preference", min_length=2, max_length=80)
+    memory_key: str | None = Field(default=None, max_length=180)
+    evidence: dict[str, Any] = Field(default_factory=dict)

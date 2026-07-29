@@ -553,3 +553,73 @@ def test_legacy_profile_aliases_preserve_event_intent():
     assert profile["identity"]["journey_mode"] == "event_preparation"
     assert profile["identity"]["event_name"] == "10K"
     assert profile["experience"]["level"] == "Intermediate"
+
+
+def test_coach_memory_requires_repeated_evidence():
+    from intelligence.coach_intelligence import infer_memory_candidates
+    one = [{"event_type": "workout_completed", "occurred_at": "2026-07-01T12:00:00Z", "payload": {"session_type": "strength", "performance_ratio": 1.05, "session_rpe": 7}}]
+    assert infer_memory_candidates(one, {}) == []
+    repeated = [
+        {"event_type": "workout_completed", "occurred_at": f"2026-07-0{i}T12:00:00Z", "payload": {"session_type": "strength", "performance_ratio": 1.03, "session_rpe": 7}}
+        for i in range(1, 5)
+    ]
+    memories = infer_memory_candidates(repeated, {})
+    assert memories and memories[0]["source_type"] == "inferred_repeated_evidence"
+    assert memories[0]["evidence"]["sample_count"] == 4
+
+
+def test_explicit_coaching_memory_is_reviewable_and_removable(client, auth):
+    headers, _ = auth("memory-control@example.com")
+    aid = client.post("/api/v1/athletes", headers=headers, json={"name": "Memory Athlete"}).json()["id"]
+    created = client.post(f"/api/v1/athletes/{aid}/memories", headers=headers, json={
+        "observation": "Neutral-grip pressing feels better on my shoulders.",
+        "category": "exercise_preference",
+    })
+    assert created.status_code == 201
+    memory = created.json()
+    assert memory["source_type"] == "athlete_explicit"
+    assert memory["confidence"] == 1.0
+    listed = client.get(f"/api/v1/athletes/{aid}/memories", headers=headers).json()["items"]
+    assert listed[0]["reviewable"] is True and listed[0]["is_active"] is True
+    removed = client.delete(f"/api/v1/athletes/{aid}/memories/{memory['id']}", headers=headers)
+    assert removed.status_code == 200 and removed.json()["is_active"] is False
+
+
+def test_removed_inferred_memory_stays_inactive_after_refresh(client, auth):
+    from app.database import SessionLocal
+    from app.services.core import event
+    headers, _ = auth("memory-inference@example.com")
+    aid = client.post("/api/v1/athletes", headers=headers, json={"name": "Pattern Athlete"}).json()["id"]
+    with SessionLocal() as db:
+        for _ in range(4):
+            event(db, aid, "workout_completed", {"session_type": "strength", "performance_ratio": 1.04, "session_rpe": 7})
+        db.commit()
+    refreshed = client.post(f"/api/v1/athletes/{aid}/memories/refresh", headers=headers).json()["items"]
+    inferred = next(item for item in refreshed if item["memory_key"] == "response:strength:positive")
+    assert inferred["is_active"] is True
+    assert client.delete(f"/api/v1/athletes/{aid}/memories/{inferred['id']}", headers=headers).status_code == 200
+    refreshed_again = client.post(f"/api/v1/athletes/{aid}/memories/refresh", headers=headers).json()["items"]
+    same = next(item for item in refreshed_again if item["id"] == inferred["id"])
+    assert same["is_active"] is False
+
+
+def test_coach_endpoint_returns_structured_explanations_and_history(client, auth):
+    headers, _ = auth("coach-intelligence@example.com")
+    aid = client.post("/api/v1/athletes", headers=headers, json={
+        "name": "Coach Athlete",
+        "profile": {"primary_training_identity": "Hybrid Athlete", "objective": "Improve Performance"},
+    }).json()["id"]
+    client.post(f"/api/v1/athletes/{aid}/missions", headers=headers, json={
+        "goal": "Run a faster 10K while preserving strength", "timeline_weeks": 8,
+        "constraints": {"training_days": 4, "session_minutes": 60},
+    })
+    assert client.post(f"/api/v1/athletes/{aid}/plans", headers=headers).status_code == 201
+    coach = client.get(f"/api/v1/athletes/{aid}/coach", headers=headers)
+    assert coach.status_code == 200
+    body = coach.json()
+    assert body["coach_engine_version"] == "13.4.0"
+    for topic in ("mission", "phase", "progression", "weekly_plan", "recovery", "nutrition", "milestone", "adaptation"):
+        item = body["explanations"][topic]
+        for field in ("context", "decision", "reason", "next_focus", "confidence", "known", "inferred", "missing"):
+            assert field in item
+    assert "memory_policy" in body["trust"]

@@ -24,6 +24,7 @@ const defaults = {
   exerciseIntelligence: { replacements: [], personalConstraints: [] },
   activeWorkout: null,
   coachingState: null,
+  coachIntelligence: { schemaVersion:1, memories:[], dismissedMemoryKeys:[], decisions:[], summaries:[], lastAnalyzedAt:"", lastPhaseFingerprint:"", processedSourceRefs:[] },
   athleteProfile: {
     schemaVersion: 1,
     demographics: { firstName:"", age:null, sex:"Prefer not to say", heightInches:null, bodyweightLb:null, goalWeightLb:null },
@@ -32,7 +33,7 @@ const defaults = {
     availability: { normalDays:[], sessionMinutes:60, preferredTime:"Flexible", reliability:"Mostly consistent", minimumDays:3 },
     baselines: { maxes:{ bench:null, squat:null, deadlift:null, pushPress:null } },
     recovery: { sleepTargetHours:8, deloadPreference:"Bell decides", limitationStatus:"none" },
-    coaching: { style:"Performance", detailLevel:"Balanced", checkInFrequency:"Weekly", scriptureFrequency:"Occasionally" },
+    coaching: { style:"Performance", detailLevel:"Balanced", checkInFrequency:"Weekly", scriptureFrequency:"Occasionally", memoryEnabled:true, showConfidence:true },
     profileCompleteness: 0,
     updatedAt:""
   },
@@ -153,6 +154,14 @@ function normalizeData() {
   data.mobility.checks = data.mobility.checks || {};
   data.readinessLog = Array.isArray(data.readinessLog) ? data.readinessLog : [];
   data.sessionFeedbackLog = Array.isArray(data.sessionFeedbackLog) ? data.sessionFeedbackLog : [];
+  const coachDefaults=cloneDefaults().coachIntelligence;
+  data.coachIntelligence=data.coachIntelligence&&typeof data.coachIntelligence==="object"?data.coachIntelligence:coachDefaults;
+  data.coachIntelligence={...coachDefaults,...data.coachIntelligence};
+  data.coachIntelligence.memories=Array.isArray(data.coachIntelligence.memories)?data.coachIntelligence.memories:[];
+  data.coachIntelligence.dismissedMemoryKeys=Array.isArray(data.coachIntelligence.dismissedMemoryKeys)?data.coachIntelligence.dismissedMemoryKeys:[];
+  data.coachIntelligence.decisions=Array.isArray(data.coachIntelligence.decisions)?data.coachIntelligence.decisions:[];
+  data.coachIntelligence.summaries=Array.isArray(data.coachIntelligence.summaries)?data.coachIntelligence.summaries:[];
+  data.coachIntelligence.processedSourceRefs=Array.isArray(data.coachIntelligence.processedSourceRefs)?data.coachIntelligence.processedSourceRefs:[];
   data.performanceReviews = data.performanceReviews && typeof data.performanceReviews === "object" ? data.performanceReviews : {weeklySeen:[],blockReviews:[],milestones:[],weeklyDebriefs:[]};
   data.performanceReviews.weeklySeen = Array.isArray(data.performanceReviews.weeklySeen) ? data.performanceReviews.weeklySeen : [];
   data.performanceReviews.blockReviews = Array.isArray(data.performanceReviews.blockReviews) ? data.performanceReviews.blockReviews : [];
@@ -242,6 +251,8 @@ function normalizeData() {
     profileCompleteness: Math.max(0, Math.min(100, Number(priorProfile.profileCompleteness) || 0)),
     updatedAt: priorProfile.updatedAt || ""
   };
+  data.athleteProfile.coaching.memoryEnabled=data.athleteProfile.coaching.memoryEnabled!==false;
+  data.athleteProfile.coaching.showConfidence=data.athleteProfile.coaching.showConfidence!==false;
 
   if (data.activeWorkout && !Array.isArray(data.activeWorkout.exercises)) {
     data.activeWorkout = null;

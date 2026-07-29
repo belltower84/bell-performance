@@ -56,6 +56,8 @@
     data.athleteProfile.baselines.maxes=data.athleteProfile.baselines.maxes||{};
     data.athleteProfile.recovery=data.athleteProfile.recovery||{};
     data.athleteProfile.coaching=data.athleteProfile.coaching||{};
+    data.athleteProfile.coaching.memoryEnabled=data.athleteProfile.coaching.memoryEnabled!==false;
+    data.athleteProfile.coaching.showConfidence=data.athleteProfile.coaching.showConfidence!==false;
     return data.athleteProfile;
   }
   function primaryIdentity(){return profile().identity.primary||data.settings?.primaryTrainingIdentity||"Performance & Health";}

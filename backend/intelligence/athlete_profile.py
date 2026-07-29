@@ -62,6 +62,8 @@ DEFAULT_PROFILE: dict[str, Any] = {
         "detail_level": "Balanced",
         "check_in_frequency": "Weekly",
         "scripture_frequency": "Occasionally",
+        "memory_enabled": True,
+        "show_confidence": True,
     },
     "profile_completeness": 0,
     "updated_at": "",
@@ -348,6 +350,10 @@ def normalize_athlete_profile(raw: dict[str, Any] | None, *, name: str = "") -> 
     )
 
     profile["schema_version"] = 1
+    coaching = profile["coaching"]
+    coaching["memory_enabled"] = bool(raw_coaching.get("memory_enabled", raw_coaching.get("memoryEnabled", coaching.get("memory_enabled", True))))
+    coaching["show_confidence"] = bool(raw_coaching.get("show_confidence", raw_coaching.get("showConfidence", coaching.get("show_confidence", True))))
+
     profile["profile_completeness"] = profile_completeness(profile)
     profile["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     return profile

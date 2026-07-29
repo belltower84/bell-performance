@@ -962,3 +962,66 @@ nav button .strength-nav-icon svg{width:23px!important;height:23px!important;dis
 @media(max-width:1180px){.exercise-page-head{grid-template-columns:1fr 1.2fr}.exercise-page-actions{grid-column:1/-1;grid-template-columns:1fr 1fr}.exercise-page-layout{grid-template-columns:1fr}.exercise-page-sidebar{grid-template-columns:repeat(2,minmax(0,1fr))}.exercise-page-sidebar .exercise-page-card:first-child{grid-column:1/-1}}
 @media(max-width:780px){.exercise-page-head{grid-template-columns:1fr;align-items:start}.exercise-page-actions{grid-template-columns:1fr}.exercise-page-layout{grid-template-columns:1fr}.exercise-page-lower{grid-template-columns:1fr}.exercise-page-sidebar{grid-template-columns:1fr}.exercise-page-sidebar .exercise-page-card:first-child{grid-column:auto}.exercise-page-title-block .section-title{font-size:42px!important}.exercise-substitute-row{grid-template-columns:1fr}.guide-artwork-panel .guide-hero-stage{min-height:360px}}
 @media(max-width:520px){.exercise-page-title-block .section-title{font-size:36px!important}.exercise-page-tools{gap:10px}.exercise-page-chip-row{overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.exercise-page-chip-row .library-chip{white-space:nowrap}.exercise-muscle-row{grid-template-columns:repeat(2,1fr)}.exercise-page-card{padding:15px}.guide-artwork-panel.exact-artwork img{aspect-ratio:auto;min-height:260px;object-fit:cover;object-position:center}}
+
+/* Bell Performance 13.6.8 — compact exercise guide header */
+#exerciseGuide .exercise-page-head{
+  position:static!important;
+  z-index:auto!important;
+  display:grid!important;
+  grid-template-columns:minmax(260px,1fr) minmax(260px,420px) auto!important;
+  gap:14px!important;
+  align-items:center!important;
+  margin:0 0 16px!important;
+  padding:12px 14px!important;
+  border:1px solid #2c3740;
+  border-radius:18px;
+  background:linear-gradient(145deg,#10161b,#090d11);
+  box-shadow:0 10px 24px rgba(0,0,0,.14);
+}
+#exerciseGuide .exercise-page-title-block{display:grid;grid-template-columns:auto 1fr;column-gap:11px;align-items:center;min-width:0}
+#exerciseGuide .exercise-back-link{grid-row:1/4;align-self:center;margin:0!important;width:38px!important;height:38px!important;min-width:38px!important;display:grid!important;place-items:center!important;padding:0!important;border:1px solid #38434c!important;border-radius:50%!important;background:#0d1216!important;font-size:0!important;line-height:1!important}
+#exerciseGuide .exercise-back-link:before{content:"←";font-size:17px;color:#e1b13c}
+#exerciseGuide .exercise-page-title-block .metric-label{margin:0 0 2px!important;font-size:9px!important}
+#exerciseGuide .exercise-page-title-block .section-title{margin:0!important;padding:0!important;font-size:clamp(30px,3.1vw,46px)!important;line-height:1!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#exerciseGuide .exercise-page-tags{gap:6px;margin-top:7px}
+#exerciseGuide .exercise-page-tag{padding:5px 9px;font-size:10px}
+#exerciseGuide .exercise-page-tools{display:block!important;min-width:0}
+#exerciseGuide .exercise-page-search{min-height:44px!important;border-radius:14px!important}
+#exerciseGuide .exercise-page-search input{font-size:14px!important}
+#exerciseGuide .exercise-page-actions{display:flex!important;gap:8px!important;align-items:center!important;justify-content:flex-end!important}
+#exerciseGuide .exercise-page-actions button{width:auto!important;min-width:0!important;min-height:42px!important;margin:0!important;padding:9px 12px!important;white-space:nowrap!important;font-size:12px!important}
+#exerciseGuide .exercise-page-layout{position:relative;z-index:0}
+
+@media(max-width:1380px){
+  #exerciseGuide .exercise-page-head{grid-template-columns:minmax(0,1fr) auto!important}
+  #exerciseGuide .exercise-page-tools{grid-column:1/-1;grid-row:2}
+  #exerciseGuide .exercise-page-actions{grid-column:2;grid-row:1}
+}
+@media(max-width:780px){
+  #exerciseGuide .exercise-page-head{grid-template-columns:1fr!important;padding:11px!important}
+  #exerciseGuide .exercise-page-title-block{grid-column:1;grid-row:1}
+  #exerciseGuide .exercise-page-tools{grid-column:1;grid-row:2}
+  #exerciseGuide .exercise-page-actions{grid-column:1;grid-row:3;display:grid!important;grid-template-columns:1fr 1fr!important}
+  #exerciseGuide .exercise-page-actions button{width:100%!important}
+}
+@media(max-width:480px){
+  #exerciseGuide .exercise-page-title-block .section-title{font-size:30px!important}
+  #exerciseGuide .exercise-page-actions{grid-template-columns:1fr!important}
+}
+
+/* Bell Performance 13.6.9 — anatomical muscle maps */
+.exercise-muscle-card{overflow:hidden;background:radial-gradient(circle at 50% 0,rgba(216,166,50,.06),transparent 45%),linear-gradient(145deg,#11171c,#090d11)}
+.exercise-muscle-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:start}
+.exercise-muscle-item{display:grid;grid-template-rows:auto auto auto;gap:7px;justify-items:center;text-align:center;min-width:0}
+.exercise-muscle-item .muscle-figure{position:relative;width:100%;height:142px;display:grid;place-items:center;padding:7px;border:1px solid #34414b;border-radius:18px;background:radial-gradient(circle at 50% 36%,rgba(216,166,50,.09),transparent 48%),linear-gradient(180deg,#131a20,#0a0f13);color:inherit;box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 10px 20px rgba(0,0,0,.12)}
+.exercise-muscle-item.is-primary .muscle-figure{border-color:rgba(216,166,50,.45);box-shadow:inset 0 0 28px rgba(216,166,50,.045),0 10px 22px rgba(0,0,0,.16)}
+.exercise-muscle-item.is-secondary .muscle-figure{opacity:.88}
+.muscle-map-svg{display:block;width:78px;height:128px;overflow:visible}
+.muscle-map-svg .muscle-view-label{fill:#75828d;font-size:7px;font-weight:800;letter-spacing:1.4px}
+.muscle-map-svg .muscle-targets{opacity:1}
+.exercise-muscle-item.is-secondary .muscle-map-svg .muscle-targets{opacity:.7}
+.exercise-muscle-item strong{font-size:13px;color:#eef2f5;line-height:1.15;overflow-wrap:anywhere}
+.exercise-muscle-item small{font-size:9px;line-height:1;text-transform:uppercase;letter-spacing:.1em;color:#d9a629;font-weight:800}
+.exercise-muscle-item.is-secondary small{color:#8e9aa5}
+@media(max-width:720px){.exercise-muscle-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.exercise-muscle-item .muscle-figure{height:154px}.muscle-map-svg{width:86px;height:138px}}
+@media(max-width:420px){.exercise-muscle-item .muscle-figure{height:138px}.muscle-map-svg{width:76px;height:124px}}

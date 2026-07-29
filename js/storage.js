@@ -9,6 +9,7 @@ const defaults = {
     weight: null,
     goal: null,
     cardioType: "Running",
+    appControlMode: "coach",
     rotationWeek: 1,
     maxes: { bench: null, squat: null, deadlift: null, pushPress: null },
     readiness: { sleepHours:7, sleepMinutes:30, sleepQuality:4, energy:4, motivation:4, recoveryStatus:4, timeAvailability:3, score:null, status:"", lastPromptDate:"" },
@@ -33,7 +34,7 @@ const defaults = {
     availability: { normalDays:[], sessionMinutes:60, preferredTime:"Flexible", reliability:"Mostly consistent", minimumDays:3 },
     baselines: { maxes:{ bench:null, squat:null, deadlift:null, pushPress:null } },
     recovery: { sleepTargetHours:8, deloadPreference:"Bell decides", limitationStatus:"none" },
-    coaching: { style:"Performance", detailLevel:"Balanced", checkInFrequency:"Weekly", scriptureFrequency:"Occasionally", memoryEnabled:true, showConfidence:true },
+    coaching: { controlMode:"coach", style:"Performance", detailLevel:"Balanced", checkInFrequency:"Weekly", scriptureFrequency:"Occasionally", memoryEnabled:true, showConfidence:true },
     profileCompleteness: 0,
     updatedAt:""
   },
@@ -90,6 +91,7 @@ function normalizeData() {
   data.settings.weight = Number.isFinite(Number(data.settings.weight)) && Number(data.settings.weight) > 0 ? Number(data.settings.weight) : null;
   data.settings.goal = Number.isFinite(Number(data.settings.goal)) && Number(data.settings.goal) > 0 ? Number(data.settings.goal) : null;
   data.settings.cardioType = data.settings.cardioType || "Running";
+  data.settings.appControlMode = data.settings.appControlMode === "planner" ? "planner" : "coach";
   data.settings.rotationWeek = Math.min(4, Math.max(1, Number(data.settings.rotationWeek) || 1));
   data.settings.maxes = {
     bench: Number(data.settings.maxes?.bench) || null,
@@ -127,6 +129,9 @@ function normalizeData() {
     lastPromptDate: old.lastPromptDate || ""
   };
   data.settings.coachMessages = { ...defaults.settings.coachMessages, ...(data.settings.coachMessages || {}) };
+  data.athleteProfile = data.athleteProfile && typeof data.athleteProfile === "object" ? data.athleteProfile : cloneDefaults().athleteProfile;
+  data.athleteProfile.coaching = { ...cloneDefaults().athleteProfile.coaching, ...(data.athleteProfile.coaching || {}) };
+  data.athleteProfile.coaching.controlMode = data.athleteProfile.coaching.controlMode === "planner" ? "planner" : data.settings.appControlMode;
   data.settings.firstFlightStage = data.settings.firstFlightStage || (data.settings.coachMessages.setupComplete ? "complete" : "profile");
   data.settings.firstFlightTourComplete = Boolean(data.settings.firstFlightTourComplete || data.settings.coachMessages.setupComplete);
   const injury=data.settings.injuryProfile||{};

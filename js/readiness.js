@@ -1,5 +1,11 @@
 "use strict";
 
+function bellAppControlMode() {
+  const mode = data?.settings?.appControlMode || data?.athleteProfile?.coaching?.controlMode || "coach";
+  return mode === "planner" ? "planner" : "coach";
+}
+function bellCoachModeEnabled() { return bellAppControlMode() === "coach"; }
+
 function sleepDurationScore(readiness = data.settings.readiness || {}) {
   const total=Math.max(0,(Number(readiness.sleepHours)||0)+(Number(readiness.sleepMinutes)||0)/60);
   if(total>=7&&total<=9)return 10;
@@ -77,12 +83,13 @@ function timeCapacityMinutes() {
 }
 
 function scalingProfile() {
-  const status = readinessStatus();
+  const actualStatus = readinessStatus();
   const timeMinutes = timeCapacityMinutes();
   const weekly = weeklyReadinessSummary();
-  if (status === "GREEN") return { status, load:1, sets:1, conditioning:1, timeMinutes, label:"You're ready for quality work. Today's Strength and Engine plan will fit the time you have.", weekly };
-  if (status === "YELLOW") return { status, load:.90, sets:.72, conditioning:.65, timeMinutes, label:"Train smart today. Keep the primary work, reduce accessory volume, and make Engine work easy or optional.", weekly };
-  return { status, load:.75, sets:.45, conditioning:.35, timeMinutes, label:"Recovery is the priority. Bell Performance has reduced today's demand and shifted Engine work toward easy recovery.", weekly };
+  if (!bellCoachModeEnabled()) return { status:"GREEN", actualStatus, adaptive:false, load:1, sets:1, conditioning:1, timeMinutes:999, reportedTimeMinutes:timeMinutes, label:"Workout Planner mode keeps the scheduled session unchanged. Readiness remains visible so you can decide whether to train, modify, or recover.", weekly };
+  if (actualStatus === "GREEN") return { status:actualStatus, actualStatus, adaptive:true, load:1, sets:1, conditioning:1, timeMinutes, label:"You're ready for quality work. Today's Strength and Engine plan will fit the time you have.", weekly };
+  if (actualStatus === "YELLOW") return { status:actualStatus, actualStatus, adaptive:true, load:.90, sets:.72, conditioning:.65, timeMinutes, label:"Train smart today. Keep the primary work, reduce accessory volume, and make Engine work easy or optional.", weekly };
+  return { status:actualStatus, actualStatus, adaptive:true, load:.75, sets:.45, conditioning:.35, timeMinutes, label:"Recovery is the priority. Bell Performance has reduced today's demand and shifted Engine work toward easy recovery.", weekly };
 }
 
 function hasTodayReadiness() {
@@ -116,7 +123,7 @@ function commitReadiness(values) {
 function saveReadiness() {
   commitReadiness(collectReadinessFrom(""));
   saveData();
-  alert(`Check-in saved. Mission Status: ${trainingStatusText()}.`);
+  alert(bellCoachModeEnabled()?`Check-in saved. Mission Status: ${trainingStatusText()}.`:`Check-in saved. Readiness: ${readinessScore()}/100. Workout Planner mode left the scheduled session unchanged.`);
 }
 
 function saveDailyReadinessPrompt() {
@@ -136,7 +143,12 @@ function readinessSliderLabel(name,value){
   };
   return labels[name]?.[value]||String(value);
 }
+function updateReadinessControlModeUI(){
+  const coachMode=bellCoachModeEnabled();
+  ["prompttimeAvailability","onboardingTimeAvailability"].forEach(id=>{const row=document.getElementById(id)?.closest("label");if(row)row.hidden=!coachMode;});
+}
 function updateReadinessSliderDisplay(){
+  updateReadinessControlModeUI();
   const sleep=document.getElementById("promptSleepDurationMinutes");
   if(sleep){const minutes=+sleep.value||0;const output=document.getElementById("promptSleepDurationValue");if(output)output.textContent=`${Math.floor(minutes/60)}h ${String(minutes%60).padStart(2,"0")}m`;}
   ["sleepQuality","energy","recoveryStatus","motivation","timeAvailability"].forEach(name=>{
@@ -144,6 +156,7 @@ function updateReadinessSliderDisplay(){
   });
 }
 function populateReadinessPrompt(){
+  updateReadinessControlModeUI();
   const r=data.settings.readiness||{};
   const sleep=document.getElementById("promptSleepDurationMinutes");if(sleep)sleep.value=Math.max(180,Math.min(720,(Number(r.sleepHours)||7)*60+(Number(r.sleepMinutes)||0)));
   const defaults={sleepQuality:4,recoveryStatus:4,energy:4,motivation:4,timeAvailability:3};
@@ -151,7 +164,7 @@ function populateReadinessPrompt(){
   updateReadinessSliderDisplay();
 }
 function maybePromptDailyReadiness() {
-  if (!data.settings.coachMessages?.setupComplete || hasTodayReadiness()) return;
+  if (!data.settings.coachMessages?.setupComplete || hasTodayReadiness() || !bellCoachModeEnabled()) return;
   const modal = document.getElementById("dailyReadinessModal");
   if (!modal) return;
   populateReadinessPrompt();

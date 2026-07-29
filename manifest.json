@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 13.5.1",
+  "name": "Bell Performance 13.6.0",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Adaptive AI performance coaching with transparent explanations, athlete-controlled coaching memory, auditable adaptations, modern athlete profiles, renewable Journeys, and Bell Core synchronization."
+  "description": "Performance training with selectable Workout Planner and adaptive Bell Coach modes, readiness scoring, renewable Journeys, and Bell Core synchronization."
 }

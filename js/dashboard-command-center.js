@@ -16,8 +16,8 @@ function commandMissionInfo(){
   let days=null;if(target){try{days=Math.max(0,typeof daysBetweenKeys==='function'?daysBetweenKeys(todayKey(),target):Math.ceil((new Date(`${target}T12:00:00`)-new Date())/86400000));}catch(_){days=null;}}
   return {title,target,days,mission,block};
 }
-function commandCloudExplanation(){return bellCloud?.lastDecision?.explanation||bellCloud?.today?.adaptation?.explanation||'';}
-function commandCloudAction(){return bellCloud?.lastDecision?.decision?.action||bellCloud?.today?.adaptation?.action?.action||'';}
+function commandCloudExplanation(){if(typeof bellCoachModeEnabled==='function'&&!bellCoachModeEnabled())return '';return bellCloud?.lastDecision?.explanation||bellCloud?.today?.adaptation?.explanation||'';}
+function commandCloudAction(){if(typeof bellCoachModeEnabled==='function'&&!bellCoachModeEnabled())return '';return bellCloud?.lastDecision?.decision?.action||bellCloud?.today?.adaptation?.action?.action||'';}
 function commandFirstIncompleteSession(sessions=premiumAllSessions()){return sessions.find(session=>!session.completed)||sessions[0]||null;}
 function commandSessionCall(session,mode='start'){
   if(!session)return;
@@ -36,7 +36,7 @@ function commandSessionSummary(sessions){
 }
 
 function commandUnifiedCloudMission(key=selectedDashboardDateKey()){
-  if(typeof bellCloudConnected!=="function"||!bellCloudConnected()||key!==todayKey())return null;
+  if((typeof bellCoachModeEnabled==="function"&&!bellCoachModeEnabled())||typeof bellCloudConnected!=="function"||!bellCloudConnected()||key!==todayKey())return null;
   const state=bellCloud?.today;if(!state)return null;
   if((state.status==='planned'||state.status==='adapted')&&state.session?.session)return {mode:'active',state,payload:state.session};
   if(state.status==='today_complete')return {mode:'complete',state,payload:null};
@@ -61,7 +61,8 @@ function commandCloudCompleteSummary(state){
 
 renderPremiumReadiness=function(){
   const score=readinessScore(),status=readinessStatus(score),r=data.settings.readiness||{},checkedIn=r.lastPromptDate===todayKey();
-  const descriptions={GREEN:'High readiness. You are recovered and ready for the full training prescription.',YELLOW:'Moderate readiness. Quality leads today and nonessential volume can be trimmed.',RED:'Low readiness. Bell has reduced demand and placed recovery first.'};
+  const coachMode=typeof bellCoachModeEnabled!=="function"||bellCoachModeEnabled();
+  const descriptions=coachMode?{GREEN:'High readiness. You are recovered and ready for the full training prescription.',YELLOW:'Moderate readiness. Quality leads today and nonessential volume can be trimmed.',RED:'Low readiness. Bell has reduced demand and placed recovery first.'}:{GREEN:'High readiness. The scheduled workout remains unchanged.',YELLOW:'Moderate readiness. The scheduled workout remains unchanged unless you modify it.',RED:'Low readiness. Consider recovery or a manual workout change; the scheduled workout remains unchanged.'};
   commandSetText('premiumReadinessScore',checkedIn?score:'—');commandSetText('premiumReadinessStatus',checkedIn?(status==='GREEN'?'READY':status==='YELLOW'?'CAUTION':'RECOVER'):'CHECK IN');commandSetText('premiumReadinessDetail',checkedIn?descriptions[status]:'Complete today’s check-in to personalize your training.');
   commandSetText('premiumSleep',premiumSleepDuration(r));commandSetText('premiumEnergy',commandReadinessWord(r.energy));commandSetText('premiumSoreness',commandReadinessWord(r.recoveryStatus,'soreness'));commandSetText('premiumMotivation',commandReadinessWord(r.motivation));commandSetText('commandPain',data.settings?.injuryProfile?.hasLimitations?'Review':'None');commandSetText('commandTime',commandAvailableTime(r));
   const card=document.getElementById('premiumReadinessCard');if(card){card.dataset.status=status.toLowerCase();card.dataset.complete=checkedIn?'true':'false';}
@@ -111,13 +112,14 @@ renderPremiumMission=function(){
   const title=!sessions.length?'Recovery Day':strength&&engine?`${premiumDisplayLabel(strength)} + ${premiumDisplayLabel(engine)}`:sessions.map(premiumDisplayLabel).join(' + ');
   const purpose=!sessions.length?'Recover, move well, and prepare for the next prescribed session.':premiumSessionDescription(strength||engine||sessions[0]);
   const duration=sessions.reduce((sum,session)=>sum+(Number(session.prescribedDuration)||Number(scaledTemplate(session.mission)?.duration)||30),0),types=[strength?'Strength':'',engine?'Engine':''].filter(Boolean).join(' + ')||'Recovery';
-  commandSetText('commandMissionTitle',title);commandSetText('commandMissionPurpose',purpose);commandSetText('commandMissionDuration',sessions.length?`${duration} min`:'Recovery');commandSetText('commandMissionType',types);commandSetText('commandMissionPriority',futureDay?'Preview Only':readinessStatus(readinessScore())==='RED'?'Recovery Priority':sessions.length>1?'High Priority':'Primary Session');
+  const coachMode=typeof bellCoachModeEnabled!=='function'||bellCoachModeEnabled();
+  commandSetText('commandMissionTitle',title);commandSetText('commandMissionPurpose',purpose);commandSetText('commandMissionDuration',sessions.length?`${duration} min`:'Recovery');commandSetText('commandMissionType',types);commandSetText('commandMissionPriority',futureDay?'Preview Only':coachMode&&readinessStatus(readinessScore())==='RED'?'Recovery Priority':sessions.length>1?'High Priority':'Primary Session');
   if(stack)stack.innerHTML=commandSessionSummary(sessions);
   if(start){start.disabled=false;if(!sessions.length){start.textContent='Open Recovery';start.onclick=()=>openCommandTile('recovery');}else if(futureDay){start.textContent='☷ Preview Workout';start.onclick=()=>commandSessionCall(target,'preview');}else if(completed===total){start.textContent='✓ Mission Complete';start.onclick=()=>showScreen('history');}else{const active=data.activeWorkout?.planSessionKey===target?.sessionKey;start.textContent=active?'▶ Resume Workout':'▶ Start Workout';start.onclick=()=>commandSessionCall(target,'start');}}
   if(view){view.disabled=!target;view.textContent='☷ View Session';view.onclick=target?()=>commandSessionCall(target,'preview'):()=>openCommandTile('weekly');}
   if(modify){modify.disabled=!target||futureDay;modify.textContent='✎ Modify';modify.onclick=target&&!futureDay?()=>commandSessionCall(target,'preview'):()=>showScreen('more');}
-  const status=readinessStatus(readinessScore()),action=String(commandCloudAction()).toLowerCase(),cloudCopy=commandCloudExplanation();let adjustmentTitle=futureDay?'Future session preview':'Normal prescription',adjustmentDetail=futureDay?'Future workouts can be reviewed here but cannot be started early.':'Execute the planned work with quality.';
-  if(!futureDay&&(status==='YELLOW'||/reduce|trim|modify|adjust/.test(action))){adjustmentTitle='Adjusted for readiness';adjustmentDetail='Quality-first volume and controlled effort.';}if(!futureDay&&(status==='RED'||/replace|recovery|rest|skip/.test(action))){adjustmentTitle='Recovery adjustment';adjustmentDetail='Demand reduced to protect recovery.';}if(!futureDay&&cloudCopy)adjustmentDetail=cloudCopy.split(/[.!?]/)[0].slice(0,88)+(cloudCopy.length>88?'…':'');
+  const status=readinessStatus(readinessScore()),action=String(commandCloudAction()).toLowerCase(),cloudCopy=commandCloudExplanation();let adjustmentTitle=futureDay?'Future session preview':coachMode?'Normal prescription':'Fixed planner prescription',adjustmentDetail=futureDay?'Future workouts can be reviewed here but cannot be started early.':coachMode?'Execute the planned work with quality.':'Readiness is informational. The workout remains unchanged until you modify it.';
+  if(coachMode&&!futureDay&&(status==='YELLOW'||/reduce|trim|modify|adjust/.test(action))){adjustmentTitle='Adjusted for readiness';adjustmentDetail='Quality-first volume and controlled effort.';}if(coachMode&&!futureDay&&(status==='RED'||/replace|recovery|rest|skip/.test(action))){adjustmentTitle='Recovery adjustment';adjustmentDetail='Demand reduced to protect recovery.';}if(coachMode&&!futureDay&&cloudCopy)adjustmentDetail=cloudCopy.split(/[.!?]/)[0].slice(0,88)+(cloudCopy.length>88?'…':'');
   commandSetText('commandAdjustmentTitle',adjustmentTitle);commandSetText('commandAdjustmentDetail',adjustmentDetail);
 };
 

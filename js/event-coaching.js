@@ -118,11 +118,13 @@ function eventPhaseDetail(){
   return {id:"competition",label:"Competition Preparation",volumeScale:.82,intensityScale:1,specificity:.92};
 }
 function eventReadinessDecision(){
-  const family=currentEventFamily(),status=typeof readinessStatus==="function"?readinessStatus(readinessScore()):"GREEN";
+  const family=currentEventFamily(),actualStatus=typeof readinessStatus==="function"?readinessStatus(readinessScore()):"GREEN";
   if(!family)return null;
-  if(status==="RED")return {status,setScale:.5,intensityScale:.78,engineMode:"recovery",message:family.readinessRed};
-  if(status==="YELLOW")return {status,setScale:.75,intensityScale:.9,engineMode:"easy",message:family.readinessYellow};
-  return {status,setScale:1,intensityScale:1,engineMode:"planned",message:"Proceed with the prescribed event-specific work and finish with repeatable quality."};
+  const coachMode=typeof bellCoachModeEnabled!=="function"||bellCoachModeEnabled();
+  if(!coachMode)return {status:actualStatus,setScale:1,intensityScale:1,engineMode:"planned",message:"Workout Planner mode keeps the scheduled event session unchanged. Readiness is informational."};
+  if(actualStatus==="RED")return {status:actualStatus,setScale:.5,intensityScale:.78,engineMode:"recovery",message:family.readinessRed};
+  if(actualStatus==="YELLOW")return {status:actualStatus,setScale:.75,intensityScale:.9,engineMode:"easy",message:family.readinessYellow};
+  return {status:actualStatus,setScale:1,intensityScale:1,engineMode:"planned",message:"Proceed with the prescribed event-specific work and finish with repeatable quality."};
 }
 function eventSimulationWeek(){
   const family=currentEventFamily(),phase=eventPhaseDetail(),week=Math.max(1,Number(data.trainingBlock?.currentWeek)||1);

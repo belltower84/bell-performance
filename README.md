@@ -1,12 +1,12 @@
-# Bell Performance 13.4.0 — Bell Coach Intelligence
+# Bell Performance 13.6.0 — Readiness & Application Control
 
-Bell Performance is a local-first adaptive coaching application. Version 13.4 adds transparent coaching explanations, evidence-based athlete memory, and an auditable adaptation history while preserving the modern athlete experience introduced in 13.3.
+Bell Performance is a local-first training application with two control modes. Version 13.6 adds a functional readiness dashboard and lets each athlete choose between a fixed Workout Planner and adaptive Bell Coach experience.
 
 ## Product blueprint
 
 Bell 13 and later are governed by [`BELL_PRODUCT_BLUEPRINT.md`](BELL_PRODUCT_BLUEPRINT.md). It defines the product language, coaching architecture, design standards, adaptive-planning rules, and release roadmap.
 
-## Bell 13.3 coaching profile
+## Bell 13 athlete profile
 
 ```text
 Athlete Profile
@@ -26,11 +26,11 @@ Bell separates who the athlete is becoming from the objective being pursued now.
 The seven-step onboarding flow captures:
 
 - athlete baseline;
-- training identity;
+- application control mode and training identity;
 - current objective and Journey mode;
 - normal training availability;
 - experience and strength baselines;
-- recovery and Bell Coach preferences;
+- recovery and mode-specific preferences;
 - final Journey review.
 
 Powerlifting requires squat, bench press, and deadlift maxes. Event Preparation requires a named event and future date.
@@ -44,7 +44,7 @@ Settings is organized into:
 - Training
 - Nutrition
 - Recovery
-- Bell Coach
+- App Control
 - App
 
 Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, and help controls remain available inside the new structure.
@@ -54,7 +54,7 @@ Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, 
 - Register or sign in to Bell Core from Settings.
 - Create, retrieve, and partially update the normalized athlete profile.
 - Sync the current mission, discipline, Journey, and multiweek plan.
-- Submit readiness and receive discipline-aware adaptation.
+- Submit readiness and receive discipline-aware adaptation in Bell Coach mode. Workout Planner keeps readiness local and informational.
 - Start and complete Bell Core sessions in the guided workout player.
 - Continue using Bell locally when Bell Core is unavailable.
 
@@ -62,8 +62,8 @@ Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, 
 
 - [`BELL_ATHLETE_EXPERIENCE_13_3.md`](BELL_ATHLETE_EXPERIENCE_13_3.md)
 - [`BELL_COACHING_ENGINE_13_2.md`](BELL_COACHING_ENGINE_13_2.md)
-- [`RELEASE_NOTES_13_3_0.md`](RELEASE_NOTES_13_3_0.md)
-- [`VALIDATION_13_3_0.md`](VALIDATION_13_3_0.md)
+- [`RELEASE_NOTES_13_6_0.md`](RELEASE_NOTES_13_6_0.md)
+- [`VALIDATION_13_6_0.md`](VALIDATION_13_6_0.md)
 
 ## Local use
 

@@ -221,10 +221,12 @@
   function currentCoachingPathway(){return resolve(currentState()?.identity||"",currentState()?.objective||"",currentText());}
   function pathwayWeekRole(){return currentState()?.currentPhaseName||"Foundation";}
   function pathwayReadinessAdjustment(){
-    const status=typeof readinessStatus==="function"?readinessStatus(readinessScore()):"GREEN",profile=currentCoachingPathway();
-    if(status==="RED")return{status,setScale:.5,intensityScale:.82,engine:"recovery",message:profile.readinessRed};
-    if(status==="YELLOW")return{status,setScale:.75,intensityScale:.92,engine:"easy",message:profile.readinessYellow};
-    return{status,setScale:1,intensityScale:1,engine:"planned",message:"Execute the planned quality and preserve readiness for the next protected session."};
+    const coachMode=typeof bellCoachModeEnabled!=="function"||bellCoachModeEnabled();
+    const actualStatus=typeof readinessStatus==="function"?readinessStatus(readinessScore()):"GREEN",profile=currentCoachingPathway();
+    if(!coachMode)return{status:actualStatus,setScale:1,intensityScale:1,engine:"planned",message:"Workout Planner mode keeps the scheduled progression unchanged. Readiness is informational."};
+    if(actualStatus==="RED")return{status:actualStatus,setScale:.5,intensityScale:.82,engine:"recovery",message:profile.readinessRed};
+    if(actualStatus==="YELLOW")return{status:actualStatus,setScale:.75,intensityScale:.92,engine:"easy",message:profile.readinessYellow};
+    return{status:actualStatus,setScale:1,intensityScale:1,engine:"planned",message:"Execute the planned quality and preserve readiness for the next protected session."};
   }
   function pathwayProgressionPrescription(){
     const state=currentState(),profile=currentCoachingPathway(),phaseState=state?.currentPhase||{},recovery=/recover|deload|taper|diet break/i.test(phaseState.name||"");

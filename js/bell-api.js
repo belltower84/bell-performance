@@ -211,6 +211,7 @@ function bellReadinessPayload() {
 }
 
 async function bellSubmitReadiness() {
+  if (typeof bellCoachModeEnabled === "function" && !bellCoachModeEnabled()) return null;
   const athleteId = await bellEnsureAthlete();
   if (!athleteId || !bellCloud.planId) return null;
   const result = await bellApiRequest(`/athletes/${athleteId}/check-ins`, { method: "POST", body: JSON.stringify(bellReadinessPayload()) });

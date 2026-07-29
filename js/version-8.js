@@ -49,7 +49,8 @@ function isRestDashboardDay(key=selectedDashboardDateKey()){
   return items.flatMap(item=>typeof sessionsFromPlanItem==="function"?sessionsFromPlanItem(item):[]).length===0;
 }
 function coreSessionName(key=selectedDashboardDateKey()){
-  if(isRestDashboardDay(key)||readinessStatus()==="RED"||hoursSinceLastHardCore()<36) return "C-R Recovery Core";
+  const coachMode=typeof bellCoachModeEnabled!=="function"||bellCoachModeEnabled();
+  if(isRestDashboardDay(key)||(coachMode&&readinessStatus()==="RED")||hoursSinceLastHardCore()<36) return "C-R Recovery Core";
   return `C-${nextCoreCode()} Optional Core`;
 }
 function coreTemplate(name){

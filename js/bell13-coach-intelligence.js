@@ -1,8 +1,9 @@
 "use strict";
-/* Bell Performance 13.4.0 — transparent coaching explanations and athlete-controlled memory. */
+/* Bell Performance 13.6.0 — transparent coaching explanations and athlete-controlled memory. */
 (function(){
-  const VERSION="13.4.0";
+  const VERSION="13.6.0";
   const $=id=>document.getElementById(id);
+  const coachMode=()=>typeof bellCoachModeEnabled!=="function"||bellCoachModeEnabled();
   const esc=value=>typeof window.escapeHtml==="function"?window.escapeHtml(String(value??"")):String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const clean=value=>String(value||"").replace(/\s+/g," ").trim();
   const now=()=>new Date().toISOString();
@@ -127,7 +128,7 @@
     document.body.insertAdjacentHTML("beforeend",`<div class="modal hidden bell134-modal" id="bellCoachModal" aria-hidden="true"><div class="modal-box bell134-modal-box"><div class="modal-header"><div><span class="metric-label">Bell Performance 13.4</span><h2 id="bellCoachModalTitle">Bell Coach</h2></div><button type="button" onclick="BellCoachIntelligence.close()">×</button></div><nav class="bell134-tabs" id="bellCoachTabs"><button data-coach-tab="now" class="active">Now</button><button data-coach-tab="why">Why</button><button data-coach-tab="memory">Memory</button><button data-coach-tab="history">Decisions</button></nav><div id="bellCoachModalBody"></div></div></div>`);
     $("bellCoachTabs").addEventListener("click",event=>{const button=event.target.closest("[data-coach-tab]");if(button)openCenter(button.dataset.coachTab);});
   }
-  function openWhy(topic="phase"){ensureModal();$("bellCoachModalTitle").textContent="Bell Coach · Why";$("bellCoachTabs").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.coachTab==="why"));$("bellCoachModalBody").innerHTML=explanationHtml(explanation(topic));$("bellCoachModal").classList.remove("hidden");$("bellCoachModal").setAttribute("aria-hidden","false");}
+  function openWhy(topic="phase"){if(!coachMode())return;ensureModal();$("bellCoachModalTitle").textContent="Bell Coach · Why";$("bellCoachTabs").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.coachTab==="why"));$("bellCoachModalBody").innerHTML=explanationHtml(explanation(topic));$("bellCoachModal").classList.remove("hidden");$("bellCoachModal").setAttribute("aria-hidden","false");}
   function topicButtons(){return [["mission","Mission"],["phase","Phase"],["progression","Progression"],["weekly_plan","Weekly Plan"],["recovery","Recovery"],["nutrition","Nutrition"],["milestone","Milestone"],["adaptation","Latest Change"]].map(([id,label])=>`<button type="button" onclick="BellCoachIntelligence.openWhy('${id}')">${label}</button>`).join("");}
   function memoriesHtml(){
     const memories=activeMemories(),prefs=coachingPreferences();if(!prefs.memoryEnabled)return `<div class="bell134-empty"><h3>Coaching memory is off</h3><p>Turn it on in Bell Coach settings to let repeated evidence improve future decisions.</p></div>`;
@@ -138,7 +139,7 @@
   function addMemoryForm(){return `<form class="bell134-add-memory" onsubmit="BellCoachIntelligence.addMemory(event)"><label>Tell Bell a durable preference or limitation<input id="bellMemoryObservation" maxlength="1000" required placeholder="Example: Neutral-grip pressing feels better on my shoulders."></label><button class="secondary" type="submit">Add confirmed memory</button><small>Explicit athlete statements are saved immediately and can be removed at any time.</small></form>`;}
   function historyHtml(){const rows=store().decisions;if(!rows.length)return `<div class="bell134-empty"><h3>No adaptations recorded yet</h3><p>Phase changes, readiness adjustments, and schedule decisions will appear here with their reasons.</p></div>`;return `<div class="bell134-history">${rows.map(x=>`<article><time>${esc(new Date(x.createdAt||Date.now()).toLocaleString())}</time><div><span>${esc(x.source||"Bell")}</span><h3>${esc(x.title)}</h3><p>${esc(x.explanation)}</p>${x.changes?.length?`<small>${esc(x.changes.join(" · "))}</small>`:""}</div></article>`).join("")}</div>`;}
   function openCenter(tab="now"){
-    analyze();ensureModal();const modal=$("bellCoachModal"),body=$("bellCoachModalBody"),s=summary();$("bellCoachModalTitle").textContent="Bell Coach";$("bellCoachTabs").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.coachTab===tab));
+    if(!coachMode())return;analyze();ensureModal();const modal=$("bellCoachModal"),body=$("bellCoachModalBody"),s=summary();$("bellCoachModalTitle").textContent="Bell Coach";$("bellCoachTabs").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.coachTab===tab));
     if(tab==="now")body.innerHTML=`<article class="bell134-now"><span class="metric-label">Current Coaching Direction</span><h2>${esc(s.headline)}</h2><h3>${esc(s.instruction)}</h3><p>${esc(s.reason)}</p><div><span>Next focus</span><strong>${esc(s.nextFocus)}</strong></div><small>${esc(s.memoryContext)} · ${esc(s.confidence)} confidence</small><button class="good" type="button" onclick="BellCoachIntelligence.openWhy('mission')">Why this Mission?</button></article>`;
     else if(tab==="why")body.innerHTML=`<div class="bell134-topic-grid">${topicButtons()}</div>${explanationHtml(explanation("phase"))}`;
     else if(tab==="memory")body.innerHTML=memoriesHtml();
@@ -155,19 +156,21 @@
 
   function briefHtml(){const s=summary();return `<section class="bell134-brief" id="bellCoachBrief"><div class="bell134-brief-mark">B</div><div class="bell134-brief-copy"><span class="metric-label">Bell Coach · Current Direction</span><h2>${esc(s.instruction)}</h2><p>${esc(s.reason)}</p><div class="bell134-brief-meta"><span><b>${esc(s.headline)}</b></span><span>Next: ${esc(s.nextFocus)}</span><span>${esc(s.memoryContext)}</span></div></div><div class="bell134-brief-actions"><button class="secondary" type="button" onclick="BellCoachIntelligence.openWhy('mission')">Why?</button><button class="good" type="button" onclick="BellCoachIntelligence.openCenter('now')">Open Coach</button></div></section>`;}
   function renderCoachBrief(){
-    if(typeof data==="undefined")return;const dashboard=$("premiumDashboard"),journey=$("bell13JourneyCard");if(dashboard&&!$("bellCoachBrief")){journey?.insertAdjacentHTML("afterend",briefHtml());if(!journey)dashboard.insertAdjacentHTML("afterbegin",briefHtml());}else if($("bellCoachBrief"))$("bellCoachBrief").outerHTML=briefHtml();
+    if(typeof data==="undefined")return;
+    if(!coachMode()){$("bellCoachBrief")?.remove();$("bellMissionWhyButton")?.remove();return;}
+    const dashboard=$("premiumDashboard"),journey=$("bell13JourneyCard");if(dashboard&&!$("bellCoachBrief")){journey?.insertAdjacentHTML("afterend",briefHtml());if(!journey)dashboard.insertAdjacentHTML("afterbegin",briefHtml());}else if($("bellCoachBrief"))$("bellCoachBrief").outerHTML=briefHtml();
     const purpose=$("commandMissionPurpose");if(purpose&&!$("bellMissionWhyButton")){purpose.insertAdjacentHTML("afterend",`<button id="bellMissionWhyButton" class="bell13-why-button bell134-inline-why" type="button" onclick="BellCoachIntelligence.openWhy('mission')">Why this Mission?</button>`);}
   }
   function settingsHtml(){const prefs=coachingPreferences();return `<article class="card bell134-memory-settings" id="bellMemorySettings"><div class="bell133-card-heading"><div><span class="metric-label">Coaching Intelligence</span><h3>Bell Memory & Explanations</h3><p>Bell only creates inferred memory from repeated evidence. You can review and remove every memory.</p></div></div><label class="bell134-toggle"><input id="settingsMemoryEnabled" type="checkbox" ${prefs.memoryEnabled?"checked":""}><span><b>Use coaching memory</b><small>Let repeated patterns influence future decisions.</small></span></label><label class="bell134-toggle"><input id="settingsShowConfidence" type="checkbox" ${prefs.showConfidence?"checked":""}><span><b>Show confidence labels</b><small>Display how certain Bell is about explanations and memories.</small></span></label><div class="row"><button class="secondary" type="button" onclick="BellCoachIntelligence.saveSettings()">Save</button><button class="secondary" type="button" onclick="BellCoachIntelligence.openCenter('memory')">Review Memory</button><button class="secondary" type="button" onclick="BellCoachIntelligence.clearDismissed()">Reset Removed Patterns</button></div></article>`;}
-  function injectSettings(){const panel=document.querySelector('[data-settings-panel="coach"]');if(panel&&!$("bellMemorySettings"))panel.insertAdjacentHTML("beforeend",settingsHtml());}
+  function injectSettings(){const panel=document.querySelector('[data-settings-panel="coach"]');if(!panel)return;if(!$("bellMemorySettings"))panel.insertAdjacentHTML("beforeend",settingsHtml());if($("bellMemorySettings"))$("bellMemorySettings").hidden=!coachMode();}
   function saveSettings(){const coaching=data.athleteProfile.coaching||(data.athleteProfile.coaching={});coaching.memoryEnabled=$("settingsMemoryEnabled")?.checked!==false;coaching.showConfidence=$("settingsShowConfidence")?.checked!==false;if(!coaching.memoryEnabled)store().memories=store().memories.filter(x=>x.sourceType==="athlete_explicit");saveData({render:false});if(typeof bellSyncAthleteProfile==="function")bellSyncAthleteProfile().catch(()=>{});analyze();renderCoachBrief();alert("Bell Coach intelligence preferences saved.");}
   function patchPlanWhyButtons(){document.querySelectorAll('.bell13-plan-overview .bell13-why-button').forEach(button=>{const text=button.textContent.toLowerCase();button.onclick=()=>openWhy(text.includes("progression")?"progression":"phase");});}
-  function init(){if(typeof data==="undefined")return;analyze();ensureModal();renderCoachBrief();injectSettings();patchPlanWhyButtons();}
+  function init(){if(typeof data==="undefined")return;if(coachMode()){analyze();ensureModal();patchPlanWhyButtons();}renderCoachBrief();injectSettings();}
 
   const priorOpen=window.openCommandTile;
-  if(typeof priorOpen==="function")window.openCommandTile=function(type){if(type==="coaching"){openCenter("now");return;}return priorOpen.apply(this,arguments);};
+  if(typeof priorOpen==="function")window.openCommandTile=function(type){if(type==="coaching"&&coachMode()){openCenter("now");return;}return priorOpen.apply(this,arguments);};
   const priorRender=window.renderApp;
-  if(typeof priorRender==="function")window.renderApp=function(){const result=priorRender.apply(this,arguments);setTimeout(()=>{analyze();renderCoachBrief();injectSettings();patchPlanWhyButtons();},0);return result;};
+  if(typeof priorRender==="function")window.renderApp=function(){const result=priorRender.apply(this,arguments);setTimeout(()=>{if(coachMode()){analyze();patchPlanWhyButtons();}renderCoachBrief();injectSettings();},0);return result;};
   window.BellCoachIntelligence={version:VERSION,explain:explanation,summary,analyze,openWhy,openCenter,close,removeMemory,addMemory,clearDismissed,saveSettings,render:renderCoachBrief};
   document.addEventListener("DOMContentLoaded",()=>setTimeout(init,100));
   document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("bellCoachModal")?.classList.contains("hidden"))close();});

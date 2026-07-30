@@ -167,7 +167,7 @@ function readinessWord(value, reverse=false) {
   return v >= 4 ? "High" : v === 3 ? "Moderate" : "Low";
 }
 function timeAvailabilityLabel(value) {
-  return ({1:"20 min",2:"30 min",3:"45 min",4:"60 min",5:"75+ min"})[Number(value)] || "45 min";
+  return ({1:"30 min",2:"45 min",3:"60 min",4:"75 min",5:"90 min",6:"105 min",7:"120 min"})[Number(value)] || `${Math.max(30,Number(value)||60)} min`;
 }
 function renderVisualProfile(template, status) {
   const sex = data.settings.sex || "Male";

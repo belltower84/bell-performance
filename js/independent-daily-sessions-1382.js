@@ -111,7 +111,7 @@
     const row=buildRows(key).rows.find(r=>r.type===type&&!r.synthetic);if(!row)return;
     previewPlannedWorkout(row.session.planId,row.session.sessionKey,row.session.mission);
   }
-  window.bell1382Start=startRow;window.bell1382Preview=previewRow;
+  bell1382Start=startRow; bell1382Preview=previewRow; window.bell1382Start=bell1382Start; window.bell1382Preview=bell1382Preview;
 
   function cardHtml(row,key){
     row.key=key;const done=row.completed,label=labelFor(row),status=done?"Complete":row.outsideBudget?"Daily":row.optional?"Optional":"Required";
@@ -123,7 +123,7 @@
     </article>`;
   }
 
-  window.renderPremiumMission=function(){
+  const renderIndependentDailySessions=function(){
     const key=dateKey(),result=buildRows(key),required=result.rows.filter(r=>!r.optional&&!r.outsideBudget),requiredDone=required.length>0&&required.every(r=>r.completed),training=result.rows.filter(r=>r.type!=="mobility"),allDone=training.filter(r=>!r.optional).every(r=>r.completed);
     commandSetText("premiumMissionDate",key===todayKey()?"Today":localDateFromKey(key).toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"}));
     commandSetText("commandMissionTitle",requiredDone?"Mission Complete":training.length?training.filter(r=>r.type==="strength"||r.type==="engine").map(labelFor).join(" + "):"Recovery Day");
@@ -135,11 +135,23 @@
     const stack=document.getElementById("premiumSessionStack");if(stack){stack.className="premium-session-stack b1382-session-stack";stack.innerHTML=result.rows.map(r=>cardHtml(r,key)).join("")+(requiredDone?`<div class="b1382-tomorrow"><strong>Mission Complete</strong><span>Required work is finished for today.</span><button type="button" onclick="selectDashboardDay(addLocalDays('${key}',1))">Preview Tomorrow</button></div>`:"");}
     ["commandSelectedSessionDetail","commandStartWorkout","commandViewSession","commandModifySession"].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add("hidden");});
   };
+  renderPremiumMission=renderIndependentDailySessions;
+  window.renderPremiumMission=renderIndependentDailySessions;
+
+  // Ensure the dashboard always applies the independent-session renderer after legacy dashboard code.
+  if(typeof renderPremiumDashboard==="function"){
+    const originalRenderPremiumDashboard=renderPremiumDashboard;
+    renderPremiumDashboard=function(){
+      originalRenderPremiumDashboard.apply(this,arguments);
+      renderIndependentDailySessions();
+    };
+    window.renderPremiumDashboard=renderPremiumDashboard;
+  }
 
   // Reliable completion write: today + broad session type. History still keeps detailed records.
   if(typeof completeWorkout==="function"){
     const originalComplete=completeWorkout;
-    window.completeWorkout=function(){
+    completeWorkout=function(){
       const active=data.activeWorkout?{...data.activeWorkout}:null;
       const key=active?.scheduledDate||todayKey();
       const type=active?.optionalCore||/^C-/i.test(String(active?.name||""))?"core":(active?.cardioType||active?.engineMetrics||/^R-/i.test(String(active?.name||"")))?"engine":"strength";
@@ -147,12 +159,14 @@
       setComplete(type,key);
       if(typeof renderApp==="function")renderApp();
     };
+    window.completeWorkout=completeWorkout;
   }
   if(typeof finishMobilityRoutine==="function"){
     const originalMobility=finishMobilityRoutine;
-    window.finishMobilityRoutine=function(){const key=activeMobilityDateKey||dateKey();originalMobility.apply(this,arguments);if(data.mobility?.completedDates?.includes(key)){setComplete("mobility",key);if(typeof renderApp==="function")renderApp();}};
+    finishMobilityRoutine=function(){const key=activeMobilityDateKey||dateKey();originalMobility.apply(this,arguments);if(data.mobility?.completedDates?.includes(key)){setComplete("mobility",key);if(typeof renderApp==="function")renderApp();}};
+    window.finishMobilityRoutine=finishMobilityRoutine;
   }
 
   // Expose for validation/debugging.
-  window.BellDailySessions={buildRows,dayState,setComplete,isComplete,usualMinutes,todayMinutes};
+  window.BellDailySessions={buildRows,dayState,setComplete,isComplete,usualMinutes,todayMinutes,render:renderIndependentDailySessions};
 })();

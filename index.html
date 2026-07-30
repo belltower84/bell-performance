@@ -14,12 +14,13 @@
 <title>Bell Performance 13.7.5 — Settings Flow Rebuild</title>
 <link href="./css/app.css?v=13710" rel="stylesheet"/>
 <link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
+<link href="./css/independent-daily-sessions-1382.css?v=13830" rel="stylesheet"/>
 <link href="./css/bell13.css?v=13300" rel="stylesheet"/>
 <link href="./css/bell134.css?v=13620" rel="stylesheet"/>
 <link href="./css/bell135.css?v=13712" rel="stylesheet"/>
 <link href="./css/bell1364.css?v=13640" rel="stylesheet"/>
 <link href="./css/guided-tour-1374.css?v=13740" rel="stylesheet"/>
-<link href="./css/settings-1377.css?v=13770" rel="stylesheet"/>
+<link href="./css/settings-1376.css?v=13760" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -292,7 +293,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div id="engineTargetFields"></div>
 </section>
 </div>
-<div class="coordination-panel"><h4>Training Coordination</h4><div class="row"><div><label>Weekly training days</label><select id="blockTrainingDays"><option value="3">3</option><option value="4">4</option><option selected="" value="5">5</option><option value="6">6</option><option value="7">7</option></select></div><div><label>Session limit</label><select id="blockSessionMinutes"><option value="45">45 minutes</option><option value="60">60 minutes</option><option selected="" value="75">75 minutes</option><option value="90">90 minutes</option></select></div><div><label>Strength + Engine scheduling</label><select id="trainingCoordination"><option selected="" value="Coach Decides">Coach Decides</option><option value="Alternate Days">Alternate Days</option><option value="Same Session">Integrated Same Session</option><option value="Two-a-Day">Two Sessions Same Day</option></select></div><div><label>Block length</label><select id="blockLength"><option value="8">8 weeks</option><option value="10">10 weeks</option><option selected="" value="12">12 weeks</option><option value="16">16 weeks</option><option value="20">20 weeks</option><option value="24">24 weeks</option></select></div></div><div class="compatibility-callout" id="goalCompatibilityMessage"></div></div>
+<div class="coordination-panel"><h4>Training Coordination</h4><div class="row"><div><label>Weekly training days</label><select id="blockTrainingDays"><option value="3">3</option><option value="4">4</option><option selected="" value="5">5</option><option value="6">6</option><option value="7">7</option></select></div><div><label>Session limit</label><select id="blockSessionMinutes"><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option><option selected="" value="75">75 minutes</option><option value="90">90 minutes</option><option value="105">105 minutes</option><option value="120">120 minutes</option></select></div><div><label>Strength + Engine scheduling</label><select id="trainingCoordination"><option selected="" value="Coach Decides">Coach Decides</option><option value="Alternate Days">Alternate Days</option><option value="Same Session">Integrated Same Session</option><option value="Two-a-Day">Two Sessions Same Day</option></select></div><div><label>Block length</label><select id="blockLength"><option value="8">8 weeks</option><option value="10">10 weeks</option><option selected="" value="12">12 weeks</option><option value="16">16 weeks</option><option value="20">20 weeks</option><option value="24">24 weeks</option></select></div></div><div class="compatibility-callout" id="goalCompatibilityMessage"></div></div>
 <div class="hidden compatibility-fields"><select id="blockGoalType"><option value="General Hybrid">General Hybrid</option></select><input id="blockTargetMinutes" type="number" value="60"/><select id="blockSecondaryGoal"><option>Maintain Strength</option></select><input checked="" id="blockMaintainStrength" type="checkbox"/><div id="bodybuildingFocusWrap"><select id="blockBodybuildingFocus"><option>Balanced</option><option>Shoulders &amp; Arms</option><option>Chest &amp; Back</option><option>Legs</option><option>Glutes &amp; Hamstrings</option><option>Glute Development</option><option>Lower Body / Wellness</option><option>Athletic Shape</option></select></div><div id="bodybuildingPhaseWrap"><select id="blockBodybuildingPhase"><option>Lean Gain</option><option selected="">Recomposition</option><option>Cut</option></select></div><div id="targetTimeWrap"></div></div>
 <div class="row"><button onclick="updateCurrentTrainingBlock()">Apply Changes to Current Block</button><button class="secondary" onclick="generateTrainingBlock()">Start New Block With Changes</button></div>
 <div class="hint" id="goalBuilderHint" style="margin-top:9px"></div>
@@ -438,7 +439,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <span class="first-flight-kicker">Flight Check 04</span><h3>Build a schedule you can sustain</h3>
 <p class="sub">Choose the weekly commitment, session length, and equipment Bell Performance should program around.</p>
 <div class="schedule-choice-panel">
-<input id="onboardingTrainingDays" type="hidden" value="5"/><label>Which days can you normally train?</label><div class="bell-weekday-grid" id="onboardingWeekdayChoices"></div><div class="row"><div><label>Typical session length</label><select id="onboardingSessionMinutes"><option value="45">45 minutes</option><option selected="" value="60">60 minutes</option><option value="75">75 minutes</option><option value="90">90 minutes</option></select></div></div>
+<input id="onboardingTrainingDays" type="hidden" value="5"/><label>Which days can you normally train?</label><div class="bell-weekday-grid" id="onboardingWeekdayChoices"></div><div class="row"><div><label>Typical session length</label><select id="onboardingSessionMinutes"><option value="30">30 minutes</option><option value="45">45 minutes</option><option selected="" value="60">60 minutes</option><option value="75">75 minutes</option><option value="90">90 minutes</option><option value="105">105 minutes</option><option value="120">120 minutes</option></select></div></div>
 <label>Primary training environment</label><div class="environment-choice-grid" id="onboardingEnvironmentChoices">
 <label><input checked="" name="onboardingSimpleEnvironment" type="radio" value="commercial"/><span><strong>Commercial Gym</strong><small>Full equipment access</small></span></label>
 <label><input name="onboardingSimpleEnvironment" type="radio" value="home"/><span><strong>Home Gym</strong><small>Rack, barbell, dumbbells, or similar</small></span></label>
@@ -527,11 +528,13 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button type="button" data-readiness-group="pain" data-value="yes" aria-pressed="false" onclick="selectDailyPain('yes')"><strong>Yes</strong><small>Flag it for Bell</small></button>
 </div><div class="quick-pain-detail hidden" id="quickPainDetail"><label for="promptPainNotes">What is bothering you?<textarea id="promptPainNotes" oninput="updateQuickReadinessSubmitState()" placeholder="Example: sharp pain in my right shoulder during pressing"></textarea></label><div class="quick-safety-note">Do not train through sharp pain, chest pain, dizziness, weakness, or other concerning symptoms. Stop and seek appropriate medical guidance.</div></div></section>
 <section class="quick-readiness-question compact" data-question="time" id="dailyTimeQuestion"><div class="quick-question-heading"><span>5</span><div><h3>How much time do you have?</h3><p>This changes session length, not your readiness score.</p></div></div><div class="quick-choice-grid time" role="group" aria-label="Time available today">
-<button type="button" data-readiness-group="time" data-value="20" aria-pressed="false" onclick="selectDailyTime(20)"><strong>20</strong><small>min</small></button>
 <button type="button" data-readiness-group="time" data-value="30" aria-pressed="false" onclick="selectDailyTime(30)"><strong>30</strong><small>min</small></button>
 <button type="button" data-readiness-group="time" data-value="45" aria-pressed="false" onclick="selectDailyTime(45)"><strong>45</strong><small>min</small></button>
 <button type="button" data-readiness-group="time" data-value="60" aria-pressed="false" onclick="selectDailyTime(60)"><strong>60</strong><small>min</small></button>
-<button type="button" data-readiness-group="time" data-value="75" aria-pressed="false" onclick="selectDailyTime(75)"><strong>75+</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="75" aria-pressed="false" onclick="selectDailyTime(75)"><strong>75</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="90" aria-pressed="false" onclick="selectDailyTime(90)"><strong>90</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="105" aria-pressed="false" onclick="selectDailyTime(105)"><strong>105</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="120" aria-pressed="false" onclick="selectDailyTime(120)"><strong>120</strong><small>min</small></button>
 </div></section>
 </div>
 <div class="quick-readiness-footer"><p id="quickReadinessProgress" aria-live="polite">Answer each question to continue.</p><button class="good premium-primary-button" id="quickReadinessSubmit" disabled onclick="saveDailyReadinessPrompt()" type="button">Build Today’s Mission</button></div></div></div></div>
@@ -669,7 +672,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.7.17-engine-completion-identity";</script>
+<script>window.BELL_APP_VERSION = "13.8.3-independent-session-renderer";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=13710"></script>
 <script src="./js/storage.js?v=13720"></script>
@@ -687,10 +690,10 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/performance-review.js?v=10006"></script>
 <script src="./js/artwork.js?v=10006"></script>
 <script src="./js/quote-cache.js?v=10006"></script>
-<script src="./js/ui.js?v=13810"></script>
+<script src="./js/ui.js?v=13718"></script>
 <script src="./js/habits.js?v=10006"></script>
 <script src="./js/dual-goals.js?v=10006"></script>
-<script src="./js/version-8.js?v=13810"></script>
+<script src="./js/version-8.js?v=13718"></script>
 <script src="./js/mission-planner.js?v=10006"></script>
 <script src="./js/coaching-pathways.js?v=13600"></script>
 <script src="./js/event-coaching.js?v=13721"></script>
@@ -712,9 +715,10 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/bell13-athlete-experience.js?v=13650"></script>
 <script src="./js/first-flight-1372.js?v=13721"></script>
 <script src="./js/bell13-coach-intelligence.js?v=13620"></script>
-<script src="./js/bell13-commercial-home.js?v=13810"></script>
-<script src="./js/settings-1377.js?v=13770"></script>
-<script src="./js/daily-mission-13710.js?v=13810"></script>
-<script src="./js/completion-engine-13717.js?v=13810"></script>
+<script src="./js/bell13-commercial-home.js?v=13718"></script>
+<script src="./js/settings-1376.js?v=13760"></script>
+<script src="./js/daily-mission-13710.js?v=13718"></script>
+<script src="./js/completion-engine-13717.js?v=13718"></script>
+<script src="./js/independent-daily-sessions-1382.js?v=13830"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@
 
 function commandSetText(id,value){const el=document.getElementById(id);if(el)el.textContent=value==null?'—':String(value);}
 function commandReadinessWord(value,kind){const n=Math.max(1,Math.min(5,Math.round(Number(value)||3)));if(kind==='soreness')return ['High','High','Moderate','Mild','Low'][n-1];return ['Low','Low','Moderate','Good','High'][n-1];}
-function commandAvailableTime(readiness){if(typeof readinessTimeLabel==='function')return readinessTimeLabel(readiness);return ({1:'20 min',2:'30 min',3:'45 min',4:'60 min',5:'75+ min'})[Number(readiness?.timeAvailability)||3]||'45 min';}
+function commandAvailableTime(readiness){if(typeof readinessTimeLabel==='function')return readinessTimeLabel(readiness);return ({1:'30 min',2:'45 min',3:'60 min',4:'75 min',5:'90 min',6:'105 min',7:'120 min'})[Number(readiness?.timeAvailability)||3]||`${Math.max(30,Number(readiness?.timeMinutes)||60)} min`;}
 function commandRelativeTime(iso){if(!iso)return 'Sync pending';const seconds=Math.max(0,Math.floor((Date.now()-new Date(iso).getTime())/1000));if(seconds<60)return 'Synced just now';const minutes=Math.floor(seconds/60);if(minutes<60)return `Synced ${minutes} min ago`;const hours=Math.floor(minutes/60);if(hours<24)return `Synced ${hours} hr ago`;return `Synced ${Math.floor(hours/24)} day ago`;}
 function commandMissionInfo(){
   const block=data.trainingBlock||{},mission=block.mission||{};

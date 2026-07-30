@@ -165,7 +165,7 @@ function readinessSliderLabel(name,value){
     energy:["","Depleted","Low","Functional","Energized","Fully energized"],
     recoveryStatus:["","Very sore","Sore","Manageable","Mostly fresh","Fresh and pain-free"],
     motivation:["","Very low","Low","Willing","Ready","Highly motivated"],
-    timeAvailability:["","20 min","30 min","45 min","60 min","75+ min"]
+    timeAvailability:["","30 min","45 min","60 min","75 min","90 min","105 min","120 min"]
   };
   return labels[name]?.[value]||String(value);
 }

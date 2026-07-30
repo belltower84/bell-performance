@@ -1,15 +1,17 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13.7.1-production-back-squat';
+const CACHE_NAME = 'bell-performance-13.7.2-first-flight-mission-alignment-r4';
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./css/app.css?v=13710",
+  "./css/first-flight-1372.css?v=13721",
   "./css/bell13.css?v=13300",
   "./css/bell134.css?v=13620",
   "./css/bell135.css?v=13610",
   "./css/bell1364.css?v=13640",
   "./assets/logo-bell-emblem.png?v=12210",
+  "./assets/logo-shield.svg?v=13720",
   "./assets/icons/engine-shoe.svg?v=10006",
   "./assets/icons/engine-mark.svg?v=10006",
   "./assets/artwork/strength/powerlifting.jpg?v=10006",
@@ -30,9 +32,9 @@ const CORE = [
   "./assets/artwork/engine/winter-trail.jpg?v=10006",
   "./assets/artwork/engine/hill-country.jpg?v=10006",
   "./data/workouts.js?v=10007",
-  "./js/storage.js?v=13610",
+  "./js/storage.js?v=13720",
   "./js/exercise-library.js?v=13710",
-  "./js/readiness.js?v=13610",
+  "./js/readiness.js?v=13720",
   "./js/equipment.js?v=13640",
   "./js/training-blocks.js?v=13600",
   "./js/mobility.js?v=13650",
@@ -51,12 +53,12 @@ const CORE = [
   "./js/version-8.js?v=13600",
   "./js/mission-planner.js?v=10006",
   "./js/coaching-pathways.js?v=13600",
-  "./js/event-coaching.js?v=13600",
-  "./js/how-to.js?v=10006",
+  "./js/event-coaching.js?v=13721",
+  "./js/how-to.js?v=13721",
   "./js/premium-dashboard.js?v=13610",
   "./js/block-lifecycle.js?v=10006",
   "./js/plan-progress.js?v=10006",
-  "./js/weekly-debrief.js?v=10006",
+  "./js/weekly-debrief.js?v=13720",
   "./js/bell-api.js?v=13600",
   "./js/api-integration.js?v=12101",
   "./js/dashboard-command-center.js?v=13650",
@@ -65,8 +67,9 @@ const CORE = [
   "./js/bell-coaching-engine.js?v=13200",
   "./js/bell13-dashboard.js?v=13200",
   "./js/bell13-athlete-experience.js?v=13650",
+  "./js/first-flight-1372.js?v=13721",
   "./js/bell13-coach-intelligence.js?v=13620",
-  "./js/bell13-commercial-home.js?v=13650",
+  "./js/bell13-commercial-home.js?v=13722",
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

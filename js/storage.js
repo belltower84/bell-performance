@@ -142,7 +142,7 @@ function normalizeData() {
   data.athleteProfile.coaching = { ...cloneDefaults().athleteProfile.coaching, ...(data.athleteProfile.coaching || {}) };
   data.athleteProfile.coaching.controlMode = data.athleteProfile.coaching.controlMode === "planner" ? "planner" : data.settings.appControlMode;
   data.settings.firstFlightStage = data.settings.firstFlightStage || (data.settings.coachMessages.setupComplete ? "complete" : "profile");
-  data.settings.firstFlightTourComplete = Boolean(data.settings.firstFlightTourComplete || data.settings.coachMessages.setupComplete);
+  data.settings.firstFlightTourComplete = data.settings.pendingFirstFlightTour ? false : Boolean(data.settings.firstFlightTourComplete || data.settings.coachMessages.setupComplete);
   const injury=data.settings.injuryProfile||{};
   data.settings.injuryProfile={...defaults.settings.injuryProfile,...injury,restrictedPatterns:Array.isArray(injury.restrictedPatterns)?injury.restrictedPatterns:[],affectedAreas:Array.isArray(injury.affectedAreas)?injury.affectedAreas:[],recoveryHistory:Array.isArray(injury.recoveryHistory)?injury.recoveryHistory:[]};
   if (typeof normalizeEquipmentSettings === "function") normalizeEquipmentSettings();

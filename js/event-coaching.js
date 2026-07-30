@@ -14,6 +14,18 @@ const BELL_EVENT_FAMILIES = {
     readinessRed:"Replace running intensity with walking, mobility, or brief easy cross-training. Resume quality only after recovery improves.",
     eventDay:"Use the rehearsed warm-up, pacing, fueling, shoes, and race strategy. Nothing new on event day."
   },
+  cycling: {
+    label:"Cycling Event",
+    events:["Cycling Time Trial"],
+    taperWeeks:2,
+    simulationEvery:3,
+    priorities:["aerobic volume consistency","threshold power","event pacing","position durability","taper freshness"],
+    progression:"Build easy riding volume first, then extend threshold and event-paced work while protecting the long ride and strength support.",
+    missedRule:"Do not stack missed intensity. Preserve the long ride and one quality session, then resume the plan.",
+    readinessYellow:"Keep the planned duration but convert threshold or event-paced work to easy spinning when recovery is compromised.",
+    readinessRed:"Use easy spinning, walking, mobility, or rest. Remove hard intervals and long event simulations.",
+    eventDay:"Use the rehearsed warm-up, pacing, position, equipment, hydration, and fueling plan. Nothing new on event day."
+  },
   multisport: {
     label:"Multisport Endurance",
     events:["Triathlon"],
@@ -153,6 +165,15 @@ function eventSpecificPlan(){
       recoveryEntry("Sunday")
     ];
   }
+  if(familyId==="cycling")return [
+    eventEntry("Monday","S-1 Upper Strength","Cyclist Strength A",taper?"Brief durability work with no soreness":"Single-leg strength, posterior chain, trunk, and position durability",taper?30:45,"strength_support"),
+    eventEntry("Tuesday","R-4 Intervals","Bike Quality",taper?"Short event-pace sharpening with full recovery":"Threshold, VO₂, or event-paced cycling selected for the phase",taper?35:60,"bike_quality"),
+    eventEntry("Wednesday","R-2 Easy Run","Easy Endurance Ride","Conversational spinning that builds aerobic volume and supports recovery",taper?30:50,"easy"),
+    eventEntry("Thursday","S-2 Lower Strength","Cyclist Strength B",taper?"Light technique and tissue-capacity work":"Lower-volume strength, single-leg control, calves, hips, and trunk",taper?25:45,"strength_support"),
+    eventEntry("Friday","R-2 Easy Run","Recovery Spin + Cadence","Low-stress riding with relaxed cadence drills and position practice",taper?25:40,"easy"),
+    eventEntry("Saturday","R-5 Long Run",sim?"Cycling Event Rehearsal":"Long Endurance Ride",taper?"Reduced long ride with short event-pace rehearsal":sim?"Controlled event-specific pacing, equipment, hydration, and fueling rehearsal":"Progressive long-ride durability at an appropriately easy effort",taper?50:100,"long"),
+    recoveryEntry("Sunday")
+  ];
   if(familyId==="multisport")return [
     eventEntry("Monday","R-2 Easy Run","Swim Technique + Aerobic","Technique-led swimming with relaxed aerobic volume",45,"swim"),
     eventEntry("Tuesday","R-4 Intervals","Bike Quality",taper?"Short race-pace cycling with full recovery":"Threshold or race-specific bike intervals with controlled power",taper?35:60,"bike_quality"),
@@ -208,8 +229,8 @@ function eventSpecificPlan(){
     eventEntry("Monday","B-1 Chest & Back","Physique Upper A","Maintain muscle, symmetry, and weak-point quality without unnecessary failure",taper?40:70,"hypertrophy"),
     eventEntry("Tuesday","B-2 Legs","Physique Lower A",taper?"Low-soreness pump and technique only":"Productive lower-body volume matched to division and recovery",taper?35:70,"hypertrophy"),
     eventEntry("Wednesday","R-2 Easy Run","Contest Prep Cardio","Low-impact aerobic work at a recoverable effort",taper?20:35,"cardio"),
-    eventEntry("Thursday","B-3 Shoulders & Arms","Physique Upper B","Delts, arms, presentation muscles, symmetry, and weak points",taper?35:65,"hypertrophy"),
-    eventEntry("Friday","R-2 Easy Run","Cardio + Presentation Practice","Low-impact cardio followed by brief stage-presentation practice",taper?20:35,"cardio_skill"),
+    eventEntry("Thursday","B-3 Shoulders & Arms","Physique Upper B","Delts, arms, symmetry, and weak-point development",taper?35:65,"hypertrophy"),
+    eventEntry("Friday","R-2 Easy Run","Cardio + Mobility","Low-impact cardio followed by brief mobility and recovery work",taper?20:35,"cardio_recovery"),
     eventEntry("Saturday","B-4 Back & Posterior","Physique Lower / Posterior B",taper?"Brief full-body pump; avoid soreness":"Posterior chain, glutes, back detail, and division-specific emphasis",taper?35:70,"hypertrophy"),
     eventEntry("Sunday","R-2 Easy Run","Recovery Cardio + Mobility","Easy low-impact movement, mobility, and recovery monitoring",taper?15:30,"recovery")
   ];

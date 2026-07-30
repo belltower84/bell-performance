@@ -5,12 +5,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <meta content="#0b1220" name="theme-color"/>
+<meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
-<title>Bell Performance 13.6.5 — Recovery Day Flow</title>
+<link href="./assets/logo-shield.svg?v=13720" rel="icon" type="image/svg+xml"/>
+<title>Bell Performance 13.7.2 — First Flight & Mission Alignment</title>
 <link href="./css/app.css?v=13710" rel="stylesheet"/>
+<link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
 <link href="./css/bell13.css?v=13300" rel="stylesheet"/>
 <link href="./css/bell134.css?v=13620" rel="stylesheet"/>
 <link href="./css/bell135.css?v=13610" rel="stylesheet"/>
@@ -667,11 +670,11 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.6.5-recovery-day-flow";</script>
+<script>window.BELL_APP_VERSION = "13.7.2-first-flight-mission-alignment";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=13710"></script>
-<script src="./js/storage.js?v=13610"></script>
-<script src="./js/readiness.js?v=13610"></script>
+<script src="./js/storage.js?v=13720"></script>
+<script src="./js/readiness.js?v=13720"></script>
 <script src="./js/equipment.js?v=13640"></script>
 <script>{const grid=document.getElementById("equipmentGrid");if(grid)grid.innerHTML=equipmentCheckboxesHtml("equipment");const onboardingGrid=document.getElementById("onboardingEquipmentGrid");if(onboardingGrid)onboardingGrid.innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");}</script>
 <script src="./js/training-blocks.js?v=13600"></script>
@@ -691,23 +694,24 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/version-8.js?v=13600"></script>
 <script src="./js/mission-planner.js?v=10006"></script>
 <script src="./js/coaching-pathways.js?v=13600"></script>
-<script src="./js/event-coaching.js?v=13600"></script>
-<script src="./js/how-to.js?v=10006"></script>
+<script src="./js/event-coaching.js?v=13721"></script>
+<script src="./js/how-to.js?v=13721"></script>
 <script src="./js/premium-dashboard.js?v=11000"></script>
 <script src="./js/block-lifecycle.js?v=10006"></script>
-<script src="./js/weekly-debrief.js?v=10006"></script>
+<script src="./js/weekly-debrief.js?v=13720"></script>
 <script src="./js/plan-progress.js?v=10006"></script>
 <script src="./js/bell-api.js?v=13600"></script>
 <script src="./js/api-integration.js?v=12101"></script>
 <script src="./js/dashboard-command-center.js?v=13650"></script>
-<script src="./js/adaptive-weekly-schedule.js?v=12240"></script>
+<script src="./js/adaptive-weekly-schedule.js?v=13722"></script>
 <script src="./js/powerlifting-programming.js?v=12212"></script>
 <script src="./js/powerlifting-meet-prep.js?v=12213"></script>
 <script src="./js/app.js?v=12101"></script>
 <script src="./js/bell-coaching-engine.js?v=13200"></script>
 <script src="./js/bell13-dashboard.js?v=13200"></script>
 <script src="./js/bell13-athlete-experience.js?v=13650"></script>
+<script src="./js/first-flight-1372.js?v=13721"></script>
 <script src="./js/bell13-coach-intelligence.js?v=13620"></script>
-<script src="./js/bell13-commercial-home.js?v=13650"></script>
+<script src="./js/bell13-commercial-home.js?v=13722"></script>
 </body>
 </html>

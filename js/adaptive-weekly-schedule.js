@@ -203,6 +203,16 @@ function bellPartialWeekTargets(base,remainingDays){
   const caps={0:{strength:0,engine:0},1:{strength:1,engine:0},2:{strength:1,engine:1},3:{strength:2,engine:2},4:{strength:3,engine:2}}[n]||base;
   return {strength:Math.min(base.strength,caps.strength),engine:Math.min(base.engine,caps.engine)};
 }
+function bellMissionAlignedExposureTargets(base,block,remainingDays){
+  const n=remainingDays.length,mission=block?.mission||{};
+  const eventText=`${mission.eventType||""} ${mission.developmentGoal||""} ${data.settings?.primaryTrainingIdentity||""}`.toLowerCase();
+  if(mission.path==="event"&&/bodybuilding|physique/.test(eventText)){
+    if(n<=1)return {strength:n,engine:0};
+    const engine=n>=3?1:0;
+    return {strength:Math.min(Number(base.strength)||4,Math.max(1,n-engine),4),engine:Math.min(Number(base.engine)||1,engine)};
+  }
+  return base;
+}
 function bellTrimPlanToTargets(plan,targets){
   const strength=plan.filter(x=>bellSessionProfile(x).strength),engine=plan.filter(x=>bellSessionProfile(x).engine),other=plan.filter(x=>!bellSessionProfile(x).strength&&!bellSessionProfile(x).engine&&!bellSessionProfile(x).mobility);
   const strengthOrder=['strength-upper-primary','strength-lower-primary','strength-upper-secondary','strength-lower-secondary','strength-full-body'];
@@ -215,7 +225,8 @@ function bellApplyAvailabilityToWeek(block,week,plan){
   if(choice.mode==="vacation")return [];
   const effectiveDays=bellWeekOneRemainingDays(block,week,choice.days);
   const baseTargets=typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2};
-  const targets=bellPartialWeekTargets(baseTargets,effectiveDays);
+  const missionTargets=bellMissionAlignedExposureTargets(baseTargets,block,effectiveDays);
+  const targets=bellPartialWeekTargets(missionTargets,effectiveDays);
   const integrated=bellIntegrateMobilityAndCore(plan);
   const generated=bellEnsureDisciplineExposures(integrated,block,targets);
   const trimmed=bellTrimPlanToTargets(generated,targets);

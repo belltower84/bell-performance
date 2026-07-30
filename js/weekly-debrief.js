@@ -70,7 +70,7 @@ function hasIncompleteSundayTraining(){
 }
 function remainingWeekSessions(){return(data.plan||[]).filter(x=>x.status!=="replaced"&&!x.done&&x.status!=="completed");}
 function openWeeklyDebrief(manual=false){
-  if(!data.trainingBlock?.enabled){alert("Create or activate a training block first.");return false;}
+  if(!data.trainingBlock?.enabled){if(manual)alert("Create or activate a training block first.");return false;}
   const isSunday=new Date().getDay()===0;
   if(!manual&& !isSunday)return false;
   if(!manual&&hasIncompleteSundayTraining())return false;

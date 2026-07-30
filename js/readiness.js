@@ -147,8 +147,16 @@ function saveDailyReadinessPrompt() {
   }
   commitReadiness(collectQuickReadinessFromPrompt());
   document.getElementById("dailyReadinessModal")?.classList.add("hidden");
-  saveData();
+  const launchTour=Boolean(data.settings.pendingFirstFlightTour&&!data.settings.firstFlightTourComplete);
+  saveData({render:false});
   renderApp();
+  if(launchTour){
+    data.settings.pendingFirstFlightTour=false;
+    saveData({render:false});
+    window.setTimeout(()=>{
+      if(typeof launchFirstFlightTour==="function")launchFirstFlightTour();
+    },300);
+  }
 }
 
 function readinessSliderLabel(name,value){

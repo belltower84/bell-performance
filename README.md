@@ -1,6 +1,6 @@
-# Bell Performance 13.6.5 — Recovery Day Flow
+# Bell Performance 13.7.2 — First Flight & Mission Alignment
 
-Bell Performance is a local-first training application with two control modes. Version 13.6.5 streamlines recovery-only days so the primary dashboard action launches the recovery session directly, while recovery viewing and options remain functional and consistent.
+Bell Performance is a local-first training application with Bell Coach and Workout Planner control modes. Version 13.7.2 rebuilds First Flight, moves readiness into the normal dashboard check-in, updates the guided tour, and aligns each event-preparation selection with the correct programming and coaching family.
 
 ## Product blueprint
 
@@ -25,15 +25,16 @@ Bell separates who the athlete is becoming from the objective being pursued now.
 
 The seven-step onboarding flow captures:
 
-- athlete baseline;
+- athlete profile, Sex, current and desired weight;
+- optional strength, Olympic-lifting, and endurance baselines;
 - application control mode and training identity;
-- current objective and Journey mode;
-- normal training availability;
-- experience and strength baselines;
-- recovery and mode-specific preferences;
+- Continuous Development or Event Preparation, followed by the specific objective or event;
+- normal training availability and session length;
+- experience and current limitations;
+- recovery and communication preferences with live message previews;
 - final Journey review.
 
-Powerlifting requires squat, bench press, and deadlift maxes. Event Preparation requires a named event and future date.
+Readiness is collected after First Flight with the same 10-second check-in used every day. The guided tour begins after that first check-in and finishes on the dashboard without reopening onboarding.
 
 ## Settings Control Center
 
@@ -59,10 +60,12 @@ Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, 
 
 ## Documentation
 
+- [`BELL_PRODUCT_BLUEPRINT.md`](BELL_PRODUCT_BLUEPRINT.md)
 - [`BELL_ATHLETE_EXPERIENCE_13_3.md`](BELL_ATHLETE_EXPERIENCE_13_3.md)
 - [`BELL_COACHING_ENGINE_13_2.md`](BELL_COACHING_ENGINE_13_2.md)
-- [`RELEASE_NOTES_13_6_5.md`](RELEASE_NOTES_13_6_5.md)
-- [`VALIDATION_13_6_5.md`](VALIDATION_13_6_5.md)
+- [`RELEASE_NOTES_13_7_2.md`](RELEASE_NOTES_13_7_2.md)
+- [`VALIDATION_13_7_2.md`](VALIDATION_13_7_2.md)
+- [`REAL_WORLD_TESTING_13_7_2.md`](REAL_WORLD_TESTING_13_7_2.md)
 
 ## Local use
 
@@ -101,6 +104,9 @@ Bell Coach now produces structured explanations, separates known facts from infe
 
 
 
+
+## Bell Performance 13.7.2
+13.7.2 rebuilds First Flight, separates Continuous Development from Event Preparation, expands optional athlete baselines, moves readiness to the standard daily check-in, repairs the guided-tour completion route, and aligns physique, powerlifting, endurance, tactical, cycling, and functional events with their correct coaching families.
 
 ## Bell Performance 13.6.5
 13.6.5 streamlines recovery-only days. **Start Recovery** now opens the prescribed recovery session immediately, **View Recovery** is functional, and **Recovery Options** retains access to readiness and recovery controls without forcing an extra drawer step before training.

@@ -9,7 +9,7 @@
   let selectedWeekKey="";
   let weekDays=[];
 
-  function athlete(){return clean(window.data?.settings?.athleteProfile?.preferredName||window.data?.settings?.athleteProfile?.firstName||window.data?.settings?.name||"Athlete");}
+  function athlete(){const appData=typeof data!=="undefined"?data:window.data;return clean(appData?.athleteProfile?.demographics?.preferredName||appData?.athleteProfile?.demographics?.firstName||appData?.settings?.athleteName||appData?.settings?.name||"Athlete");}
   function greeting(){const h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening";}
   function controlMode(){try{return typeof bellAppControlMode==="function"?bellAppControlMode():(window.data?.settings?.appControlMode==="planner"?"planner":"coach");}catch(_){return "coach";}}
   function state(){try{return window.BellCoachingEngine?.getState({persist:false})||{};}catch(_){return {};}}

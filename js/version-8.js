@@ -40,6 +40,10 @@ function markPlannedSessionComplete(completed){
   }
   if(!key){console.error("Bell: planned item found but session key could not be resolved",{completed,item});return false;}
   item.sessionCompletions[key]=completed.completedAt||new Date().toISOString();
+  // Keep the completed workout linked to the exact normalized plan/session identity.
+  completed.planId=item.id;
+  completed.planSessionKey=key;
+  completed.scheduledDate=completed.scheduledDate||item.scheduledDate||planDateKey(item);
   const prescribed=sessions.filter(session=>!String(session.mission||"").startsWith("M-")&&!session.optionalCore);
   item.done=prescribed.length>0&&prescribed.every(session=>Boolean(item.sessionCompletions[session.sessionKey]));
   item.status=item.done?"completed":"planned";

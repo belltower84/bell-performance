@@ -396,10 +396,27 @@ function deleteHistoryRecord(){const index=Number(byId("historyEditIndex").value
 
 function currentDayName(dateKey=selectedDashboardDateKey()){return new Intl.DateTimeFormat("en-US",{weekday:"long"}).format(localDateFromKey(dateKey));}
 function sessionCompletionKey(planItem, slot, sessionIndex){return `${planItem.id||planItem.day}:${slot}${Number.isInteger(sessionIndex)?`:${sessionIndex}`:""}`;}
+function bellCanonicalCompletionMission(value){return typeof bellCanonicalWorkoutMission==="function"?bellCanonicalWorkoutMission(value):String(value||"");}
+function bellHistoryCompletesPlannedSession(item,sessionKey,mission,scheduledDate){
+  const same=(a,b)=>String(a??"")===String(b??"");
+  const targetMission=bellCanonicalCompletionMission(mission);
+  const targetDate=scheduledDate||item?.scheduledDate||(typeof planDateKey==="function"?planDateKey(item):"");
+  return (data.history||[]).some(record=>{
+    if(!(record?.completed||record?.status==="completed"))return false;
+    if(record.planSessionKey&&same(record.planSessionKey,sessionKey))return true;
+    if(record.planId&&!same(record.planId,item?.id))return false;
+    const recordDate=record.scheduledDate||String(record.completedAt||"").slice(0,10);
+    if(targetDate&&recordDate&&recordDate!==targetDate)return false;
+    return same(bellCanonicalCompletionMission(record.name||record.mission),targetMission);
+  });
+}
+function bellPlannedSessionCompleted(item,sessionKey,mission,scheduledDate){
+  return Boolean(item?.sessionCompletions?.[sessionKey]||item?.done||bellHistoryCompletesPlannedSession(item,sessionKey,mission,scheduledDate));
+}
 function sessionsFromPlanItem(item){
   if(!item)return[];
   const sessions=[];
-  const push=(session,slot,index)=>{if(!session?.mission)return;const sessionKey=sessionCompletionKey(item,slot,index);sessions.push({...session,sessionKey,completed:Boolean(item.sessionCompletions?.[sessionKey]||item.done),scheduledDate:item.scheduledDate||planDateKey(item)});};
+  const push=(session,slot,index)=>{if(!session?.mission)return;const sessionKey=sessionCompletionKey(item,slot,index),scheduledDate=item.scheduledDate||planDateKey(item);sessions.push({...session,sessionKey,completed:bellPlannedSessionCompleted(item,sessionKey,session.mission,scheduledDate),scheduledDate});};
   push({mission:item.mission,label:item.customLabel,detail:item.detail,prescribedDuration:item.prescribedDuration,primary:true,planId:item.id},"primary");
   push({mission:item.secondaryMission,label:item.secondaryLabel,detail:item.secondaryDetail,prescribedDuration:item.secondaryDuration,primary:false,planId:item.id},"secondary");
   if(Array.isArray(item.sessions))item.sessions.forEach((session,index)=>push({mission:session.mission,label:session.label||session.customLabel,detail:session.detail,prescribedDuration:session.prescribedDuration||session.duration,primary:false,planId:item.id,sessionIndex:index},"session",index));

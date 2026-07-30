@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-7-15";
+const CACHE_NAME = "bell-performance-13-7-16";
 const CORE = [
   "./",
   "./index.html",

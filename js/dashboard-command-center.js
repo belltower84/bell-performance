@@ -113,7 +113,7 @@ renderPremiumMission=function(){
   const completed=sessions.filter(x=>x.completed).length,total=sessions.length,target=commandFirstIncompleteSession(sessions),futureDay=key>today;
   commandSetText('premiumCompletionCount',completed);commandSetText('premiumCompletionTotal',`of ${total}`);commandSetText('premiumCompletionLabel',total?(completed===total?'MISSION COMPLETE':'COMPLETE'):'REST DAY');
   const strength=sessions.find(x=>premiumSessionType(x)==='strength'),engine=sessions.find(x=>premiumSessionType(x)==='engine');
-  const title=!sessions.length?'Recovery Day':strength&&engine?`${premiumDisplayLabel(strength)} + ${premiumDisplayLabel(engine)}`:sessions.map(premiumDisplayLabel).join(' + ');
+  const title=!sessions.length?'Recovery Day':(typeof bellCombinedWorkoutDisplayLabel==='function'?bellCombinedWorkoutDisplayLabel(sessions):(strength&&engine?`${premiumDisplayLabel(strength)} + ${premiumDisplayLabel(engine)}`:sessions.map(premiumDisplayLabel).join(' + ')));
   const purpose=!sessions.length?'Recover, move well, and prepare for the next prescribed session.':premiumSessionDescription(strength||engine||sessions[0]);
   const duration=sessions.reduce((sum,session)=>sum+(Number(session.prescribedDuration)||Number(scaledTemplate(session.mission)?.duration)||30),0),types=[strength?'Strength':'',engine?'Engine':''].filter(Boolean).join(' + ')||'Recovery';
   const coachMode=typeof bellCoachModeEnabled!=='function'||bellCoachModeEnabled();
@@ -127,12 +127,26 @@ renderPremiumMission=function(){
       start.onclick=()=>commandOpenRecoverySession(key);
     }else if(futureDay){start.textContent='☷ Preview Workout';start.onclick=()=>commandSessionCall(target,'preview');}
     else if(completed===total){start.textContent='✓ Mission Complete';start.onclick=()=>showScreen('history');}
-    else{const active=data.activeWorkout?.planSessionKey===target?.sessionKey;start.textContent=active?'▶ Resume Workout':'▶ Start Workout';start.onclick=()=>commandSessionCall(target,'start');}
+    else if(strength&&engine){
+      const strengthActive=data.activeWorkout?.planSessionKey===strength.sessionKey;
+      const strengthDone=Boolean(strength.completed);
+      start.textContent=strengthDone?'✓ Strength Complete':strengthActive?'▶ Resume Strength':'▶ Start Strength';
+      start.disabled=strengthDone;
+      start.onclick=strengthDone?null:()=>commandSessionCall(strength,'start');
+    }else{const active=data.activeWorkout?.planSessionKey===target?.sessionKey;start.textContent=active?'▶ Resume Workout':'▶ Start Workout';start.onclick=()=>commandSessionCall(target,'start');}
   }
   if(view){
-    view.disabled=sessions.length?!target:false;
-    view.textContent=sessions.length?'☷ View Session':'View Recovery';
-    view.onclick=sessions.length?()=>commandSessionCall(target,'preview'):()=>commandOpenRecoverySession(key);
+    if(strength&&engine&&!futureDay){
+      const engineActive=data.activeWorkout?.planSessionKey===engine.sessionKey;
+      const engineDone=Boolean(engine.completed);
+      view.disabled=engineDone;
+      view.textContent=engineDone?'✓ Engine Complete':engineActive?'▶ Resume Engine':'▶ Start Engine';
+      view.onclick=engineDone?null:()=>commandSessionCall(engine,'start');
+    }else{
+      view.disabled=sessions.length?!target:false;
+      view.textContent=sessions.length?'☷ View Session':'View Recovery';
+      view.onclick=sessions.length?()=>commandSessionCall(target,'preview'):()=>commandOpenRecoverySession(key);
+    }
   }
   if(modify){
     modify.disabled=sessions.length?(!target||futureDay):false;

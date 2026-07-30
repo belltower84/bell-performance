@@ -223,10 +223,11 @@ function openWorkoutUI() {
   const female = (data.settings.sex || "Male") === "Female";
   document.body.classList.toggle("engine-session", isEngine);
   document.body.classList.toggle("female-session", female);
-  const title = active.cardioType?`${active.label||active.name} • ${active.cardioType}`:(active.label||active.name);
+  const displayTitle = typeof bellWorkoutDisplayLabel==='function' ? bellWorkoutDisplayLabel(active) : (active.label||active.name);
+  const title = active.cardioType&&displayTitle!==active.cardioType?`${displayTitle} • ${active.cardioType}`:displayTitle;
   document.getElementById("activeTitle").textContent=title;
   setText("activeTrainingType", active.optionalCore ? "Optional Core Training" : (isEngine ? "Engine Training" : "Strength Training"));
-  setText("workoutHeroTitle", active.label || active.name);
+  setText("workoutHeroTitle", displayTitle);
   setText("workoutHeroFocus", active.focus?.length ? active.focus.join(" • ") : (active.optionalCore ? "Train the trunk without compromising the primary plan." : (isEngine ? "Build sustainable capacity with controlled effort." : "Execute quality sets with strong technique.")));
   setText("workoutHeroDuration", `${active.duration} min`);
   setText("workoutHeroStatus", active.intensity || "Moderate");
@@ -245,7 +246,8 @@ function openWorkoutUI() {
 
 function renderMissionBriefing(active){
   if(!active)return;
-  setText("workoutBriefHeading", `${active.label || active.name} supports the current mission`);
+  const displayTitle=typeof bellWorkoutDisplayLabel==='function'?bellWorkoutDisplayLabel(active):(active.label||active.name);
+  setText("workoutBriefHeading", `${displayTitle} supports the current mission`);
   setText("workoutCoachBrief", active.coachBrief || "Execute the prescribed work with deliberate technique and controlled effort.");
   const focus=document.getElementById("workoutFocusList");
   if(focus)focus.innerHTML=(active.focus||[]).map(item=>`<span>${item}</span>`).join("");
@@ -316,7 +318,7 @@ function previewPlannedWorkout(planId,sessionKey,name){
 function previewActiveWorkout(){if(!data.activeWorkout)return;openWorkoutPreview(data.activeWorkout,()=>{closeWorkoutPreview();beginWorkoutFlow();});}
 function openWorkoutPreview(workout,onBegin){
   if(!workout)return;const modal=document.getElementById('workoutPreviewModal'),content=document.getElementById('workoutPreviewContent');
-  setText('workoutPreviewTitle',workout.label||workout.name);setText('workoutPreviewMeta',`${workout.duration||30} minutes · ${(workout.exercises||[]).length} exercises`);
+  setText('workoutPreviewTitle',typeof bellWorkoutDisplayLabel==='function'?bellWorkoutDisplayLabel(workout):(workout.label||workout.name));setText('workoutPreviewMeta',`${workout.duration||30} minutes · ${(workout.exercises||[]).length} exercises`);
   const warmups=(workout.exercises||[]).filter(x=>String(x.block||'').toLowerCase().includes('warm'));
   const main=(workout.exercises||[]).filter(x=>!String(x.block||'').toLowerCase().includes('warm'));
   const rows=list=>list.map((x,i)=>`<div class="preview-exercise-row"><span>${i+1}</span><div><strong>${escapeHtml(x.name)}</strong><small>${x.prescription||`${x.sets||''} × ${x.reps||''}`}</small></div></div>`).join('');

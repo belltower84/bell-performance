@@ -15,7 +15,7 @@
   function state(){try{return window.BellCoachingEngine?.getState({persist:false})||{};}catch(_){return {};}}
   function currentSessions(){try{return typeof premiumAllSessions==='function'?premiumAllSessions():[];}catch(_){return [];}}
   function todayDateKey(){try{return typeof todayKey==='function'?todayKey():new Date().toISOString().slice(0,10);}catch(_){return new Date().toISOString().slice(0,10);}}
-  function sessionLabel(s){try{return clean(s?.label||scaledTemplate(s?.mission)?.label||s?.mission||"Training");}catch(_){return clean(s?.label||s?.mission||"Training");}}
+  function sessionLabel(s){try{return typeof bellWorkoutDisplayLabel==="function"?bellWorkoutDisplayLabel(s):clean(s?.label||scaledTemplate(s?.mission)?.label||s?.mission||"Training");}catch(_){return clean(s?.label||s?.mission||"Training");}}
   function sessionType(s){try{return clean(typeof premiumSessionType==='function'?premiumSessionType(s):"training").toLowerCase();}catch(_){return "training";}}
   function sessionMinutes(s){try{return Number(s?.prescribedDuration)||Number(scaledTemplate(s?.mission)?.duration)||30;}catch(_){return Number(s?.prescribedDuration)||30;}}
   function sessionPurpose(s){
@@ -29,7 +29,7 @@
     if(!sessions.length)return {title:"Recovery Day",purpose:"Recover, move well, and prepare for the next training day.",minutes:"Flexible",type:"Recovery",sessions:[]};
     const first=sessions.find(s=>!s.completed)||sessions[0];
     const total=sessions.reduce((n,s)=>n+sessionMinutes(s),0);
-    const title=sessions.length>1?`${sessionLabel(first)} + ${sessionLabel(sessions.find(s=>s!==first)||sessions[1])}`:sessionLabel(first);
+    const title=typeof bellCombinedWorkoutDisplayLabel==='function'?bellCombinedWorkoutDisplayLabel(sessions):(sessions.length>1?`${sessionLabel(first)} + ${sessionLabel(sessions.find(s=>s!==first)||sessions[1])}`:sessionLabel(first));
     const s=state();
     return {title,purpose:clean(s.currentPhase?.purpose||text('commandMissionPurpose')||"Complete the prescribed work with controlled effort and quality execution."),minutes:`${total} min`,type:sessions.map(sessionType).join(" + "),sessions};
   }
@@ -63,7 +63,7 @@
     const detail=sessions.map(sessionPurpose).find(Boolean)||state().currentPhase?.purpose||"Complete the scheduled work with quality effort and controlled execution.";
     return {
       key,name,date:dateLabel(key),sessions,totalMinutes,types,labels,
-      title:labels.length?labels.join(' + '):'Recovery Day',
+      title:typeof bellCombinedWorkoutDisplayLabel==='function'?bellCombinedWorkoutDisplayLabel(sessions):(labels.length?labels.join(' + '):'Recovery Day'),
       detail:labels.length?clean(detail):'Recover, move well, and maintain normal daily activity.',
       status:!sessions.length?'Recovery':allComplete?'Complete':someComplete?'In progress':'Planned',
       statusClass:!sessions.length?'recovery':allComplete?'complete':someComplete?'active':'planned',

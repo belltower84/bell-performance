@@ -35,26 +35,8 @@ function premiumSelectedItems(){return bellActivePlanItemsForDate(selectedDashbo
 function premiumAllSessions(){return premiumSelectedItems().flatMap(sessionsFromPlanItem);}
 function premiumSessionType(session){return scheduleTypeForMission(session?.mission,session?.label,session?.detail)||'strength';}
 function premiumDisplayLabel(session){
-  const raw=String(session?.label||scaledTemplate(session?.mission)?.label||session?.mission||'Training')
-    .replace(/^\s*(?:AM|A\.?M\.?|PM|P\.?M\.?)\s*[-–—:|•]*\s*/i,'')
-    .replace(/\s*[-–—:|•]*\s*(?:AM|A\.?M\.?|PM|P\.?M\.?)\s*$/i,'')
-    .replace(/\s*\((?:AM|A\.?M\.?|PM|P\.?M\.?)\)\s*/ig,' ')
-    .trim();
-  const type=premiumSessionType(session);
-  if(type==='engine'){
-    return raw
-      .replace(/^\s*(?:engine|conditioning|cardio)\s*[-–—:|•]*\s*/i,'')
-      .replace(/\s*[-–—:|•]*\s*(?:engine|conditioning|cardio)\s*$/i,'')
-      .trim()||String(data.settings?.cardioType||'Engine');
-  }
-  const parts=raw.split(/\s+[—–|:]\s+/).map(x=>x.trim()).filter(Boolean);
-  if(parts.length>1&&/\b(?:upper|lower|full body|strength|hypertrophy|power|powerbuilding|bodybuilding|session|workout)\b/i.test(parts[0])){
-    return parts.slice(1).join(' — ');
-  }
-  return raw
-    .replace(/^\s*(?:upper|lower|full body)?\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|training|workout|session)(?:\s+[A-Z])?\s*[-–—:|•]*\s*/i,'')
-    .replace(/\s*[-–—:|•]*\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|training|workout|session)\s*$/i,'')
-    .trim()||'Full Body';
+  if(typeof bellWorkoutDisplayLabel==="function")return bellWorkoutDisplayLabel(session);
+  return String(session?.label||scaledTemplate(session?.mission)?.label||session?.mission||"Training").trim();
 }
 function premiumInlineIcon(kind){
   const icons={
@@ -130,7 +112,7 @@ function renderPremiumMission(){
 }
 
 function premiumWeekSessionChip(session){
-  const type=premiumSessionType(session), title=escapeHtml(session.label||scaledTemplate(session.mission)?.label||session.mission);
+  const type=premiumSessionType(session), title=escapeHtml(premiumDisplayLabel(session));
   return `<div class="premium-week-chip ${type} ${session.completed?'completed':''}" title="${title}">${premiumInlineIcon(type)}${session.completed?'<i class="premium-week-chip-check">✓</i>':''}</div>`;
 }
 function premiumWeekRestChip(){return `<div class="premium-week-chip rest" title="Rest day">${premiumInlineIcon('rest')}</div>`;}
@@ -150,7 +132,7 @@ function renderPremiumWeek(){
   const host=byId('premiumWeekDays');if(!host)return;
   host.innerHTML=days.map((day,index)=>{
     const key=addLocalDays(monday,index),items=plan.filter(x=>(x.day===fullDays[index]||planDateKey(x)===key)&&!['skipped','replaced'].includes(x.status)),sessions=items.flatMap(sessionsFromPlanItem),allDone=sessions.length&&sessions.every(x=>x.completed),chips=sessions.length?sessions.slice(0,2).map(premiumWeekSessionChip).join(''):premiumWeekRestChip();
-    const label=sessions.length?sessions.map(x=>x.label||scaledTemplate(x.mission)?.label||x.mission).join(', '):'Rest / recovery';
+    const label=sessions.length?sessions.map(premiumDisplayLabel).join(', '):'Rest / recovery';
     const isActive=block===data.trainingBlock&&week===Number(block.currentWeek||1);
     const action=isActive?`setDashboardDate('${key}')`:`bpPreviewWeek(${week})`;
     return `<button class="premium-week-day-card ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''} ${sessions.length>1?'two-a-day':''}" onclick="${action}" aria-label="${day} ${localDateFromKey(key).getDate()}: ${escapeHtml(label)}"><span>${day}</span><strong>${localDateFromKey(key).getDate()}</strong><div class="premium-week-chips">${chips}</div></button>`;
@@ -220,7 +202,7 @@ function renderPremiumNext(){
   }
   if(!found){setText('premiumNextTitle','No upcoming session');setText('premiumNextDetail','Open the full schedule to plan ahead.');return;}
   const date=localDateFromKey(found.key), template=scaledTemplate(found.session.mission);
-  setText('premiumNextTitle',`${date.toLocaleDateString('en-US',{weekday:'long'})} · ${found.session.label||template?.label||found.session.mission}`);
+  setText('premiumNextTitle',`${date.toLocaleDateString('en-US',{weekday:'long'})} · ${premiumDisplayLabel(found.session)}`);
   setText('premiumNextDetail',`${Number(found.session.prescribedDuration)||Number(template?.duration)||30} min · Tap for full schedule`);
 }
 function renderPremiumDashboard(){renderPremiumQuote();renderPremiumReadiness();renderPremiumMission();renderPremiumNext();renderPremiumSupport();renderPremiumProgress();renderPremiumCoach();renderPremiumStandards();}

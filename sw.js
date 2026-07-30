@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13.7.4-guided-tour-visibility-r1';
+const CACHE_NAME = 'bell-performance-13.7.5-settings-flow-r1';
 const CORE = [
   "./",
   "./index.html",
@@ -11,6 +11,7 @@ const CORE = [
   "./css/bell135.css?v=13610",
   "./css/bell1364.css?v=13640",
   "./css/guided-tour-1374.css?v=13740",
+  "./css/settings-1375.css?v=13750",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/logo-shield.svg?v=13720",
   "./assets/icons/engine-shoe.svg?v=10006",
@@ -71,6 +72,7 @@ const CORE = [
   "./js/first-flight-1372.js?v=13721",
   "./js/bell13-coach-intelligence.js?v=13620",
   "./js/bell13-commercial-home.js?v=13722",
+  "./js/settings-1375.js?v=13750",
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

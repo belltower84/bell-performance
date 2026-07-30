@@ -101,7 +101,7 @@
       let done=0,total=0;
       weekDays=names.map((name,i)=>{
         const key=addLocalDays(monday,i);
-        const items=plan.filter(x=>(x.day===full[i]||planDateKey(x)===key)&&!['skipped','replaced'].includes(x.status));
+        const items=plan.filter(x=>!['skipped','replaced'].includes(x.status)&&((typeof bellCanonicalPlanDateKey==='function'?bellCanonicalPlanDateKey(x,block,week):planDateKey(x))===key));
         const model=weekDayModel(key,full[i],items);
         total+=model.sessions.length;
         done+=model.sessions.filter(x=>x.completed).length;
@@ -135,6 +135,7 @@
 
   function render(){
     if(!$("b135Home"))return;
+    if(typeof bellRepairActivePlanDates==='function')bellRepairActivePlanDates();
     const s=state(),m=todayMission(),mode=controlMode(),coachMode=mode==="coach";
     $("b135Home").dataset.control=mode;
     $("b135Greeting").textContent=greeting();$("b135Athlete").textContent=athlete();$("b135WelcomeLine").textContent=coachMode?"Your plan, readiness, and coaching direction for today.":"Your workout plan and readiness at a glance.";$("b135MissionTitle").textContent=m.title;$("b135MissionPurpose").textContent=m.purpose;$("b135MissionDuration").textContent=m.minutes;renderSessions(m);renderWeek();

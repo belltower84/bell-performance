@@ -405,16 +405,16 @@ function sessionsFromPlanItem(item){
   if(Array.isArray(item.sessions))item.sessions.forEach((session,index)=>push({mission:session.mission,label:session.label||session.customLabel,detail:session.detail,prescribedDuration:session.prescribedDuration||session.duration,primary:false,planId:item.id,sessionIndex:index},"session",index));
   return sessions.filter(x=>!String(x.mission||'').startsWith('M-'));
 }
-function dashboardPrimaryPlanItem(){const key=selectedDashboardDateKey();return(data.plan||[]).find(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status))||null;}
+function dashboardPrimaryPlanItem(){const key=selectedDashboardDateKey();const items=typeof bellActivePlanItemsForDate==='function'?bellActivePlanItemsForDate(key):(data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status));return items[0]||null;}
 function dashboardSessionsForToday(){
   const key=selectedDashboardDateKey();
-  const items=(data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status));
+  const items=typeof bellActivePlanItemsForDate==='function'?bellActivePlanItemsForDate(key):(data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status));
   const sessions=items.flatMap(sessionsFromPlanItem).filter(session=>!session.completed);
   const unique=[];
   sessions.forEach(session=>{const identity=session.sessionKey; if(!unique.some(x=>x.sessionKey===identity))unique.push(session);});
   return unique;
 }
-function beginPlannedWorkout(planId,sessionKey,mission){const item=(data.plan||[]).find(x=>x.id===planId);beginWorkout(mission,{planId,sessionKey,scheduledDate:item?.scheduledDate||selectedDashboardDateKey()});}
+function beginPlannedWorkout(planId,sessionKey,mission){const item=(data.plan||[]).find(x=>x.id===planId);const scheduledDate=typeof bellCanonicalPlanDateKey==='function'?bellCanonicalPlanDateKey(item,data.trainingBlock,Number(data.trainingBlock?.currentWeek||1)):(item?.scheduledDate||selectedDashboardDateKey());beginWorkout(mission,{planId,sessionKey,scheduledDate});}
 function optionalSessionHtml(primaryType){if(primaryType==='strength')return `<span class="metric-label">Optional Support</span><h3>Add Easy Cardio</h3><p class="hint">Add 20–30 minutes of easy Zone 2 work only when readiness is Green or Yellow and it will not compromise tomorrow's training.</p><div class="row"><button class="secondary" onclick="beginWorkout('R-1 Recovery Run')">Start Optional Cardio</button><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Choose Mobility Instead</button></div>`;return `<span class="metric-label">Optional Support</span><h3>Add Mobility</h3><p class="hint">A conditioning-only day can be paired with extra mobility, breathing, or easy recovery work without adding another hard session.</p><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Open Daily Mobility</button>`;}
 function renderTodayTrainingCards(){
   renderDashboardDayNavigation();

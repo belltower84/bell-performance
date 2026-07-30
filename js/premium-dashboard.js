@@ -2,10 +2,36 @@
 
 let premiumQuoteOffset = 0;
 
-function premiumSelectedItems(){
-  const key=selectedDashboardDateKey();
-  return (data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status));
+function bellCanonicalPlanDateKey(item,block=data.trainingBlock,week=Number(data.trainingBlock?.currentWeek||1)){
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const dayIndex=days.indexOf(item?.day);
+  const monday=typeof bpWeekStartKey==='function'
+    ? bpWeekStartKey(block,week)
+    : (typeof planWeekStartKey==='function'?planWeekStartKey():mondayKeyFor(localDateKey()));
+  if(dayIndex>=0)return addLocalDays(monday,dayIndex);
+  return item?.scheduledDate||'';
 }
+function bellActivePlanItemsForDate(key=selectedDashboardDateKey()){
+  const block=data.trainingBlock;
+  const week=Math.max(1,Number(block?.currentWeek)||1);
+  const plan=typeof bpWeekPlan==='function'&&block?bpWeekPlan(block,week):(data.plan||[]);
+  return (plan||[]).filter(item=>{
+    if(['skipped','replaced'].includes(item?.status))return false;
+    return bellCanonicalPlanDateKey(item,block,week)===key;
+  });
+}
+function bellRepairActivePlanDates(){
+  const block=data.trainingBlock;if(!block)return false;
+  const week=Math.max(1,Number(block.currentWeek)||1);
+  let changed=false;
+  (data.plan||[]).forEach(item=>{
+    const canonical=bellCanonicalPlanDateKey(item,block,week);
+    if(canonical&&item.scheduledDate!==canonical){item.scheduledDate=canonical;changed=true;}
+  });
+  if(changed&&typeof saveData==='function')saveData({render:false});
+  return changed;
+}
+function premiumSelectedItems(){return bellActivePlanItemsForDate(selectedDashboardDateKey());}
 function premiumAllSessions(){return premiumSelectedItems().flatMap(sessionsFromPlanItem);}
 function premiumSessionType(session){return scheduleTypeForMission(session?.mission,session?.label,session?.detail)||'strength';}
 function premiumDisplayLabel(session){

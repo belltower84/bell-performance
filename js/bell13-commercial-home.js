@@ -60,7 +60,7 @@
   }
   function selectedMissionSession(m){
     if(!m.sessions.length)return null;
-    let selected=m.sessions.find((s,index)=>missionSessionIdentity(s,index)===selectedMissionSessionKey&&!s.completed);
+    let selected=m.sessions.find((s,index)=>missionSessionIdentity(s,index)===selectedMissionSessionKey);
     if(!selected&&selectedMissionSessionType)selected=m.sessions.find(s=>sessionType(s)===selectedMissionSessionType&&!s.completed);
     if(!selected)selected=m.sessions.find(s=>!s.completed&&!s.optional)||m.sessions.find(s=>!s.completed)||m.sessions[0];
     selectedMissionSessionKey=missionSessionIdentity(selected,m.sessions.indexOf(selected));
@@ -190,8 +190,8 @@
       const kind=sessionType(selected)==="engine"?"Engine":"Strength";
       const active=window.data?.activeWorkout?.planSessionKey===selected.sessionKey;
       start.disabled=Boolean(selected.completed);
-      start.textContent=selected.completed?"✓ Session Complete":active?`▶ Resume ${kind}`:`▶ Start ${kind}`;
-      view.disabled=false;view.textContent="☷ View Description";
+      start.textContent=selected.completed?"✓ Completed":active?`▶ Resume ${kind}`:`▶ Start ${kind}`;
+      view.disabled=false;view.textContent="☷ Preview";
       modify.disabled=Boolean(selected.completed);modify.textContent=selected.optional?"Optional Session":"✎ Modify";
       start.onclick=selected.completed?null:()=>{
         if(typeof beginPlannedWorkout==='function')beginPlannedWorkout(selected.planId,selected.sessionKey,selected.mission);

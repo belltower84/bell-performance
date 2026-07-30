@@ -80,10 +80,10 @@ function bellRenderSelectedMissionDetail(session,budget,futureDay){
   if(start){
     const active=data.activeWorkout?.planSessionKey===session.sessionKey;
     start.disabled=Boolean(session.completed);
-    start.textContent=session.completed?"✓ Session Complete":futureDay?"☷ Preview Session":active?`▶ Resume ${session.type==='engine'?'Engine':'Strength'}`:`▶ Start ${session.type==='engine'?'Engine':'Strength'}`;
+    start.textContent=session.completed?"✓ Completed":futureDay?"☷ Preview Session":active?`▶ Resume ${session.type==='engine'?'Engine':'Strength'}`:`▶ Start ${session.type==='engine'?'Engine':'Strength'}`;
     start.onclick=session.completed?null:()=>commandSessionCall(session,futureDay?'preview':'start');
   }
-  if(view){view.disabled=false;view.textContent="☷ View Description";view.onclick=()=>commandSessionCall(session,"preview");}
+  if(view){view.disabled=false;view.textContent="☷ Preview";view.onclick=()=>commandSessionCall(session,"preview");}
   if(modify){modify.disabled=futureDay||session.completed;modify.textContent=session.optional?"Optional Session":"✎ Modify";modify.onclick=session.optional?()=>openCommandTile("coaching"):()=>commandSessionCall(session,"preview");}
 }
 

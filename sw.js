@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13.7.12";
+const CACHE_NAME = "bell-performance-13-7-15";
 const CORE = [
   "./",
   "./index.html",
@@ -71,7 +71,7 @@ const CORE = [
   "./js/bell13-athlete-experience.js?v=13650",
   "./js/first-flight-1372.js?v=13721",
   "./js/bell13-coach-intelligence.js?v=13620",
-  "./js/bell13-commercial-home.js?v=13714",
+  "./js/bell13-commercial-home.js?v=13715",
   "./js/settings-1377.js?v=13770",
 ];
 self.addEventListener("install", event => {

@@ -12,7 +12,41 @@ function resetDashboardToToday(){setDashboardDate(localDateKey());}
 function planDateKey(item){if(item?.scheduledDate)return item.scheduledDate;const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],idx=days.indexOf(item?.day);return idx>=0?addLocalDays(planWeekStartKey(),idx):"";}
 function stampCurrentPlanDates(){const monday=planWeekStartKey();const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];(data.plan||[]).forEach((item,index)=>{const idx=Math.max(0,days.indexOf(item.day));item.scheduledDate=addLocalDays(monday,idx>=0?idx:index);item.sessionCompletions=item.sessionCompletions&&typeof item.sessionCompletions==="object"?item.sessionCompletions:{};});}
 function renderDashboardDayNavigation(){const key=selectedDashboardDateKey(),today=localDateKey(),date=localDateFromKey(key),isToday=key===today;setText("missionDayHeading",isToday?"Today's Mission":`${new Intl.DateTimeFormat("en-US",{weekday:"long"}).format(date)} Mission`);setText("missionDayDate",new Intl.DateTimeFormat("en-US",{month:"long",day:"numeric",year:"numeric"}).format(date));const b=byId("dashboardDayButton");if(b){b.textContent=isToday?"Today":new Intl.DateTimeFormat("en-US",{weekday:"short",month:"short",day:"numeric"}).format(date);b.classList.toggle("viewing-today",isToday);b.title=isToday?"Viewing today":"Return to today";}document.querySelectorAll(".weekly-schedule-day").forEach(el=>el.classList.toggle("selected",el.dataset.date===key));}
-function markPlannedSessionComplete(completed){let item=completed.planId?(data.plan||[]).find(x=>x.id===completed.planId):null;if(!item){const date=completed.scheduledDate||localDateKey(new Date(completed.completedAt));item=(data.plan||[]).find(x=>planDateKey(x)===date&&(x.mission===completed.name||x.secondaryMission===completed.name)&&!["skipped","replaced"].includes(x.status));}if(!item)return;item.sessionCompletions=item.sessionCompletions||{};let key=completed.planSessionKey;if(!key){const sessions=typeof sessionsFromPlanItem==="function"?sessionsFromPlanItem(item):[];key=sessions.find(x=>x.mission===completed.name&&!x.completed)?.sessionKey;}if(key)item.sessionCompletions[key]=completed.completedAt;const sessions=typeof sessionsFromPlanItem==="function"?sessionsFromPlanItem(item):[];const prescribed=sessions.filter(x=>!String(x.mission||"").startsWith("M-"));item.done=prescribed.length>0&&prescribed.every(x=>Boolean(item.sessionCompletions[x.sessionKey]));item.status=item.done?"completed":"planned";if(item.done)item.completedAt=completed.completedAt;}
+function markPlannedSessionComplete(completed){
+  const plan=data.plan||[];
+  const same=(a,b)=>String(a??"")===String(b??"");
+  const canonical=value=>typeof bellCanonicalWorkoutMission==="function"?bellCanonicalWorkoutMission(value):value;
+  let item=completed.planId?plan.find(x=>same(x.id,completed.planId)):null;
+  if(!item&&completed.planSessionKey&&typeof sessionsFromPlanItem==="function"){
+    item=plan.find(candidate=>sessionsFromPlanItem(candidate).some(session=>same(session.sessionKey,completed.planSessionKey)))||null;
+  }
+  if(!item){
+    const date=completed.scheduledDate||localDateKey(new Date(completed.completedAt));
+    const completedMission=canonical(completed.name);
+    item=plan.find(candidate=>{
+      if(planDateKey(candidate)!==date||["skipped","replaced"].includes(candidate.status))return false;
+      const sessions=typeof sessionsFromPlanItem==="function"?sessionsFromPlanItem(candidate):[];
+      return sessions.some(session=>same(canonical(session.mission),completedMission));
+    })||null;
+  }
+  if(!item){console.error("Bell: unable to mark planned session complete",completed);return false;}
+  item.sessionCompletions=item.sessionCompletions||{};
+  const sessions=typeof sessionsFromPlanItem==="function"?sessionsFromPlanItem(item):[];
+  let key=completed.planSessionKey;
+  if(!key||!sessions.some(session=>same(session.sessionKey,key))){
+    const completedMission=canonical(completed.name);
+    key=sessions.find(session=>same(canonical(session.mission),completedMission)&&!session.completed)?.sessionKey||
+        sessions.find(session=>same(canonical(session.mission),completedMission))?.sessionKey||null;
+  }
+  if(!key){console.error("Bell: planned item found but session key could not be resolved",{completed,item});return false;}
+  item.sessionCompletions[key]=completed.completedAt||new Date().toISOString();
+  const prescribed=sessions.filter(session=>!String(session.mission||"").startsWith("M-")&&!session.optionalCore);
+  item.done=prescribed.length>0&&prescribed.every(session=>Boolean(item.sessionCompletions[session.sessionKey]));
+  item.status=item.done?"completed":"planned";
+  if(item.done)item.completedAt=completed.completedAt;
+  else delete item.completedAt;
+  return true;
+}
 function performLocalMidnightRollover(){const today=localDateKey();data.dayNavigation=data.dayNavigation||{};if(data.dayNavigation.lastLocalDate&&data.dayNavigation.lastLocalDate!==today){data.dayNavigation.selectedDate=today;data.settings.readiness.lastPromptDate="";}data.dayNavigation.lastLocalDate=today;if(!data.dayNavigation.selectedDate)data.dayNavigation.selectedDate=today;saveData({render:false});}
 function scheduleMidnightRollover(){clearTimeout(window.__bellMidnightTimeout);const now=new Date(),next=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,1,0);window.__bellMidnightTimeout=setTimeout(()=>{performLocalMidnightRollover();renderApp();maybePromptDailyReadiness();scheduleMidnightRollover();},Math.max(1000,next-now));}
 

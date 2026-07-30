@@ -1,12 +1,12 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-8-3";
+const CACHE_NAME = "bell-performance-13-8-4";
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./css/app.css?v=13710",
   "./css/first-flight-1372.css?v=13721",
-  "./css/independent-daily-sessions-1382.css?v=13830",
+  "./css/independent-daily-sessions-1382.css?v=13840",
   "./css/bell13.css?v=13300",
   "./css/bell134.css?v=13620",
   "./css/bell135.css?v=13712",
@@ -35,9 +35,9 @@ const CORE = [
   "./assets/artwork/engine/winter-trail.jpg?v=10006",
   "./assets/artwork/engine/hill-country.jpg?v=10006",
   "./data/workouts.js?v=10007",
-  "./js/storage.js?v=13720",
+  "./js/storage.js?v=13840",
   "./js/exercise-library.js?v=13710",
-  "./js/readiness.js?v=13720",
+  "./js/readiness.js?v=13840",
   "./js/equipment.js?v=13640",
   "./js/training-blocks.js?v=13600",
   "./js/mobility.js?v=13650",
@@ -72,9 +72,9 @@ const CORE = [
   "./js/bell13-athlete-experience.js?v=13650",
   "./js/first-flight-1372.js?v=13721",
   "./js/bell13-coach-intelligence.js?v=13620",
-  "./js/bell13-commercial-home.js?v=13715",
+  "./js/bell13-commercial-home.js?v=13840",
   "./js/settings-1376.js?v=13760",
-  "./js/independent-daily-sessions-1382.js?v=13830",
+  "./js/independent-daily-sessions-1382.js?v=13840",
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

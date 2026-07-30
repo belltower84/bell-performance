@@ -67,8 +67,38 @@
     selectedMissionSessionType=sessionType(selected);
     return selected;
   }
-  function renderSessions(m){
-    const host=$('b135SessionSummary');if(!host)return;
+  function independentMissionModel(){
+    try{
+      if(!window.BellDailySessions?.buildRows)return null;
+      const model=window.BellDailySessions.buildRows(todayDateKey());
+      const training=model.rows.filter(row=>row.type==="strength"||row.type==="engine");
+      const required=model.rows.filter(row=>row.required);
+      const requiredDone=required.length>0&&required.every(row=>row.completed);
+      const title=requiredDone?"Mission Complete":training.length?training.map(row=>row.label).join(" + "):"Recovery Day";
+      const purpose=requiredDone
+        ?"Today’s required training is complete."
+        :training.length
+          ?`Today’s required work has been fit to your ${model.available}-minute availability. Core is included; daily mobility is separate.`
+          :"Recover, move well, and prepare for the next training day.";
+      return {...model,training,required,requiredDone,title,purpose,minutes:training.length?`${model.available} min`:"Flexible"};
+    }catch(error){console.error("Bell independent mission render failed",error);return null;}
+  }
+  function renderIndependentSessions(model){
+    const host=$("b135SessionSummary");if(!host)return;
+    host.className="b135-session-summary b1384-session-stack";
+    host.innerHTML=model.rows.map(row=>`<article class="b1384-session ${esc(row.type)}${row.completed?' completed':''}" data-session-type="${esc(row.type)}">
+      <div class="b1384-session-top"><span>${esc(row.type==='strength'?'Primary':titleCase(row.type))} · ${esc(row.status)}</span>${row.completed?'<i aria-hidden="true">✓</i>':''}</div>
+      <div class="b1384-session-copy"><h3>${esc(row.label)}</h3><p>${esc(row.description)}</p><small>${esc(row.minutes)} min${row.outsideBudget?' · outside training budget':row.optional?' · optional':''}</small></div>
+      <div class="b1384-session-actions"><button type="button" class="b135-secondary" data-independent-preview="${esc(row.type)}">Preview</button><button type="button" class="b135-start" data-independent-start="${esc(row.type)}" ${row.completed?'disabled':''}>${row.completed?'✓ Completed':`▶ Start ${esc(row.type==='strength'?'Strength':titleCase(row.type))}`}</button></div>
+    </article>`).join('')+(model.requiredDone?`<div class="b1384-tomorrow"><div><strong>Mission Complete</strong><span>Required training for today is finished.</span></div><button type="button" class="b135-secondary" id="b1384PreviewTomorrow">Preview Tomorrow</button></div>`:'');
+    host.querySelectorAll('[data-independent-start]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();window.BellDailySessions.start(button.dataset.independentStart,model.key);}));
+    host.querySelectorAll('[data-independent-preview]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();window.BellDailySessions.preview(button.dataset.independentPreview,model.key);}));
+    const tomorrow=$("b1384PreviewTomorrow");if(tomorrow)tomorrow.onclick=()=>{const next=typeof addLocalDays==='function'?addLocalDays(model.key,1):model.key;if(typeof setDashboardDate==='function')setDashboardDate(next);};
+  }
+  function renderSessions(m,independent=null){
+    const host=$("b135SessionSummary");if(!host)return;
+    if(independent){renderIndependentSessions(independent);return;}
+    host.className="b135-session-summary";
     if(!m.sessions.length){host.innerHTML='<div class="b135-session-item"><span>Today</span><strong>Recovery</strong><small>Walking, mobility, and normal daily activity</small></div>';return;}
     const selected=selectedMissionSession(m);
     host.innerHTML=m.sessions.slice(0,3).map((s,i)=>{
@@ -168,9 +198,10 @@
   function render(){
     if(!$("b135Home"))return;
     if(typeof bellRepairActivePlanDates==='function')bellRepairActivePlanDates();
-    const s=state(),m=todayMission(),mode=controlMode(),coachMode=mode==="coach";
+    const s=state(),independent=independentMissionModel(),m=independent?{sessions:[],title:independent.title,purpose:independent.purpose,minutes:independent.minutes}:todayMission(),mode=controlMode(),coachMode=mode==="coach";
     $("b135Home").dataset.control=mode;
-    $("b135Greeting").textContent=greeting();$("b135Athlete").textContent=athlete();$("b135WelcomeLine").textContent=coachMode?"Your plan, readiness, and coaching direction for today.":"Your workout plan and readiness at a glance.";$("b135MissionTitle").textContent=m.title;$("b135MissionPurpose").textContent=m.purpose;$("b135MissionDuration").textContent=m.minutes;renderSessions(m);renderWeek();
+    $("b135Greeting").textContent=greeting();$("b135Athlete").textContent=athlete();$("b135WelcomeLine").textContent=coachMode?"Your plan, readiness, and coaching direction for today.":"Your workout plan and readiness at a glance.";
+    $("b135MissionTitle").textContent=independent?.title||m.title;$("b135MissionPurpose").textContent=independent?.purpose||m.purpose;$("b135MissionDuration").textContent=independent?.minutes||m.minutes;renderSessions(m,independent);renderWeek();
     const checked=typeof hasTodayReadiness==="function"?hasTodayReadiness():window.data?.settings?.readiness?.lastPromptDate===todayDateKey();
     const score=typeof readinessScore==="function"?readinessScore():Number(window.data?.settings?.readiness?.score)||0;
     const status=typeof readinessStatus==="function"?readinessStatus(score):"GREEN";
@@ -185,29 +216,33 @@
     let completed=0;try{completed=(data.history||[]).filter(x=>x.completed||x.status==="completed").length;}catch(_){}
     $("b135ProgressValue").textContent=completed?`${completed} sessions`:"Getting started";$("b135ProgressTrend").textContent=completed?"On track":"Building";
     const start=$("b135Start"),view=$("b135View"),modify=$("b135Modify"),legacyStart=$("commandStartWorkout"),legacyView=$("commandViewSession"),legacyModify=$("commandModifySession");
-    const selected=selectedMissionSession(m);
-    if(selected){
-      const kind=sessionType(selected)==="engine"?"Engine":"Strength";
-      const active=window.data?.activeWorkout?.planSessionKey===selected.sessionKey;
-      start.disabled=Boolean(selected.completed);
-      start.textContent=selected.completed?"✓ Completed":active?`▶ Resume ${kind}`:`▶ Start ${kind}`;
-      view.disabled=false;view.textContent="☷ Preview";
-      modify.disabled=Boolean(selected.completed);modify.textContent=selected.optional?"Optional Session":"✎ Modify";
-      start.onclick=selected.completed?null:()=>{
-        if(typeof beginPlannedWorkout==='function')beginPlannedWorkout(selected.planId,selected.sessionKey,selected.mission);
-        else if(typeof commandSessionCall==='function')commandSessionCall(selected,'start');
-        else legacyStart?.click();
-      };
-      view.onclick=()=>{
-        if(typeof previewPlannedWorkout==='function')previewPlannedWorkout(selected.planId,selected.sessionKey,selected.mission);
-        else if(typeof commandSessionCall==='function')commandSessionCall(selected,'preview');
-        else legacyView?.click();
-      };
-      modify.onclick=()=>selected.optional?(typeof openCommandTile==='function'&&openCommandTile('coaching')):(typeof commandSessionCall==='function'?commandSessionCall(selected,'preview'):legacyModify?.click());
-    }else{
-      start.disabled=Boolean(legacyStart?.disabled);view.disabled=Boolean(legacyView?.disabled);modify.disabled=Boolean(legacyModify?.disabled);
-      start.textContent=legacyStart?.textContent?.trim()||"Start Recovery";view.textContent=legacyView?.textContent?.trim()||"View Recovery";modify.textContent=legacyModify?.textContent?.trim()||"Recovery Options";
-      start.onclick=()=>legacyStart?.click();view.onclick=()=>legacyView?.click();modify.onclick=()=>legacyModify?.click();
+    const sharedActions=start?.closest('.b135-primary-actions');
+    if(sharedActions)sharedActions.hidden=Boolean(independent);
+    if(!independent){
+      const selected=selectedMissionSession(m);
+      if(selected){
+        const kind=sessionType(selected)==="engine"?"Engine":"Strength";
+        const active=window.data?.activeWorkout?.planSessionKey===selected.sessionKey;
+        start.disabled=Boolean(selected.completed);
+        start.textContent=selected.completed?"✓ Completed":active?`▶ Resume ${kind}`:`▶ Start ${kind}`;
+        view.disabled=false;view.textContent="☷ Preview";
+        modify.disabled=Boolean(selected.completed);modify.textContent=selected.optional?"Optional Session":"✎ Modify";
+        start.onclick=selected.completed?null:()=>{
+          if(typeof beginPlannedWorkout==='function')beginPlannedWorkout(selected.planId,selected.sessionKey,selected.mission);
+          else if(typeof commandSessionCall==='function')commandSessionCall(selected,'start');
+          else legacyStart?.click();
+        };
+        view.onclick=()=>{
+          if(typeof previewPlannedWorkout==='function')previewPlannedWorkout(selected.planId,selected.sessionKey,selected.mission);
+          else if(typeof commandSessionCall==='function')commandSessionCall(selected,'preview');
+          else legacyView?.click();
+        };
+        modify.onclick=()=>selected.optional?(typeof openCommandTile==='function'&&openCommandTile('coaching')):(typeof commandSessionCall==='function'?commandSessionCall(selected,'preview'):legacyModify?.click());
+      }else{
+        start.disabled=Boolean(legacyStart?.disabled);view.disabled=Boolean(legacyView?.disabled);modify.disabled=Boolean(legacyModify?.disabled);
+        start.textContent=legacyStart?.textContent?.trim()||"Start Recovery";view.textContent=legacyView?.textContent?.trim()||"View Recovery";modify.textContent=legacyModify?.textContent?.trim()||"Recovery Options";
+        start.onclick=()=>legacyStart?.click();view.onclick=()=>legacyView?.click();modify.onclick=()=>legacyModify?.click();
+      }
     }
     $("b135WhyMission").hidden=!coachMode;$("b135WhyMission").onclick=()=>{if(window.openBellCoachExplanation)openBellCoachExplanation("mission");else openCommandTile("coaching");};
   }

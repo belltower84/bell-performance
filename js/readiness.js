@@ -92,8 +92,8 @@ function trainingStatusText(status = readinessStatus()) {
 function timeCapacityMinutes() {
   const readiness=data.settings.readiness||{};
   const direct=Number(readiness.timeMinutes);
-  if(Number.isFinite(direct)&&direct>=15)return direct;
-  return ({1:20,2:30,3:45,4:60,5:75})[Number(readiness.timeAvailability)||3];
+  if(Number.isFinite(direct)&&direct>=30)return Math.min(120,direct);
+  return ({1:30,2:45,3:60,4:75,5:90,6:105,7:120})[Number(readiness.timeAvailability)||3];
 }
 
 function scalingProfile() {
@@ -175,7 +175,7 @@ const QUICK_READINESS_MAP={
   sleep:{poor:2,okay:4,good:5},
   body:{"beat-up":2,normal:4,fresh:5},
   energy:{drained:2,steady:4,"fired-up":5},
-  time:{20:1,30:2,45:3,60:4,75:5}
+  time:{30:1,45:2,60:3,75:4,90:5,105:6,120:7}
 };
 
 function readinessSleepLabel(readiness=data.settings.readiness||{}){
@@ -198,7 +198,7 @@ function readinessPainLabel(readiness=data.settings.readiness||{}){
 }
 function readinessTimeLabel(readiness=data.settings.readiness||{}){
   const minutes=Number(readiness.timeMinutes)||timeCapacityMinutes();
-  return `${minutes}${minutes>=75?"+":""} min`;
+  return `${minutes} min`;
 }
 
 function updateReadinessControlModeUI(){
@@ -261,7 +261,7 @@ function collectQuickReadinessFromPrompt(){
   const sleep=quickReadinessDraft.sleep,body=quickReadinessDraft.body,energyState=quickReadinessDraft.energy;
   const sleepMinutes=({poor:330,okay:405,good:480})[sleep]||420;
   const energy=QUICK_READINESS_MAP.energy[energyState]||4;
-  const time=Number(quickReadinessDraft.time)||45;
+  const time=Number(quickReadinessDraft.time)||60;
   return {
     checkInVersion:"quick-v1",
     sleepState:sleep,
@@ -287,7 +287,7 @@ function populateReadinessPrompt(){
     body:todayComplete?(r.bodyState||((Number(r.recoveryStatus)||3)>=5?"fresh":(Number(r.recoveryStatus)||3)>=3?"normal":"beat-up")):null,
     energy:todayComplete?(r.energyState||((Number(r.energy)||3)>=5?"fired-up":(Number(r.energy)||3)>=3?"steady":"drained")):null,
     pain:todayComplete?(r.painToday?"yes":"no"):null,
-    time:todayComplete?(Number(r.timeMinutes)||({1:20,2:30,3:45,4:60,5:75})[Number(r.timeAvailability)]||45):null
+    time:todayComplete?(Number(r.timeMinutes)||({1:30,2:45,3:60,4:75,5:90,6:105,7:120})[Number(r.timeAvailability)]||60):null
   };
   ["sleep","body","energy","pain","time"].forEach(group=>setQuickChoiceUI(group,quickReadinessDraft[group]));
   const notes=document.getElementById("promptPainNotes");if(notes)notes.value=todayComplete?String(r.painNotes||""):"";

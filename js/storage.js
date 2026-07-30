@@ -116,8 +116,8 @@ function normalizeData() {
     : Number.isFinite(legacySoreness)
       ? Math.max(1,Math.min(5,Math.round(5-(legacySoreness-1)*4/9)))
       : 4;
-  const normalizedTimeAvailability=Math.max(1,Math.min(5,Number.isFinite(+old.timeAvailability)?Math.round(+old.timeAvailability):3));
-  const normalizedTimeMinutes=Number.isFinite(+old.timeMinutes)&&+old.timeMinutes>=15?Math.round(+old.timeMinutes):({1:20,2:30,3:45,4:60,5:75})[normalizedTimeAvailability];
+  const normalizedTimeAvailability=Math.max(1,Math.min(7,Number.isFinite(+old.timeAvailability)?Math.round(+old.timeAvailability):3));
+  const normalizedTimeMinutes=Number.isFinite(+old.timeMinutes)&&+old.timeMinutes>=30?Math.min(120,Math.round(+old.timeMinutes)):({1:30,2:45,3:60,4:75,5:90,6:105,7:120})[normalizedTimeAvailability];
   data.settings.readiness = {
     checkInVersion: old.checkInVersion === "quick-v1" ? "quick-v1" : "",
     sleepState: ["poor","okay","good"].includes(old.sleepState) ? old.sleepState : "",

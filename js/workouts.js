@@ -90,7 +90,21 @@ function saveRotationWeek() {
   saveData(); alert(`Rotation Week ${data.settings.rotationWeek} loaded.`);
 }
 
+function bellCanonicalWorkoutMission(name) {
+  const raw=String(name||"").trim();
+  const aliases={
+    "R-1":"R-1 Recovery Run",
+    "R-2":"R-2 Easy Run",
+    "R-3":"R-3 Tempo Run",
+    "R-4":"R-4 Intervals",
+    "R-5":"R-5 Long Run",
+    "M-1":"M-1 Daily Reset"
+  };
+  return aliases[raw]||raw;
+}
+
 function scaledTemplate(name) {
+  name=bellCanonicalWorkoutMission(name);
   let base = getWorkoutTemplate(name);
   if (!base) return null;
   base = blockRunOverride(name, base);
@@ -205,6 +219,7 @@ function skipRestTimer() { clearInterval(restInterval); restRemaining = 0; updat
 
 function beginToday() { const session=typeof dashboardSessionsForToday==="function"?dashboardSessionsForToday()[0]:null; if(session) beginPlannedWorkout(session.planId,session.sessionKey,session.mission); else alert("No prescribed training is scheduled for the selected day. Choose a workout from Training if you want an optional session."); }
 function beginWorkout(name, context={}) {
+  name=bellCanonicalWorkoutMission(name);
   if(data.activeWorkout){if(data.activeWorkout.name===name){openWorkoutUI();startTimer();return;}if(!confirm("Another workout is already in progress. Discard it and start this session?"))return;data.activeWorkout=null;}
   let template=scaledTemplate(name); if(!template) return;
   const planned=context.planId?data.plan?.find(item=>item.id===context.planId):data.plan?.find(item=>!item.done&&(item.mission===name||item.secondaryMission===name));
@@ -315,7 +330,7 @@ function workoutTemplatePreview(name, context={}){
 }
 function previewPlannedWorkout(planId,sessionKey,name){
   const resolved=typeof resolvePlannedSession==='function'?resolvePlannedSession(planId,sessionKey,name):{item:null,session:null};
-  const actualName=resolved.session?.mission||name;
+  const actualName=bellCanonicalWorkoutMission(resolved.session?.mission||name);
   const workout=workoutTemplatePreview(actualName,{planId:resolved.item?.id??planId,sessionKey:resolved.session?.sessionKey||sessionKey});
   openWorkoutPreview(workout,()=>{closeWorkoutPreview();beginPlannedWorkout(planId,sessionKey,actualName);});
 }

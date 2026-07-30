@@ -427,7 +427,8 @@ function resolvePlannedSession(planId,sessionKey,mission){
 }
 function beginPlannedWorkout(planId,sessionKey,mission){
   const resolved=resolvePlannedSession(planId,sessionKey,mission),item=resolved.item,session=resolved.session;
-  const actualMission=session?.mission||mission;
+  const rawMission=session?.mission||mission;
+  const actualMission=typeof bellCanonicalWorkoutMission==='function'?bellCanonicalWorkoutMission(rawMission):rawMission;
   if(!actualMission){console.error('Bell: planned session could not be resolved',{planId,sessionKey,mission});return;}
   const actualPlanId=item?.id??session?.planId??planId;
   const actualSessionKey=session?.sessionKey||sessionKey;

@@ -71,7 +71,7 @@ const CORE = [
   "./js/bell13-athlete-experience.js?v=13650",
   "./js/first-flight-1372.js?v=13721",
   "./js/bell13-coach-intelligence.js?v=13620",
-  "./js/bell13-commercial-home.js?v=13713",
+  "./js/bell13-commercial-home.js?v=13714",
   "./js/settings-1377.js?v=13770",
 ];
 self.addEventListener("install", event => {

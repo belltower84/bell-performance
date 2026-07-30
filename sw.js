@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13.7.10-mission-time-budget-r1';
+const CACHE_NAME = "bell-performance-13.7.12";
 const CORE = [
   "./",
   "./index.html",
@@ -8,7 +8,7 @@ const CORE = [
   "./css/first-flight-1372.css?v=13721",
   "./css/bell13.css?v=13300",
   "./css/bell134.css?v=13620",
-  "./css/bell135.css?v=13610",
+  "./css/bell135.css?v=13712",
   "./css/bell1364.css?v=13640",
   "./css/guided-tour-1374.css?v=13740",
   "./css/settings-1377.css?v=13770",
@@ -71,7 +71,7 @@ const CORE = [
   "./js/bell13-athlete-experience.js?v=13650",
   "./js/first-flight-1372.js?v=13721",
   "./js/bell13-coach-intelligence.js?v=13620",
-  "./js/bell13-commercial-home.js?v=13722",
+  "./js/bell13-commercial-home.js?v=13712",
   "./js/settings-1377.js?v=13770",
 ];
 self.addEventListener("install", event => {

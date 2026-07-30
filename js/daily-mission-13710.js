@@ -19,7 +19,10 @@ function bellSessionOptional(session,sessions=[]){
 }
 function bellDailySessionBudget(sessions=premiumAllSessions(),key=selectedDashboardDateKey()){
   const rows=(sessions||[]).map(session=>({...session,type:premiumSessionType(session),plannedMinutes:bellSessionPlannedMinutes(session)}));
-  const checkedIn=key===todayKey()&&(data.settings?.readiness?.lastPromptDate===todayKey()||hasTodayReadiness());
+  const readiness=data.settings?.readiness||{};
+  const isToday=key===todayKey()||key===localDateKey();
+  const hasCurrentCheckIn=readiness.lastPromptDate===todayKey()||readiness.lastPromptDate===key||hasTodayReadiness()||Boolean(readiness.checkInVersion&&Number(readiness.timeMinutes)>=15);
+  const checkedIn=isToday&&hasCurrentCheckIn;
   const available=checkedIn?Math.max(15,timeCapacityMinutes()):rows.reduce((sum,x)=>sum+x.plannedMinutes,0);
   rows.forEach(row=>row.optional=bellSessionOptional(row,rows));
   const required=rows.filter(x=>!x.optional&&!x.completed), optional=rows.filter(x=>x.optional&&!x.completed);

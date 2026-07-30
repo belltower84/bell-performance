@@ -8,6 +8,8 @@
   const titleCase=v=>clean(v).replace(/\b\w/g,c=>c.toUpperCase());
   let selectedWeekKey="";
   let weekDays=[];
+  let selectedMissionSessionKey="";
+  let selectedMissionSessionType="";
 
   function athlete(){const appData=typeof data!=="undefined"?data:window.data;return clean(appData?.athleteProfile?.demographics?.preferredName||appData?.athleteProfile?.demographics?.firstName||appData?.settings?.athleteName||appData?.settings?.name||"Athlete");}
   function greeting(){const h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening";}
@@ -17,7 +19,7 @@
   function todayDateKey(){try{return typeof todayKey==='function'?todayKey():new Date().toISOString().slice(0,10);}catch(_){return new Date().toISOString().slice(0,10);}}
   function sessionLabel(s){try{return typeof bellWorkoutDisplayLabel==="function"?bellWorkoutDisplayLabel(s):clean(s?.label||scaledTemplate(s?.mission)?.label||s?.mission||"Training");}catch(_){return clean(s?.label||s?.mission||"Training");}}
   function sessionType(s){try{return clean(typeof premiumSessionType==='function'?premiumSessionType(s):"training").toLowerCase();}catch(_){return "training";}}
-  function sessionMinutes(s){try{return Number(s?.prescribedDuration)||Number(scaledTemplate(s?.mission)?.duration)||30;}catch(_){return Number(s?.prescribedDuration)||30;}}
+  function sessionMinutes(s){try{return Number(s?.minutes)||Number(s?.allocatedMinutes)||Number(s?.prescribedDuration)||Number(scaledTemplate(s?.mission)?.duration)||30;}catch(_){return Number(s?.minutes)||Number(s?.allocatedMinutes)||Number(s?.prescribedDuration)||30;}}
   function sessionPurpose(s){
     try{
       const template=typeof scaledTemplate==='function'?scaledTemplate(s?.mission):null;
@@ -25,13 +27,17 @@
     }catch(_){return clean(s?.detail||"");}
   }
   function todayMission(){
-    const sessions=currentSessions();
-    if(!sessions.length)return {title:"Recovery Day",purpose:"Recover, move well, and prepare for the next training day.",minutes:"Flexible",type:"Recovery",sessions:[]};
-    const first=sessions.find(s=>!s.completed)||sessions[0];
-    const total=sessions.reduce((n,s)=>n+sessionMinutes(s),0);
-    const title=typeof bellCombinedWorkoutDisplayLabel==='function'?bellCombinedWorkoutDisplayLabel(sessions):(sessions.length>1?`${sessionLabel(first)} + ${sessionLabel(sessions.find(s=>s!==first)||sessions[1])}`:sessionLabel(first));
+    const rawSessions=currentSessions();
+    if(!rawSessions.length)return {title:"Recovery Day",purpose:"Recover, move well, and prepare for the next training day.",minutes:"Flexible",type:"Recovery",sessions:[],budget:null};
+    const budget=typeof bellDailySessionBudget==='function'?bellDailySessionBudget(rawSessions,todayDateKey()):null;
+    const sessions=(budget?.sessions||rawSessions).map(session=>({...session,allocatedMinutes:session.minutes||sessionMinutes(session)}));
+    const first=sessions.find(s=>!s.completed&&!s.optional)||sessions.find(s=>!s.completed)||sessions[0];
+    const required=sessions.filter(s=>!s.optional);
+    const total=(required.length?required:sessions).reduce((n,s)=>n+sessionMinutes(s),0);
+    const title=typeof bellCombinedWorkoutDisplayLabel==='function'?bellCombinedWorkoutDisplayLabel(rawSessions):(sessions.length>1?`${sessionLabel(first)} + ${sessionLabel(sessions.find(s=>s!==first)||sessions[1])}`:sessionLabel(first));
     const s=state();
-    return {title,purpose:clean(s.currentPhase?.purpose||text('commandMissionPurpose')||"Complete the prescribed work with controlled effort and quality execution."),minutes:`${total} min`,type:sessions.map(sessionType).join(" + "),sessions};
+    const purpose=budget?.checkedIn?`Today’s required work has been fit to your ${budget.available}-minute availability.${sessions.some(x=>x.optional)?" Optional support is shown separately.":""}`:clean(s.currentPhase?.purpose||text('commandMissionPurpose')||"Complete the prescribed work with controlled effort and quality execution.");
+    return {title,purpose,minutes:`${total} min${sessions.some(x=>x.optional)?" required":""}`,type:sessions.map(sessionType).join(" + "),sessions,budget};
   }
 
   function markup(){return `<div class="b135-home" id="b135Home" data-control="coach">
@@ -44,10 +50,36 @@
     <section class="b135-card b135-section b135-progress-card"><div class="b135-section-head"><div><span class="b135-eyebrow">Your progress</span><h3>Current trend</h3></div><button class="b135-link" type="button" onclick="showScreen('history')">View Progress</button></div><div class="b135-stat"><div><span id="b135ProgressLabel">Training consistency</span><strong id="b135ProgressValue">—</strong></div><span class="b135-trend" id="b135ProgressTrend">Building</span></div></section></div>
   </div>`;}
 
+  function missionSessionIdentity(session,index=0){
+    return clean(session?.sessionKey||`${sessionType(session)}:${session?.planId||"plan"}:${session?.mission||index}`);
+  }
+  function selectMissionSession(key,type=""){
+    selectedMissionSessionKey=clean(key);
+    selectedMissionSessionType=clean(type).toLowerCase();
+    render();
+  }
+  function selectedMissionSession(m){
+    if(!m.sessions.length)return null;
+    let selected=m.sessions.find((s,index)=>missionSessionIdentity(s,index)===selectedMissionSessionKey&&!s.completed);
+    if(!selected&&selectedMissionSessionType)selected=m.sessions.find(s=>sessionType(s)===selectedMissionSessionType&&!s.completed);
+    if(!selected)selected=m.sessions.find(s=>!s.completed&&!s.optional)||m.sessions.find(s=>!s.completed)||m.sessions[0];
+    selectedMissionSessionKey=missionSessionIdentity(selected,m.sessions.indexOf(selected));
+    selectedMissionSessionType=sessionType(selected);
+    return selected;
+  }
   function renderSessions(m){
     const host=$('b135SessionSummary');if(!host)return;
     if(!m.sessions.length){host.innerHTML='<div class="b135-session-item"><span>Today</span><strong>Recovery</strong><small>Walking, mobility, and normal daily activity</small></div>';return;}
-    host.innerHTML=m.sessions.slice(0,3).map((s,i)=>`<div class="b135-session-item"><span>${i===0?'Primary':esc(titleCase(sessionType(s)))}</span><strong>${esc(sessionLabel(s))}</strong><small>${sessionMinutes(s)} min${s.completed?' · Complete':''}</small></div>`).join('');
+    const selected=selectedMissionSession(m);
+    host.innerHTML=m.sessions.slice(0,3).map((s,i)=>{
+      const identity=missionSessionIdentity(s,i),isSelected=identity===selectedMissionSessionKey;
+      const kind=sessionType(s)==='engine'?'Engine':'Primary';
+      return `<button type="button" class="b135-session-item b135-session-choice ${isSelected?'selected':'muted'} ${s.completed?'complete':''}" data-mission-session="${esc(identity)}" data-mission-type="${esc(sessionType(s))}" aria-pressed="${isSelected?'true':'false'}" aria-label="Select ${esc(kind)} session: ${esc(sessionLabel(s))}"><span>${esc(kind)} · ${s.optional?'Optional':s.completed?'Complete':'Required'}</span><strong>${esc(sessionLabel(s))}</strong><small>${sessionMinutes(s)} min${s.optional?' · not included in required total':s.completed?' · Complete':''}</small><i class="b135-session-check" aria-hidden="true">${isSelected?'✓':''}</i></button>`;
+    }).join('');
+    host.querySelectorAll('[data-mission-session]').forEach(button=>{
+      button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();selectMissionSession(button.dataset.missionSession,button.dataset.missionType);});
+      button.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();selectMissionSession(button.dataset.missionSession,button.dataset.missionType);}});
+    });
   }
 
   function dateLabel(key){
@@ -153,11 +185,30 @@
     let completed=0;try{completed=(data.history||[]).filter(x=>x.completed||x.status==="completed").length;}catch(_){}
     $("b135ProgressValue").textContent=completed?`${completed} sessions`:"Getting started";$("b135ProgressTrend").textContent=completed?"On track":"Building";
     const start=$("b135Start"),view=$("b135View"),modify=$("b135Modify"),legacyStart=$("commandStartWorkout"),legacyView=$("commandViewSession"),legacyModify=$("commandModifySession");
-    start.disabled=Boolean(legacyStart?.disabled);view.disabled=Boolean(legacyView?.disabled);modify.disabled=Boolean(legacyModify?.disabled);
-    start.textContent=legacyStart?.textContent?.trim()||(m.sessions.length?"Start Training":"Start Recovery");
-    view.textContent=legacyView?.textContent?.trim()||(m.sessions.length?"View Session":"View Recovery");
-    modify.textContent=legacyModify?.textContent?.trim()||(m.sessions.length?"Modify":"Recovery Options");
-    start.onclick=()=>legacyStart?.click();view.onclick=()=>legacyView?.click();modify.onclick=()=>legacyModify?.click();
+    const selected=selectedMissionSession(m);
+    if(selected){
+      const kind=sessionType(selected)==="engine"?"Engine":"Strength";
+      const active=window.data?.activeWorkout?.planSessionKey===selected.sessionKey;
+      start.disabled=Boolean(selected.completed);
+      start.textContent=selected.completed?"✓ Session Complete":active?`▶ Resume ${kind}`:`▶ Start ${kind}`;
+      view.disabled=false;view.textContent="☷ View Description";
+      modify.disabled=Boolean(selected.completed);modify.textContent=selected.optional?"Optional Session":"✎ Modify";
+      start.onclick=selected.completed?null:()=>{
+        if(typeof beginPlannedWorkout==='function')beginPlannedWorkout(selected.planId,selected.sessionKey,selected.mission);
+        else if(typeof commandSessionCall==='function')commandSessionCall(selected,'start');
+        else legacyStart?.click();
+      };
+      view.onclick=()=>{
+        if(typeof previewPlannedWorkout==='function')previewPlannedWorkout(selected.planId,selected.sessionKey,selected.mission);
+        else if(typeof commandSessionCall==='function')commandSessionCall(selected,'preview');
+        else legacyView?.click();
+      };
+      modify.onclick=()=>selected.optional?(typeof openCommandTile==='function'&&openCommandTile('coaching')):(typeof commandSessionCall==='function'?commandSessionCall(selected,'preview'):legacyModify?.click());
+    }else{
+      start.disabled=Boolean(legacyStart?.disabled);view.disabled=Boolean(legacyView?.disabled);modify.disabled=Boolean(legacyModify?.disabled);
+      start.textContent=legacyStart?.textContent?.trim()||"Start Recovery";view.textContent=legacyView?.textContent?.trim()||"View Recovery";modify.textContent=legacyModify?.textContent?.trim()||"Recovery Options";
+      start.onclick=()=>legacyStart?.click();view.onclick=()=>legacyView?.click();modify.onclick=()=>legacyModify?.click();
+    }
     $("b135WhyMission").hidden=!coachMode;$("b135WhyMission").onclick=()=>{if(window.openBellCoachExplanation)openBellCoachExplanation("mission");else openCommandTile("coaching");};
   }
 

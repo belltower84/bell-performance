@@ -1,6 +1,6 @@
 "use strict";
 
-/* Bell Performance 13.7.3 — Contextual Guided Tour */
+/* Bell Performance 13.7.4 — Guided Tour Visibility & Focus */
 const HOW_TO_KEY = "bellPerformanceHowToSeenV9";
 const howToSlides = [
   {
@@ -86,6 +86,7 @@ let firstFlightTourActive = false;
 let activeTourTarget = null;
 let howToReturnScreen = "home";
 let tourPositionFrame = null;
+let tourGeometryTimers = [];
 
 function activeScreenName() {
   return document.querySelector(".screen.active")?.id || "home";
@@ -97,6 +98,16 @@ function clearHowToTarget() {
     activeTourTarget.removeAttribute("data-tour-active");
     activeTourTarget = null;
   }
+  tourGeometryTimers.forEach(timer => window.clearTimeout(timer));
+  tourGeometryTimers = [];
+  const spotlight = document.getElementById("howToSpotlight");
+  if (spotlight) {
+    spotlight.classList.remove("is-visible");
+    spotlight.style.left = "";
+    spotlight.style.top = "";
+    spotlight.style.width = "";
+    spotlight.style.height = "";
+  }
   document.body.classList.remove("tour-active");
   const modal = document.getElementById("howToModal");
   if (modal) {
@@ -107,6 +118,44 @@ function clearHowToTarget() {
 
 function clampTourPosition(value, minimum, maximum) {
   return Math.max(minimum, Math.min(maximum, value));
+}
+
+function positionHowToSpotlight() {
+  const spotlight = document.getElementById("howToSpotlight");
+  const modal = document.getElementById("howToModal");
+  if (!spotlight || !modal || modal.classList.contains("hidden") || !activeTourTarget) {
+    spotlight?.classList.remove("is-visible");
+    return;
+  }
+
+  const rect = activeTourTarget.getBoundingClientRect();
+  if (!rect.width || !rect.height) {
+    spotlight.classList.remove("is-visible");
+    return;
+  }
+
+  const mobile = window.matchMedia("(max-width: 760px)").matches;
+  const padding = mobile ? 5 : 8;
+  const left = clampTourPosition(rect.left - padding, 4, window.innerWidth - 8);
+  const top = clampTourPosition(rect.top - padding, 4, window.innerHeight - 8);
+  const right = clampTourPosition(rect.right + padding, 8, window.innerWidth - 4);
+  const bottom = clampTourPosition(rect.bottom + padding, 8, window.innerHeight - 4);
+  const radius = parseFloat(window.getComputedStyle(activeTourTarget).borderRadius) || (mobile ? 16 : 18);
+
+  spotlight.style.left = `${left}px`;
+  spotlight.style.top = `${top}px`;
+  spotlight.style.width = `${Math.max(12, right - left)}px`;
+  spotlight.style.height = `${Math.max(12, bottom - top)}px`;
+  spotlight.style.borderRadius = `${Math.min(28, Math.max(14, radius + padding))}px`;
+  spotlight.classList.add("is-visible");
+}
+
+function scheduleHowToGeometry(slide, delays = [0, 90, 220, 420]) {
+  tourGeometryTimers.forEach(timer => window.clearTimeout(timer));
+  tourGeometryTimers = delays.map(delay => window.setTimeout(() => {
+    positionHowToSpotlight();
+    positionHowToPanel(slide, { skipScroll: delay > 0 });
+  }, delay));
 }
 
 function scrollTargetIntoTourView(target, panel, mobileTop) {
@@ -134,7 +183,7 @@ function scrollTargetIntoTourView(target, panel, mobileTop) {
   if (Math.abs(delta) > 4) window.scrollBy({ top: delta, behavior: "smooth" });
 }
 
-function positionHowToPanel(slide) {
+function positionHowToPanel(slide, options = {}) {
   const modal = document.getElementById("howToModal");
   const panel = document.getElementById("howToPanel");
   if (!modal || !panel || modal.classList.contains("hidden")) return;
@@ -148,6 +197,7 @@ function positionHowToPanel(slide) {
   if (slide.centered || !activeTourTarget) {
     modal.classList.add("tour-centered");
     modal.dataset.placement = "center";
+    document.getElementById("howToSpotlight")?.classList.remove("is-visible");
     return;
   }
 
@@ -155,31 +205,44 @@ function positionHowToPanel(slide) {
   const mobile = window.matchMedia("(max-width: 760px)").matches;
   if (mobile) {
     modal.dataset.placement = slide.mobilePosition === "top" ? "top" : "bottom";
-    scrollTargetIntoTourView(activeTourTarget, panel, slide.mobilePosition === "top");
+    if (!options.skipScroll) scrollTargetIntoTourView(activeTourTarget, panel, slide.mobilePosition === "top");
+    positionHowToSpotlight();
     return;
   }
 
   const targetRect = activeTourTarget.getBoundingClientRect();
   const panelRect = panel.getBoundingClientRect();
-  const gap = 20;
-  const edge = 18;
+  const gap = 24;
+  const edge = 20;
   const candidates = [
     { placement: "right", left: targetRect.right + gap, top: targetRect.top + targetRect.height / 2 - panelRect.height / 2 },
     { placement: "left", left: targetRect.left - panelRect.width - gap, top: targetRect.top + targetRect.height / 2 - panelRect.height / 2 },
     { placement: "bottom", left: targetRect.left + targetRect.width / 2 - panelRect.width / 2, top: targetRect.bottom + gap },
     { placement: "top", left: targetRect.left + targetRect.width / 2 - panelRect.width / 2, top: targetRect.top - panelRect.height - gap }
   ];
-  const fit = candidates.find(candidate =>
-    candidate.left >= edge &&
-    candidate.left + panelRect.width <= window.innerWidth - edge &&
-    candidate.top >= edge &&
-    candidate.top + panelRect.height <= window.innerHeight - edge
-  ) || candidates[0];
+
+  const overlapArea = candidate => {
+    const left = Math.max(candidate.left, targetRect.left);
+    const right = Math.min(candidate.left + panelRect.width, targetRect.right);
+    const top = Math.max(candidate.top, targetRect.top);
+    const bottom = Math.min(candidate.top + panelRect.height, targetRect.bottom);
+    return Math.max(0, right - left) * Math.max(0, bottom - top);
+  };
+  const overflow = candidate =>
+    Math.max(0, edge - candidate.left) +
+    Math.max(0, candidate.left + panelRect.width - (window.innerWidth - edge)) +
+    Math.max(0, edge - candidate.top) +
+    Math.max(0, candidate.top + panelRect.height - (window.innerHeight - edge));
+
+  const fit = candidates
+    .map((candidate, index) => ({ ...candidate, score: overflow(candidate) * 10000 + overlapArea(candidate) + index }))
+    .sort((a, b) => a.score - b.score)[0];
 
   panel.style.left = `${clampTourPosition(fit.left, edge, Math.max(edge, window.innerWidth - panelRect.width - edge))}px`;
   panel.style.top = `${clampTourPosition(fit.top, edge, Math.max(edge, window.innerHeight - panelRect.height - edge))}px`;
   modal.dataset.placement = fit.placement;
-  scrollTargetIntoTourView(activeTourTarget, panel, false);
+  if (!options.skipScroll) scrollTargetIntoTourView(activeTourTarget, panel, false);
+  positionHowToSpotlight();
 }
 
 function applyHowToTarget(slide) {
@@ -193,7 +256,7 @@ function applyHowToTarget(slide) {
       target.setAttribute("data-tour-active", "true");
       document.body.classList.add("tour-active");
     }
-    window.requestAnimationFrame(() => positionHowToPanel(slide));
+    window.requestAnimationFrame(() => scheduleHowToGeometry(slide));
   });
 }
 
@@ -308,13 +371,19 @@ function maybeShowHowToGuideAfterProfileSetup() {
   window.setTimeout(() => openHowToGuide(0), 350);
 }
 
-window.addEventListener("resize", () => {
+function refreshHowToGeometry() {
   window.cancelAnimationFrame(tourPositionFrame);
   tourPositionFrame = window.requestAnimationFrame(() => {
     const slide = howToSlides[howToIndex];
-    if (!document.getElementById("howToModal")?.classList.contains("hidden")) positionHowToPanel(slide);
+    if (!document.getElementById("howToModal")?.classList.contains("hidden")) {
+      positionHowToSpotlight();
+      positionHowToPanel(slide, { skipScroll: true });
+    }
   });
-});
+}
+
+window.addEventListener("resize", refreshHowToGeometry);
+window.addEventListener("scroll", refreshHowToGeometry, { passive: true });
 
 window.addEventListener("keydown", event => {
   const modal = document.getElementById("howToModal");

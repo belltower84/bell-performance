@@ -1,0 +1,285 @@
+/* Bell Performance 13.7.4 — Guided Tour Visibility & Focus */
+#howToModal.guided-tour{
+  position:fixed;
+  inset:0;
+  z-index:12000;
+  display:block;
+  pointer-events:none;
+  background:transparent!important;
+  isolation:isolate;
+}
+#howToModal.guided-tour.hidden{display:none!important}
+
+/* A separate spotlight frame creates a reliable cutout without forcing the
+   highlighted app card into a new stacking context. */
+#howToSpotlight.guided-tour-spotlight{
+  position:fixed;
+  z-index:12002;
+  display:block;
+  pointer-events:none;
+  opacity:0;
+  border:2px solid rgba(249,199,76,.98);
+  border-radius:20px;
+  background:transparent;
+  box-shadow:
+    0 0 0 4px rgba(242,185,49,.24),
+    0 0 32px rgba(242,185,49,.38),
+    0 0 0 9999px rgba(1,3,5,.78);
+  transition:left .2s ease,top .2s ease,width .2s ease,height .2s ease,opacity .16s ease,border-radius .2s ease;
+}
+#howToSpotlight.is-visible{opacity:1}
+
+#howToModal .guided-tour-panel{
+  position:fixed;
+  z-index:12004;
+  width:min(460px,calc(100vw - 40px));
+  max-height:min(650px,calc(100vh - 40px));
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  pointer-events:auto;
+  outline:none;
+  border:2px solid rgba(241,188,58,.86);
+  border-radius:24px;
+  background:
+    linear-gradient(90deg,rgba(246,194,67,.15),transparent 28%,transparent 72%,rgba(246,194,67,.09)),
+    radial-gradient(circle at 92% 0%,rgba(240,184,50,.22),transparent 34%),
+    linear-gradient(155deg,#20272e 0%,#11171d 46%,#080c10 100%);
+  box-shadow:
+    0 30px 100px rgba(0,0,0,.9),
+    0 0 42px rgba(224,167,34,.24),
+    0 0 0 1px rgba(255,255,255,.08) inset,
+    0 1px 0 rgba(255,255,255,.10) inset;
+}
+#howToModal .guided-tour-panel:before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:22px;
+  right:22px;
+  top:0;
+  height:3px;
+  border-radius:0 0 8px 8px;
+  background:linear-gradient(90deg,transparent,#efbb3e 18%,#ffe39a 50%,#efbb3e 82%,transparent);
+  box-shadow:0 0 18px rgba(239,187,62,.48);
+}
+#howToModal .guided-tour-panel>*{position:relative;z-index:1}
+#howToModal.tour-centered .guided-tour-panel{
+  left:50%!important;
+  top:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:translate(-50%,-50%);
+}
+#howToModal:not(.tour-centered) .guided-tour-panel{transform:none}
+
+/* Centered intro and finish steps use a full backdrop. Targeted steps use the
+   spotlight frame's cutout shadow instead. */
+#howToModal.tour-centered:after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:12001;
+  background:rgba(1,3,5,.82);
+  backdrop-filter:blur(3px);
+}
+#howToModal.tour-centered .guided-tour-panel{z-index:12004}
+
+.guided-tour-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:20px 22px 15px;
+  border-bottom:1px solid rgba(255,255,255,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),transparent);
+}
+.guided-tour-meta{display:flex;align-items:center;gap:11px;min-width:0}
+.guided-tour-kicker{
+  color:#ffd46d;
+  font-size:11px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-shadow:0 0 16px rgba(239,187,62,.28);
+}
+.guided-tour-step{
+  display:inline-flex;
+  align-items:center;
+  min-height:24px;
+  padding:3px 8px;
+  border:1px solid rgba(239,187,62,.22);
+  border-radius:999px;
+  background:rgba(239,187,62,.08);
+  color:#d7dee3;
+  font-size:11px;
+  font-weight:850;
+  white-space:nowrap;
+}
+.guided-tour-skip{
+  min-height:36px!important;
+  padding:8px 11px!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.035)!important;
+  color:#c4ccd2!important;
+  font-size:12px!important;
+  font-weight:850!important;
+  box-shadow:none!important;
+}
+.guided-tour-skip:hover,.guided-tour-skip:focus{color:#ffe09a!important;border-color:rgba(239,187,62,.42)!important;background:rgba(216,166,50,.10)!important}
+.guided-tour-progress{height:4px;background:#252d34;overflow:hidden}
+.guided-tour-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#bc7d14,#efbd47 55%,#ffe29a);box-shadow:0 0 16px rgba(239,189,71,.42);transition:width .28s ease}
+.guided-tour-content{
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr);
+  gap:18px;
+  padding:26px 24px 24px;
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+.guided-tour-icon{
+  width:56px;
+  height:56px;
+  border-radius:17px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(244,193,67,.66);
+  background:linear-gradient(145deg,rgba(235,179,44,.24),rgba(225,174,53,.05));
+  color:#ffd36a;
+  font-size:25px;
+  font-weight:950;
+  box-shadow:0 0 24px rgba(225,174,53,.13),inset 0 1px 0 rgba(255,255,255,.09);
+}
+.guided-tour-copy h2{
+  margin:0 0 11px;
+  color:#fff;
+  font-size:29px;
+  line-height:1.08;
+  letter-spacing:-.038em;
+  text-shadow:0 2px 18px rgba(0,0,0,.46);
+}
+.guided-tour-copy p{
+  margin:0;
+  color:#d8dfe4;
+  font-size:15px;
+  line-height:1.62;
+}
+.guided-tour-points{
+  display:grid;
+  gap:10px;
+  margin:17px 0 0;
+  padding:0;
+  list-style:none;
+}
+.guided-tour-points li{
+  position:relative;
+  padding-left:19px;
+  color:#f4f6f7;
+  font-size:14px;
+  line-height:1.48;
+}
+.guided-tour-points li:before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.52em;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#efbd47;
+  box-shadow:0 0 0 4px rgba(239,189,71,.12),0 0 12px rgba(239,189,71,.28);
+}
+.guided-tour-footer{
+  display:grid;
+  grid-template-columns:minmax(104px,.72fr) minmax(150px,1fr);
+  gap:12px;
+  padding:15px 18px 18px;
+  border-top:1px solid rgba(255,255,255,.10);
+  background:rgba(4,7,9,.72);
+}
+#howToModal .guided-tour-footer button{
+  min-height:50px;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:950;
+  letter-spacing:.01em;
+}
+#howToModal #howToBack{
+  border:1px solid #46525c;
+  background:#151c23;
+  color:#e2e8ec;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+#howToModal #howToBack:disabled{opacity:.28;cursor:default}
+#howToModal #howToNext{
+  border:1px solid #f0bd43;
+  background:linear-gradient(180deg,#f4ca61,#d89b24);
+  color:#171208;
+  box-shadow:0 10px 30px rgba(211,150,31,.29),inset 0 1px 0 rgba(255,255,255,.38);
+}
+#howToModal #howToNext:hover,#howToModal #howToNext:focus{filter:brightness(1.07)}
+body.guided-tour-open{overflow:hidden}
+body.tour-active{overflow:auto}
+.tour-highlight{
+  filter:brightness(1.12) saturate(1.04);
+  transition:filter .2s ease;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .guided-tour-progress i,.tour-highlight,#howToSpotlight.guided-tour-spotlight{transition:none}
+}
+
+@media(max-width:760px){
+  #howToModal .guided-tour-panel{
+    left:8px!important;
+    right:8px!important;
+    top:auto!important;
+    bottom:calc(8px + env(safe-area-inset-bottom))!important;
+    width:auto;
+    max-height:min(58vh,510px);
+    border-radius:22px;
+  }
+  #howToModal.tour-mobile-top .guided-tour-panel{
+    top:calc(70px + env(safe-area-inset-top))!important;
+    bottom:auto!important;
+  }
+  #howToModal.tour-centered .guided-tour-panel{
+    left:10px!important;
+    right:10px!important;
+    top:50%!important;
+    bottom:auto!important;
+    width:auto;
+    transform:translateY(-50%);
+    max-height:min(76vh,610px);
+  }
+  .guided-tour-header{padding:17px 17px 12px}
+  .guided-tour-content{grid-template-columns:48px minmax(0,1fr);gap:14px;padding:21px 18px 19px}
+  .guided-tour-icon{width:46px;height:46px;border-radius:14px;font-size:21px}
+  .guided-tour-copy h2{font-size:24px;margin-bottom:9px}
+  .guided-tour-copy p{font-size:14.25px;line-height:1.56}
+  .guided-tour-points{margin-top:14px;gap:8px}
+  .guided-tour-points li{font-size:13.25px}
+  .guided-tour-footer{padding:12px 14px 14px}
+  #howToModal .guided-tour-footer button{min-height:47px;font-size:14px}
+  #howToSpotlight.guided-tour-spotlight{border-radius:18px}
+  .tour-highlight{scroll-margin-top:90px;scroll-margin-bottom:61vh}
+}
+@media(max-width:390px){
+  .guided-tour-kicker{max-width:160px}
+  .guided-tour-content{grid-template-columns:44px minmax(0,1fr);gap:12px;padding:19px 16px 17px}
+  .guided-tour-icon{width:42px;height:42px}
+  .guided-tour-copy h2{font-size:22px}
+  .guided-tour-copy p{font-size:13.75px}
+  .guided-tour-points li{font-size:12.75px}
+}
+@media(max-height:690px) and (max-width:760px){
+  #howToModal .guided-tour-panel{max-height:62vh}
+  .guided-tour-header{padding-top:14px}
+  .guided-tour-content{padding-top:16px;padding-bottom:14px}
+  .guided-tour-footer{padding-top:10px}
+}

@@ -11,14 +11,14 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <link href="./assets/logo-shield.svg?v=13720" rel="icon" type="image/svg+xml"/>
-<title>Bell Performance 13.7.3 — Guided Tour Rebuild</title>
+<title>Bell Performance 13.7.4 — Guided Tour Visibility</title>
 <link href="./css/app.css?v=13710" rel="stylesheet"/>
 <link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
 <link href="./css/bell13.css?v=13300" rel="stylesheet"/>
 <link href="./css/bell134.css?v=13620" rel="stylesheet"/>
 <link href="./css/bell135.css?v=13610" rel="stylesheet"/>
 <link href="./css/bell1364.css?v=13640" rel="stylesheet"/>
-<link href="./css/guided-tour-1373.css?v=13730" rel="stylesheet"/>
+<link href="./css/guided-tour-1374.css?v=13740" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -367,6 +367,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </div>
 
 <div aria-labelledby="howToTitle" aria-modal="true" class="guided-tour hidden" id="howToModal" role="dialog">
+<div aria-hidden="true" class="guided-tour-spotlight" id="howToSpotlight"></div>
 <section class="guided-tour-panel" id="howToPanel" tabindex="-1">
 <header class="guided-tour-header">
 <div class="guided-tour-meta"><span class="guided-tour-kicker" id="howToKicker">Bell Performance</span><span class="guided-tour-step" id="howToStepCount">1 of 8</span></div>
@@ -667,7 +668,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.7.3-guided-tour-rebuild";</script>
+<script>window.BELL_APP_VERSION = "13.7.4-guided-tour-visibility";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=13710"></script>
 <script src="./js/storage.js?v=13720"></script>
@@ -692,7 +693,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/mission-planner.js?v=10006"></script>
 <script src="./js/coaching-pathways.js?v=13600"></script>
 <script src="./js/event-coaching.js?v=13721"></script>
-<script src="./js/how-to.js?v=13730"></script>
+<script src="./js/how-to.js?v=13740"></script>
 <script src="./js/premium-dashboard.js?v=11000"></script>
 <script src="./js/block-lifecycle.js?v=10006"></script>
 <script src="./js/weekly-debrief.js?v=13720"></script>

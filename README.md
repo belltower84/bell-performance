@@ -1,6 +1,6 @@
-# Bell Performance 13.7.3 — Guided Tour Rebuild
+# Bell Performance 13.7.4 — Guided Tour Visibility
 
-Bell Performance is a local-first training application with Bell Coach and Workout Planner control modes. Version 13.7.3 replaces the legacy walkthrough with a contextual guided tour that spotlights the current Daily Check-In, Today’s Mission, Bell Coach, Weekly Plan, Workouts, and primary navigation.
+Bell Performance is a local-first training application with Bell Coach and Workout Planner control modes. Version 13.7.4 strengthens the contextual guided tour with a larger coaching panel, a reliable spotlight cutout, and brighter focus treatment across mobile and desktop.
 
 ## Product blueprint
 
@@ -119,3 +119,7 @@ Bell Coach now produces structured explanations, separates known facts from infe
 
 ## Bell Performance 13.6.3
 13.6.3 replaces the long Settings page with a compact control-center home and focused pages for Athlete Profile, Mission & Program, Training Setup, Recovery & Nutrition, Bell Behavior, and Help & Data.
+
+
+## Bell Performance 13.7.4
+13.7.4 improves guided-tour visibility and focus. The guide panel is larger and brighter, the active interface element is isolated with a dedicated spotlight frame, and geometry now stays synchronized during scrolling and resizing.

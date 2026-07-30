@@ -1,33 +1,325 @@
 "use strict";
 
-const HOW_TO_KEY = "bellPerformanceHowToSeenV8";
+/* Bell Performance 13.7.3 — Contextual Guided Tour */
+const HOW_TO_KEY = "bellPerformanceHowToSeenV9";
 const howToSlides = [
-  {kicker:"Bell Performance",title:"Your training command center",body:"Bell Performance connects your Journey, weekly plan, daily readiness, workout execution, recovery, and progress in one coaching system.",bullets:["Gold highlights the next important action.","The dashboard answers what to do today.","Every other screen supports planning, execution, or review."],image:"./assets/artwork/strength/custom-strength-shadows.jpg?v=13720",visual:"Bell Performance",detail:"Assess. Execute. Recover. Repeat.",screen:"home",target:".brand-header",theme:"strength"},
-  {kicker:"Daily Check-In",title:"Start with the same 10-second readiness check every day",body:"Choose how you slept, how your body feels, your energy, any pain concern, and the time available. Bell Coach can use that information to adjust today’s prescription; Workout Planner keeps it informational.",metrics:[["Sleep","Poor · Okay · Good"],["Body","Beat Up · Normal · Fresh"],["Energy","Drained · Steady · Fired Up"],["Pain","Flag concerns separately"],["Time","Controls session length"]],image:"./assets/artwork/engine/forest-trail.jpg?v=13720",visual:"10-Second Check-In",detail:"The onboarding check-in and dashboard check-in are now the same system.",screen:"home",target:"#premiumReadinessCard",panelPosition:"left",theme:"engine"},
-  {kicker:"Today’s Mission",title:"See the entire training day in one place",body:"Today’s Mission organizes prescribed Strength, Engine, Core, and Recovery work without turning the dashboard into a cluttered workout list.",bullets:["The primary action opens the correct session.","Completion tracks prescribed work only.","Bell Coach explains why today matters."],image:"./assets/artwork/strength/custom-heavy-deadlift.jpg?v=13720",visual:"Today’s Mission",detail:"One clear route into the work.",screen:"home",target:".premium-mission-card",theme:"strength"},
-  {kicker:"Bell Coach",title:"Today’s direction must match your Journey",body:"The coach message, training phase, event family, and workout prescription now read from the same compiled mission. A physique athlete should see physique preparation—not tactical fallback language.",bullets:["Continuous development follows the selected objective.","Event preparation follows the selected event type and date.","Readiness changes the day without changing the mission."],image:"./assets/artwork/strength/bodybuilding.jpg?v=13720",visual:"Aligned Coaching",detail:"Identity, Journey, and today’s workout stay connected.",screen:"home",target:".premium-coach-card",theme:"strength"},
-  {kicker:"Weekly Rhythm",title:"Preview the plan before life changes it",body:"The weekly strip shows Strength, Engine, Recovery, and completed work at a glance. Open Calendar for the full week and use the schedule tools when availability changes.",bullets:["Tap a day to preview it.","Completed and current states remain visible.","Missed sessions should be handled—not blindly stacked."],image:"./assets/artwork/engine/custom-sandbag-trek.jpg?v=13720",visual:"Weekly Rhythm",detail:"Understand the week before you execute the day.",screen:"home",target:".premium-week-card",theme:"engine"},
-  {kicker:"Workouts",title:"Execute and log the real session",body:"Open the workout, review the coach brief, complete the warm-up, log sets and results, and finish with honest feedback. Bell improves only when the recorded work reflects what actually happened.",feedback:["Weight used","Reps completed","RPE and effort","Pain or technique notes"],image:"./assets/artwork/strength/custom-heavy-deadlift.jpg?v=13720",visual:"Workout Execution",detail:"Real training data drives better prescriptions.",screen:"workouts",target:"#workoutLibrary",theme:"strength"},
-  {kicker:"Training Library",title:"Use guides when technique or substitutions matter",body:"The Training Library provides exercise context, coaching cues, muscle maps, equipment requirements, and purposeful substitutions. Production guides will expand after the core app is stable.",bullets:["Open guides from the library or workout player.","Substitutions should preserve training intent.","Back Squat is the current production-standard guide."],image:"./assets/library/back-squat-production-guide.png?v=13710",visual:"Exercise Guides",detail:"Learn the movement without leaving the training system.",screen:"workouts",target:"#workouts .section-heading",theme:"strength"},
-  {kicker:"Performance",title:"Review trends instead of judging one day",body:"Training History, readiness trends, milestones, and performance reviews show whether the Journey is working over time.",bullets:["Look for repeatable progress.","Use missed-session and recovery patterns as useful data.","Update baselines when verified performance improves."],image:"./assets/artwork/engine/hill-country.jpg?v=13720",visual:"Performance Review",detail:"Track the story, not only the score.",screen:"history",target:"#history .section-title",theme:"engine"},
-  {kicker:"Settings",title:"Change the system without wiping your history",body:"Update your athlete profile, mission, schedule, equipment, limitations, coaching behavior, and help resources from Settings.",bullets:["Edit the Journey when the objective or event changes.","Update equipment when the training environment changes.","Replay this tour from Help at any time."],image:"./assets/artwork/strength/upper-body.jpg?v=13720",visual:"Control Center",detail:"Adapt the plan while preserving the work already completed.",screen:"more",target:"#settingsHub",theme:"system"},
-  {kicker:"Ready",title:"Begin with today’s Mission",body:"The daily rhythm is simple: check in, understand the direction, execute honestly, recover intentionally, and review the trend. The dashboard is now ready for real-world testing.",bullets:["Start on Dashboard each day.","Use Calendar and Workouts for context and execution.","Report anything confusing, incorrect, or blocked."],image:"./assets/artwork/strength/custom-strength-shadows.jpg?v=13720",visual:"Ready for Testing",detail:"The tour will return you to the dashboard.",screen:"home",target:".brand-header",theme:"strength"}
+  {
+    kicker: "Welcome to Bell",
+    icon: "B",
+    title: "One clear training decision at a time",
+    body: "Bell Performance turns your Journey, readiness, schedule, and training history into a practical plan for today.",
+    points: ["Start on the Dashboard each day.", "Gold marks the action that matters next."],
+    screen: "home",
+    target: null,
+    centered: true
+  },
+  {
+    kicker: "Daily Check-In",
+    icon: "⌁",
+    title: "Tell Bell what you can handle today",
+    body: "The 10-second check-in records sleep, body condition, energy, pain concerns, and available time before you train.",
+    points: ["Bell Coach may adjust today’s prescription.", "Update it whenever your condition changes."],
+    screen: "home",
+    target: "#b135ReadinessCard"
+  },
+  {
+    kicker: "Today’s Mission",
+    icon: "▶",
+    title: "This is your main route into training",
+    body: "Today’s Mission shows the prescribed work, estimated duration, priority, and any readiness-based adjustment in one place.",
+    points: ["Start Workout opens the correct session.", "Use View Session when you want the details first."],
+    screen: "home",
+    target: ".b135-primary"
+  },
+  {
+    kicker: "Bell Coach",
+    icon: "☊",
+    title: "Understand why today matters",
+    body: "Today’s Briefing explains the purpose of the session and keeps the workout aligned with your selected Journey and training phase.",
+    points: ["Use View rationale for more context.", "The coaching direction should match the workout you receive."],
+    screen: "home",
+    target: "#b135GuidanceCard"
+  },
+  {
+    kicker: "Weekly Plan",
+    icon: "▣",
+    title: "See the week before life changes it",
+    body: "The Weekly Plan previews training, recovery, and completed work. Open it when availability changes or you need more context than today’s card provides.",
+    points: ["Current and completed days remain visible.", "Missed work should be handled—not blindly stacked."],
+    screen: "home",
+    target: ".b135-week-card"
+  },
+  {
+    kicker: "Workouts",
+    icon: "⚒",
+    title: "Execute, record, and finish honestly",
+    body: "The Workouts screen contains your current rotation and access to the Exercise Library. Log the work you actually complete so Bell has useful training data.",
+    points: ["Record loads, reps, effort, and notes.", "Use movement guides or substitutions when needed."],
+    screen: "workouts",
+    target: "#workouts .section-heading"
+  },
+  {
+    kicker: "Primary Navigation",
+    icon: "⌂",
+    title: "Everything else supports the daily mission",
+    body: "Use Calendar to understand the week, Performance to review trends, and Settings to update your athlete profile, Journey, equipment, or coaching behavior.",
+    points: ["Your completed history stays intact when settings change.", "Replay this tour from Settings → Help."],
+    screen: "home",
+    target: ".app-nav",
+    mobilePosition: "top"
+  },
+  {
+    kicker: "Ready",
+    icon: "✓",
+    title: "Your dashboard is ready",
+    body: "The daily rhythm is simple: check in, understand the direction, execute the session, and record what actually happened.",
+    points: ["Begin with Today’s Mission.", "Report anything confusing, incorrect, or blocked during testing."],
+    screen: "home",
+    target: null,
+    centered: true,
+    finish: true
+  }
 ];
-let howToIndex=0, howToTimer=null, firstFlightTourActive=false, activeTourTarget=null, howToReturnScreen="home";
-function clearHowToTarget(){if(activeTourTarget){activeTourTarget.classList.remove("tour-highlight");activeTourTarget=null;}document.body.classList.remove("tour-active");const modal=document.getElementById("howToModal");if(modal)modal.classList.remove("tour-panel-left");}
-function activeScreenName(){return document.querySelector(".screen.active")?.id||"home";}
-function applyHowToTarget(slide){clearHowToTarget();const modal=document.getElementById("howToModal");if(modal&&slide.panelPosition==="left")modal.classList.add("tour-panel-left");if(slide.screen&&typeof showScreen==="function")showScreen(slide.screen);const target=slide.target?document.querySelector(slide.target):null;if(!target)return;activeTourTarget=target;target.classList.add("tour-highlight");document.body.classList.add("tour-active");window.setTimeout(()=>target.scrollIntoView({behavior:"smooth",block:"center"}),80);}
-function openHowToGuide(startIndex=0,options={}){firstFlightTourActive=Boolean(options.firstFlight||options.resumeFirstFlight);howToReturnScreen=firstFlightTourActive?"home":activeScreenName();howToIndex=Math.max(0,Math.min(howToSlides.length-1,Number(startIndex)||0));document.getElementById("howToModal")?.classList.remove("hidden");document.body.classList.add("modal-open");renderHowToSlide();}
-function launchFirstFlightTour(){openHowToGuide(0,{firstFlight:true});}
-function closeHowToGuide(){stopHowToAutoplay();clearHowToTarget();document.getElementById("howToModal")?.classList.add("hidden");document.body.classList.remove("modal-open");localStorage.setItem(HOW_TO_KEY,"1");if(firstFlightTourActive){firstFlightTourActive=false;data.settings.firstFlightTourComplete=true;data.settings.pendingFirstFlightTour=false;data.settings.firstFlightStage="complete";saveData({render:false});if(typeof showScreen==="function")showScreen("home");if(typeof renderApp==="function")renderApp();else if(typeof renderBellCommercialHome==="function")renderBellCommercialHome();window.scrollTo(0,0);return;}if(typeof showScreen==="function")showScreen(howToReturnScreen);}
-function howToFallbackImage(theme){return theme==="strength"?"./assets/strength-classic.jpg?v=13720":"./assets/engine-mountain-trail.jpg?v=13720";}
-function renderHowToSlide(){const slide=howToSlides[howToIndex];applyHowToTarget(slide);const extras=slide.metrics?`<div class="guide-metric-grid">${slide.metrics.map(x=>`<div class="guide-metric"><span>${x[0]}</span><b>${x[1]}</b></div>`).join("")}</div>`:slide.feedback?`<div class="guide-feedback">${slide.feedback.map(x=>`<span>${x}</span>`).join("")}</div>`:slide.bullets?`<ul>${slide.bullets.map(x=>`<li>${x}</li>`).join("")}</ul>`:"";const tags=(slide.bullets||[]).slice(0,3).map(x=>x.replace(/^Use\s+/,"").replace(/^Bell Performance\s+/,"")).map(x=>`<i>${x.split(".")[0]}</i>`).join("");document.getElementById("howToTitle").textContent=slide.title;document.getElementById("howToSlide").innerHTML=`<div class="how-to-slide-copy"><div class="how-to-kicker">${slide.kicker}</div><h3>${slide.title}</h3><p>${slide.body}</p>${extras}</div><div class="how-to-visual" data-theme="${slide.theme||"system"}"><img src="${slide.image}" alt="" onerror="this.onerror=null;this.src='${howToFallbackImage(slide.theme)}';"><div class="how-to-visual-content"><div class="how-to-visual-badge">Bell Performance Tour</div><strong>${slide.visual}</strong><span>${slide.detail}</span>${tags?`<div class="how-to-tags">${tags}</div>`:""}</div></div>`;document.getElementById("howToProgress").style.width=`${((howToIndex+1)/howToSlides.length)*100}%`;document.getElementById("howToBack").disabled=howToIndex===0;document.getElementById("howToNext").textContent=howToIndex===howToSlides.length-1?"Finish Tour":"Next";document.getElementById("howToDots").innerHTML=howToSlides.map((_,i)=>`<button class="${i===howToIndex?"active":""}" aria-label="Go to slide ${i+1}" onclick="goToHowToSlide(${i})"></button>`).join("");}
-function nextHowToSlide(){if(howToIndex>=howToSlides.length-1){closeHowToGuide();return;}howToIndex++;renderHowToSlide();}
-function previousHowToSlide(){if(howToIndex>0){howToIndex--;renderHowToSlide();}}
-function goToHowToSlide(i){howToIndex=i;renderHowToSlide();}
-function toggleHowToAutoplay(){howToTimer?stopHowToAutoplay():startHowToAutoplay();}
-function startHowToAutoplay(){document.getElementById("howToAutoPlay").textContent="Ⅱ Pause Auto-Advance";howToTimer=setInterval(()=>{if(howToIndex===howToSlides.length-1){stopHowToAutoplay();return;}howToIndex++;renderHowToSlide();},7200);}
-function stopHowToAutoplay(){if(howToTimer)clearInterval(howToTimer);howToTimer=null;const button=document.getElementById("howToAutoPlay");if(button)button.textContent="▶ Auto-Advance";}
-function hasSeenHowToGuide(){return localStorage.getItem(HOW_TO_KEY)==="1";}
-function maybeShowHowToGuideAfterProfileSetup(){if(hasSeenHowToGuide())return;window.setTimeout(()=>openHowToGuide(0),350);}
-window.addEventListener("keydown",event=>{if(document.getElementById("howToModal")?.classList.contains("hidden"))return;if(event.key==="Escape")closeHowToGuide();if(event.key==="ArrowRight")nextHowToSlide();if(event.key==="ArrowLeft")previousHowToSlide();});
+
+let howToIndex = 0;
+let firstFlightTourActive = false;
+let activeTourTarget = null;
+let howToReturnScreen = "home";
+let tourPositionFrame = null;
+
+function activeScreenName() {
+  return document.querySelector(".screen.active")?.id || "home";
+}
+
+function clearHowToTarget() {
+  if (activeTourTarget) {
+    activeTourTarget.classList.remove("tour-highlight");
+    activeTourTarget.removeAttribute("data-tour-active");
+    activeTourTarget = null;
+  }
+  document.body.classList.remove("tour-active");
+  const modal = document.getElementById("howToModal");
+  if (modal) {
+    modal.classList.remove("tour-centered", "tour-mobile-top");
+    modal.removeAttribute("data-placement");
+  }
+}
+
+function clampTourPosition(value, minimum, maximum) {
+  return Math.max(minimum, Math.min(maximum, value));
+}
+
+function scrollTargetIntoTourView(target, panel, mobileTop) {
+  if (!target || !panel) return;
+  const rect = target.getBoundingClientRect();
+  const mobile = window.matchMedia("(max-width: 760px)").matches;
+
+  if (!mobile) {
+    const safeTop = 84;
+    const safeBottom = window.innerHeight - 42;
+    if (rect.top < safeTop || rect.bottom > safeBottom) {
+      target.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    }
+    return;
+  }
+
+  const panelHeight = Math.min(panel.offsetHeight || 320, window.innerHeight * 0.58);
+  const safeTop = mobileTop ? panelHeight + 28 : 76;
+  const safeBottom = mobileTop ? window.innerHeight - 92 : window.innerHeight - panelHeight - 28;
+  const availableHeight = Math.max(120, safeBottom - safeTop);
+  let delta = 0;
+  if (rect.height > availableHeight) delta = rect.top - safeTop;
+  else if (rect.top < safeTop) delta = rect.top - safeTop;
+  else if (rect.bottom > safeBottom) delta = rect.bottom - safeBottom;
+  if (Math.abs(delta) > 4) window.scrollBy({ top: delta, behavior: "smooth" });
+}
+
+function positionHowToPanel(slide) {
+  const modal = document.getElementById("howToModal");
+  const panel = document.getElementById("howToPanel");
+  if (!modal || !panel || modal.classList.contains("hidden")) return;
+
+  panel.style.left = "";
+  panel.style.right = "";
+  panel.style.top = "";
+  panel.style.bottom = "";
+  modal.classList.toggle("tour-mobile-top", slide.mobilePosition === "top");
+
+  if (slide.centered || !activeTourTarget) {
+    modal.classList.add("tour-centered");
+    modal.dataset.placement = "center";
+    return;
+  }
+
+  modal.classList.remove("tour-centered");
+  const mobile = window.matchMedia("(max-width: 760px)").matches;
+  if (mobile) {
+    modal.dataset.placement = slide.mobilePosition === "top" ? "top" : "bottom";
+    scrollTargetIntoTourView(activeTourTarget, panel, slide.mobilePosition === "top");
+    return;
+  }
+
+  const targetRect = activeTourTarget.getBoundingClientRect();
+  const panelRect = panel.getBoundingClientRect();
+  const gap = 20;
+  const edge = 18;
+  const candidates = [
+    { placement: "right", left: targetRect.right + gap, top: targetRect.top + targetRect.height / 2 - panelRect.height / 2 },
+    { placement: "left", left: targetRect.left - panelRect.width - gap, top: targetRect.top + targetRect.height / 2 - panelRect.height / 2 },
+    { placement: "bottom", left: targetRect.left + targetRect.width / 2 - panelRect.width / 2, top: targetRect.bottom + gap },
+    { placement: "top", left: targetRect.left + targetRect.width / 2 - panelRect.width / 2, top: targetRect.top - panelRect.height - gap }
+  ];
+  const fit = candidates.find(candidate =>
+    candidate.left >= edge &&
+    candidate.left + panelRect.width <= window.innerWidth - edge &&
+    candidate.top >= edge &&
+    candidate.top + panelRect.height <= window.innerHeight - edge
+  ) || candidates[0];
+
+  panel.style.left = `${clampTourPosition(fit.left, edge, Math.max(edge, window.innerWidth - panelRect.width - edge))}px`;
+  panel.style.top = `${clampTourPosition(fit.top, edge, Math.max(edge, window.innerHeight - panelRect.height - edge))}px`;
+  modal.dataset.placement = fit.placement;
+  scrollTargetIntoTourView(activeTourTarget, panel, false);
+}
+
+function applyHowToTarget(slide) {
+  clearHowToTarget();
+  if (slide.screen && typeof showScreen === "function") showScreen(slide.screen);
+  window.requestAnimationFrame(() => {
+    const target = slide.target ? document.querySelector(slide.target) : null;
+    if (target && target.getClientRects().length) {
+      activeTourTarget = target;
+      target.classList.add("tour-highlight");
+      target.setAttribute("data-tour-active", "true");
+      document.body.classList.add("tour-active");
+    }
+    window.requestAnimationFrame(() => positionHowToPanel(slide));
+  });
+}
+
+function openHowToGuide(startIndex = 0, options = {}) {
+  firstFlightTourActive = Boolean(options.firstFlight || options.resumeFirstFlight);
+  howToReturnScreen = firstFlightTourActive ? "home" : activeScreenName();
+  howToIndex = Math.max(0, Math.min(howToSlides.length - 1, Number(startIndex) || 0));
+  const modal = document.getElementById("howToModal");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  document.body.classList.add("modal-open", "guided-tour-open");
+  renderHowToSlide();
+  window.setTimeout(() => document.getElementById("howToPanel")?.focus(), 60);
+}
+
+function launchFirstFlightTour() {
+  openHowToGuide(0, { firstFlight: true });
+}
+
+function finishHowToGuide() {
+  clearHowToTarget();
+  const modal = document.getElementById("howToModal");
+  if (modal) modal.classList.add("hidden");
+  document.body.classList.remove("modal-open", "guided-tour-open");
+  localStorage.setItem(HOW_TO_KEY, "1");
+
+  if (firstFlightTourActive) {
+    firstFlightTourActive = false;
+    data.settings.firstFlightTourComplete = true;
+    data.settings.pendingFirstFlightTour = false;
+    data.settings.firstFlightStage = "complete";
+    saveData({ render: false });
+    if (typeof showScreen === "function") showScreen("home");
+    if (typeof renderApp === "function") renderApp();
+    else if (typeof renderBellCommercialHome === "function") renderBellCommercialHome();
+    window.scrollTo(0, 0);
+    return;
+  }
+
+  if (typeof showScreen === "function") showScreen(howToReturnScreen || "home");
+}
+
+function closeHowToGuide() {
+  finishHowToGuide();
+}
+
+function skipHowToGuide() {
+  finishHowToGuide();
+}
+
+function renderHowToSlide() {
+  const slide = howToSlides[howToIndex];
+  const panel = document.getElementById("howToPanel");
+  const slideRoot = document.getElementById("howToSlide");
+  if (!slideRoot || !panel) return;
+
+  const pointMarkup = Array.isArray(slide.points) && slide.points.length
+    ? `<ul class="guided-tour-points">${slide.points.slice(0, 2).map(point => `<li>${point}</li>`).join("")}</ul>`
+    : "";
+
+  document.getElementById("howToKicker").textContent = slide.kicker;
+  document.getElementById("howToStepCount").textContent = `${howToIndex + 1} of ${howToSlides.length}`;
+  document.getElementById("howToTitle").textContent = slide.title;
+  document.getElementById("howToProgress").style.width = `${((howToIndex + 1) / howToSlides.length) * 100}%`;
+  slideRoot.innerHTML = `
+    <div class="guided-tour-icon" aria-hidden="true">${slide.icon || "B"}</div>
+    <div class="guided-tour-copy">
+      <h2 id="howToTitle">${slide.title}</h2>
+      <p>${slide.body}</p>
+      ${pointMarkup}
+    </div>`;
+
+  const back = document.getElementById("howToBack");
+  const next = document.getElementById("howToNext");
+  if (back) back.disabled = howToIndex === 0;
+  if (next) next.textContent = slide.finish ? "Go to Dashboard" : "Next";
+  panel.dataset.step = String(howToIndex + 1);
+  applyHowToTarget(slide);
+}
+
+function nextHowToSlide() {
+  if (howToIndex >= howToSlides.length - 1) {
+    finishHowToGuide();
+    return;
+  }
+  howToIndex += 1;
+  renderHowToSlide();
+}
+
+function previousHowToSlide() {
+  if (howToIndex <= 0) return;
+  howToIndex -= 1;
+  renderHowToSlide();
+}
+
+function goToHowToSlide(index) {
+  howToIndex = Math.max(0, Math.min(howToSlides.length - 1, Number(index) || 0));
+  renderHowToSlide();
+}
+
+/* Kept as harmless compatibility hooks for older saved markup. */
+function toggleHowToAutoplay() {}
+function startHowToAutoplay() {}
+function stopHowToAutoplay() {}
+
+function hasSeenHowToGuide() {
+  return localStorage.getItem(HOW_TO_KEY) === "1";
+}
+
+function maybeShowHowToGuideAfterProfileSetup() {
+  if (hasSeenHowToGuide()) return;
+  window.setTimeout(() => openHowToGuide(0), 350);
+}
+
+window.addEventListener("resize", () => {
+  window.cancelAnimationFrame(tourPositionFrame);
+  tourPositionFrame = window.requestAnimationFrame(() => {
+    const slide = howToSlides[howToIndex];
+    if (!document.getElementById("howToModal")?.classList.contains("hidden")) positionHowToPanel(slide);
+  });
+});
+
+window.addEventListener("keydown", event => {
+  const modal = document.getElementById("howToModal");
+  if (!modal || modal.classList.contains("hidden")) return;
+  if (event.key === "Escape") skipHowToGuide();
+  if (event.key === "ArrowRight") nextHowToSlide();
+  if (event.key === "ArrowLeft") previousHowToSlide();
+});

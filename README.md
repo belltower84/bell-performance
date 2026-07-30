@@ -1,6 +1,6 @@
-# Bell Performance 13.7.2 — First Flight & Mission Alignment
+# Bell Performance 13.7.3 — Guided Tour Rebuild
 
-Bell Performance is a local-first training application with Bell Coach and Workout Planner control modes. Version 13.7.2 rebuilds First Flight, moves readiness into the normal dashboard check-in, updates the guided tour, and aligns each event-preparation selection with the correct programming and coaching family.
+Bell Performance is a local-first training application with Bell Coach and Workout Planner control modes. Version 13.7.3 replaces the legacy walkthrough with a contextual guided tour that spotlights the current Daily Check-In, Today’s Mission, Bell Coach, Weekly Plan, Workouts, and primary navigation.
 
 ## Product blueprint
 
@@ -63,9 +63,9 @@ Existing equipment, limitation, nutrition, Bell Core, advanced Journey, backup, 
 - [`BELL_PRODUCT_BLUEPRINT.md`](BELL_PRODUCT_BLUEPRINT.md)
 - [`BELL_ATHLETE_EXPERIENCE_13_3.md`](BELL_ATHLETE_EXPERIENCE_13_3.md)
 - [`BELL_COACHING_ENGINE_13_2.md`](BELL_COACHING_ENGINE_13_2.md)
-- [`RELEASE_NOTES_13_7_2.md`](RELEASE_NOTES_13_7_2.md)
-- [`VALIDATION_13_7_2.md`](VALIDATION_13_7_2.md)
-- [`REAL_WORLD_TESTING_13_7_2.md`](REAL_WORLD_TESTING_13_7_2.md)
+- [`RELEASE_NOTES_13_7_3.md`](RELEASE_NOTES_13_7_3.md)
+- [`VALIDATION_13_7_3.md`](VALIDATION_13_7_3.md)
+- [`REAL_WORLD_TESTING_13_7_3.md`](REAL_WORLD_TESTING_13_7_3.md)
 
 ## Local use
 
@@ -104,6 +104,9 @@ Bell Coach now produces structured explanations, separates known facts from infe
 
 
 
+
+## Bell Performance 13.7.3
+13.7.3 replaces the legacy slide walkthrough with an eight-step contextual tour that spotlights the current Dashboard, Workouts screen, and primary navigation. It also repairs replay return behavior and first-flight completion state.
 
 ## Bell Performance 13.7.2
 13.7.2 rebuilds First Flight, separates Continuous Development from Event Preparation, expands optional athlete baselines, moves readiness to the standard daily check-in, repairs the guided-tour completion route, and aligns physique, powerlifting, endurance, tactical, cycling, and functional events with their correct coaching families.

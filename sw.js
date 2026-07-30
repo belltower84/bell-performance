@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13.7.2-first-flight-mission-alignment-r4';
+const CACHE_NAME = 'bell-performance-13.7.3-guided-tour-rebuild-r1';
 const CORE = [
   "./",
   "./index.html",
@@ -10,6 +10,7 @@ const CORE = [
   "./css/bell134.css?v=13620",
   "./css/bell135.css?v=13610",
   "./css/bell1364.css?v=13640",
+  "./css/guided-tour-1373.css?v=13730",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/logo-shield.svg?v=13720",
   "./assets/icons/engine-shoe.svg?v=10006",
@@ -54,7 +55,7 @@ const CORE = [
   "./js/mission-planner.js?v=10006",
   "./js/coaching-pathways.js?v=13600",
   "./js/event-coaching.js?v=13721",
-  "./js/how-to.js?v=13721",
+  "./js/how-to.js?v=13730",
   "./js/premium-dashboard.js?v=13610",
   "./js/block-lifecycle.js?v=10006",
   "./js/plan-progress.js?v=10006",

@@ -1,3 +1,7 @@
+## Bell Performance 13.7.10 — Mission Time Budget & Session Selector
+
+See `RELEASE_NOTES_13_7_10.md` for changes.
+
 # Bell Performance 13.7.5 — Settings Flow Rebuild
 
 Bell Performance is a local-first training application with Bell Coach and Workout Planner control modes. Version 13.7.5 rebuilds the Settings follow-on screens into a cleaner expandable flow that matches the Control Center home page.

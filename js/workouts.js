@@ -318,7 +318,58 @@ function syncActiveWorkoutTimer(){if(!data.activeWorkout)return 0;const elapsed=
 function startTimer(){clearInterval(timerInterval);if(!data.activeWorkout)return;if(data.activeWorkout.timerRunning!==false&&!data.activeWorkout.timerStartedAt)data.activeWorkout.timerStartedAt=new Date().toISOString();data.activeWorkout.timerRunning=true;timerInterval=setInterval(()=>{if(!data.activeWorkout)return;const elapsed=syncActiveWorkoutTimer();updateTimerDisplay();if(elapsed%15===0)saveData({render:false});},1000);updateTimerDisplay();}
 function updateTimerDisplay(){const elapsed=syncActiveWorkoutTimer();const hours=Math.floor(elapsed/3600);const minutes=String(Math.floor((elapsed%3600)/60)).padStart(2,"0");const seconds=String(elapsed%60).padStart(2,"0");const timer=document.getElementById("workoutTimer");if(timer)timer.textContent=hours?`${String(hours).padStart(2,"0")}:${minutes}:${seconds}`:`${minutes}:${seconds}`;}
 function closeWorkout(){if(data.activeWorkout){syncActiveWorkoutTimer();persistActive();}document.getElementById("workoutModal").classList.add("hidden");clearInterval(timerInterval);clearInterval(restInterval);document.body.classList.remove("workout-open","engine-session","female-session");document.body.style.top="";window.scrollTo(0,savedPageScroll);}
-function completeWorkout(){if(!data.activeWorkout)return;syncActiveWorkoutTimer();persistActive();if(data.activeWorkout.engineMetrics&&!parseEngineTime(data.activeWorkout.engineMetrics.manualTime)){data.activeWorkout.engineMetrics.manualTime=formatEngineTime(data.activeWorkout.elapsed||0);data.activeWorkout.officialElapsed=data.activeWorkout.elapsed||0;}const completed={...data.activeWorkout,timerRunning:false,completed:true,status:"completed",completedAt:new Date().toISOString()};if(typeof applyCompletedWorkoutProgression==="function")applyCompletedWorkoutProgression(completed);data.history.unshift(completed);if(typeof markPlannedSessionComplete==="function")completed.planCompletionRecorded=Boolean(markPlannedSessionComplete(completed));else{const plan=data.plan.find(item=>item.mission===completed.name&&!item.done&&!["skipped","replaced"].includes(item.status));if(plan){plan.done=true;plan.status="completed";plan.completedAt=completed.completedAt;}}closeWorkout();data.activeWorkout=null;data.pendingFeedbackSessionId=completed.completedAt;saveData();if(typeof renderBellCommercialHome==="function")setTimeout(renderBellCommercialHome,0);if(typeof renderPremiumMission==="function")setTimeout(renderPremiumMission,0);openPendingSessionFeedback();}
+function completeWorkout(){
+  if(!data.activeWorkout)return;
+  syncActiveWorkoutTimer();
+  persistActive();
+  if(data.activeWorkout.engineMetrics&&!parseEngineTime(data.activeWorkout.engineMetrics.manualTime)){
+    data.activeWorkout.engineMetrics.manualTime=formatEngineTime(data.activeWorkout.elapsed||0);
+    data.activeWorkout.officialElapsed=data.activeWorkout.elapsed||0;
+  }
+  // Preserve the exact planned-session identity before the active workout is cleared.
+  const launchIdentity={
+    planId:data.activeWorkout.planId,
+    sessionKey:data.activeWorkout.planSessionKey,
+    scheduledDate:data.activeWorkout.scheduledDate,
+    mission:data.activeWorkout.name,
+    type:(data.activeWorkout.cardioType||data.activeWorkout.engineMetrics)?"engine":"strength"
+  };
+  const completed={...data.activeWorkout,timerRunning:false,completed:true,status:"completed",completedAt:new Date().toISOString()};
+  if(typeof applyCompletedWorkoutProgression==="function")applyCompletedWorkoutProgression(completed);
+  data.history.unshift(completed);
+  let recorded=false;
+  if(typeof markPlannedSessionComplete==="function")recorded=Boolean(markPlannedSessionComplete(completed));
+  // Exact-key fallback: completion must never depend on a renamed Engine mission.
+  const exactItem=(data.plan||[]).find(item=>String(item.id)===String(launchIdentity.planId))||
+    (data.plan||[]).find(item=>typeof sessionsFromPlanItem==="function"&&sessionsFromPlanItem(item).some(session=>String(session.sessionKey)===String(launchIdentity.sessionKey)));
+  if(exactItem&&launchIdentity.sessionKey){
+    exactItem.sessionCompletions=exactItem.sessionCompletions&&typeof exactItem.sessionCompletions==="object"?exactItem.sessionCompletions:{};
+    exactItem.sessionCompletions[launchIdentity.sessionKey]=completed.completedAt;
+    completed.planId=exactItem.id;
+    completed.planSessionKey=launchIdentity.sessionKey;
+    completed.scheduledDate=launchIdentity.scheduledDate||exactItem.scheduledDate||completed.scheduledDate;
+    completed.sessionType=launchIdentity.type;
+    completed.completionIdentity={planId:exactItem.id,sessionKey:launchIdentity.sessionKey,mission:typeof bellCanonicalWorkoutMission==="function"?bellCanonicalWorkoutMission(launchIdentity.mission):launchIdentity.mission,type:launchIdentity.type,scheduledDate:completed.scheduledDate};
+    const planned=typeof sessionsFromPlanItem==="function"?sessionsFromPlanItem(exactItem):[];
+    const required=planned.filter(session=>!String(session.mission||"").startsWith("M-")&&!session.optionalCore);
+    exactItem.done=required.length>0&&required.every(session=>Boolean(exactItem.sessionCompletions[session.sessionKey]));
+    exactItem.status=exactItem.done?"completed":"planned";
+    if(exactItem.done)exactItem.completedAt=completed.completedAt;else delete exactItem.completedAt;
+    recorded=true;
+  }
+  completed.planCompletionRecorded=recorded;
+  if(!recorded){
+    const plan=data.plan.find(item=>item.mission===completed.name&&!item.done&&!["skipped","replaced"].includes(item.status));
+    if(plan){plan.done=true;plan.status="completed";plan.completedAt=completed.completedAt;}
+  }
+  closeWorkout();
+  data.activeWorkout=null;
+  data.pendingFeedbackSessionId=completed.completedAt;
+  saveData();
+  if(typeof renderBellCommercialHome==="function")setTimeout(renderBellCommercialHome,0);
+  if(typeof renderPremiumMission==="function")setTimeout(renderPremiumMission,0);
+  openPendingSessionFeedback();
+}
 function discardWorkout(){if(!confirm("Discard this workout?"))return;closeWorkout();data.activeWorkout=null;saveData();}
 
 

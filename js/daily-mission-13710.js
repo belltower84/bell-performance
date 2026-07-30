@@ -25,7 +25,7 @@ function bellDailySessionBudget(sessions=premiumAllSessions(),key=selectedDashbo
   const checkedIn=isToday&&hasCurrentCheckIn;
   const available=checkedIn?Math.max(15,timeCapacityMinutes()):rows.reduce((sum,x)=>sum+x.plannedMinutes,0);
   rows.forEach(row=>row.optional=bellSessionOptional(row,rows));
-  const required=rows.filter(x=>!x.optional&&!x.completed), optional=rows.filter(x=>x.optional&&!x.completed);
+  const required=rows.filter(x=>!x.optional), optional=rows.filter(x=>x.optional);
   const plannedRequired=required.reduce((sum,x)=>sum+x.plannedMinutes,0);
   let target=Math.min(available,plannedRequired||available);
   if(required.length===1){required[0].minutes=Math.max(10,target||required[0].plannedMinutes);}
@@ -44,7 +44,6 @@ function bellDailySessionBudget(sessions=premiumAllSessions(),key=selectedDashbo
   const used=required.reduce((sum,x)=>sum+(x.minutes||0),0);
   const spare=Math.max(0,available-used);
   optional.forEach((x,index)=>{x.minutes=Math.max(10,Math.min(x.plannedMinutes,index===0&&spare>=10?spare:Math.min(20,x.plannedMinutes)));});
-  rows.filter(x=>x.completed).forEach(x=>x.minutes=x.plannedMinutes);
   return {available,checkedIn,requiredMinutes:used,sessions:rows};
 }
 function bellCapWorkoutTemplateToMinutes(template,minutes,name){

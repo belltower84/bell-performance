@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-8-4";
+const CACHE_NAME = "bell-performance-13-8-5";
 const CORE = [
   "./",
   "./index.html",
@@ -13,6 +13,7 @@ const CORE = [
   "./css/bell1364.css?v=13640",
   "./css/guided-tour-1374.css?v=13740",
   "./css/settings-1376.css?v=13760",
+  "./css/workout-experience-1385.css?v=13850",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/logo-shield.svg?v=13720",
   "./assets/icons/engine-shoe.svg?v=10006",
@@ -44,13 +45,13 @@ const CORE = [
   "./js/nutrition.js?v=10006",
   "./js/milestones.js?v=10006",
   "./js/progression.js?v=10006",
-  "./js/workout-model.js?v=10006",
-  "./js/workouts.js?v=11000",
+  "./js/workout-model.js?v=13850",
+  "./js/workouts.js?v=13850",
   "./js/missed-sessions.js?v=10006",
   "./js/performance-review.js?v=10006",
   "./js/artwork.js?v=10006",
   "./js/quote-cache.js?v=10006",
-  "./js/ui.js?v=13610",
+  "./js/ui.js?v=13850",
   "./js/habits.js?v=10006",
   "./js/dual-goals.js?v=13610",
   "./js/version-8.js?v=13600",
@@ -68,13 +69,15 @@ const CORE = [
   "./js/adaptive-weekly-schedule.js?v=12290",
   "./js/app.js?v=12101",
   "./js/bell-coaching-engine.js?v=13200",
-  "./js/bell13-dashboard.js?v=13200",
+  "./js/bell13-dashboard.js?v=13850",
   "./js/bell13-athlete-experience.js?v=13650",
   "./js/first-flight-1372.js?v=13721",
   "./js/bell13-coach-intelligence.js?v=13620",
-  "./js/bell13-commercial-home.js?v=13840",
+  "./js/bell13-commercial-home.js?v=13850",
   "./js/settings-1376.js?v=13760",
-  "./js/independent-daily-sessions-1382.js?v=13840",
+  "./js/independent-daily-sessions-1382.js?v=13850",
+  "./js/training-hub-1385.js?v=13850",
+  "./js/mission-routing-1385.js?v=13850",
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

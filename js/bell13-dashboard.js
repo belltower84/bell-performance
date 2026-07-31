@@ -101,7 +101,7 @@
     if(!$('bell13JourneyCard'))dashboard.insertAdjacentHTML('afterbegin',cardHtml());
     const pageCopy={
       plan:['Journey Plan','See how today’s work fits into your longer-term development.'],
-      workouts:['Training','Start today’s prescription or explore purpose-matched sessions.'],
+      workouts:['Training','Start today’s prescribed training and return to sessions already in progress.'],
       history:['Progress','Review performance, consistency, readiness, and milestones.'],
       more:['Settings','Control your athlete profile, journey, schedule, and Bell coaching preferences.']
     };

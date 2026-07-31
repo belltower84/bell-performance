@@ -1,6 +1,6 @@
-## Bell Performance 13.7.10 — Mission Time Budget & Session Selector
+## Bell Performance 13.8.5 — Training Experience Refinement
 
-See `RELEASE_NOTES_13_7_10.md` for changes.
+See `RELEASE_NOTES_13_8_5.md` and `VALIDATION_13_8_5.md` for the current changes and test record.
 
 # Bell Performance 13.7.5 — Settings Flow Rebuild
 

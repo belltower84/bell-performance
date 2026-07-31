@@ -11,7 +11,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <link href="./assets/logo-shield.svg?v=13720" rel="icon" type="image/svg+xml"/>
-<title>Bell Performance 13.8.4 — Independent Daily Sessions</title>
+<title>Bell Performance 13.8.5 — Training Experience Refinement</title>
 <link href="./css/app.css?v=13710" rel="stylesheet"/>
 <link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
 <link href="./css/independent-daily-sessions-1382.css?v=13840" rel="stylesheet"/>
@@ -21,6 +21,7 @@
 <link href="./css/bell1364.css?v=13640" rel="stylesheet"/>
 <link href="./css/guided-tour-1374.css?v=13740" rel="stylesheet"/>
 <link href="./css/settings-1376.css?v=13760" rel="stylesheet"/>
+<link href="./css/workout-experience-1385.css?v=13850" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -178,7 +179,12 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </div>
 </section>
 <section class="screen" id="plan"><h2 class="section-title">Training Plan</h2><div id="planProgressArea"></div><div class="list" id="planList"></div></section>
-<section class="screen" id="workouts"><div class="section-heading"><h2 class="section-title">Training Library</h2><button onclick="openExerciseLibrary()" type="button">Exercise Library ›</button></div><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div class="list" id="workoutLibrary"></div></section>
+<section class="screen" id="workouts">
+  <div class="training-hub-shell">
+    <div class="section-heading training-hub-heading"><div><span class="metric-label">Training</span><h2 class="section-title">Today’s Training</h2><p class="sub">Your prescribed sessions live in one place. The full workout catalog is no longer shown here.</p></div></div>
+    <div id="trainingHubCurrent"></div>
+  </div>
+</section>
 <section class="screen" id="exerciseLibrary">
 <div class="library-shell">
 <div class="library-main-column">
@@ -621,22 +627,22 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div aria-labelledby="weekPreviewTitle" aria-modal="true" class="modal hidden" id="weekPreviewModal" role="dialog"><div class="modal-box onboarding-box week-preview-modal"><div class="card"><div class="notification-header"><div><span class="metric-label">Training Timeline</span><h2 id="weekPreviewTitle">Week Preview</h2><p class="sub" id="weekPreviewSubtitle"></p></div><button class="modal-close" onclick="bpCloseWeekPreview()" aria-label="Close week preview">×</button></div><div class="week-coach-brief" id="weekPreviewCoachBrief"></div><div id="weekPreviewList"></div><div class="row"><button class="secondary" onclick="bpPreviewAdjacentWeek(-1)">‹ Previous Week</button><button class="secondary" onclick="bpPreviewAdjacentWeek(1)">Next Week ›</button></div><button class="good" id="weekPreviewBuildButton" onclick="bpBuildPreviewedWeek()">Rebuild This Week</button></div></div></div>
 <div aria-labelledby="workoutPreviewTitle" aria-modal="true" class="modal hidden" id="workoutPreviewModal" role="dialog"><div class="modal-box preview-workout-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Workout Preview</span><h2 id="workoutPreviewTitle">Today’s Mission</h2><p class="sub" id="workoutPreviewMeta"></p></div><button class="modal-close" onclick="closeWorkoutPreview()" aria-label="Close workout preview">×</button></div><div id="workoutPreviewContent"></div><div class="row"><button class="secondary" onclick="closeWorkoutPreview()">Back</button><button class="good" id="previewBeginButton">Begin Workout</button></div></div></div></div>
 <div class="modal hidden" id="workoutModal">
-<div class="modal-box">
+<div class="modal-box workout-shell-1385">
 <div class="workout-top">
-<div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
+<div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><span class="workout-header-spacer" aria-hidden="true"></span></div>
 <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
 </div>
 <div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=10006"/><div><span class="metric-label">Today's Mission</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Hard</span><span id="workoutHeroWeek">Week 1 • Training</span></div></div></div>
 <div class="mission-briefing-grid" id="missionBriefing">
-  <section class="card mission-coach-brief"><span class="metric-label">Coach's Brief</span><h3 id="workoutBriefHeading">Why today matters</h3><p id="workoutCoachBrief">Your briefing will appear here.</p><div class="mission-focus-list" id="workoutFocusList"></div></section>
-  <section class="card mission-session-breakdown"><span class="metric-label">Session Breakdown</span><div id="workoutSectionList"></div><div class="mission-total"><span>Total estimated time</span><strong id="workoutBreakdownTotal">—</strong></div></section>
+  <section class="card mission-coach-brief"><span class="metric-label">Bell Coach</span><h3 id="workoutBriefHeading">Why today matters</h3><p id="workoutCoachBrief">Your briefing will appear here.</p><div class="mission-focus-list" id="workoutFocusList"></div></section>
+  <section class="card mission-session-breakdown"><span class="metric-label">Today's Plan</span><div id="workoutSectionList"></div><div class="mission-total"><span>Total estimated time</span><strong id="workoutBreakdownTotal">—</strong></div></section>
   <section class="card mission-success-card"><span class="metric-label">Success Today</span><div id="workoutSuccessList"></div></section>
   <section class="card mission-details-card"><span class="metric-label">Mission Details</span><div class="mission-detail-metrics"><div><strong id="workoutSetCount">—</strong><span>Work Sets</span></div><div><strong id="workoutIntensity">—</strong><span>Intensity</span></div></div><div class="mission-equipment"><span>Equipment</span><p id="workoutEquipment">—</p></div><div class="mission-next"><span>Next Session</span><strong id="workoutNextTitle">No session scheduled</strong><small id="workoutNextDetail"></small></div></section>
 </div>
-<div class="workout-stage-actions" id="workoutBriefActions"><button class="secondary" onclick="previewActiveWorkout()">Preview Full Workout</button><button class="good" onclick="beginWorkoutFlow()">Begin Workout</button></div>
-<div class="workout-stage-actions hidden" id="warmupActions"><button class="good" onclick="advanceToTraining()">Advance to Training</button></div>
+<div class="workout-stage-actions" id="workoutBriefActions"><button class="secondary" onclick="previewActiveWorkout()">View Exercise List</button><button class="good" onclick="beginWorkoutFlow()">Start Session</button></div>
+<div class="workout-stage-actions hidden" id="warmupActions"><button class="good" onclick="advanceToTraining()">Begin Working Sets</button></div>
 <div class="card workout-control-card" id="workoutControlCard">
-<h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
+<h3>Session Timer</h3><div class="timer" id="workoutTimer">00:00</div>
 <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
 <div class="rest-panel hidden" id="restPanel"><span class="metric-label">Rest Timer</span><div class="rest-time" id="restTimer">00:00</div><div class="row three"><button class="secondary" onclick="adjustRestTimer(-30)">−30 sec</button><button class="secondary" onclick="adjustRestTimer(30)">+30 sec</button><button class="danger" onclick="skipRestTimer()">Skip</button></div></div>
 <div class="row"><button class="secondary" onclick="closeWorkout()">Save &amp; Exit</button><button class="danger" onclick="discardWorkout()">Discard</button></div>
@@ -656,7 +662,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="performance-callout" id="enginePacePreview">Enter time and distance to calculate pace.</div>
 </div>
 <div id="activeExercises"></div>
-<div class="card" id="workoutCompletionCard"><label>Session RPE</label><input id="sessionRpe" max="10" min="1" type="number"/><label>Training Notes</label><textarea id="sessionNotes"></textarea><button class="good" onclick="completeWorkout()">Finish Training</button></div>
+<div class="card" id="workoutCompletionCard"><div class="workout-finish-heading"><span class="metric-label">Finish Session</span><h3>Record how the workout went</h3></div><div class="workout-finish-fields"><label>Session RPE<input id="sessionRpe" max="10" min="1" placeholder="1–10" type="number"/></label><label>Training Notes<textarea id="sessionNotes" placeholder="Optional notes for Bell Coach"></textarea></label></div><button class="good workout-finish-button" onclick="completeWorkout()">Complete Session</button></div>
 </div>
 </div>
 
@@ -672,7 +678,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.8.4-commercial-home-independent-sessions";</script>
+<script>window.BELL_APP_VERSION = "13.8.5-training-experience-refinement";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=13710"></script>
 <script src="./js/storage.js?v=13840"></script>
@@ -684,13 +690,13 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/nutrition.js?v=10006"></script>
 <script src="./js/milestones.js?v=10006"></script>
 <script src="./js/progression.js?v=10006"></script>
-<script src="./js/workout-model.js?v=10006"></script>
-<script src="./js/workouts.js?v=11000"></script>
+<script src="./js/workout-model.js?v=13850"></script>
+<script src="./js/workouts.js?v=13850"></script>
 <script src="./js/missed-sessions.js?v=10006"></script>
 <script src="./js/performance-review.js?v=10006"></script>
 <script src="./js/artwork.js?v=10006"></script>
 <script src="./js/quote-cache.js?v=10006"></script>
-<script src="./js/ui.js?v=13718"></script>
+<script src="./js/ui.js?v=13850"></script>
 <script src="./js/habits.js?v=10006"></script>
 <script src="./js/dual-goals.js?v=10006"></script>
 <script src="./js/version-8.js?v=13718"></script>
@@ -711,14 +717,16 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/powerlifting-meet-prep.js?v=12213"></script>
 <script src="./js/app.js?v=12101"></script>
 <script src="./js/bell-coaching-engine.js?v=13200"></script>
-<script src="./js/bell13-dashboard.js?v=13200"></script>
+<script src="./js/bell13-dashboard.js?v=13850"></script>
 <script src="./js/bell13-athlete-experience.js?v=13650"></script>
 <script src="./js/first-flight-1372.js?v=13721"></script>
 <script src="./js/bell13-coach-intelligence.js?v=13620"></script>
-<script src="./js/bell13-commercial-home.js?v=13840"></script>
+<script src="./js/bell13-commercial-home.js?v=13850"></script>
 <script src="./js/settings-1376.js?v=13760"></script>
 <script src="./js/daily-mission-13710.js?v=13718"></script>
 <script src="./js/completion-engine-13717.js?v=13718"></script>
-<script src="./js/independent-daily-sessions-1382.js?v=13840"></script>
+<script src="./js/independent-daily-sessions-1382.js?v=13850"></script>
+<script src="./js/training-hub-1385.js?v=13850"></script>
+<script src="./js/mission-routing-1385.js?v=13850"></script>
 </body>
 </html>

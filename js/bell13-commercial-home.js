@@ -1,5 +1,5 @@
 "use strict";
-/* Bell Performance 13.6.5 — streamlined recovery-day launch flow. */
+/* Bell Performance 13.8.5 — commercial Home with optional support sessions and streamlined training. */
 (function(){
   const $=id=>document.getElementById(id);
   const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -74,23 +74,29 @@
       const training=model.rows.filter(row=>row.type==="strength"||row.type==="engine");
       const required=model.rows.filter(row=>row.required);
       const requiredDone=required.length>0&&required.every(row=>row.completed);
-      const title=requiredDone?"Mission Complete":training.length?training.map(row=>row.label).join(" + "):"Recovery Day";
+      const requiredTraining=training.filter(row=>row.required);
+      const title=requiredDone?"Mission Complete":requiredTraining.length?requiredTraining.map(row=>row.label).join(" + "):"Recovery Day";
       const purpose=requiredDone
-        ?"Today’s required training is complete."
-        :training.length
-          ?`Today’s required work has been fit to your ${model.available}-minute availability. Core is included; daily mobility is separate.`
-          :"Recover, move well, and prepare for the next training day.";
-      return {...model,training,required,requiredDone,title,purpose,minutes:training.length?`${model.available} min`:"Flexible"};
+        ?"Today’s required training is complete. Optional Core and Mobility remain available."
+        :requiredTraining.length
+          ?`Required Strength and Engine work has been fit to your ${model.available}-minute availability. Core and Mobility are optional support.`
+          :"Mobility, easy movement, and recovery habits are today’s main focus. Core remains optional.";
+      return {...model,training,required,requiredDone,title,purpose,minutes:requiredTraining.length?`${model.requiredMinutes||model.available} min`:"Recovery"};
     }catch(error){console.error("Bell independent mission render failed",error);return null;}
   }
   function renderIndependentSessions(model){
     const host=$("b135SessionSummary");if(!host)return;
     host.className="b135-session-summary b1384-session-stack";
-    host.innerHTML=model.rows.map(row=>`<article class="b1384-session ${esc(row.type)}${row.completed?' completed':''}" data-session-type="${esc(row.type)}">
-      <div class="b1384-session-top"><span>${esc(row.type==='strength'?'Primary':titleCase(row.type))} · ${esc(row.status)}</span>${row.completed?'<i aria-hidden="true">✓</i>':''}</div>
-      <div class="b1384-session-copy"><h3>${esc(row.label)}</h3><p>${esc(row.description)}</p><small>${esc(row.minutes)} min${row.outsideBudget?' · outside training budget':row.optional?' · optional':''}</small></div>
+    host.innerHTML=model.rows.map(row=>{
+      const typeLabel=row.type==='strength'?'Primary':titleCase(row.type);
+      const statusLabel=row.recoveryFocus?'Recovery Focus · Optional':row.status;
+      const timeNote=row.required?'included in today’s required time':row.type==='engine'?'optional support':row.type==='core'?'optional · based on usual availability':'optional · separate from training';
+      return `<article class="b1384-session ${esc(row.type)}${row.completed?' completed':''}${row.recoveryFocus?' recovery-focus':''}" data-session-type="${esc(row.type)}">
+      <div class="b1384-session-top"><span>${esc(typeLabel)} · ${esc(statusLabel)}</span>${row.completed?'<i aria-hidden="true">✓</i>':''}</div>
+      <div class="b1384-session-copy"><h3>${esc(row.label)}</h3><p>${esc(row.description)}</p><small>${esc(row.minutes)} min · ${esc(timeNote)}</small></div>
       <div class="b1384-session-actions"><button type="button" class="b135-secondary" data-independent-preview="${esc(row.type)}">Preview</button><button type="button" class="b135-start" data-independent-start="${esc(row.type)}" ${row.completed?'disabled':''}>${row.completed?'✓ Completed':`▶ Start ${esc(row.type==='strength'?'Strength':titleCase(row.type))}`}</button></div>
-    </article>`).join('')+(model.requiredDone?`<div class="b1384-tomorrow"><div><strong>Mission Complete</strong><span>Required training for today is finished.</span></div><button type="button" class="b135-secondary" id="b1384PreviewTomorrow">Preview Tomorrow</button></div>`:'');
+    </article>`;
+    }).join('')+(model.requiredDone?`<div class="b1384-tomorrow"><div><strong>Mission Complete</strong><span>Required training for today is finished. Optional support remains available.</span></div><button type="button" class="b135-secondary" id="b1384PreviewTomorrow">Preview Tomorrow</button></div>`:'');
     host.querySelectorAll('[data-independent-start]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();window.BellDailySessions.start(button.dataset.independentStart,model.key);}));
     host.querySelectorAll('[data-independent-preview]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();window.BellDailySessions.preview(button.dataset.independentPreview,model.key);}));
     const tomorrow=$("b1384PreviewTomorrow");if(tomorrow)tomorrow.onclick=()=>{const next=typeof addLocalDays==='function'?addLocalDays(model.key,1):model.key;if(typeof setDashboardDate==='function')setDashboardDate(next);};

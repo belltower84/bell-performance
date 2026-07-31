@@ -1,0 +1,133 @@
+/* Bell Performance 13.8.5 — training and workout experience refinement */
+
+/* Today’s Mission support-session hierarchy */
+.b1384-session.core,.b1384-session.mobility{background:linear-gradient(180deg,rgba(13,18,23,.78),rgba(8,12,16,.82));border-style:dashed}
+.b1384-session.core .b1384-session-top,.b1384-session.mobility .b1384-session-top{color:#b9c2cb}
+.b1384-session.recovery-focus{border-style:solid;border-color:rgba(226,177,49,.4);background:linear-gradient(135deg,rgba(226,177,49,.09),rgba(10,14,18,.95))}
+.b1384-session.recovery-focus .b1384-session-top{color:#e4b632}
+.b1384-session.completed{filter:saturate(.72)}
+
+/* Focused Train tab */
+.training-hub-shell{display:grid;gap:18px;max-width:900px;margin:0 auto}
+.training-hub-heading{align-items:flex-end}
+.training-hub-heading .sub{max-width:650px;margin:7px 0 0}
+#trainingHubCurrent{display:grid;gap:16px}
+.training-hub-active,.training-hub-today{margin:0!important;padding:22px!important}
+.training-hub-active,.training-hub-title{display:flex;align-items:center;justify-content:space-between;gap:22px}
+.training-hub-active h3,.training-hub-title h3{margin:5px 0 7px;font-size:25px;letter-spacing:-.025em}
+.training-hub-active p,.training-hub-title p{margin:0;color:#aeb7c1;line-height:1.5}
+.training-hub-active button,.training-hub-title button{width:auto;min-width:190px;margin:0}
+.training-hub-rows{display:grid;gap:9px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
+.training-hub-row{display:grid;grid-template-columns:100px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:#0c1115}
+.training-hub-row span{color:#d8a632;font-size:10px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+.training-hub-row strong{min-width:0}
+.training-hub-row small{color:#9ca6af;text-align:right}
+.training-hub-row.completed{opacity:.58}
+.training-hub-empty{padding:18px;color:#9ca6af;text-align:center}
+
+/* Workout shell — same dark, restrained hierarchy used across Bell Performance */
+.workout-shell-1385{padding-left:18px!important;padding-right:18px!important;background:radial-gradient(circle at 100% 0,rgba(216,166,50,.07),transparent 24%),#090d11!important}
+@media(min-width:760px){.workout-shell-1385{width:min(920px,100%)!important}}
+.workout-shell-1385 .workout-top{position:sticky;top:0;z-index:20;margin:-10px -18px 16px;padding:calc(env(safe-area-inset-top) + 10px) 18px 12px;background:rgba(9,13,17,.95);border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(18px)}
+.workout-shell-1385 .workout-modal-header{grid-template-columns:42px minmax(0,1fr) 42px;padding:0 0 10px}
+.workout-shell-1385 .workout-modal-header strong{font-size:20px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.workout-shell-1385 .workout-header-spacer{width:42px;height:42px}
+.workout-shell-1385 .scorebar{height:5px;border-radius:99px;background:#1e262d;overflow:hidden}
+.workout-shell-1385 .progress-label{margin-top:7px;font-size:11px;color:#9ca6af}
+
+.workout-shell-1385 .workout-hero{min-height:0;display:block;margin:0 0 14px;padding:22px;border-radius:19px;border:1px solid rgba(216,166,50,.26);background:linear-gradient(135deg,rgba(216,166,50,.09),rgba(12,17,22,.96));box-shadow:none}
+.workout-shell-1385 .workout-hero img,.workout-shell-1385 .workout-hero:after,.workout-shell-1385 .workout-hero:before{display:none!important}
+.workout-shell-1385 .workout-hero>div{width:100%}
+.workout-shell-1385 .workout-hero h2{font-size:32px;line-height:1.05;margin:6px 0 9px}
+.workout-shell-1385 .workout-hero p{max-width:680px;margin:0;color:#b9c2ca;line-height:1.55}
+.workout-shell-1385 .hero-pills{margin-top:16px}
+.workout-shell-1385 .hero-pills span{padding:7px 10px;background:#0d1318;border-color:rgba(216,166,50,.22)}
+
+.workout-shell-1385 .mission-briefing-grid{grid-template-columns:1.15fr .85fr;gap:12px;margin-bottom:12px}
+.workout-shell-1385 .mission-briefing-grid>.card{padding:18px;border-radius:17px;background:#0d1318;box-shadow:none}
+.workout-shell-1385 .mission-success-card,.workout-shell-1385 .mission-details-card{display:none!important}
+.workout-shell-1385 .mission-coach-brief p{margin:8px 0 12px;line-height:1.55}
+.workout-shell-1385 .mission-section-row{padding:8px 0}
+.workout-shell-1385 .workout-stage-actions{padding:0 0 18px;gap:10px}
+.workout-shell-1385 .workout-stage-actions button{min-height:50px;margin:0}
+
+.workout-shell-1385 .workout-control-card{position:sticky;top:94px;z-index:12;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;margin:0 0 14px;padding:13px 15px;border:1px solid rgba(216,166,50,.24);border-radius:16px;background:rgba(12,17,22,.96);box-shadow:0 12px 30px rgba(0,0,0,.28);backdrop-filter:blur(15px)}
+.workout-shell-1385 .workout-control-card h3{display:none}
+.workout-shell-1385 .workout-control-card .timer{grid-column:auto;font-size:25px;font-weight:900;letter-spacing:.02em;color:#f3c758}
+.workout-shell-1385 .current-exercise{min-width:0;padding:0 0 0 12px;border-left:2px solid #d8a632}
+.workout-shell-1385 .current-exercise .metric-label{font-size:8px}
+.workout-shell-1385 .current-exercise strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.workout-shell-1385 .workout-control-card>.row{display:flex;gap:7px;margin:0}
+.workout-shell-1385 .workout-control-card>.row button{width:auto;min-width:0;margin:0;padding:9px 11px;font-size:11px}
+.workout-shell-1385 .rest-panel{grid-column:1/-1;margin-top:2px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+
+.workout-shell-1385 #warmupPanel{margin-bottom:14px;padding:18px;border-radius:17px}
+.workout-shell-1385 #warmupPanel h3{margin:0 0 5px}
+.workout-shell-1385 .warmup-row{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.workout-shell-1385 .warmup-row:last-child{border-bottom:0}
+
+.workout-shell-1385 .workout-block-title{margin:22px 3px 9px;color:#d8a632;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+.workout-shell-1385 .streamlined-exercise{margin:0 0 12px;padding:17px;border:1px solid #2d3740;border-radius:17px;background:linear-gradient(145deg,#11171d,#0a0f13);box-shadow:none}
+.workout-shell-1385 .streamlined-exercise:after{display:none}
+.workout-shell-1385 .streamlined-head{align-items:flex-start}
+.workout-shell-1385 .streamlined-head .exercise-num{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;font-size:14px}
+.workout-shell-1385 .exercise-name-row{align-items:flex-start}
+.workout-shell-1385 .exercise-name{font-size:20px;line-height:1.2}
+.workout-shell-1385 .prescription{margin-top:4px;font-size:13px}
+.workout-shell-1385 .exercise-card-actions{display:flex;gap:6px}
+.workout-shell-1385 .exercise-card-actions button{width:auto;min-width:0;margin:0;padding:7px 9px;border:1px solid #36414b;background:#10161b;color:#d2d8dd;font-size:10px}
+.workout-shell-1385 .exercise-primary-cue{margin:10px 0 0;color:#b9c2ca;line-height:1.5}
+.workout-shell-1385 .exercise-guidance-drawer,.workout-shell-1385 .exercise-feedback-drawer{margin-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+.workout-shell-1385 details>summary{padding:11px 0 2px;color:#d7dde2;font-size:12px;font-weight:800;cursor:pointer;list-style:none}
+.workout-shell-1385 details>summary::-webkit-details-marker{display:none}
+.workout-shell-1385 details>summary:after{content:'+';float:right;color:#d8a632;font-size:18px;line-height:.8}
+.workout-shell-1385 details[open]>summary:after{content:'–'}
+.workout-shell-1385 .exercise-detail-grid{display:grid;gap:8px;padding:10px 0 2px}
+.workout-shell-1385 .exercise-detail-line{display:grid;grid-template-columns:105px 1fr;gap:10px;padding:9px 10px;border-radius:10px;background:#0b1014}
+.workout-shell-1385 .exercise-detail-line strong{color:#d8a632;font-size:11px}
+.workout-shell-1385 .exercise-detail-line span{color:#aeb7c1;font-size:12px;line-height:1.45}
+.workout-shell-1385 .exercise-detail-line.warning strong{color:#e1a052}
+.workout-shell-1385 .set-table-wrap{margin-top:14px}
+.workout-shell-1385 .set-head,.workout-shell-1385 .set-row{grid-template-columns:48px minmax(80px,1fr) minmax(80px,1fr) 52px}
+.workout-shell-1385 .set-head{padding:0 6px 6px;color:#7f8a94;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+.workout-shell-1385 .set-row{padding:7px 5px;border-top:1px solid rgba(255,255,255,.06)}
+.workout-shell-1385 .set-row input{min-width:0;margin:0;padding:9px 8px;border-radius:9px}
+.workout-shell-1385 .set-row input[type=checkbox]{width:22px;height:22px;justify-self:center;accent-color:#d8a632}
+.workout-shell-1385 .exercise-feedback{padding:10px 0 2px}
+.workout-shell-1385 .feedback-buttons{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.workout-shell-1385 .feedback-buttons button{min-width:0;margin:0;padding:9px 6px;font-size:10px}
+
+.workout-shell-1385 #engineResultCard{margin:0 0 14px;padding:18px}
+.workout-shell-1385 #workoutCompletionCard{margin:18px 0 24px;padding:20px;border:1px solid rgba(216,166,50,.25);background:linear-gradient(145deg,rgba(216,166,50,.07),#0c1115)}
+.workout-finish-heading h3{margin:5px 0 14px;font-size:20px}
+.workout-finish-fields{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px}
+.workout-finish-fields label{margin:0;color:#b8c1ca;font-size:11px;font-weight:800}
+.workout-finish-fields input,.workout-finish-fields textarea{margin-top:7px}
+.workout-finish-fields textarea{min-height:78px}
+.workout-finish-button{margin:14px 0 0;min-height:52px}
+
+.preview-workout-box #workoutPreviewContent h3{margin:18px 0 7px;color:#d8a632;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+
+@media(max-width:760px){
+  .training-hub-active,.training-hub-title{align-items:stretch;flex-direction:column}
+  .training-hub-active button,.training-hub-title button{width:100%}
+  .training-hub-row{grid-template-columns:1fr;gap:4px}
+  .training-hub-row small{text-align:left}
+  .workout-shell-1385{padding-left:13px!important;padding-right:13px!important}
+  .workout-shell-1385 .workout-top{margin-left:-13px;margin-right:-13px;padding-left:13px;padding-right:13px}
+  .workout-shell-1385 .workout-hero{padding:18px}
+  .workout-shell-1385 .workout-hero h2{font-size:27px}
+  .workout-shell-1385 .mission-briefing-grid{grid-template-columns:1fr}
+  .workout-shell-1385 .workout-control-card{top:88px;grid-template-columns:auto minmax(0,1fr);padding:12px}
+  .workout-shell-1385 .workout-control-card>.row{grid-column:1/-1}
+  .workout-shell-1385 .workout-control-card>.row button{flex:1}
+  .workout-shell-1385 .feedback-buttons{grid-template-columns:1fr 1fr}
+  .workout-finish-fields{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .workout-shell-1385 .workout-stage-actions{flex-direction:column-reverse}
+  .workout-shell-1385 .set-head,.workout-shell-1385 .set-row{grid-template-columns:36px minmax(66px,1fr) minmax(66px,1fr) 42px;gap:6px}
+  .workout-shell-1385 .exercise-detail-line{grid-template-columns:1fr;gap:3px}
+  .workout-shell-1385 .exercise-name{font-size:18px}
+  .workout-shell-1385 .exercise-card-actions{flex-direction:column}
+}

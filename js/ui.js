@@ -350,24 +350,9 @@ function togglePlan(index, checked) {
 }
 
 function renderWorkoutLibrary() {
-  const container = byId("workoutLibrary");
-  container.innerHTML = "";
-  setText("libraryRotation", `Week ${getRotationWeek()}`);
-  allWorkoutNames().forEach(name => {
-    const scaled = scaledTemplate(name);
-    if (!scaled) return;
-    const blocks = [...new Set(scaled.exercises.map(exercise => exercise.block).filter(Boolean))].join(" • ");
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="status-line">
-        <div><h3>${name}</h3><div class="workout-library-title">${scaled.label}</div><div class="sub">${scaled.duration} min • ${blocks}</div></div>
-        <button class="compact-button" onclick="beginWorkout('${name.replaceAll("'", "\\'")}')">Begin</button>
-      </div>
-      <div class="hint">${scaled.exercises.map(exercise => `${exercise.name}: ${exercise.sets} × ${exercise.reps}`).join(" • ")}</div>
-    `;
-    container.appendChild(card);
-  });
+  // Bell 13.8.5: the Train tab is a focused daily-training hub, not a catalog
+  // of every workout the coaching engine could prescribe.
+  if (typeof renderTrainingHub === "function") renderTrainingHub();
 }
 
 function renderHistory() {

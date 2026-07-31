@@ -82,21 +82,23 @@
       if(!group){group={title:label,sets:0};groups.push(group);}
       group.sets += Array.isArray(ex.sets)?ex.sets.length:Number(ex.originalSets)||0;
     });
-    const warmup=isEngine?5:10;
-    const cooldown=isEngine?5:Math.min(5,Math.max(0,duration-15));
-    const workMinutes=Math.max(5,duration-warmup-cooldown);
-    const totalWeight=groups.reduce((sum,g)=>sum+Math.max(1,g.sets),0)||1;
-    const sections=[{title:'Warm-up',minutes:warmup}];
+    const hasWarmup=groups.some(group=>group.title==='Warm-up');
+    const generatedWarmup=!hasWarmup&&!isEngine;
+    if(generatedWarmup)groups.unshift({title:'Warm-up',sets:2,generated:true});
+    // Do not invent a cooldown section. It appears only when the workout template
+    // contains an actual cooldown exercise that the athlete can complete in-app.
+    const totalWeight=groups.reduce((sum,group)=>sum+Math.max(1,group.sets),0)||1;
+    const minimum=groups.length*3<=duration?3:1;
     let allocated=0;
-    groups.forEach((group,index)=>{
-      const minutes=index===groups.length-1?workMinutes-allocated:Math.max(3,Math.round(workMinutes*Math.max(1,group.sets)/totalWeight));
+    return groups.map((group,index)=>{
+      const slotsAfter=groups.length-index-1;
+      const remaining=Math.max(minimum,duration-allocated);
+      const maxCurrent=Math.max(minimum,remaining-(slotsAfter*minimum));
+      const proportional=Math.max(minimum,Math.round(duration*Math.max(1,group.sets)/totalWeight));
+      const minutes=index===groups.length-1?remaining:Math.min(maxCurrent,proportional);
       allocated+=minutes;
-      sections.push({title:group.title,minutes});
+      return {title:group.title,minutes};
     });
-    if(cooldown>0)sections.push({title:'Cooldown',minutes:cooldown});
-    const total=sections.reduce((sum,s)=>sum+s.minutes,0);
-    if(total!==duration && sections.length>1)sections[sections.length-2].minutes=Math.max(1,sections[sections.length-2].minutes+(duration-total));
-    return sections;
   }
 
   function coachBriefFor(workout,isEngine,intensity,next){

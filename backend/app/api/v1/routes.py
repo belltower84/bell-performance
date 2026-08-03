@@ -270,6 +270,20 @@ def intelligence(athlete_id: str, db: Session = Depends(get_db), user: User = De
     return intelligence_summary(db, athlete_id)
 
 
+@router.get("/athletes/{athlete_id}/adaptive-progression", tags=["Intelligence"])
+def adaptive_progression(athlete_id: str, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    athlete = athlete_for_user(db, athlete_id, user)
+    profile = loads(athlete.profile_json)
+    return profile.get("adaptive_progression") or {
+        "schema_version": 3,
+        "status": "collecting_data",
+        "longitudinal_state": {"total_exposures": 0, "channels": {}},
+        "message": "Complete comparable sessions before Bell changes the prescription.",
+        "history": [],
+        "exercise_decisions": [],
+    }
+
+
 @router.get("/decisions/{decision_id}", tags=["Decisions"])
 def decision(decision_id: str, db: Session = Depends(get_db), user: User = Depends(current_user)):
     row = db.get(Decision, decision_id)

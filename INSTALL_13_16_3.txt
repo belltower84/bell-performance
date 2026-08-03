@@ -1,0 +1,13 @@
+Bell Performance 13.16.3
+Journey Channel Fidelity & Application Persistence Repair
+
+1. Extract the ZIP so index.html is at the repository root.
+2. Replace the prior GitHub repository contents with this build.
+3. Commit and push.
+4. Run the full-stack validation in Windows PowerShell:
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+.\automation\run-full-stack-athlete-journeys.ps1
+
+Expected report:
+automation\full_stack_journey_reports\latest\index.html

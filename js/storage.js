@@ -41,6 +41,7 @@ const defaults = {
   mobility: { focus: "Auto", minutes: 10, completedDates: [], checks: {} },
   readinessLog: [],
   sessionFeedbackLog: [],
+  responseEngine: { schemaVersion:3, decisions:[], exerciseDecisions:{}, lastEvaluation:null, trend:{}, longitudinalState:null, prescriptionApplications:[], lastApplication:null },
   pendingFeedbackSessionId: null,
   dayNavigation: { selectedDate: "", lastLocalDate: "" },
   performanceReviews: { weeklySeen:[], blockReviews:[], milestones:[], weeklyDebriefs:[] },
@@ -70,6 +71,172 @@ const defaults = {
 };
 
 const STORAGE_KEY = "bellPerformanceV2";
+const STORAGE_RECOVERY_KEY = "bellPerformanceV2Recovery";
+const STORAGE_SCHEMA_VERSION = 4;
+const STORAGE_SOFT_LIMIT_BYTES = 3_600_000;
+const STORAGE_RECENT_HISTORY_LIMIT = 140;
+const STORAGE_RECENT_DECISION_LIMIT = 120;
+const STORAGE_RECENT_APPLICATION_LIMIT = 120;
+const STORAGE_SUMMARY_LIMIT = 1200;
+const STORAGE_DB_NAME = "bellPerformanceDurable";
+const STORAGE_DB_VERSION = 1;
+let durableArchiveQueue = [];
+let durableArchiveFlushPending = false;
+
+function storageBytes(value) {
+  try { return new Blob([typeof value === "string" ? value : JSON.stringify(value)]).size; }
+  catch { return String(typeof value === "string" ? value : JSON.stringify(value || null)).length * 2; }
+}
+
+function durableSummary(record, collection) {
+  const source = record && typeof record === "object" ? record : {};
+  return {
+    archiveId: source.id || source.sessionId || source.completionId || source.applicationId || `${collection}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+    collection,
+    date: source.date || source.completedAt || source.createdAt || source.timestamp || source.evaluatedAt || "",
+    channel: source.channel || source.sessionChannel || source.type || "",
+    status: source.status || source.decision || source.finalStatus || source.result || "",
+    sessionId: source.sessionId || source.targetSessionId || source.planSessionId || "",
+    goal: source.goal || source.objective || source.goalType || "",
+    rpe: Number.isFinite(Number(source.rpe ?? source.sessionRpe)) ? Number(source.rpe ?? source.sessionRpe) : null,
+    readiness: Number.isFinite(Number(source.readinessScore ?? source.readiness?.score)) ? Number(source.readinessScore ?? source.readiness?.score) : null,
+    compactedAt: new Date().toISOString()
+  };
+}
+
+function openDurableStorage() {
+  if (typeof indexedDB === "undefined") return Promise.resolve(null);
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(STORAGE_DB_NAME, STORAGE_DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains("archive")) {
+        const store = db.createObjectStore("archive", { keyPath:"archiveKey" });
+        store.createIndex("collection", "collection", { unique:false });
+        store.createIndex("date", "date", { unique:false });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function flushDurableArchiveQueue() {
+  if (durableArchiveFlushPending || !durableArchiveQueue.length) return;
+  durableArchiveFlushPending = true;
+  const batch = durableArchiveQueue.splice(0, durableArchiveQueue.length);
+  try {
+    const db = await openDurableStorage();
+    if (!db) return;
+    await new Promise((resolve, reject) => {
+      const transaction = db.transaction("archive", "readwrite");
+      const store = transaction.objectStore("archive");
+      batch.forEach(item => store.put(item));
+      transaction.oncomplete = resolve;
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = () => reject(transaction.error || new Error("Archive transaction aborted"));
+    });
+    db.close();
+    if (data?.storageDurability) {
+      data.storageDurability.lastArchiveWriteAt = new Date().toISOString();
+      data.storageDurability.lastArchiveError = "";
+    }
+  } catch (error) {
+    durableArchiveQueue.unshift(...batch.slice(-500));
+    if (data?.storageDurability) data.storageDurability.lastArchiveError = String(error?.message || error);
+  } finally {
+    durableArchiveFlushPending = false;
+    if (durableArchiveQueue.length) setTimeout(flushDurableArchiveQueue, 50);
+  }
+}
+
+function queueDurableArchive(collection, records) {
+  if (!Array.isArray(records) || !records.length) return;
+  const athleteId = data?.athleteProfile?.id || data?.athleteProfile?.demographics?.firstName || "default-athlete";
+  records.forEach((record, index) => {
+    const summary = durableSummary(record, collection);
+    durableArchiveQueue.push({
+      archiveKey: `${athleteId}:${collection}:${summary.archiveId}:${summary.date || index}`,
+      athleteId,
+      collection,
+      date: summary.date,
+      summary,
+      record,
+      archivedAt: new Date().toISOString()
+    });
+  });
+  setTimeout(flushDurableArchiveQueue, 0);
+}
+
+function ensureStorageDurability() {
+  const current = data.storageDurability && typeof data.storageDurability === "object" ? data.storageDurability : {};
+  data.storageDurability = {
+    schemaVersion: STORAGE_SCHEMA_VERSION,
+    archiveCounts: { ...(current.archiveCounts || {}) },
+    summaries: Array.isArray(current.summaries) ? current.summaries : [],
+    lastCompactionAt: current.lastCompactionAt || "",
+    lastArchiveWriteAt: current.lastArchiveWriteAt || "",
+    lastArchiveError: current.lastArchiveError || "",
+    lastPersistedBytes: Number(current.lastPersistedBytes) || 0,
+    peakPersistedBytes: Number(current.peakPersistedBytes) || 0,
+    compactionRuns: Number(current.compactionRuns) || 0,
+    recoveredWrites: Number(current.recoveredWrites) || 0
+  };
+}
+
+function compactArray(collection, array, keep) {
+  if (!Array.isArray(array) || array.length <= keep) return array;
+  const removed = array.splice(0, array.length - keep);
+  queueDurableArchive(collection, removed);
+  ensureStorageDurability();
+  data.storageDurability.archiveCounts[collection] = (Number(data.storageDurability.archiveCounts[collection]) || 0) + removed.length;
+  const summaries = removed.map(item => durableSummary(item, collection));
+  data.storageDurability.summaries.push(...summaries);
+  if (data.storageDurability.summaries.length > STORAGE_SUMMARY_LIMIT) {
+    data.storageDurability.summaries.splice(0, data.storageDurability.summaries.length - STORAGE_SUMMARY_LIMIT);
+  }
+  return array;
+}
+
+function compactDataForPersistence({ aggressive = false } = {}) {
+  ensureStorageDurability();
+  const before = storageBytes(data);
+  const historyKeep = aggressive ? 90 : STORAGE_RECENT_HISTORY_LIMIT;
+  const decisionKeep = aggressive ? 80 : STORAGE_RECENT_DECISION_LIMIT;
+  const applicationKeep = aggressive ? 80 : STORAGE_RECENT_APPLICATION_LIMIT;
+  compactArray("history", data.history, historyKeep);
+  if (data.responseEngine) {
+    compactArray("responseDecisions", data.responseEngine.decisions, decisionKeep);
+    compactArray("prescriptionApplications", data.responseEngine.prescriptionApplications, applicationKeep);
+  }
+  if (data.coachIntelligence) compactArray("coachDecisions", data.coachIntelligence.decisions, decisionKeep);
+  if (data.sessionFeedbackLog) compactArray("sessionFeedback", data.sessionFeedbackLog, aggressive ? 80 : 120);
+  if (data.readinessLog) compactArray("readiness", data.readinessLog, aggressive ? 100 : 180);
+  if (data.missedSessionLog) compactArray("missedSessions", data.missedSessionLog, 100);
+  if (data.performanceReviews) {
+    compactArray("weeklyDebriefs", data.performanceReviews.weeklyDebriefs, 80);
+    compactArray("blockReviews", data.performanceReviews.blockReviews, 40);
+  }
+  data.storageDurability.lastCompactionAt = new Date().toISOString();
+  data.storageDurability.compactionRuns += 1;
+  data.storageDurability.lastCompaction = { beforeBytes:before, afterBytes:storageBytes(data), aggressive };
+}
+
+function storageDiagnostics() {
+  ensureStorageDurability();
+  return {
+    schemaVersion: STORAGE_SCHEMA_VERSION,
+    localBytes: storageBytes(data),
+    archiveQueue: durableArchiveQueue.length,
+    archiveCounts: { ...data.storageDurability.archiveCounts },
+    summaryCount: data.storageDurability.summaries.length,
+    lastCompactionAt: data.storageDurability.lastCompactionAt,
+    lastArchiveWriteAt: data.storageDurability.lastArchiveWriteAt,
+    lastArchiveError: data.storageDurability.lastArchiveError
+  };
+}
+window.bellStorageDiagnostics = storageDiagnostics;
+
 
 function cloneDefaults() {
   return JSON.parse(JSON.stringify(defaults));
@@ -168,6 +335,21 @@ function normalizeData() {
   data.mobility.checks = data.mobility.checks || {};
   data.readinessLog = Array.isArray(data.readinessLog) ? data.readinessLog : [];
   data.sessionFeedbackLog = Array.isArray(data.sessionFeedbackLog) ? data.sessionFeedbackLog : [];
+  const response=data.responseEngine&&typeof data.responseEngine==="object"?data.responseEngine:{};
+  // Preserve the complete adaptive-coaching state across reloads. Earlier normalization
+  // rebuilt responseEngine from a small allow-list and silently discarded longitudinal
+  // state plus closed-loop application records.
+  data.responseEngine={
+    ...response,
+    schemaVersion:Math.max(3,Number(response.schemaVersion)||0),
+    decisions:Array.isArray(response.decisions)?response.decisions:[],
+    exerciseDecisions:response.exerciseDecisions&&typeof response.exerciseDecisions==="object"?response.exerciseDecisions:{},
+    lastEvaluation:response.lastEvaluation||null,
+    trend:response.trend&&typeof response.trend==="object"?response.trend:{},
+    longitudinalState:response.longitudinalState&&typeof response.longitudinalState==="object"?response.longitudinalState:null,
+    prescriptionApplications:Array.isArray(response.prescriptionApplications)?response.prescriptionApplications:[],
+    lastApplication:response.lastApplication&&typeof response.lastApplication==="object"?response.lastApplication:null
+  };
   const coachDefaults=cloneDefaults().coachIntelligence;
   data.coachIntelligence=data.coachIntelligence&&typeof data.coachIntelligence==="object"?data.coachIntelligence:coachDefaults;
   data.coachIntelligence={...coachDefaults,...data.coachIntelligence};
@@ -274,12 +456,43 @@ function normalizeData() {
 }
 
 function saveData({ render = true } = {}) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  ensureStorageDurability();
+  let serialized = JSON.stringify(data);
+  if (storageBytes(serialized) > STORAGE_SOFT_LIMIT_BYTES || data.history.length > STORAGE_RECENT_HISTORY_LIMIT + 40) {
+    compactDataForPersistence({ aggressive:false });
+    serialized = JSON.stringify(data);
+  }
+  if (storageBytes(serialized) > STORAGE_SOFT_LIMIT_BYTES) {
+    compactDataForPersistence({ aggressive:true });
+    serialized = JSON.stringify(data);
+  }
+  try {
+    localStorage.setItem(STORAGE_KEY, serialized);
+    localStorage.removeItem(STORAGE_RECOVERY_KEY);
+    data.storageDurability.lastPersistedBytes = storageBytes(serialized);
+    data.storageDurability.peakPersistedBytes = Math.max(data.storageDurability.peakPersistedBytes, data.storageDurability.lastPersistedBytes);
+  } catch (error) {
+    const recovery = {
+      savedAt:new Date().toISOString(),
+      error:String(error?.message || error),
+      activeWorkout:data.activeWorkout || null,
+      pendingFeedbackSessionId:data.pendingFeedbackSessionId || null,
+      latestHistory:Array.isArray(data.history) ? data.history.slice(-3) : []
+    };
+    try { localStorage.setItem(STORAGE_RECOVERY_KEY, JSON.stringify(recovery)); } catch {}
+    compactDataForPersistence({ aggressive:true });
+    serialized = JSON.stringify(data);
+    localStorage.setItem(STORAGE_KEY, serialized);
+    data.storageDurability.recoveredWrites += 1;
+    data.storageDurability.lastPersistedBytes = storageBytes(serialized);
+  }
   if (render && typeof renderApp === "function") renderApp();
 }
 
 function exportData() {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  ensureStorageDurability();
+  const exportPayload = { ...data, storageExport:{ exportedAt:new Date().toISOString(), diagnostics:storageDiagnostics(), note:"Detailed archived records remain in this device's IndexedDB; compact summaries are included here." } };
+  const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -296,6 +509,7 @@ function importData(event) {
     try {
       data = JSON.parse(reader.result);
       normalizeData();
+ensureStorageDurability();
       saveData();
       alert("Backup imported.");
     } catch {
@@ -308,6 +522,8 @@ function importData(event) {
 function resetApp() {
   if (!confirm("Reset all Bell Performance data on this device?")) return;
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(STORAGE_RECOVERY_KEY);
+  try { indexedDB.deleteDatabase(STORAGE_DB_NAME); } catch {}
   data = cloneDefaults();
   delete data.missionPlan;
   data.settings.maxes = { bench:null, squat:null, deadlift:null, pushPress:null };
@@ -324,3 +540,4 @@ function resetApp() {
 }
 
 normalizeData();
+ensureStorageDurability();

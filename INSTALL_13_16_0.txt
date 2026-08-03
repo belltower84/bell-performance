@@ -1,0 +1,14 @@
+BELL PERFORMANCE 13.16.0 INSTALLATION
+Real-World Athlete Simulation & Chaos Testing
+
+1. Commit or stash current repository changes.
+2. Extract the GitHub-ready ZIP.
+3. Copy everything inside the extracted folder into the repository root.
+4. Replace matching files.
+5. Confirm index.html remains at the repository root.
+6. Commit with: Add real-world athlete simulation and chaos guards 13.16.0
+7. Push and allow the backend to redeploy.
+8. Hard refresh or reinstall the PWA so the 13.16 service-worker cache activates.
+9. Run: .\automation\run-real-world-chaos-validation.ps1
+
+No database migration is required.

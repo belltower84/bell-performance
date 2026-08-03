@@ -30,13 +30,11 @@
   const originalComplete = window.completeWorkout;
   if (typeof originalComplete === "function") {
     window.completeWorkout = function bellIntegratedCompletion() {
-      const snapshot = data.activeWorkout ? JSON.parse(JSON.stringify(data.activeWorkout)) : null;
+      const activeIdentity=data.activeWorkout?{planId:data.activeWorkout.planId,sessionKey:data.activeWorkout.planSessionKey,name:data.activeWorkout.name}:null;
       const result = originalComplete.apply(this, arguments);
-      if (snapshot && bellCloudConnected()) {
-        snapshot.completedAt = snapshot.completedAt || new Date().toISOString();
-        snapshot.sessionRpe = Number(document.getElementById("sessionRpe")?.value) || 7;
-        snapshot.notes = document.getElementById("sessionNotes")?.value || "";
-        bellRunInBackground(() => bellCompleteCurrentSession(snapshot));
+      if (activeIdentity && bellCloudConnected()) {
+        const completed=(data.history||[]).find(item=>String(item.planId||"")===String(activeIdentity.planId||"")&&String(item.planSessionKey||"")===String(activeIdentity.sessionKey||""))||(data.history||[])[0];
+        if(completed)bellRunInBackground(() => bellCompleteCurrentSession(completed));
       }
       return result;
     };

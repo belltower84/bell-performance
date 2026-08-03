@@ -1,0 +1,18 @@
+{
+  "version": "2026-07-31",
+  "principles": [
+    {"id":"acsm-2026","domain":"resistance","title":"ACSM 2026 Resistance Training Position Stand","url":"https://acsm.org/science-spotlight-acsm-releases-new-position-stand-on-resistance-training/","evidenceLevel":"position_stand","use":"General resistance-training prescription and progression."},
+    {"id":"acsm-2009","domain":"resistance","title":"ACSM Progression Models in Resistance Training for Healthy Adults","url":"https://pubmed.ncbi.nlm.nih.gov/19204579/","evidenceLevel":"position_stand","use":"Novice-to-advanced progression, loading, frequency, and exercise order."},
+    {"id":"helms-training-2014","domain":"physique","title":"Recommendations for Natural Bodybuilding Contest Preparation: Resistance and Cardiovascular Training","url":"https://pubmed.ncbi.nlm.nih.gov/24998610/","evidenceLevel":"narrative_review","use":"Physique resistance frequency, rep ranges, per-session volume, cardio and periodization."},
+    {"id":"helms-nutrition-2014","domain":"physique","title":"Evidence-based Recommendations for Natural Bodybuilding Contest Preparation","url":"https://link.springer.com/article/10.1186/1550-2783-11-20","evidenceLevel":"narrative_review","use":"Contest-preparation rate of loss and muscle-retention safeguards."},
+    {"id":"endurance-taper-2023","domain":"endurance","title":"Effects of Tapering on Performance in Endurance Athletes","url":"https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0282838","evidenceLevel":"systematic_review_meta_analysis","use":"Taper length, volume reduction and intensity retention."},
+    {"id":"endurance-tid-2025","domain":"endurance","title":"Training Intensity Distribution Network Meta-analysis","url":"https://pubmed.ncbi.nlm.nih.gov/39888556/","evidenceLevel":"systematic_review_network_meta_analysis","use":"Acceptable polarized and pyramidal intensity distributions."},
+    {"id":"powerlifting-taper-2020","domain":"powerlifting","title":"Tapering and Peaking Maximal Strength for Powerlifting Performance","url":"https://pubmed.ncbi.nlm.nih.gov/32917000/","evidenceLevel":"systematic_review","use":"Defensible strength-sport taper ranges; avoids one-formula claims."}
+  ],
+  "complianceScenarios": [
+    {"id":"ideal","target":1.0,"label":"100% Ideal execution"},
+    {"id":"real_world","target":0.9,"label":"90% Real-world standard"},
+    {"id":"inconsistent","target":0.75,"label":"75% Inconsistent athlete"},
+    {"id":"disrupted","target":0.6,"label":"60% Disrupted season"}
+  ]
+}

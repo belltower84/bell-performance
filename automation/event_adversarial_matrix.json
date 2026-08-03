@@ -1,0 +1,744 @@
+{
+  "version": "13.12.3",
+  "title": "Event-Type Adversarial Validation \u2014 Mutation Isolation Repair",
+  "design": {
+    "cleanControls": 16,
+    "mutationsPerEvent": 5,
+    "totalCases": 96,
+    "scoring": "Differential: only warnings newly introduced beyond the clean baseline count.",
+    "acceptance": "Every clean control passes; every mutation triggers only its expected warning; every mutation is verified; all non-target invariants remain unchanged.",
+    "mutationIsolation": "Concept, rehearsal, and dose mutations preserve weekly minutes and unrelated event properties. Invalid compound mutations return CONTROL_MUTATION_INVALID."
+  },
+  "events": [
+    {
+      "id": "5k-race",
+      "eventType": "5K Race",
+      "requiredConcepts": [
+        "Quality running"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Quality running removed",
+          "kind": "remove_concept",
+          "concept": "Quality running"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Quality running": {
+          "roles": [
+            "quality_run"
+          ]
+        }
+      }
+    },
+    {
+      "id": "10k-race",
+      "eventType": "10K Race",
+      "requiredConcepts": [
+        "Threshold or race-pace work"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Threshold or race-pace work removed",
+          "kind": "remove_concept",
+          "concept": "Threshold or race-pace work"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Threshold or race-pace work": {
+          "roles": [
+            "quality_run"
+          ]
+        }
+      }
+    },
+    {
+      "id": "half-marathon",
+      "eventType": "Half Marathon",
+      "requiredConcepts": [
+        "Threshold or goal-pace work"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Threshold or goal-pace work removed",
+          "kind": "remove_concept",
+          "concept": "Threshold or goal-pace work"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Threshold or goal-pace work": {
+          "roles": [
+            "quality_run"
+          ]
+        }
+      }
+    },
+    {
+      "id": "marathon",
+      "eventType": "Marathon",
+      "requiredConcepts": [
+        "Race-pace or threshold work"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Race-pace or threshold work removed",
+          "kind": "remove_concept",
+          "concept": "Race-pace or threshold work"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Race-pace or threshold work": {
+          "roles": [
+            "quality_run"
+          ]
+        }
+      }
+    },
+    {
+      "id": "cycling-time-trial",
+      "eventType": "Cycling Time Trial",
+      "requiredConcepts": [
+        "Threshold or event-paced cycling"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Threshold or event-paced cycling removed",
+          "kind": "remove_concept",
+          "concept": "Threshold or event-paced cycling"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Threshold or event-paced cycling": {
+          "roles": [
+            "bike_quality"
+          ]
+        }
+      }
+    },
+    {
+      "id": "triathlon",
+      "eventType": "Triathlon",
+      "requiredConcepts": [
+        "Swim preparation"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Swim preparation removed",
+          "kind": "remove_concept",
+          "concept": "Swim preparation"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Swim preparation": {
+          "roles": [
+            "triathlon_swim"
+          ]
+        }
+      }
+    },
+    {
+      "id": "hyrox",
+      "eventType": "HYROX",
+      "requiredConcepts": [
+        "Station strength and carries"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Station strength and carries removed",
+          "kind": "remove_concept",
+          "concept": "Station strength and carries"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Station strength and carries": {
+          "terms": [
+            "station strength + carries",
+            "hyrox strength"
+          ]
+        }
+      }
+    },
+    {
+      "id": "crossfit-competition",
+      "eventType": "CrossFit Competition",
+      "requiredConcepts": [
+        "Olympic-lift or gymnastics skill"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Olympic-lift or gymnastics skill removed",
+          "kind": "remove_concept",
+          "concept": "Olympic-lift or gymnastics skill"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Olympic-lift or gymnastics skill": {
+          "terms": [
+            "olympic lift + gymnastics skill"
+          ]
+        }
+      }
+    },
+    {
+      "id": "combat-sports",
+      "eventType": "Combat Sports Tournament",
+      "requiredConcepts": [
+        "Strength and power support"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Strength and power support removed",
+          "kind": "remove_concept",
+          "concept": "Strength and power support"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Strength and power support": {
+          "terms": [
+            "fight strength & power",
+            "relative strength + durability"
+          ]
+        }
+      }
+    },
+    {
+      "id": "powerlifting-meet-event",
+      "eventType": "Powerlifting Meet",
+      "requiredConcepts": [
+        "Competition squat",
+        "Competition bench",
+        "Competition deadlift"
+      ],
+      "mutations": [
+        {
+          "id": "specificity_removed",
+          "name": "Competition-lift specificity removed",
+          "kind": "remove_powerlifting_specificity"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Opener and command rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Meet taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-meet recovery corrupted",
+          "kind": "corrupt_recovery"
+        },
+        {
+          "id": "family_mismatch",
+          "name": "Event family routing corrupted",
+          "kind": "family_mismatch"
+        }
+      ],
+      "conceptTargets": {
+        "Competition squat": {
+          "roles": [
+            "competition_squat"
+          ]
+        },
+        "Competition bench": {
+          "roles": [
+            "competition_bench"
+          ]
+        },
+        "Competition deadlift": {
+          "roles": [
+            "competition_deadlift"
+          ]
+        }
+      }
+    },
+    {
+      "id": "strongman-competition",
+      "eventType": "Strongman Competition",
+      "requiredConcepts": [
+        "Overhead event strength"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Overhead event strength removed",
+          "kind": "remove_concept",
+          "concept": "Overhead event strength"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Overhead event strength": {
+          "terms": [
+            "overhead event strength"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tactical-games",
+      "eventType": "Tactical Games",
+      "requiredConcepts": [
+        "Usable strength"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Usable strength removed",
+          "kind": "remove_concept",
+          "concept": "Usable strength"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Usable strength": {
+          "terms": [
+            "usable strength a",
+            "usable strength b"
+          ]
+        }
+      }
+    },
+    {
+      "id": "fitness-test",
+      "eventType": "Military / Law-Enforcement Fitness Test",
+      "requiredConcepts": [
+        "Aerobic base"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Aerobic base removed",
+          "kind": "remove_concept",
+          "concept": "Aerobic base"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Aerobic base": {
+          "roles": [
+            "easy_aerobic"
+          ],
+          "terms": [
+            "aerobic base"
+          ]
+        }
+      }
+    },
+    {
+      "id": "custom-sport-event",
+      "eventType": "Custom Sport Event",
+      "requiredConcepts": [
+        "General strength",
+        "Conditioning",
+        "Skill or standards practice"
+      ],
+      "mutations": [
+        {
+          "id": "strength_removed",
+          "name": "General strength removed",
+          "kind": "remove_concept",
+          "concept": "General strength"
+        },
+        {
+          "id": "conditioning_removed",
+          "name": "Conditioning removed",
+          "kind": "remove_concept",
+          "concept": "Conditioning"
+        },
+        {
+          "id": "skill_removed",
+          "name": "Skill or standards practice removed",
+          "kind": "remove_concept",
+          "concept": "Skill or standards practice"
+        },
+        {
+          "id": "scope_overclaim",
+          "name": "Undefined custom event overclaims specificity",
+          "kind": "scope_overclaim"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "General strength": {
+          "terms": [
+            "usable strength a",
+            "usable strength b"
+          ]
+        },
+        "Conditioning": {
+          "roles": [
+            "task_intervals",
+            "easy_aerobic",
+            "loaded_endurance"
+          ]
+        },
+        "Skill or standards practice": {
+          "terms": [
+            "calisthenics + task skill"
+          ]
+        }
+      }
+    },
+    {
+      "id": "obstacle-course-race",
+      "eventType": "Obstacle Course Race",
+      "requiredConcepts": [
+        "Grip and pulling strength"
+      ],
+      "mutations": [
+        {
+          "id": "critical_concept_removed",
+          "name": "Grip and pulling strength removed",
+          "kind": "remove_concept",
+          "concept": "Grip and pulling strength"
+        },
+        {
+          "id": "rehearsal_removed",
+          "name": "Controlled event rehearsal removed",
+          "kind": "remove_rehearsal"
+        },
+        {
+          "id": "dose_reduced",
+          "name": "Event-specific long or rehearsal dose reduced",
+          "kind": "reduce_dose"
+        },
+        {
+          "id": "taper_corrupted",
+          "name": "Taper volume corrupted",
+          "kind": "corrupt_taper"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-event recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Grip and pulling strength": {
+          "terms": [
+            "grip + pulling strength"
+          ]
+        }
+      }
+    },
+    {
+      "id": "physique-competition",
+      "eventType": "Bodybuilding / Physique Competition",
+      "requiredConcepts": [
+        "Upper-body resistance training",
+        "Lower-body resistance training",
+        "Recoverable contest cardio",
+        "Peak-week fatigue reduction"
+      ],
+      "mutations": [
+        {
+          "id": "upper_removed",
+          "name": "Upper-body resistance training removed",
+          "kind": "remove_concept",
+          "concept": "Upper-body resistance training"
+        },
+        {
+          "id": "lower_removed",
+          "name": "Lower-body resistance training removed",
+          "kind": "remove_concept",
+          "concept": "Lower-body resistance training"
+        },
+        {
+          "id": "cardio_removed",
+          "name": "Recoverable contest cardio removed",
+          "kind": "remove_concept",
+          "concept": "Recoverable contest cardio"
+        },
+        {
+          "id": "peak_week_removed",
+          "name": "Peak-week fatigue reduction removed",
+          "kind": "remove_concept",
+          "concept": "Peak-week fatigue reduction"
+        },
+        {
+          "id": "recovery_corrupted",
+          "name": "Post-show recovery corrupted",
+          "kind": "corrupt_recovery"
+        }
+      ],
+      "conceptTargets": {
+        "Upper-body resistance training": {
+          "roles": [
+            "resistance_upper"
+          ]
+        },
+        "Lower-body resistance training": {
+          "roles": [
+            "resistance_lower"
+          ]
+        },
+        "Recoverable contest cardio": {
+          "roles": [
+            "cardio",
+            "cardio_recovery"
+          ]
+        },
+        "Peak-week fatigue reduction": {
+          "terms": [
+            "peak week fatigue reduction",
+            "low-soreness",
+            "brief full-body pump"
+          ]
+        }
+      }
+    }
+  ]
+}

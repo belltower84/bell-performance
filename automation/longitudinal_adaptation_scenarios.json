@@ -1,0 +1,165 @@
+{
+  "version": "13.14.0",
+  "description": "Longitudinal adaptive-coaching controls across 8–30 comparable exposures.",
+  "cases": [
+    {
+      "id": "steady-strength-responder",
+      "title": "Steady strength progress advances without runaway increases",
+      "segments": [{"count": 12, "completion": {"session_type":"strength","performance_ratio":1.0,"session_rpe":7,"readiness":{"score":82}}, "context":{"phase_id":"build"}}],
+      "checks": {"must_include":["progress"],"forbid":["accelerate","regress","rebuild","protect","safety_hold"],"max_upward":4,"max_intensity":1.10,"max_volume":1.15}
+    },
+    {
+      "id": "rapid-strength-responder",
+      "title": "Rapid strength response accelerates only after enough evidence",
+      "segments": [{"count": 14, "completion": {"session_type":"strength","performance_ratio":1.09,"session_rpe":6.4,"readiness":{"score":88}}, "context":{"phase_id":"build"}}],
+      "checks": {"must_include":["accelerate"],"max_upward":4,"max_intensity":1.10,"max_volume":1.15,"first_accelerate_at_or_after":3}
+    },
+    {
+      "id": "noisy-alternating-response",
+      "title": "Alternating success and struggle does not oscillate prescriptions",
+      "segments": [
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":0.8,"session_rpe":9.6},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":0.8,"session_rpe":9.6},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":0.8,"session_rpe":9.6},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":0.8,"session_rpe":9.6},"context":{"phase_id":"build"}},
+        {"count":2,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"max_upward":1,"max_consecutive_downward":1,"max_intensity":1.10,"min_intensity":0.90}
+    },
+    {
+      "id": "persistent-underperformance",
+      "title": "Persistent underperformance reduces once and avoids a regression spiral",
+      "segments": [{"count":10,"completion":{"session_type":"strength","performance_ratio":0.78,"session_rpe":9.7},"context":{"phase_id":"build"}}],
+      "checks": {"must_include":["regress"],"forbid":["progress","accelerate"],"max_consecutive_downward":1,"min_intensity":0.90,"min_volume":0.60}
+    },
+    {
+      "id": "interruption-reentry",
+      "title": "Training interruption rebuilds before progression resumes",
+      "segments": [
+        {"count":2,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build","interruption_days":14}},
+        {"count":6,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"must_include":["rebuild"],"no_upward_for_after":{"status":"rebuild","count":1},"max_intensity":1.10}
+    },
+    {
+      "id": "moderate-pain-reentry",
+      "title": "Moderate pain protects and requires two pain-free re-entry exposures",
+      "segments": [
+        {"count":2,"completion":{"session_type":"strength","performance_ratio":1.08,"session_rpe":6.5},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7,"pain":{"knee":5}},"context":{"phase_id":"build"}},
+        {"count":6,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"must_include":["protect","reentry"],"no_upward_for_after":{"status":"protect","count":2},"max_intensity":1.10}
+    },
+    {
+      "id": "severe-pain-reentry",
+      "title": "Severe pain creates a safety hold and three-exposure re-entry",
+      "segments": [
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7,"pain":{"back":8}},"context":{"phase_id":"build"}},
+        {"count":7,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"must_include":["safety_hold","reentry"],"no_upward_for_after":{"status":"safety_hold","count":3},"max_intensity":1.10}
+    },
+    {
+      "id": "fatigue-deload",
+      "title": "Accumulated low readiness creates one planned deload episode",
+      "segments": [
+        {"count":6,"completion":{"session_type":"strength","performance_ratio":0.95,"session_rpe":8.8,"readiness":{"score":48}},"context":{"phase_id":"build"}},
+        {"count":5,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7,"readiness":{"score":80}},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"must_include":["deload"],"max_deload_episodes":1,"forbid":["accelerate"],"min_volume":0.60}
+    },
+    {
+      "id": "taper-phase-protection",
+      "title": "Taper phase blocks progression while preserving specificity",
+      "segments": [{"count":8,"completion":{"session_type":"engine","performance_ratio":1.10,"session_rpe":6.2},"context":{"phase_id":"taper","event_roles":["race_pace","event_rehearsal"]}}],
+      "checks": {"forbid":["progress","accelerate"],"require_specificity_preserved":true,"max_engine":1.20}
+    },
+    {
+      "id": "post-event-recovery-protection",
+      "title": "Post-event recovery absorbs positive response without progression",
+      "segments": [{"count":7,"completion":{"session_type":"strength","performance_ratio":1.08,"session_rpe":6.5},"context":{"phase_id":"post_event_recovery","event_roles":["competition_lift"]}}],
+      "checks": {"forbid":["progress","accelerate"],"require_specificity_preserved":true}
+    },
+    {
+      "id": "mixed-channel-independence",
+      "title": "Strength struggle does not erase engine progression",
+      "segments": [
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":0.78,"session_rpe":9.7},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"engine","performance_ratio":1.02,"session_rpe":7},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":0.78,"session_rpe":9.7},"context":{"phase_id":"build"}},
+        {"count":5,"completion":{"session_type":"engine","performance_ratio":1.02,"session_rpe":7},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"engine_must_progress":true,"strength_must_not_progress":true,"max_engine":1.20,"min_intensity":0.90}
+    },
+    {
+      "id": "missed-training-no-catchup",
+      "title": "Missed training rebuilds without catch-up volume",
+      "segments": [
+        {"count":2,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build","missed_sessions":3,"compliance":0.5}},
+        {"count":4,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"must_include":["rebuild"],"no_catchup_volume":true,"max_volume":1.15}
+    },
+    {
+      "id": "hold-preserves-earned-target",
+      "title": "Temporary holds do not erase previously earned progression",
+      "segments": [
+        {"count":5,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}},
+        {"count":3,"completion":{"session_type":"strength","performance_ratio":0.92,"session_rpe":9.1,"difficulty":"hard"},"context":{"phase_id":"build"}},
+        {"count":3,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"must_include":["progress","hold"],"target_not_reset_by_hold":true,"max_intensity":1.10}
+    },
+    {
+      "id": "long-horizon-cumulative-caps",
+      "title": "Thirty rapid exposures remain inside cumulative ceilings",
+      "segments": [{"count":30,"completion":{"session_type":"strength","performance_ratio":1.10,"session_rpe":6.2},"context":{"phase_id":"build"}}],
+      "checks": {"must_include":["accelerate"],"max_intensity":1.10,"max_volume":1.15,"max_upward":10}
+    },
+    {
+      "id": "event-specificity-invariant",
+      "title": "Dose adaptation never removes event-specific roles",
+      "segments": [
+        {"count":4,"completion":{"session_type":"engine","performance_ratio":1.05,"session_rpe":7},"context":{"phase_id":"specific","event_roles":["brick_bike_run","fueling_rehearsal","race_rehearsal"]}},
+        {"count":4,"completion":{"session_type":"engine","performance_ratio":1.05,"session_rpe":7},"context":{"phase_id":"taper","event_roles":["brick_bike_run","fueling_rehearsal","race_rehearsal"]}}
+      ],
+      "checks": {"require_specificity_preserved":true,"no_upward_in_phases":["taper"]}
+    },
+    {
+      "id": "deload-cooldown",
+      "title": "Deloads cannot repeat before a six-exposure cooldown",
+      "segments": [
+        {"count":5,"completion":{"session_type":"strength","performance_ratio":0.9,"session_rpe":9.2,"readiness":{"score":45}},"context":{"phase_id":"build"}},
+        {"count":3,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7,"readiness":{"score":80}},"context":{"phase_id":"build"}},
+        {"count":4,"completion":{"session_type":"strength","performance_ratio":0.9,"session_rpe":9.2,"readiness":{"score":45}},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"must_include":["deload"],"min_deload_episode_gap":6,"max_deload_episodes":2}
+    },
+    {
+      "id": "pain-overrides-fast-improvement",
+      "title": "Pain continues to override rapid positive performance longitudinally",
+      "segments": [
+        {"count":3,"completion":{"session_type":"strength","performance_ratio":1.10,"session_rpe":6.2},"context":{"phase_id":"build"}},
+        {"count":1,"completion":{"session_type":"strength","performance_ratio":1.10,"session_rpe":6.2,"pain":{"shoulder":5}},"context":{"phase_id":"build"}},
+        {"count":4,"completion":{"session_type":"strength","performance_ratio":1.10,"session_rpe":6.2},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"must_include":["protect","reentry"],"no_upward_for_after":{"status":"protect","count":2}}
+    },
+    {
+      "id": "regress-then-recover",
+      "title": "A setback regresses once and later permits measured recovery",
+      "segments": [
+        {"count":2,"completion":{"session_type":"strength","performance_ratio":0.78,"session_rpe":9.7},"context":{"phase_id":"build"}},
+        {"count":8,"completion":{"session_type":"strength","performance_ratio":1.0,"session_rpe":7},"context":{"phase_id":"build"}}
+      ],
+      "checks": {"must_include":["regress","progress"],"max_consecutive_downward":1,"max_intensity":1.10}
+    }
+  ]
+}

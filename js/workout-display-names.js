@@ -23,8 +23,13 @@
     if(/recovery cardio/i.test(value))return "Recovery Cardio";
     return value||"Conditioning";
   }
+  function malformedTitle(value){
+    const text=clean(value);
+    return !text||text.length<4||/^(?:ress|ngth|ine|workout|session|training)$/i.test(text);
+  }
   function workout(session){
-    let raw=baseLabel(session)
+    const original=baseLabel(session);
+    let raw=original
       .replace(/^\s*(?:AM|A\.?M\.?|PM|P\.?M\.?)\s*[-–—:|•]*\s*/i,"")
       .replace(/\s*[-–—:|•]*\s*(?:AM|A\.?M\.?|PM|P\.?M\.?)\s*$/i,"")
       .replace(/\s*\((?:AM|A\.?M\.?|PM|P\.?M\.?)\)\s*/ig," ")
@@ -42,10 +47,16 @@
     const parts=raw.split(/\s+[—–|:]\s+/).map(x=>x.trim()).filter(Boolean);
     if(parts.length>1&&/\b(?:upper|lower|full body|strength|hypertrophy|power|powerbuilding|bodybuilding|female physique|session|workout)\b/i.test(parts[0]))raw=parts.slice(1).join(" — ");
     raw=raw
-      .replace(/^\s*(?:upper|lower|full body)?\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|female physique|training|workout|session)(?:\s+[A-Z])?\s*[-–—:|•]*\s*/i,"")
+      .replace(/^\s*(?:upper|lower|full body)?\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|female physique|training|workout|session)(?:\s+[A-Z](?=\s*[-–—:|•]|\s*$))?\s*[-–—:|•]*\s*/i,"")
       .replace(/\s*[-–—:|•]*\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|female physique|training|workout|session)\s*$/i,"")
       .trim();
-    return raw||"Full Body";
+    if(malformedTitle(raw)){
+      const template=clean(global.scaledTemplate?.(session?.mission)?.label);
+      const mission=clean(session?.mission).replace(/^[A-Z]-\d+\s*/i,"");
+      const fallback=[template,mission,original,"Full Body"].find(value=>!malformedTitle(value));
+      raw=fallback||"Full Body";
+    }
+    return raw;
   }
   function combined(sessions){
     const names=(sessions||[]).map(workout).filter(Boolean);
@@ -57,6 +68,7 @@
     return [primary,...support].join(" + ");
   }
   global.bellWorkoutDisplayLabel=workout;
+  global.bellWorkoutTitleIsMalformed=malformedTitle;
   global.bellCombinedWorkoutDisplayLabel=combined;
   global.bellDisciplineDisplayName=discipline;
 })(window);

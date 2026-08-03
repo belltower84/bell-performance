@@ -1,0 +1,11 @@
+Bell Performance 13.16.2
+
+1. Extract the ZIP so index.html is at the repository root.
+2. Replace the contents of the GitHub Pages repository with this build.
+3. Commit and push.
+4. Run the validation from PowerShell:
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+.\automation\run-full-stack-athlete-journeys.ps1
+
+Expected: 8/8 full-stack journeys passed and more than 100 real plan exposures.

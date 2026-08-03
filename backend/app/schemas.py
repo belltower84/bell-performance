@@ -55,11 +55,22 @@ class CheckInCreate(BaseModel):
 
 
 class CompletionCreate(BaseModel):
+    schema_version: int = Field(default=1, ge=1, le=10)
+    session_type: Literal["strength", "engine", "recovery", "mobility"] | None = None
     duration_minutes: int = Field(default=45, ge=1, le=600)
     session_rpe: float = Field(default=7, ge=0, le=10)
     performance_ratio: float = Field(default=1.0, ge=0, le=2)
+    difficulty: Literal["easy", "right", "hard", "very_hard"] | None = None
     notes: str | None = Field(default=None, max_length=2000)
+    planned: dict[str, Any] = Field(default_factory=dict)
+    actual: dict[str, Any] = Field(default_factory=dict)
+    readiness: dict[str, Any] = Field(default_factory=dict)
+    feedback: dict[str, Any] = Field(default_factory=dict)
+    pain: dict[str, float] = Field(default_factory=dict)
+    technique_issues: list[str] = Field(default_factory=list, max_length=50)
+    symptoms: list[str] = Field(default_factory=list, max_length=50)
     exercise_results: list[dict[str, Any]] = Field(default_factory=list, max_length=100)
+    engine_results: dict[str, Any] = Field(default_factory=dict)
 
 class CoachingMemoryCreate(BaseModel):
     observation: str = Field(min_length=3, max_length=1000)

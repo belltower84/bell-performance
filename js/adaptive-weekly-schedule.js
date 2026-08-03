@@ -44,17 +44,29 @@ function bellSaveOnboardingDays(){
   if(days.length<2){alert("Select at least two normal training days.");return false;}
   bellSetNormalTrainingDays(days);return true;
 }
+function bellCanonicalRoles(item){
+  return [item?.eventRole,item?.enduranceRole,item?.exerciseRole,item?.physiqueRole,item?.sessionRole]
+    .filter(Boolean).map(value=>String(value).trim().toLowerCase());
+}
 function bellSessionProfile(item){
-  const text=[item?.mission,item?.customLabel].filter(Boolean).join(" ").toLowerCase();
-  const mobility=/mobility|daily reset|recovery reset/.test(text);
-  const engine=!mobility&&/^r-|run|engine|interval|tempo|threshold|zone 2|aerobic|ruck|bike|row/.test(text);
-  const strength=!mobility&&!engine;
-  const lower=strength&&/lower|squat|deadlift|leg|hinge/.test(text);
-  const upper=strength&&!lower&&/upper|bench|press|pull/.test(text);
+  const labelText=[item?.mission,item?.customLabel,item?.label].filter(Boolean).join(" ").toLowerCase();
+  const roles=bellCanonicalRoles(item),has=(...tokens)=>roles.some(role=>tokens.some(token=>role===token||role.includes(token)));
+  const recoveryDay=has("recovery_day")||(/^m-/i.test(String(item?.mission||""))&&/recovery|reset|mobility/.test(labelText));
+  const mobility=recoveryDay||has("mobility")||/daily reset|recovery reset/.test(labelText);
+  const canonicalLong=has("long_run","long_ride","long_endurance","race_rehearsal","event_rehearsal","simulation","brick","test_simulation","course_simulation");
+  const canonicalHard=has("quality_run","run_quality","bike_quality","quality","interval","race_pace","round_conditioning");
+  const canonicalEasy=has("easy_run","easy_ride","easy","swim","aerobic_recovery","cardio","cardio_recovery","recovery_aerobic");
+  const canonicalEngine=canonicalLong||canonicalHard||canonicalEasy||has("endurance","conditioning","loaded_endurance");
+  const canonicalStrength=has("strength_support","strength_skill","primary_lift","secondary_lift","hypertrophy","resistance","strength","carry_strength","grip_strength");
+  const textEngine=!mobility&&/^r-|\brun\b|engine|interval|tempo|threshold|zone 2|aerobic|ruck|\bbike\b|\brow\b|swim|brick|simulation/.test(labelText);
+  const engine=!mobility&&(canonicalEngine||(!canonicalStrength&&textEngine));
+  const strength=!mobility&&!engine&&(canonicalStrength||!textEngine);
+  const lower=strength&&(has("lower","competition_squat","competition_deadlift")||/lower|squat|deadlift|\bleg|hinge|posterior/.test(labelText));
+  const upper=strength&&!lower&&(has("upper","competition_bench","overhead")||/upper|bench|press|pull|grip/.test(labelText));
   const full=strength&&!lower&&!upper;
-  const longEngine=engine&&/long run|long aerobic|long endurance/.test(text);
-  const hardEngine=engine&&/interval|tempo|threshold|quality|sprint|hill|vo2/.test(text);
-  return {mobility,engine,strength,lower,upper,full,longEngine,hardEngine,easyEngine:engine&&!longEngine&&!hardEngine};
+  const longEngine=engine&&(canonicalLong||/long run|long ride|long aerobic|long endurance|race rehearsal|event simulation|course simulation|full test|brick/.test(labelText));
+  const hardEngine=engine&&!longEngine&&(canonicalHard||/interval|tempo|threshold|quality|sprint|hill|vo2|race pace|competition rounds/.test(labelText));
+  return {mobility,engine,strength,lower,upper,full,longEngine,hardEngine,easyEngine:engine&&!longEngine&&!hardEngine,roles};
 }
 function bellSessionRole(item){
   const p=bellSessionProfile(item),text=`${item?.customLabel||""} ${item?.mission||""}`.toLowerCase();
@@ -82,9 +94,52 @@ function bellCloneSessionTemplate(source,role,index){
     "engine-long":{mission:"R-3",label:"Long Run"}
   };
   const d=definitions[role];if(d){item.mission=d.mission;item.customLabel=d.label;}
-  item.detail=`${item.detail||"Mission-specific training"} · Unique ${d?.label||role} exposure.`;
+  if(role.startsWith("engine-")){
+    const kind=role==="engine-quality"?"quality":role==="engine-long"?"long":"easy";
+    let prescription=null;try{prescription=typeof engineWeekPrescription==="function"?engineWeekPrescription(kind):null;}catch(_){}
+    item.prescribedDuration=Number(prescription?.duration)||Number(item.prescribedDuration)||Number(scaledTemplate?.(item.mission)?.duration)||30;
+    item.detail=prescription?.detail||`Complete the ${d?.label||role} prescription at controlled, phase-appropriate effort.`;
+  }else item.detail=`${item.detail||"Mission-specific training"} · Unique ${d?.label||role} exposure.`;
+  delete item.secondaryMission;delete item.secondaryLabel;delete item.secondaryDetail;delete item.secondaryDuration;delete item.sessions;
   return item;
 }
+
+function bellExplodeConcurrentPlan(plan){
+  if(!Array.isArray(plan))return [];
+  const out=[];
+  const cleanBase=item=>{
+    const copy={...item};
+    delete copy.secondaryMission;delete copy.secondaryLabel;delete copy.secondaryDetail;delete copy.secondaryDuration;delete copy.sessions;
+    return copy;
+  };
+  plan.forEach((raw,index)=>{
+    if(!raw)return;
+    const baseId=String(raw.id||`plan-${index}`);
+    const primary=cleanBase(raw);
+    if(primary.mission)out.push(primary);
+    if(raw.secondaryMission){
+      out.push({
+        id:`${baseId}-secondary`,day:raw.day,scheduledDate:raw.scheduledDate,
+        mission:raw.secondaryMission,customLabel:raw.secondaryLabel,
+        detail:raw.secondaryDetail,prescribedDuration:raw.secondaryDuration,
+        done:Boolean(raw.sessionCompletions?.[`${baseId}:secondary`]||false),status:'planned',
+        concurrentSourceId:baseId,concurrentSlot:'secondary'
+      });
+    }
+    if(Array.isArray(raw.sessions))raw.sessions.forEach((session,sessionIndex)=>{
+      if(!session?.mission)return;
+      out.push({
+        id:`${baseId}-session-${sessionIndex}`,day:raw.day,scheduledDate:raw.scheduledDate,
+        mission:session.mission,customLabel:session.label||session.customLabel,
+        detail:session.detail,prescribedDuration:session.prescribedDuration||session.duration,
+        done:Boolean(raw.sessionCompletions?.[`${baseId}:session:${sessionIndex}`]||false),status:'planned',
+        concurrentSourceId:baseId,concurrentSlot:`session:${sessionIndex}`
+      });
+    });
+  });
+  return out;
+}
+
 function bellEnsureDisciplineExposures(plan,block=data.trainingBlock||{},targetOverride=null){
   if(!Array.isArray(plan))return plan;
   const targets=targetOverride||(typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2});
@@ -172,6 +227,7 @@ function bellOptimizeConcurrentPlan(plan,days){
     const p=bellSessionProfile(item);
     place(item,allowed,day=>{
       const existing=profiles(day);let score=existing.length*35;
+      if(existing.some(q=>q.engine))score+=1000;
       if(existing.some(q=>q.longEngine))score+=500;
       if(existing.some(q=>q.upper))score-=28;
       if(existing.some(q=>q.lower))score+=p.easyEngine?18:160;
@@ -206,18 +262,50 @@ function bellPartialWeekTargets(base,remainingDays){
 function bellMissionAlignedExposureTargets(base,block,remainingDays){
   const n=remainingDays.length,mission=block?.mission||{};
   const eventText=`${mission.eventType||""} ${mission.developmentGoal||""} ${data.settings?.primaryTrainingIdentity||""}`.toLowerCase();
-  if(mission.path==="event"&&/bodybuilding|physique/.test(eventText)){
+  if(mission.path==="event"){
+    const family=typeof currentEventFamilyId==="function"?currentEventFamilyId(mission.eventType):(
+      /5k|10k|half marathon|marathon/.test(eventText)?"running":
+      /cycling time trial/.test(eventText)?"cycling":
+      /triathlon/.test(eventText)?"multisport":
+      /hyrox|crossfit|combat sports/.test(eventText)?"functional":
+      /powerlifting|strongman/.test(eventText)?"strength_competition":
+      /obstacle course/.test(eventText)?"obstacle_loaded":
+      /bodybuilding|physique/.test(eventText)?"physique":"tactical"
+    );
+    const full={
+      running:{strength:2,engine:4},cycling:{strength:2,engine:4},multisport:{strength:1,engine:5},
+      functional:{strength:2,engine:4},strength_competition:/strongman/.test(eventText)?{strength:4,engine:2}:{strength:4,engine:1},
+      tactical:{strength:3,engine:3},obstacle_loaded:{strength:3,engine:3},physique:{strength:4,engine:2}
+    }[family]||base;
+    if(n<=1)return {strength:n,engine:0};
+    return full;
+  }
+  if(/bodybuilding|physique/.test(eventText)){
     if(n<=1)return {strength:n,engine:0};
     const engine=n>=3?1:0;
     return {strength:Math.min(Number(base.strength)||4,Math.max(1,n-engine),4),engine:Math.min(Number(base.engine)||1,engine)};
   }
   return base;
 }
+function bellEventPriority(item){
+  const roles=bellCanonicalRoles(item),text=`${item?.customLabel||""} ${item?.mission||""}`.toLowerCase();
+  if(roles.some(role=>/simulation|rehearsal|event_day|long_run|long_ride|brick/.test(role))||/simulation|race rehearsal|long run|long ride|brick|full test/.test(text))return 100;
+  if(roles.some(role=>/quality|run_quality|bike_quality/.test(role))||/quality|threshold|interval|competition rounds/.test(text))return 90;
+  if(roles.some(role=>/primary_lift|strength_skill|hypertrophy|resistance/.test(role)))return 80;
+  if(roles.some(role=>/easy|swim|aerobic_recovery|cardio/.test(role)))return 70;
+  return 50;
+}
 function bellTrimPlanToTargets(plan,targets){
   const strength=plan.filter(x=>bellSessionProfile(x).strength),engine=plan.filter(x=>bellSessionProfile(x).engine),other=plan.filter(x=>!bellSessionProfile(x).strength&&!bellSessionProfile(x).engine&&!bellSessionProfile(x).mobility);
+  const eventActive=data.trainingBlock?.mission?.path==="event";
   const strengthOrder=['strength-upper-primary','strength-lower-primary','strength-upper-secondary','strength-lower-secondary','strength-full-body'];
-  const engineOrder=['engine-easy','engine-quality','engine-long'];
-  const pick=(items,roles,count)=>{const out=[];for(const role of roles){for(const item of items){if(out.length>=count)break;if(!out.includes(item)&&bellSessionRole(item)===role)out.push(item);}if(out.length>=count)break;}for(const item of items){if(out.length>=count)break;if(!out.includes(item))out.push(item);}return out;};
+  const engineOrder=eventActive?['engine-long','engine-quality','engine-easy']:['engine-easy','engine-quality','engine-long'];
+  const pick=(items,roles,count)=>{
+    const out=[];
+    const ordered=eventActive?[...items].sort((a,b)=>bellEventPriority(b)-bellEventPriority(a)):items;
+    for(const role of roles){for(const item of ordered){if(out.length>=count)break;if(!out.includes(item)&&bellSessionRole(item)===role)out.push(item);}if(out.length>=count)break;}
+    for(const item of ordered){if(out.length>=count)break;if(!out.includes(item))out.push(item);}return out;
+  };
   return [...pick(strength,strengthOrder,targets.strength),...pick(engine,engineOrder,targets.engine),...other];
 }
 function bellApplyAvailabilityToWeek(block,week,plan){
@@ -227,7 +315,8 @@ function bellApplyAvailabilityToWeek(block,week,plan){
   const baseTargets=typeof bellDisciplineExposureTargets==="function"?bellDisciplineExposureTargets(block):{strength:3,engine:2};
   const missionTargets=bellMissionAlignedExposureTargets(baseTargets,block,effectiveDays);
   const targets=bellPartialWeekTargets(missionTargets,effectiveDays);
-  const integrated=bellIntegrateMobilityAndCore(plan);
+  const atomic=bellExplodeConcurrentPlan(plan);
+  const integrated=bellIntegrateMobilityAndCore(atomic);
   const generated=bellEnsureDisciplineExposures(integrated,block,targets);
   const trimmed=bellTrimPlanToTargets(generated,targets);
   const validation=bellValidateGeneratedWeek(trimmed,targets);

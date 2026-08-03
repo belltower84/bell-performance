@@ -1,0 +1,30 @@
+/* Bell Performance 13.13.0 — structured completion and athlete response. */
+.strength-response-head,.strength-response-row{grid-template-columns:42px minmax(76px,1fr) minmax(64px,.8fr) minmax(58px,.65fr) minmax(58px,.65fr) 48px}
+.engine-response-head,.engine-response-row{grid-template-columns:42px minmax(90px,1fr) minmax(84px,1fr) 48px}
+.strength-response-row input[type="number"]{min-width:0;text-align:center}
+.athlete-response-finish .workout-finish-heading p{margin:.35rem 0 0;max-width:48rem;color:var(--muted,#aab1bc);line-height:1.45}
+.athlete-response-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.athlete-response-fields label{display:grid;gap:7px}
+.athlete-response-fields input,.athlete-response-fields select,.athlete-response-fields textarea{width:100%}
+.athlete-response-wide{grid-column:1/-1}
+.athlete-response-check{display:flex!important;align-items:center;gap:10px;align-self:end;min-height:48px;padding:10px 12px;border:1px solid rgba(255,255,255,.12);border-radius:12px}
+.athlete-response-check input{width:20px!important;height:20px;margin:0}
+.athlete-response-check span{line-height:1.25}
+.athlete-response-summary{display:grid;gap:5px;padding:12px 14px;border:1px solid rgba(224,174,50,.28);border-radius:14px;background:rgba(224,174,50,.06)}
+.athlete-response-summary strong{font-size:1rem}.athlete-response-summary small{color:var(--muted,#aab1bc);line-height:1.4}
+@media(max-width:720px){
+  .strength-response-head,.strength-response-row{grid-template-columns:32px minmax(62px,1fr) minmax(54px,.8fr) 48px 48px 38px;gap:5px}
+  .strength-response-head span{font-size:.68rem}
+  .strength-response-row input{padding:8px 5px;font-size:.84rem}
+  .athlete-response-fields{grid-template-columns:1fr}
+  .athlete-response-wide{grid-column:auto}
+}
+
+.athlete-response-review-card{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,1fr);gap:20px;align-items:center}
+.athlete-response-review-card h3{margin:.3rem 0}.athlete-response-review-card p{margin:0;color:var(--muted,#aab1bc);line-height:1.5}
+.athlete-response-factor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.athlete-response-factor-grid span{display:grid;gap:4px;padding:11px;border:1px solid rgba(255,255,255,.1);border-radius:12px}.athlete-response-factor-grid small{color:var(--muted,#aab1bc)}
+@media(max-width:760px){.athlete-response-review-card{grid-template-columns:1fr}.athlete-response-factor-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* 13.14.0 longitudinal progression context */
+.athlete-response-phase{margin-top:.65rem!important;color:#d6b45c!important;font-size:.82rem;text-transform:capitalize;letter-spacing:.02em}

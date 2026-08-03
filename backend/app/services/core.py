@@ -24,6 +24,13 @@ from intelligence.discipline_library import BellDisciplineLibrary
 from intelligence.pattern_recognition import BellPatternRecognitionEngine
 from intelligence.session_builder import BellSessionBuilder
 from intelligence.weekly_planner import BellWeeklyPlanningEngine
+from intelligence.athlete_response import evaluate_athlete_response, exercise_progression_decisions
+from intelligence.longitudinal_progression import stabilize_longitudinal_progression
+from intelligence.prescription_application import (
+    apply_application_to_plan,
+    apply_prescription_application,
+    build_prescription_application,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 KB_DATABASE = ROOT / "database" / "bckb_v1.3.0.sqlite"
@@ -641,6 +648,7 @@ def generate_plan(db: Session, athlete: Athlete, mission_row: Mission) -> Plan:
             "weekly_planner": "13.2.0", "session_builder": "0.1.0", "exercise_selection": "0.1.0",
             "adaptive_coaching": "0.1.0", "coaching_reasoning": "0.1.0", "learning": "0.1.0",
             "athlete_state": state.get("engine_version"), "coaching_language": "0.1.0",
+            "prescription_application": "13.15.0", "real_world_chaos_guards": "13.16.0",
         },
     }
     row = Plan(
@@ -952,6 +960,52 @@ def _apply_reasoning(original: dict[str, Any], adaptive: dict[str, Any], reasoni
     return copy.deepcopy(original), changes
 
 
+def _recent_completion_payloads(db: Session, athlete_id: str, limit: int = 8) -> list[dict[str, Any]]:
+    rows = db.scalars(
+        select(SessionCompletion)
+        .where(SessionCompletion.athlete_id == athlete_id)
+        .order_by(SessionCompletion.created_at.desc())
+        .limit(max(1, min(50, limit)))
+    ).all()
+    return [loads(row.payload_json) for row in reversed(rows)]
+
+
+def _apply_athlete_response_adjustment(session: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
+    """Apply only the closed-loop application assigned to this exact future session.
+
+    13.15.0 removes the old behavior that broadcast the latest athlete-response
+    factor across every future session. A rewritten plan session carries its own
+    idempotent application. Legacy profiles still receive the prior safe fallback.
+    """
+    revised = copy.deepcopy(session)
+    state = profile.get("adaptive_progression") if isinstance(profile, dict) else None
+    if not isinstance(state, dict):
+        return revised
+
+    embedded = (revised.get("programming") or {}).get("closed_loop_application")
+    if isinstance(embedded, dict):
+        return revised
+
+    session_id = str((revised.get("session") or {}).get("session_id") or "")
+    application = state.get("last_application") if isinstance(state.get("last_application"), dict) else None
+    if application and application.get("target_session_id") == session_id:
+        return apply_prescription_application(revised, application)
+
+    # Compatibility for athletes whose profile predates the closed-loop ledger.
+    decision = state.get("last_decision") if isinstance(state.get("last_decision"), dict) else None
+    if not decision or state.get("prescription_applications"):
+        return revised
+    legacy = build_prescription_application(
+        decision,
+        state.get("exercise_decisions") or [],
+        str(decision.get("source_session_id") or "legacy"),
+        source_session_type=revised.get("session_type"),
+    )
+    legacy["target_session_id"] = session_id
+    legacy["state"] = "legacy_fallback"
+    return apply_prescription_application(revised, legacy)
+
+
 def _daily_bcl(mission_row: Mission, checkin: dict[str, Any], readiness: dict[str, Any]) -> dict[str, Any]:
     request = loads(mission_row.request_json)
     text = request.get("coaching_language") or _auto_bcl(request)
@@ -1023,9 +1077,13 @@ def today_payload(db: Session, athlete_id: str, target_date: str | None = None) 
         select(CheckIn).where(CheckIn.athlete_id == athlete_id).order_by(CheckIn.created_at.desc())
     )
     if not check:
+        profile = _profile(db.get(Athlete, athlete_id))
+        response_adjusted = _apply_athlete_response_adjustment(original, profile)
+        adjustment = response_adjusted.get("programming", {}).get("athlete_response_adjustment")
         return {
-            "status": "planned", "scheduled_date": scheduled_date,
-            "original_session": original, "session": original, "adaptation": None,
+            "status": "adapted" if adjustment else "planned", "scheduled_date": scheduled_date,
+            "original_session": original, "session": response_adjusted,
+            "adaptation": ({"source": "athlete_response", **adjustment} if adjustment else None),
             "completed_today": [_session_preview(session, scheduled_date) for session in completed_today],
             "remaining_today": len(remaining_sessions),
             "next_session": None, "next_session_preview": None,
@@ -1091,6 +1149,7 @@ def today_payload(db: Session, athlete_id: str, target_date: str | None = None) 
     patterns = BellPatternRecognitionEngine().analyze(pattern_events(db, athlete_id))
     profile = _profile(db.get(Athlete, athlete_id))
     revised, changes = _apply_reasoning(original, adaptive, reasoning, profile, checkin)
+    revised = _apply_athlete_response_adjustment(revised, profile)
     status = "planned" if reasoning["decision"]["action"] == "proceed" and adaptive["decision"]["action"] == "proceed" else "adapted"
 
     public = {
@@ -1128,22 +1187,109 @@ def today_payload(db: Session, athlete_id: str, target_date: str | None = None) 
 def learn_from_completion(db: Session, athlete: Athlete, session: dict[str, Any] | None,
                           completion: dict[str, Any]) -> dict[str, Any]:
     profile = _profile(athlete)
+    recent = _recent_completion_payloads(db, athlete.id, limit=8)
+    recent = [item for item in recent if item.get("session_id") != completion.get("session_id")]
+    state = project_state(db, athlete.id)
+    compliance = (state.get("compliance") or {}).get("rate")
+    if isinstance(compliance, (int, float)) and compliance > 1:
+        compliance = compliance / 100
+    context = {
+        "compliance": compliance,
+        "missed_sessions": (state.get("compliance") or {}).get("missed", 0),
+        "interruption_days": completion.get("actual", {}).get("interruption_days", 0),
+    }
+    raw_response = evaluate_athlete_response(completion, recent, context)
+    adaptive_state = profile.get("adaptive_progression") if isinstance(profile.get("adaptive_progression"), dict) else {}
+    longitudinal = stabilize_longitudinal_progression(
+        raw_response,
+        adaptive_state.get("longitudinal_state"),
+        {
+            "session_type": completion.get("session_type") or (session or {}).get("session_type"),
+            "phase_id": (session or {}).get("phase_id") or (session or {}).get("phase") or (session or {}).get("load_phase") or "build",
+            "event_role": (session or {}).get("event_role") or (session or {}).get("session_role"),
+        },
+    )
+    response = longitudinal["decision"]
+    exercise_decisions = exercise_progression_decisions(completion, recent)
+    session_type = (session or {}).get("session_type", completion.get("session_type", "strength"))
+
+    prescription_application = build_prescription_application(
+        response,
+        exercise_decisions,
+        str(completion.get("session_id") or (session or {}).get("session", {}).get("session_id") or ""),
+        source_session_type=session_type,
+        created_at=now().isoformat(),
+    )
+    active_plan = latest_plan(db, athlete.id)
+    application_result = {
+        "application": prescription_application,
+        "applied": False,
+        "target_session_id": None,
+        "target_week": None,
+    }
+    if active_plan:
+        plan_data = loads(active_plan.plan_json)
+        application_result = apply_application_to_plan(
+            plan_data,
+            prescription_application,
+            source_session_id=str(completion.get("session_id") or ""),
+            completed_session_ids=_completed_session_ids(db, athlete.id),
+        )
+        active_plan.plan_json = dumps(application_result["plan"])
+    prescription_application = application_result["application"]
+
     parameters = _learning_parameters(profile)
-    session_type = (session or {}).get("session_type", "strength")
     target_parameter = "volume_response" if session_type == "engine" else "intensity_response"
     observations = [{
         "parameter": target_parameter, "predicted": 1.0,
         "actual": float(completion.get("performance_ratio", 1.0)),
     }]
-    result = BellLearningEngine().update(parameters, observations, learning_rate=0.08)
-    profile["bell_learning_parameters"] = result["parameters"]
+    statistical = BellLearningEngine().update(parameters, observations, learning_rate=0.08)
+    profile["bell_learning_parameters"] = statistical["parameters"]
     profile["bell_learning_last_update"] = now().isoformat()
+    adaptive_state["schema_version"] = 3
+    adaptive_state["last_update"] = now().isoformat()
+    adaptive_state["last_decision"] = response
+    adaptive_state["last_raw_decision"] = raw_response
+    adaptive_state["longitudinal_state"] = longitudinal["state"]
+    adaptive_state["exercise_decisions"] = exercise_decisions
+    adaptive_state["last_application"] = prescription_application
+    adaptive_state["prescription_applications"] = (adaptive_state.get("prescription_applications") or [])[-39:] + [prescription_application]
+    adaptive_state["history"] = (adaptive_state.get("history") or [])[-19:] + [{
+        "session_id": completion.get("session_id"),
+        "created_at": now().isoformat(),
+        "status": response.get("status"),
+        "reason_codes": response.get("reason_codes", []),
+        "intensity_factor": response.get("intensity_factor"),
+        "volume_factor": response.get("volume_factor"),
+        "engine_duration_factor": response.get("engine_duration_factor"),
+    }]
+    profile["adaptive_progression"] = adaptive_state
     athlete.profile_json = dumps(profile)
-    event(db, athlete.id, "learning_updated", {
-        "session_id": completion.get("session_id"), "changes": result.get("changes", {}),
-        "parameters": result.get("parameters", {}),
-    })
-    return result
+
+    payload = {
+        "learning_engine_version": statistical.get("learning_engine_version", "0.1.0"),
+        "parameters": statistical.get("parameters", {}),
+        "changes": statistical.get("changes", {}),
+        "guardrails": statistical.get("guardrails", {}),
+        "status": statistical.get("status", "personalized_parameters_updated"),
+        "session_id": completion.get("session_id"),
+        "response": response,
+        "raw_response": raw_response,
+        "longitudinal": longitudinal,
+        "exercise_decisions": exercise_decisions,
+        "prescription_application": prescription_application,
+        "prescription_applied": bool(application_result.get("applied")),
+        "target_session_id": application_result.get("target_session_id"),
+        "target_week": application_result.get("target_week"),
+        "statistical_learning": statistical,
+    }
+    event(db, athlete.id, "athlete_response_evaluated", payload)
+    db.add(Decision(
+        id=uid("dec"), athlete_id=athlete.id, decision_type="adaptive_progression",
+        payload_json=dumps(payload),
+    ))
+    return payload
 
 
 def intelligence_summary(db: Session, athlete_id: str) -> dict[str, Any]:

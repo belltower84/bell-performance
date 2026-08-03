@@ -130,6 +130,7 @@ const bellPowerliftingRotations = {
 };
 
 function bellPowerliftingActive(block=data.trainingBlock||{}){
+  if(block?.mission?.path==="event"&&block?.mission?.eventType==="Strongman Competition")return false;
   const text=[data.settings?.primaryTrainingIdentity,data.settings?.athleteMode,block?.dualGoals?.strengthGoal,block?.primaryGoal,block?.goalType].filter(Boolean).join(" ").toLowerCase();
   return /powerlifting/.test(text);
 }

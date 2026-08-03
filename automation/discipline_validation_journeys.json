@@ -1,0 +1,786 @@
+[
+  {
+    "name": "Casey",
+    "sex": "Prefer not to say",
+    "age": 34,
+    "heightInches": 68,
+    "bodyweightLb": 180,
+    "goalWeightLb": 175,
+    "experience": "Intermediate",
+    "environment": "commercial",
+    "days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "usualMinutes": 60,
+    "maxes": {
+      "squat": 315,
+      "bench": 225,
+      "deadlift": 365,
+      "pushPress": 145
+    },
+    "adherence": 0.9,
+    "optionalCompletion": 0.4,
+    "projection": {
+      "type": "bodyweight",
+      "yearEndLb": 175
+    },
+    "id": "performance-health",
+    "title": "Performance & Health Discipline Journey",
+    "phases": [
+      {
+        "name": "Foundation",
+        "weeks": 8,
+        "identity": "Performance & Health",
+        "journeyMode": "continuous_development",
+        "objective": "Body Recomposition",
+        "goalType": "Bodybuilding",
+        "strengthDays": 3,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development I",
+        "weeks": 12,
+        "identity": "Performance & Health",
+        "journeyMode": "continuous_development",
+        "objective": "Body Recomposition",
+        "goalType": "Bodybuilding",
+        "strengthDays": 3,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Recovery & Assessment",
+        "weeks": 4,
+        "identity": "Performance & Health",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Bodybuilding",
+        "strengthDays": 3,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development II",
+        "weeks": 12,
+        "identity": "Performance & Health",
+        "journeyMode": "continuous_development",
+        "objective": "Body Recomposition",
+        "goalType": "Bodybuilding",
+        "strengthDays": 3,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Specific Capacity",
+        "weeks": 10,
+        "identity": "Performance & Health",
+        "journeyMode": "continuous_development",
+        "objective": "Body Recomposition",
+        "goalType": "Bodybuilding",
+        "strengthDays": 3,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Consolidation",
+        "weeks": 6,
+        "identity": "Performance & Health",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Bodybuilding",
+        "strengthDays": 3,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      }
+    ]
+  },
+  {
+    "name": "Morgan",
+    "sex": "Prefer not to say",
+    "age": 34,
+    "heightInches": 68,
+    "bodyweightLb": 180,
+    "goalWeightLb": 175,
+    "experience": "Intermediate",
+    "environment": "commercial",
+    "days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "usualMinutes": 60,
+    "maxes": {
+      "squat": 315,
+      "bench": 225,
+      "deadlift": 365,
+      "pushPress": 145
+    },
+    "adherence": 0.9,
+    "optionalCompletion": 0.4,
+    "projection": {
+      "type": "strength",
+      "yearEndPercent": 1.04
+    },
+    "id": "powerlifting-discipline",
+    "title": "Powerlifting Discipline Journey",
+    "phases": [
+      {
+        "name": "Foundation",
+        "weeks": 8,
+        "identity": "Powerlifting",
+        "journeyMode": "continuous_development",
+        "objective": "Increase Strength",
+        "goalType": "Powerlifting",
+        "strengthDays": 4,
+        "engineDays": 1,
+        "engineMode": "None / Recovery Only",
+        "engineGoal": "recovery-only",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development I",
+        "weeks": 12,
+        "identity": "Powerlifting",
+        "journeyMode": "continuous_development",
+        "objective": "Increase Strength",
+        "goalType": "Powerlifting",
+        "strengthDays": 4,
+        "engineDays": 1,
+        "engineMode": "None / Recovery Only",
+        "engineGoal": "recovery-only",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Recovery & Assessment",
+        "weeks": 4,
+        "identity": "Powerlifting",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Powerlifting",
+        "strengthDays": 4,
+        "engineDays": 1,
+        "engineMode": "None / Recovery Only",
+        "engineGoal": "recovery-only",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development II",
+        "weeks": 12,
+        "identity": "Powerlifting",
+        "journeyMode": "continuous_development",
+        "objective": "Increase Strength",
+        "goalType": "Powerlifting",
+        "strengthDays": 4,
+        "engineDays": 1,
+        "engineMode": "None / Recovery Only",
+        "engineGoal": "recovery-only",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Specific Capacity",
+        "weeks": 10,
+        "identity": "Powerlifting",
+        "journeyMode": "continuous_development",
+        "objective": "Increase Strength",
+        "goalType": "Powerlifting",
+        "strengthDays": 4,
+        "engineDays": 1,
+        "engineMode": "None / Recovery Only",
+        "engineGoal": "recovery-only",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Consolidation",
+        "weeks": 6,
+        "identity": "Powerlifting",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Powerlifting",
+        "strengthDays": 4,
+        "engineDays": 1,
+        "engineMode": "None / Recovery Only",
+        "engineGoal": "recovery-only",
+        "usualMinutes": 60
+      }
+    ]
+  },
+  {
+    "name": "Riley",
+    "sex": "Prefer not to say",
+    "age": 34,
+    "heightInches": 68,
+    "bodyweightLb": 180,
+    "goalWeightLb": 175,
+    "experience": "Intermediate",
+    "environment": "commercial",
+    "days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "usualMinutes": 60,
+    "maxes": {
+      "squat": 315,
+      "bench": 225,
+      "deadlift": 365,
+      "pushPress": 145
+    },
+    "adherence": 0.9,
+    "optionalCompletion": 0.4,
+    "projection": {
+      "type": "bodyweight",
+      "yearEndLb": 175
+    },
+    "id": "bodybuilding-discipline",
+    "title": "Bodybuilding Discipline Journey",
+    "phases": [
+      {
+        "name": "Foundation",
+        "weeks": 8,
+        "identity": "Bodybuilding",
+        "journeyMode": "continuous_development",
+        "objective": "Build Muscle",
+        "goalType": "Bodybuilding",
+        "strengthDays": 5,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "fat-loss",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development I",
+        "weeks": 12,
+        "identity": "Bodybuilding",
+        "journeyMode": "continuous_development",
+        "objective": "Build Muscle",
+        "goalType": "Bodybuilding",
+        "strengthDays": 5,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "fat-loss",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Recovery & Assessment",
+        "weeks": 4,
+        "identity": "Bodybuilding",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Bodybuilding",
+        "strengthDays": 5,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "fat-loss",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development II",
+        "weeks": 12,
+        "identity": "Bodybuilding",
+        "journeyMode": "continuous_development",
+        "objective": "Build Muscle",
+        "goalType": "Bodybuilding",
+        "strengthDays": 5,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "fat-loss",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Specific Capacity",
+        "weeks": 10,
+        "identity": "Bodybuilding",
+        "journeyMode": "continuous_development",
+        "objective": "Build Muscle",
+        "goalType": "Bodybuilding",
+        "strengthDays": 5,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "fat-loss",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Consolidation",
+        "weeks": 6,
+        "identity": "Bodybuilding",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Bodybuilding",
+        "strengthDays": 5,
+        "engineDays": 2,
+        "engineMode": "General Conditioning",
+        "engineGoal": "fat-loss",
+        "usualMinutes": 60
+      }
+    ]
+  },
+  {
+    "name": "Jordan",
+    "sex": "Prefer not to say",
+    "age": 34,
+    "heightInches": 68,
+    "bodyweightLb": 180,
+    "goalWeightLb": 175,
+    "experience": "Intermediate",
+    "environment": "commercial",
+    "days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "usualMinutes": 60,
+    "maxes": {
+      "squat": 315,
+      "bench": 225,
+      "deadlift": 365,
+      "pushPress": 145
+    },
+    "adherence": 0.9,
+    "optionalCompletion": 0.4,
+    "projection": {
+      "type": "bodyweight",
+      "yearEndLb": 175
+    },
+    "id": "hybrid-athlete-discipline",
+    "title": "Hybrid Athlete Discipline Journey",
+    "phases": [
+      {
+        "name": "Foundation",
+        "weeks": 8,
+        "identity": "Hybrid Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Hybrid",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Running",
+        "engineGoal": "10k",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development I",
+        "weeks": 12,
+        "identity": "Hybrid Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Hybrid",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Running",
+        "engineGoal": "10k",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Recovery & Assessment",
+        "weeks": 4,
+        "identity": "Hybrid Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Hybrid",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Running",
+        "engineGoal": "10k",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development II",
+        "weeks": 12,
+        "identity": "Hybrid Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Hybrid",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Running",
+        "engineGoal": "10k",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Specific Capacity",
+        "weeks": 10,
+        "identity": "Hybrid Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Hybrid",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Running",
+        "engineGoal": "10k",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Consolidation",
+        "weeks": 6,
+        "identity": "Hybrid Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Hybrid",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Running",
+        "engineGoal": "10k",
+        "usualMinutes": 60
+      }
+    ]
+  },
+  {
+    "name": "Alex",
+    "sex": "Prefer not to say",
+    "age": 34,
+    "heightInches": 68,
+    "bodyweightLb": 180,
+    "goalWeightLb": 175,
+    "experience": "Intermediate",
+    "environment": "commercial",
+    "days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "usualMinutes": 60,
+    "maxes": {
+      "squat": 315,
+      "bench": 225,
+      "deadlift": 365,
+      "pushPress": 145
+    },
+    "adherence": 0.9,
+    "optionalCompletion": 0.4,
+    "projection": {
+      "type": "bodyweight",
+      "yearEndLb": 175
+    },
+    "id": "tactical-athlete-discipline",
+    "title": "Tactical Athlete Discipline Journey",
+    "phases": [
+      {
+        "name": "Foundation",
+        "weeks": 8,
+        "identity": "Tactical Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Hiking / Rucking",
+        "engineGoal": "ruck",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development I",
+        "weeks": 12,
+        "identity": "Tactical Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Hiking / Rucking",
+        "engineGoal": "ruck",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Recovery & Assessment",
+        "weeks": 4,
+        "identity": "Tactical Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Athlete",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Hiking / Rucking",
+        "engineGoal": "ruck",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development II",
+        "weeks": 12,
+        "identity": "Tactical Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Hiking / Rucking",
+        "engineGoal": "ruck",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Specific Capacity",
+        "weeks": 10,
+        "identity": "Tactical Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Hiking / Rucking",
+        "engineGoal": "ruck",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Consolidation",
+        "weeks": 6,
+        "identity": "Tactical Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Athlete",
+        "strengthDays": 4,
+        "engineDays": 3,
+        "engineMode": "Hiking / Rucking",
+        "engineGoal": "ruck",
+        "usualMinutes": 60
+      }
+    ]
+  },
+  {
+    "name": "Taylor",
+    "sex": "Prefer not to say",
+    "age": 34,
+    "heightInches": 68,
+    "bodyweightLb": 180,
+    "goalWeightLb": 175,
+    "experience": "Intermediate",
+    "environment": "commercial",
+    "days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "usualMinutes": 60,
+    "maxes": {
+      "squat": 315,
+      "bench": 225,
+      "deadlift": 365,
+      "pushPress": 145
+    },
+    "adherence": 0.9,
+    "optionalCompletion": 0.4,
+    "projection": {
+      "type": "bodyweight",
+      "yearEndLb": 175
+    },
+    "id": "functional-fitness-discipline",
+    "title": "Functional Fitness Discipline Journey",
+    "phases": [
+      {
+        "name": "Foundation",
+        "weeks": 8,
+        "identity": "Functional Fitness",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 3,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development I",
+        "weeks": 12,
+        "identity": "Functional Fitness",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 3,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Recovery & Assessment",
+        "weeks": 4,
+        "identity": "Functional Fitness",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 3,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development II",
+        "weeks": 12,
+        "identity": "Functional Fitness",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 3,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Specific Capacity",
+        "weeks": 10,
+        "identity": "Functional Fitness",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 3,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Consolidation",
+        "weeks": 6,
+        "identity": "Functional Fitness",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 3,
+        "engineMode": "General Conditioning",
+        "engineGoal": "work-capacity",
+        "usualMinutes": 60
+      }
+    ]
+  },
+  {
+    "name": "Cameron",
+    "sex": "Prefer not to say",
+    "age": 34,
+    "heightInches": 68,
+    "bodyweightLb": 180,
+    "goalWeightLb": 175,
+    "experience": "Intermediate",
+    "environment": "commercial",
+    "days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "usualMinutes": 60,
+    "maxes": {
+      "squat": 315,
+      "bench": 225,
+      "deadlift": 365,
+      "pushPress": 145
+    },
+    "adherence": 0.9,
+    "optionalCompletion": 0.4,
+    "projection": {
+      "type": "bodyweight",
+      "yearEndLb": 175
+    },
+    "id": "endurance-athlete-discipline",
+    "title": "Endurance Athlete Discipline Journey",
+    "phases": [
+      {
+        "name": "Foundation",
+        "weeks": 8,
+        "identity": "Endurance Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 4,
+        "engineMode": "Running",
+        "engineGoal": "half-marathon",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development I",
+        "weeks": 12,
+        "identity": "Endurance Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 4,
+        "engineMode": "Running",
+        "engineGoal": "half-marathon",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Recovery & Assessment",
+        "weeks": 4,
+        "identity": "Endurance Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 4,
+        "engineMode": "Running",
+        "engineGoal": "half-marathon",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Development II",
+        "weeks": 12,
+        "identity": "Endurance Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 4,
+        "engineMode": "Running",
+        "engineGoal": "half-marathon",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Specific Capacity",
+        "weeks": 10,
+        "identity": "Endurance Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Improve Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 4,
+        "engineMode": "Running",
+        "engineGoal": "half-marathon",
+        "usualMinutes": 60
+      },
+      {
+        "name": "Consolidation",
+        "weeks": 6,
+        "identity": "Endurance Athlete",
+        "journeyMode": "continuous_development",
+        "objective": "Maintain Performance",
+        "goalType": "Athlete",
+        "strengthDays": 3,
+        "engineDays": 4,
+        "engineMode": "Running",
+        "engineGoal": "half-marathon",
+        "usualMinutes": 60
+      }
+    ]
+  }
+]

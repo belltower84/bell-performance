@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-8-5";
+const CACHE_NAME = "bell-performance-13-17-4";
 const CORE = [
   "./",
   "./index.html",
@@ -14,6 +14,7 @@ const CORE = [
   "./css/guided-tour-1374.css?v=13740",
   "./css/settings-1376.css?v=13760",
   "./css/workout-experience-1385.css?v=13850",
+  "./css/athlete-response-13130.css?v=131400",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/logo-shield.svg?v=13720",
   "./assets/icons/engine-shoe.svg?v=10006",
@@ -36,7 +37,7 @@ const CORE = [
   "./assets/artwork/engine/winter-trail.jpg?v=10006",
   "./assets/artwork/engine/hill-country.jpg?v=10006",
   "./data/workouts.js?v=10007",
-  "./js/storage.js?v=13840",
+  "./js/storage.js?v=13841",
   "./js/exercise-library.js?v=13710",
   "./js/readiness.js?v=13840",
   "./js/equipment.js?v=13640",
@@ -46,7 +47,7 @@ const CORE = [
   "./js/milestones.js?v=10006",
   "./js/progression.js?v=10006",
   "./js/workout-model.js?v=13850",
-  "./js/workouts.js?v=13850",
+  "./js/workouts.js?v=131300",
   "./js/missed-sessions.js?v=10006",
   "./js/performance-review.js?v=10006",
   "./js/artwork.js?v=10006",
@@ -58,15 +59,19 @@ const CORE = [
   "./js/mission-planner.js?v=10006",
   "./js/coaching-pathways.js?v=13600",
   "./js/event-coaching.js?v=13721",
+  "./js/real-world-chaos-13160.js?v=131670",
+  "./js/longitudinal-progression-13140.js?v=131600",
+  "./js/prescription-application-13150.js?v=131600",
+  "./js/athlete-response-13130.js?v=131670",
   "./js/how-to.js?v=13740",
   "./js/premium-dashboard.js?v=13610",
   "./js/block-lifecycle.js?v=10006",
   "./js/plan-progress.js?v=10006",
-  "./js/weekly-debrief.js?v=13720",
-  "./js/bell-api.js?v=13600",
-  "./js/api-integration.js?v=12101",
+  "./js/weekly-debrief.js?v=131300",
+  "./js/bell-api.js?v=131300",
+  "./js/api-integration.js?v=131300",
   "./js/dashboard-command-center.js?v=13650",
-  "./js/adaptive-weekly-schedule.js?v=12290",
+  "./js/adaptive-weekly-schedule.js?v=13730",
   "./js/app.js?v=12101",
   "./js/bell-coaching-engine.js?v=13200",
   "./js/bell13-dashboard.js?v=13850",
@@ -78,6 +83,7 @@ const CORE = [
   "./js/independent-daily-sessions-1382.js?v=13850",
   "./js/training-hub-1385.js?v=13850",
   "./js/mission-routing-1385.js?v=13850",
+  "./js/longitudinal-coaching-1390.js?v=13910",
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

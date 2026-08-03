@@ -1,0 +1,127 @@
+{
+  "version": "13.11.2",
+  "primaryCompliance": 0.9,
+  "disciplines": [
+    {
+      "id": "performance_health",
+      "label": "Performance & Health",
+      "cleanControl": "performance-health",
+      "guardrails": [
+        "balanced movement patterns",
+        "2\u20133+ strength exposures",
+        "recoverable conditioning",
+        "gradual progression",
+        "adherence-aware progression"
+      ]
+    },
+    {
+      "id": "powerlifting",
+      "label": "Powerlifting",
+      "cleanControl": "powerlifting-discipline",
+      "guardrails": [
+        "competition-lift specificity",
+        "heavy exposure quality",
+        "fatigue management",
+        "weak-point balance",
+        "deload/recovery"
+      ],
+      "adversarialControl": "powerlifting-year",
+      "adversarialContext": "Explicit powerlifting meet preparation with taper, event week, and post-meet recovery"
+    },
+    {
+      "id": "bodybuilding",
+      "label": "Bodybuilding",
+      "cleanControl": "bodybuilding-discipline",
+      "guardrails": [
+        "weekly muscle volume",
+        "push/pull balance",
+        "frequency",
+        "proximity-to-failure control",
+        "recovery microcycles"
+      ]
+    },
+    {
+      "id": "hybrid_athlete",
+      "label": "Hybrid Athlete",
+      "cleanControl": "hybrid-athlete-discipline",
+      "guardrails": [
+        "strength-endurance interference",
+        "key-session spacing",
+        "single-stressor progression",
+        "long-session durability",
+        "strength retention"
+      ]
+    },
+    {
+      "id": "tactical_athlete",
+      "label": "Tactical Athlete",
+      "cleanControl": "tactical-athlete-discipline",
+      "guardrails": [
+        "load carriage progression",
+        "running/ruck separation",
+        "grip and carry dose",
+        "operational readiness",
+        "impact management"
+      ]
+    },
+    {
+      "id": "functional_fitness",
+      "label": "Functional Fitness",
+      "cleanControl": "functional-fitness-discipline",
+      "guardrails": [
+        "skill-strength-conditioning balance",
+        "mixed-modal density",
+        "movement quality",
+        "repeatability",
+        "no stacked maximal efforts"
+      ]
+    },
+    {
+      "id": "endurance_athlete",
+      "label": "Endurance Athlete",
+      "cleanControl": "endurance-athlete-discipline",
+      "guardrails": [
+        "easy/quality/long distribution",
+        "load-spike control",
+        "hard-day spacing",
+        "strength support",
+        "recovery weeks"
+      ]
+    }
+  ],
+  "eventFamilies": {
+    "running": [
+      "5K Race",
+      "10K Race",
+      "Half Marathon",
+      "Marathon"
+    ],
+    "cycling": [
+      "Cycling Time Trial"
+    ],
+    "multisport": [
+      "Triathlon"
+    ],
+    "functional": [
+      "HYROX",
+      "CrossFit Competition",
+      "Combat Sports Tournament"
+    ],
+    "strength_competition": [
+      "Powerlifting Meet",
+      "Strongman Competition"
+    ],
+    "tactical": [
+      "Tactical Games",
+      "Military / Law-Enforcement Fitness Test",
+      "Custom Sport Event"
+    ],
+    "obstacle_loaded": [
+      "Obstacle Course Race"
+    ],
+    "physique": [
+      "Bodybuilding / Physique Competition"
+    ]
+  },
+  "nextTrack": "After all seven discipline controls pass, generate one clean control and at least two negative mutations for every event type."
+}

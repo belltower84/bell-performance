@@ -1,0 +1,128 @@
+{
+  "version": "13.15.0",
+  "total": 20,
+  "passed": 20,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "strength-progress",
+      "title": "Strength progress changes the next dose",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "strength-accelerate",
+      "title": "Accelerated progression stays inside ceiling",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "strength-hold",
+      "title": "Hold caps effort without progressing movement",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "strength-regress",
+      "title": "Regression reduces load and volume",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "strength-rebuild",
+      "title": "Rebuild returns with reduced prescription",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "strength-deload",
+      "title": "Deload limits work sets and effort",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "strength-reentry",
+      "title": "Re-entry keeps the next exposure conservative",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "exercise-protect-squat",
+      "title": "Pain protects only the affected squat",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "exercise-protect-row",
+      "title": "Technique concern protects only the affected pull",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "safety-hold",
+      "title": "Safety hold replaces hard training with recovery",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "engine-progress",
+      "title": "Engine progress changes duration only",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "engine-accelerate",
+      "title": "Engine acceleration respects ten-percent step",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "engine-hold",
+      "title": "Engine hold reduces next duration",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "engine-rebuild",
+      "title": "Engine rebuild reduces next duration",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "channel-isolation",
+      "title": "Engine decision cannot change strength prescription",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "idempotency",
+      "title": "The same application cannot compound twice",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "role-invariant",
+      "title": "Event roles remain present after dose application",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "exercise-hold",
+      "title": "Exercise hold blocks a movement-specific increase",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "next-comparable-routing",
+      "title": "Application targets the next same-channel session",
+      "passed": true,
+      "detail": "Passed"
+    },
+    {
+      "id": "application-consumption",
+      "title": "Completing an adapted session consumes its application",
+      "passed": true,
+      "detail": "Passed"
+    }
+  ]
+}

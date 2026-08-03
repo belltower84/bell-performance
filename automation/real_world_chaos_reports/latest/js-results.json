@@ -1,0 +1,1089 @@
+{
+  "version": "13.16.0",
+  "journeys": 120,
+  "passed": 120,
+  "failed": 0,
+  "exposures": 2040,
+  "results": [
+    {
+      "persona": "steady",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "steady",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "steady",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "steady",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "steady",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "steady",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "steady",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "steady",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "steady",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "steady",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "rapid",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "slow",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "inconsistent",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "low_adherence",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "overreaching",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 2,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "pain_interrupted",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "travel",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "travel",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "travel",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "travel",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "travel",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "travel",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "travel",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "travel",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "travel",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "travel",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "beginner_bad_data",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "plateau",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "plateau",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "plateau",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "plateau",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "plateau",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "plateau",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "plateau",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "plateau",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "plateau",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "plateau",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "goal_change",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "10k",
+      "deloadEpisodes": 0,
+      "maxDownRun": 1
+    },
+    {
+      "persona": "hybrid",
+      "seed": 1,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "hybrid",
+      "seed": 2,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "hybrid",
+      "seed": 3,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "hybrid",
+      "seed": 4,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "hybrid",
+      "seed": 5,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "hybrid",
+      "seed": 6,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "hybrid",
+      "seed": 7,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "hybrid",
+      "seed": 8,
+      "passed": true,
+      "exposures": 18,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "hybrid",
+      "seed": 9,
+      "passed": true,
+      "exposures": 16,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    },
+    {
+      "persona": "hybrid",
+      "seed": 10,
+      "passed": true,
+      "exposures": 17,
+      "goal": "hybrid",
+      "deloadEpisodes": 0,
+      "maxDownRun": 0
+    }
+  ]
+}

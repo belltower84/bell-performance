@@ -1,0 +1,142 @@
+{
+  "version": "2026-07-31",
+  "scope": "Primary research, systematic reviews, position stands, and official competition standards used to define conservative validation guardrails. These sources support programming principles, not guaranteed outcomes.",
+  "sources": [
+    {
+      "id": "endurance-taper-2023",
+      "domain": "endurance",
+      "title": "Effects of tapering on performance in endurance athletes: systematic review and meta-analysis",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37163550/",
+      "evidenceLevel": "systematic_review_meta_analysis",
+      "use": "Endurance taper should reduce volume while retaining event-specific intensity and frequency."
+    },
+    {
+      "id": "endurance-taper-2007",
+      "domain": "endurance",
+      "title": "Effects of tapering on performance: a meta-analysis",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/17762369/",
+      "evidenceLevel": "meta_analysis",
+      "use": "Supports a progressive pre-event volume reduction rather than eliminating intensity."
+    },
+    {
+      "id": "triathlon-taper-1999",
+      "domain": "triathlon",
+      "title": "Training theory and taper: validation in triathlon athletes",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/10029340/",
+      "evidenceLevel": "controlled_field_validation",
+      "use": "Supports a structured multisport taper and retained discipline-specific work."
+    },
+    {
+      "id": "hyrox-demands-2025",
+      "domain": "hyrox",
+      "title": "Acute physiological responses and performance determinants in HYROX",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40230601/",
+      "evidenceLevel": "observational_simulation",
+      "use": "Supports running endurance, station repeatability, and controlled competition simulations."
+    },
+    {
+      "id": "hybrid-hift-2025",
+      "domain": "hybrid_fitness",
+      "title": "High Intensity Functional Training in Hybrid Competitions: scoping review",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41133555/",
+      "evidenceLevel": "scoping_review",
+      "use": "Supports integrated aerobic, strength, power, and repeated-effort preparation."
+    },
+    {
+      "id": "crossfit-predictors-2023",
+      "domain": "crossfit",
+      "title": "Predictors of CrossFit performance: systematic review",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37368562/",
+      "evidenceLevel": "systematic_review",
+      "use": "Supports retention of strength, technical skill, and broad competition-specific capacity."
+    },
+    {
+      "id": "crossfit-demands-2024",
+      "domain": "crossfit",
+      "title": "Physical demands and physiological responses to CrossFit: scoping review",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39300545/",
+      "evidenceLevel": "scoping_review",
+      "use": "Supports competition-specific practice and recovery spacing after demanding mixed-modal work."
+    },
+    {
+      "id": "combat-hiit-2019",
+      "domain": "combat",
+      "title": "HIIT in Olympic combat-sport athletes: systematic review",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30431531/",
+      "evidenceLevel": "systematic_review",
+      "use": "Supports intermittent round-capacity work as conditioning support to technical-tactical training."
+    },
+    {
+      "id": "powerlifting-taper-2020",
+      "domain": "powerlifting",
+      "title": "Tapering and peaking maximal strength for powerlifting performance",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/32917000/",
+      "evidenceLevel": "systematic_review",
+      "use": "Supports competition-lift specificity, fatigue reduction, and retained heavy-skill exposure."
+    },
+    {
+      "id": "strongman-practices-2011",
+      "domain": "strongman",
+      "title": "Strength and conditioning practices of strongman competitors",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21993033/",
+      "evidenceLevel": "large_survey",
+      "use": "Supports maximal strength, power, carries, loading, grip, and direct implement practice."
+    },
+    {
+      "id": "strongman-biomechanics-2020",
+      "domain": "strongman",
+      "title": "Biomechanics and applications of strongman exercises: systematic review",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31820223/",
+      "evidenceLevel": "systematic_review",
+      "use": "Supports event-pattern practice for carries, pulls, loading, and awkward-object tasks."
+    },
+    {
+      "id": "load-carriage-2012",
+      "domain": "tactical",
+      "title": "Effects of physical training on load carriage performance: systematic review",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/22130400/",
+      "evidenceLevel": "systematic_review",
+      "use": "Supports combined aerobic, strength, and progressive loaded-movement preparation."
+    },
+    {
+      "id": "load-carriage-biomechanics-2018",
+      "domain": "tactical",
+      "title": "Physiology and biomechanics of load carriage performance",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30252089/",
+      "evidenceLevel": "review",
+      "use": "Supports controlled load-speed progression and impact management."
+    },
+    {
+      "id": "ocr-demands-2019",
+      "domain": "obstacle_course",
+      "title": "Physiological demands of extreme obstacle-course racing",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31430849/",
+      "evidenceLevel": "case_study",
+      "use": "Supports combined endurance, grip, obstacle, and terrain-specific preparation while acknowledging limited evidence."
+    },
+    {
+      "id": "bodybuilding-training-2014",
+      "domain": "physique",
+      "title": "Natural bodybuilding contest preparation: resistance and cardiovascular training",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/24998610/",
+      "evidenceLevel": "narrative_review",
+      "use": "Supports continued resistance training, recoverable cardio, frequency, and fatigue control during contest preparation."
+    },
+    {
+      "id": "bodybuilding-nutrition-2014",
+      "domain": "physique",
+      "title": "Evidence-based natural bodybuilding contest preparation",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/24864135/",
+      "evidenceLevel": "narrative_review",
+      "use": "Supports conservative contest-preparation pacing and muscle-retention safeguards."
+    },
+    {
+      "id": "acsm-2009",
+      "domain": "general_training",
+      "title": "ACSM progression models in resistance training for healthy adults",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/19204579/",
+      "evidenceLevel": "position_stand",
+      "use": "Supports general progressive resistance training in custom-event fallback programming."
+    }
+  ]
+}

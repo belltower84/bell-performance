@@ -11,7 +11,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <link href="./assets/logo-shield.svg?v=13720" rel="icon" type="image/svg+xml"/>
-<title>Bell Performance 13.8.5 — Training Experience Refinement</title>
+<title>Bell Performance 13.17.4 — Atomic Session Identity & Workout Title Integrity</title>
 <link href="./css/app.css?v=13710" rel="stylesheet"/>
 <link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
 <link href="./css/independent-daily-sessions-1382.css?v=13840" rel="stylesheet"/>
@@ -22,6 +22,7 @@
 <link href="./css/guided-tour-1374.css?v=13740" rel="stylesheet"/>
 <link href="./css/settings-1376.css?v=13760" rel="stylesheet"/>
 <link href="./css/workout-experience-1385.css?v=13850" rel="stylesheet"/>
+<link href="./css/athlete-response-13130.css?v=131400" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -229,7 +230,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="performance-callout" id="habitWeekSummary">No habit history yet.</div>
 </div>
 </section>
-<section class="screen" id="history"><h2 class="section-title">Performance Review</h2><div id="weeklyReview"></div><div id="blockReview"></div><div id="milestoneReview"></div><h2 class="section-title">Training History</h2><div class="list" id="historyList"></div></section>
+<section class="screen" id="history"><h2 class="section-title">Performance Review</h2><div id="athleteResponseReview"></div><div id="weeklyReview"></div><div id="blockReview"></div><div id="milestoneReview"></div><h2 class="section-title">Training History</h2><div class="list" id="historyList"></div></section>
 <section class="screen" id="more">
 <h2 class="section-title">Settings &amp; Data</h2>
 <div class="settings-section-heading"><span class="metric-label">Support</span><h3>Help</h3></div>
@@ -662,7 +663,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="performance-callout" id="enginePacePreview">Enter time and distance to calculate pace.</div>
 </div>
 <div id="activeExercises"></div>
-<div class="card" id="workoutCompletionCard"><div class="workout-finish-heading"><span class="metric-label">Finish Session</span><h3>Record how the workout went</h3></div><div class="workout-finish-fields"><label>Session RPE<input id="sessionRpe" max="10" min="1" placeholder="1–10" type="number"/></label><label>Training Notes<textarea id="sessionNotes" placeholder="Optional notes for Bell Coach"></textarea></label></div><button class="good workout-finish-button" onclick="completeWorkout()">Complete Session</button></div>
+<div class="card athlete-response-finish" id="workoutCompletionCard"><div class="workout-finish-heading"><span class="metric-label">Finish Session</span><h3>Record how the workout went</h3><p>Bell compares the planned prescription with what you completed before changing future training.</p></div><div class="workout-finish-fields athlete-response-fields"><label>Session RPE<input id="sessionRpe" max="10" min="1" placeholder="1–10" step="0.5" type="number"/></label><label>Overall difficulty<select id="sessionDifficulty"><option value="easy">Easier than expected</option><option value="right" selected>About right</option><option value="hard">Harder than expected</option><option value="very_hard">Near limit</option></select></label><label>Pain severity<input id="sessionPainSeverity" max="10" min="0" placeholder="0–10" type="number" value="0"/></label><label>Pain area<input id="sessionPainArea" placeholder="None, knee, shoulder…" type="text"/></label><label class="athlete-response-check"><input id="sessionTechniqueIssue" onchange="toggleSessionTechniqueDetail()" type="checkbox"/><span>Technique or movement issue</span></label><label class="hidden athlete-response-wide" id="sessionTechniqueDetail">Technique concern<input id="sessionTechniqueNote" placeholder="What broke down or felt limited?" type="text"/></label><label class="athlete-response-wide">Training Notes<textarea id="sessionNotes" placeholder="Optional notes for Bell Coach"></textarea></label></div><button class="good workout-finish-button" onclick="completeWorkout()">Complete Session</button></div>
 </div>
 </div>
 
@@ -678,10 +679,10 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.8.5-training-experience-refinement";</script>
+<script>window.BELL_APP_VERSION = "13.17.4-atomic-session-identity-workout-title-integrity";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=13710"></script>
-<script src="./js/storage.js?v=13840"></script>
+<script src="./js/storage.js?v=13841"></script>
 <script src="./js/readiness.js?v=13840"></script>
 <script src="./js/equipment.js?v=13640"></script>
 <script>{const grid=document.getElementById("equipmentGrid");if(grid)grid.innerHTML=equipmentCheckboxesHtml("equipment");const onboardingGrid=document.getElementById("onboardingEquipmentGrid");if(onboardingGrid)onboardingGrid.innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");}</script>
@@ -691,7 +692,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/milestones.js?v=10006"></script>
 <script src="./js/progression.js?v=10006"></script>
 <script src="./js/workout-model.js?v=13850"></script>
-<script src="./js/workouts.js?v=13850"></script>
+<script src="./js/workouts.js?v=131300"></script>
 <script src="./js/missed-sessions.js?v=10006"></script>
 <script src="./js/performance-review.js?v=10006"></script>
 <script src="./js/artwork.js?v=10006"></script>
@@ -703,16 +704,20 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/mission-planner.js?v=10006"></script>
 <script src="./js/coaching-pathways.js?v=13600"></script>
 <script src="./js/event-coaching.js?v=13721"></script>
+<script src="./js/real-world-chaos-13160.js?v=131670"></script>
+<script src="./js/longitudinal-progression-13140.js?v=131600"></script>
+<script src="./js/prescription-application-13150.js?v=131600"></script>
+<script src="./js/athlete-response-13130.js?v=131670"></script>
 <script src="./js/how-to.js?v=13740"></script>
-<script src="./js/workout-display-names.js?v=13790"></script>
+<script src="./js/workout-display-names.js?v=131740"></script>
 <script src="./js/premium-dashboard.js?v=13790"></script>
 <script src="./js/block-lifecycle.js?v=10006"></script>
-<script src="./js/weekly-debrief.js?v=13720"></script>
+<script src="./js/weekly-debrief.js?v=131300"></script>
 <script src="./js/plan-progress.js?v=10006"></script>
-<script src="./js/bell-api.js?v=13600"></script>
-<script src="./js/api-integration.js?v=12101"></script>
+<script src="./js/bell-api.js?v=131300"></script>
+<script src="./js/api-integration.js?v=131300"></script>
 <script src="./js/dashboard-command-center.js?v=13650"></script>
-<script src="./js/adaptive-weekly-schedule.js?v=13722"></script>
+<script src="./js/adaptive-weekly-schedule.js?v=13730"></script>
 <script src="./js/powerlifting-programming.js?v=12212"></script>
 <script src="./js/powerlifting-meet-prep.js?v=12213"></script>
 <script src="./js/app.js?v=12101"></script>
@@ -728,5 +733,6 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/independent-daily-sessions-1382.js?v=13850"></script>
 <script src="./js/training-hub-1385.js?v=13850"></script>
 <script src="./js/mission-routing-1385.js?v=13850"></script>
+<script src="./js/longitudinal-coaching-1390.js?v=13910"></script>
 </body>
 </html>

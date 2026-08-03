@@ -242,11 +242,23 @@ function bellCompletionPerformanceRatio(completed) {
 async function bellCompleteCurrentSession(completed) {
   const athleteId = bellCloud.athleteId, sessionId = completed?.cloudSessionId || bellCloudSessionId();
   if (!bellCloudConnected() || !athleteId || !sessionId) return null;
-  const duration = Math.max(1, Math.round((Number(completed.elapsed) || Number(completed.officialElapsed) || 2700) / 60));
+  const structured=completed?.structuredCompletion||(typeof bellBuildStructuredCompletion==="function"?bellBuildStructuredCompletion(completed):null);
+  const duration = Math.max(1, Number(structured?.duration_minutes)||Math.round((Number(completed.elapsed) || Number(completed.officialElapsed) || 2700) / 60));
   const idempotency = `bell-${athleteId}-${sessionId}-${completed.completedAt || todayKey()}`;
+  const body=structured?{
+    schema_version:structured.schema_version||1,
+    session_type:structured.session_type||((completed?.cardioType||completed?.engineMetrics)?"engine":"strength"),
+    duration_minutes:duration,
+    session_rpe:Number(structured.session_rpe)||Number(completed.sessionRpe)||Number(completed.rpe)||7,
+    performance_ratio:Number(structured.performance_ratio)||bellCompletionPerformanceRatio(completed),
+    difficulty:structured.difficulty||completed.difficulty||"right",
+    notes:structured.notes||completed.notes||"Completed in Bell Performance",
+    planned:structured.planned||{},actual:structured.actual||{},readiness:structured.readiness||{},feedback:structured.feedback||{},
+    pain:structured.pain||{},technique_issues:structured.technique_issues||[],symptoms:structured.symptoms||[],
+    exercise_results:structured.exercise_results||[],engine_results:structured.engine_results||{}
+  }:{duration_minutes:duration,session_rpe:Number(completed.sessionRpe)||Number(completed.rpe)||7,performance_ratio:bellCompletionPerformanceRatio(completed),notes:completed.notes||"Completed in Bell Performance"};
   const result = await bellApiRequest(`/athletes/${athleteId}/sessions/${encodeURIComponent(sessionId)}/complete`, {
-    method: "POST", headers: { "Idempotency-Key": idempotency },
-    body: JSON.stringify({ duration_minutes: duration, session_rpe: Number(completed.sessionRpe) || Number(completed.rpe) || 7, performance_ratio: bellCompletionPerformanceRatio(completed), notes: completed.notes || "Completed in Bell Performance" })
+    method: "POST", headers: { "Idempotency-Key": idempotency }, body: JSON.stringify(body)
   });
   await bellRefreshCloudState(); return result;
 }

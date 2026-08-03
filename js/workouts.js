@@ -433,7 +433,7 @@ function closeWorkoutPreview(){document.getElementById('workoutPreviewModal')?.c
 function beginWorkoutFlow(){
   const active=data.activeWorkout;if(!active)return;active.stage='warmup';active.startedAt=active.startedAt||new Date().toISOString();active.timerStartedAt=new Date().toISOString();active.timerRunning=true;saveData({render:false});renderWorkoutStage();startTimer();
 }
-function advanceToTraining(){const active=data.activeWorkout;if(!active)return;active.stage='training';saveData({render:false});renderWorkoutStage();}
+function advanceToTraining(){const active=data.activeWorkout;if(!active)return;if(typeof gwMaterializeWorkout==='function'&&!gwMaterializeWorkout(active)){alert('Bell could not prepare the working sets for this session. Return to the workout overview and try again.');return;}active.stage='training';saveData({render:false});renderWorkoutStage();if(typeof window.renderActiveWorkout==='function')window.renderActiveWorkout();}
 function renderWorkoutStage(){
   const active=data.activeWorkout;if(!active)return;const stage=active.stage||'training';
   const modal=document.getElementById('workoutModal'),hero=document.getElementById('workoutHero'),briefing=document.getElementById('missionBriefing'),briefActions=document.getElementById('workoutBriefActions'),warm=document.getElementById('warmupPanel'),warmActions=document.getElementById('warmupActions'),control=document.getElementById('workoutControlCard'),exercises=document.getElementById('activeExercises'),completion=document.getElementById('workoutCompletionCard');
@@ -444,7 +444,9 @@ function renderWorkoutStage(){
   if(stage==='briefing'){active.timerRunning=false;setText('currentExerciseOut','Review the mission, then begin when ready');}
   if(stage==='warmup')setText('currentExerciseOut','Complete the warm-up, then advance to training');
   if(stage==='training'){
+    if(typeof gwMaterializeWorkout==='function')gwMaterializeWorkout(active);
     const nextExercise=active.exercises?.find(exercise=>exercise.sets?.some(set=>!set.done));
     setText('currentExerciseOut',nextExercise?nextExercise.name:'All working sets complete');
+    requestAnimationFrame(()=>{if(typeof window.renderActiveWorkout==='function')window.renderActiveWorkout();});
   }
 }

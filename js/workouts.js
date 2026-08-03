@@ -282,50 +282,81 @@ function renderMissionBriefing(active){
   setText("workoutNextDetail", next ? `${next.day ? `${next.day} • ` : ""}${next.duration} min` : "Complete this mission, then review the plan.");
 }
 
+function bellJumpToExercise(exerciseIndex){
+  const active=data.activeWorkout;const exercise=active?.exercises?.[exerciseIndex];if(!exercise)return;
+  const firstUndone=exercise.sets?.findIndex(set=>!set.done);
+  if(firstUndone<0)return;
+  exercise.sets.forEach((set,index)=>{ if(index<firstUndone&&set.done!==true)set.done=false; });
+  renderActiveWorkout();
+}
+function bellCompleteCurrentSet(exerciseIndex,setIndex){
+  const active=data.activeWorkout;const exercise=active?.exercises?.[exerciseIndex];const set=exercise?.sets?.[setIndex];if(!set)return;
+  set.done=true;saveData({render:false});
+  const nextSame=exercise.sets.find(s=>!s.done);
+  if(nextSame)beginRestTimer(exercise.rest||60,exercise.name);
+  else {const nextExercise=active.exercises.slice(exerciseIndex+1).find(ex=>ex.sets?.some(s=>!s.done));if(nextExercise)beginRestTimer(Math.min(90,exercise.rest||60),nextExercise.name);else skipRestTimer();}
+  renderActiveWorkout();if(typeof updateWorkoutProgress==='function')updateWorkoutProgress();
+}
+
 function renderActiveWorkout() {
   const active=data.activeWorkout;if(!active)return;
-  const container=document.getElementById("activeExercises");container.innerHTML="";
-  let lastBlock="";
-  active.exercises.forEach((exercise,exerciseIndex)=>{
-    if(exercise.block&&exercise.block!==lastBlock){
-      const heading=document.createElement("div");heading.className="workout-block-title";heading.textContent=exercise.block;container.appendChild(heading);lastBlock=exercise.block;
-    }
-    const card=document.createElement("article");card.className=`exercise-card streamlined-exercise${exercise.injuryAdjusted?" injury-adjusted":""}`;
-    const isEngine=Boolean(active.cardioType)||String(active.name||"").startsWith("R-");
-    const safeName=String(exercise.name).replace(/'/g,"\'");
-    const detailItems=[];
-    if(exercise.advancedTechnique)detailItems.push(`<div class="exercise-detail-line"><strong>${escapeHtml(exercise.advancedTechnique.name)}</strong><span>${escapeHtml(exercise.advancedTechnique.short)}</span></div>`);
-    if(exercise.scaleNote)detailItems.push(`<div class="exercise-detail-line"><strong>Readiness</strong><span>${escapeHtml(exercise.scaleNote)}</span></div>`);
-    if(!isEngine)detailItems.push(`<div class="exercise-detail-line"><strong>Starting load</strong><span>${escapeHtml(exercise.recommendationDisplay||"Choose by effort")}</span></div>`);
-    if(!isEngine&&exercise.recommendationNote)detailItems.push(`<div class="exercise-detail-line"><strong>Why</strong><span>${escapeHtml(exercise.recommendationNote)}</span></div>`);
-    if(exercise.injuryAdjusted)detailItems.push(`<div class="exercise-detail-line warning"><strong>Adjusted</strong><span>Replaced ${escapeHtml(exercise.originalExercise||"the original movement")} using your saved limitation profile.</span></div>`);
-    const feedbackButtons=isEngine
-      ? `<button class="${exercise.feedback==='below'?'selected':''}" onclick="recordExerciseFeedback(${exerciseIndex},'below')">Below Target</button><button class="${exercise.feedback==='target'?'selected':''}" onclick="recordExerciseFeedback(${exerciseIndex},'target')">On Target</button><button class="${exercise.feedback==='hard'?'selected':''}" onclick="recordExerciseFeedback(${exerciseIndex},'hard')">Too Hard</button><button class="issue ${exercise.feedback==='symptoms'?'selected':''}" onclick="recordExerciseFeedback(${exerciseIndex},'symptoms')">Pain / Symptoms</button>`
-      : `<button class="${exercise.feedback==='easy'?'selected':''}" onclick="recordExerciseFeedback(${exerciseIndex},'easy')">Too Easy</button><button class="${exercise.feedback==='right'?'selected':''}" onclick="recordExerciseFeedback(${exerciseIndex},'right')">Just Right</button><button class="${exercise.feedback==='heavy'?'selected':''}" onclick="recordExerciseFeedback(${exerciseIndex},'heavy')">Too Heavy</button><button class="issue ${exercise.feedback==='pain'?'selected':''}" onclick="recordExerciseFeedback(${exerciseIndex},'pain')">Pain / Technique</button>`;
-    card.innerHTML=`
-      <header class="exercise-head streamlined-head"><div class="exercise-num">${exerciseIndex+1}</div><div class="grow"><div class="exercise-name-row"><div><div class="exercise-name">${escapeHtml(exercise.name)}</div><div class="prescription">${escapeHtml(exercise.prescription)}</div></div><div class="exercise-card-actions"><button type="button" onclick="openExerciseDetail('${safeName}')">Guide</button>${isEngine?"":`<button type="button" onclick="openExerciseSwap(${exerciseIndex})">Replace</button>`}</div></div>${exercise.cue?`<p class="exercise-primary-cue">${escapeHtml(exercise.cue)}</p>`:""}</div></header>
-      ${detailItems.length?`<details class="exercise-guidance-drawer"><summary>Coaching & load guidance</summary><div class="exercise-detail-grid">${detailItems.join("")}</div></details>`:""}
-      <div class="set-table-wrap"><div class="set-head ${isEngine?"engine-response-head":"strength-response-head"}"><span>${isEngine?"Round":"Set"}</span><span>${isEngine?"Target":"Weight"}</span><span>${isEngine?"Result":"Reps"}</span>${isEngine?"":"<span>RPE</span><span>RIR</span>"}<span>Done</span></div><div id="sets-${exerciseIndex}"></div></div>
-      <details class="exercise-feedback-drawer"><summary>${exercise.feedback?"Feedback saved":"Rate this exercise"}</summary><div class="exercise-feedback"><div class="feedback-buttons">${feedbackButtons}</div><div class="feedback-result">${exercise.feedback?(isEngine?'Saved for future conditioning progression.':'Saved for next-session progression.'):(isEngine?'Rate effort, breathing, and control after the segment.':'Rate the movement after the final working set.')}</div></div></details>`;
-    container.appendChild(card);
-    const setsContainer=card.querySelector(`#sets-${exerciseIndex}`);
-    exercise.sets.forEach((set,setIndex)=>{
-      const row=document.createElement("div");row.className=`set-row ${isEngine?"engine-response-row":"strength-response-row"}`;
-      row.innerHTML=`<span>${set.set}</span><input aria-label="${isEngine?'Target':'Weight'} for ${escapeHtml(exercise.name)} ${isEngine?'round':'set'} ${set.set}" inputmode="decimal" value="${escapeHtml(set.weight)}" oninput="updateSet(${exerciseIndex},${setIndex},'weight',this.value)"><input aria-label="${isEngine?'Result':'Reps'} for ${escapeHtml(exercise.name)} ${isEngine?'round':'set'} ${set.set}" inputmode="text" value="${escapeHtml(set.reps)}" oninput="updateSet(${exerciseIndex},${setIndex},'reps',this.value)">${isEngine?"":`<input aria-label="RPE for ${escapeHtml(exercise.name)} set ${set.set}" inputmode="decimal" min="1" max="10" step="0.5" type="number" value="${escapeHtml(set.rpe??'')}" oninput="updateSet(${exerciseIndex},${setIndex},'rpe',this.value)"><input aria-label="Reps in reserve for ${escapeHtml(exercise.name)} set ${set.set}" inputmode="decimal" min="0" max="10" step="0.5" type="number" value="${escapeHtml(set.rir??'')}" oninput="updateSet(${exerciseIndex},${setIndex},'rir',this.value)">`}<input aria-label="Mark ${escapeHtml(exercise.name)} ${isEngine?'round':'set'} ${set.set} complete" type="checkbox" ${set.done?"checked":""} onchange="updateSet(${exerciseIndex},${setIndex},'done',this.checked)">`;
-      setsContainer.appendChild(row);
-    });
-  });
+  const container=document.getElementById('activeExercises');if(!container)return;
+  const isEngine=Boolean(active.cardioType)||String(active.name||'').startsWith('R-');
+  const exercises=Array.isArray(active.exercises)?active.exercises:[];
+  const totalSets=exercises.reduce((n,e)=>n+(e.sets?.length||0),0);
+  const doneSets=exercises.reduce((n,e)=>n+(e.sets?.filter(s=>s.done).length||0),0);
+  let currentExerciseIndex=exercises.findIndex(ex=>ex.sets?.some(s=>!s.done));
+  if(currentExerciseIndex<0)currentExerciseIndex=Math.max(0,exercises.length-1);
+  const exercise=exercises[currentExerciseIndex];
+  if(!exercise){container.innerHTML='<section class="bell-focus-card"><h2>No exercises found</h2></section>';return;}
+  const currentSetIndex=exercise.sets?.findIndex(s=>!s.done) ?? -1;
+  const currentSet=currentSetIndex>=0?exercise.sets[currentSetIndex]:null;
+  const complete=doneSets>=totalSets&&totalSets>0;
+  const nextExercise=exercises.slice(currentExerciseIndex+1).find(ex=>ex.sets?.some(s=>!s.done));
+  const queue=exercises.map((ex,index)=>{
+    const exDone=ex.sets?.every(s=>s.done);
+    const exCurrent=index===currentExerciseIndex&&!complete;
+    return `<button type="button" class="bell-queue-item ${exDone?'done':''} ${exCurrent?'current':''}" onclick="bellJumpToExercise(${index})"><span>${exDone?'✓':index+1}</span><strong>${escapeHtml(ex.name)}</strong><small>${exDone?'Complete':exCurrent?'Now':'Next'}</small></button>`;
+  }).join('');
+  const completedSets=(exercise.sets||[]).filter(s=>s.done).map(s=>`<span>Set ${s.set}: ${escapeHtml(s.weight||'—')} × ${escapeHtml(s.reps||'—')}</span>`).join('');
+  const target=currentSet?`${currentSet.weight||exercise.recommendationDisplay||'As prescribed'}${isEngine?'':' lb'} × ${currentSet.reps||exercise.plannedReps||'—'}`:'';
+  container.innerHTML=`
+    <section class="bell-workout-queue" aria-label="Workout order">${queue}</section>
+    ${complete?`
+      <section class="bell-focus-card bell-session-complete">
+        <span class="metric-label">Working Sets Complete</span>
+        <h2>Nice work. Finish the session.</h2>
+        <p>Bell only needs a quick overall rating. Everything else is optional.</p>
+        <button class="good" type="button" onclick="document.getElementById('workoutCompletionCard')?.scrollIntoView({behavior:'smooth'})">Finish Session</button>
+      </section>`:`
+      <section class="bell-focus-card">
+        <div class="bell-focus-topline"><span class="metric-label">Exercise ${currentExerciseIndex+1} of ${exercises.length}</span><span>${doneSets}/${totalSets} sets</span></div>
+        <div class="bell-focus-heading">
+          <div><h2>${escapeHtml(exercise.name)}</h2><p>${escapeHtml(exercise.prescription||'')}</p></div>
+          <div class="bell-focus-actions"><button type="button" onclick="openExerciseDetail('${String(exercise.name).replace(/'/g,"\\'")}')">Guide</button>${isEngine?'':`<button type="button" onclick="openExerciseSwap(${currentExerciseIndex})">Replace</button>`}</div>
+        </div>
+        ${exercise.cue?`<div class="bell-cue">${escapeHtml(exercise.cue)}</div>`:''}
+        <div class="bell-current-set">
+          <div><span>Current</span><strong>${isEngine?'Round':'Set'} ${currentSet.set} of ${exercise.sets.length}</strong></div>
+          <div class="bell-set-target"><span>Target</span><strong>${escapeHtml(target)}</strong></div>
+        </div>
+        <button class="good bell-complete-set" type="button" onclick="bellCompleteCurrentSet(${currentExerciseIndex},${currentSetIndex})">Complete ${isEngine?'Round':'Set'} ${currentSet.set}</button>
+        <details class="bell-adjust-result" id="bellSetEdit-${currentExerciseIndex}-${currentSetIndex}">
+          <summary>Change what I did</summary>
+          <div class="bell-adjust-grid">
+            <label>${isEngine?'Target':'Weight'}<input inputmode="decimal" value="${escapeHtml(currentSet.weight)}" oninput="updateSet(${currentExerciseIndex},${currentSetIndex},'weight',this.value)"></label>
+            <label>${isEngine?'Result':'Reps'}<input inputmode="text" value="${escapeHtml(currentSet.reps)}" oninput="updateSet(${currentExerciseIndex},${currentSetIndex},'reps',this.value)"></label>
+          </div>
+        </details>
+        ${completedSets?`<div class="bell-completed-sets"><span class="metric-label">Completed</span><div>${completedSets}</div></div>`:''}
+        <div class="bell-next-up"><span class="metric-label">Next Up</span><strong>${currentSetIndex+1<exercise.sets.length?`${escapeHtml(exercise.name)} — Set ${currentSetIndex+2}`:(nextExercise?escapeHtml(nextExercise.name):'Finish session')}</strong></div>
+      </section>`}
+  `;
   renderWarmupPanel();
-  const nextExercise=active.exercises.find(exercise=>exercise.sets.some(set=>!set.done));
-  setText("currentExerciseOut",nextExercise?nextExercise.name:"All working sets complete");
-  document.getElementById("sessionRpe").value=active.rpe||"";
-  document.getElementById("sessionDifficulty").value=active.difficulty||"right";
-  document.getElementById("sessionPainSeverity").value=active.painSeverity||0;
-  document.getElementById("sessionPainArea").value=active.painArea||"";
-  document.getElementById("sessionTechniqueIssue").checked=Boolean(active.techniqueIssue);
-  document.getElementById("sessionTechniqueNote").value=active.techniqueIssueNote||"";
-  document.getElementById("sessionNotes").value=active.notes||"";
-  toggleSessionTechniqueDetail();updateTimerDisplay();updateWorkoutProgress();
+  setText('currentExerciseOut',complete?'All working sets complete':exercise.name);
+  document.getElementById('sessionRpe').value=active.rpe||'';
+  document.getElementById('sessionDifficulty').value=active.difficulty||'right';
+  updateTimerDisplay();
 }
 
 function updateSet(exerciseIndex,setIndex,field,value){const exercise=data.activeWorkout.exercises[exerciseIndex];exercise.sets[setIndex][field]=value;if(field==='weight'&&setIndex===0){const topLoad=Number(value);let changed=false;data.activeWorkout.exercises.forEach(candidate=>{if(candidate.backoffSourceIndex!==exerciseIndex||!Number.isFinite(topLoad)||topLoad<=0)return;const backoff=roundTo5(topLoad*Number(candidate.backoffPercent||0));candidate.recommendedWeight=backoff;candidate.recommendationDisplay=`${backoff} lb`;candidate.recommendationNote=`Automatically recalculated from the entered top-set load of ${topLoad} lb.`;candidate.sets.forEach(set=>{if(!set.done)set.weight=backoff;});changed=true;});if(changed){saveData({render:false});renderActiveWorkout();return;}}saveData({render:false});updateWorkoutProgress();if(field==='done'&&value){const next=exercise.sets.find(set=>!set.done);if(next){beginRestTimer(exercise.rest||60,exercise.name);}else{const nextExercise=data.activeWorkout.exercises.slice(exerciseIndex+1).find(ex=>ex.sets.some(set=>!set.done));setText('currentExerciseOut',nextExercise?nextExercise.name:'All working sets complete');if(nextExercise)beginRestTimer(Math.min(90,exercise.rest||60),nextExercise.name);}}}

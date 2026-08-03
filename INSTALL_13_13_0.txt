@@ -1,0 +1,12 @@
+Bell Performance 13.13.0 — Athlete Response & Adaptive Progression
+
+1. Commit or stash current repository changes.
+2. Extract the GitHub-ready ZIP.
+3. Copy everything inside the extracted folder into the Bell Performance repository root.
+4. Replace matching files. Keep index.html, css/, js/, backend/, automation/, manifest.json, and sw.js at the repository root.
+5. Commit with: Add structured athlete response and adaptive progression 13.13.0
+6. Push the test branch and wait for Bell Core to redeploy.
+7. Hard-refresh the app or reinstall the PWA so the 13.13.0 service-worker cache replaces the prior cache.
+8. Run: .\automation\run-athlete-response-validation.ps1
+
+No database migration is required.

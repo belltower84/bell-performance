@@ -1,0 +1,45 @@
+/* Bell Performance 13.7.5 — Settings Flow Rebuild */
+#more[data-bell1363-settings="true"]{--settings-surface:#0b0f12;--settings-surface-2:#10161a;--settings-line:rgba(255,255,255,.08);--settings-gold:rgba(217,166,41,.78)}
+#more .bell1363-settings-detail{max-width:1100px;margin:0 auto}
+#more .bell1363-settings-detail-head{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;margin:0 0 14px;padding:16px 18px;border:1px solid rgba(217,166,41,.24);border-radius:18px;background:radial-gradient(circle at 100% 0,rgba(217,166,41,.12),transparent 45%),linear-gradient(145deg,#101519,#090c0f);box-shadow:0 16px 42px rgba(0,0,0,.24)}
+#more .bell1363-settings-detail-head:after{content:"";position:absolute;left:18px;right:18px;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(217,166,41,.48),transparent)}
+#more .bell1363-settings-detail-head h2{font-size:clamp(1.45rem,4vw,2rem)}
+#more .bell1363-settings-detail-head p{max-width:680px}
+#more .bell133-settings-panels{display:block}
+#more .bell133-settings-panel.active{display:grid!important;grid-template-columns:1fr!important;gap:10px}
+#more .bell133-settings-panel>.card{position:relative;margin:0!important;padding:0!important;border:1px solid var(--settings-line)!important;border-radius:16px!important;background:linear-gradient(145deg,rgba(16,22,26,.98),rgba(8,11,14,.98))!important;box-shadow:none!important;overflow:hidden}
+#more .bell133-settings-panel>.card.settings-section-open{border-color:rgba(217,166,41,.26)!important;box-shadow:0 16px 34px rgba(0,0,0,.18)!important}
+#more .settings-section-toggle{width:100%;min-height:82px;display:grid;grid-template-columns:46px minmax(0,1fr) auto;align-items:center;gap:13px;padding:14px 16px;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important;text-align:left;box-shadow:none!important}
+#more .settings-section-toggle:hover,#more .settings-section-toggle:focus-visible{background:rgba(255,255,255,.025)!important;outline:none}
+#more .settings-section-toggle-icon{width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(217,166,41,.25);border-radius:13px;background:rgba(217,166,41,.07);color:#e4b83e;font-weight:900;font-size:1rem}
+#more .settings-section-toggle-copy{min-width:0;display:grid;gap:4px}
+#more .settings-section-toggle-copy strong{font-size:.96rem;letter-spacing:-.01em;color:#f5f6f7}
+#more .settings-section-toggle-copy small{color:#929ba1;font-size:.75rem;line-height:1.38;font-weight:500}
+#more .settings-section-toggle-state{display:flex;align-items:center;gap:8px;color:#d9a629;font-size:.7rem;font-weight:850;letter-spacing:.04em;text-transform:uppercase}
+#more .settings-section-toggle-state i{width:25px;height:25px;display:grid;place-items:center;border:1px solid rgba(217,166,41,.22);border-radius:50%;font-style:normal;font-size:1rem;transition:transform .2s ease}
+#more .settings-section-open .settings-section-toggle-state i{transform:rotate(90deg)}
+#more .settings-section-body{display:none;padding:0 16px 17px;border-top:1px solid transparent}
+#more .settings-section-open>.settings-section-body{display:block;border-color:rgba(255,255,255,.06);animation:settingsBodyIn .18s ease both}
+@keyframes settingsBodyIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+#more .settings-section-body>.bell133-card-heading:first-child{display:flex!important;justify-content:flex-end;margin:14px 0 0!important}#more .settings-section-body>.bell133-card-heading:first-child>div{display:none!important}#more .settings-section-body>.bell133-card-heading:first-child:not(:has(button)),#more .settings-section-body>h3:first-child{display:none!important}
+#more .settings-section-body>.hint:first-child{margin-top:14px}
+#more .settings-section-body .bell133-card-heading{margin:14px 0 12px;padding:0;border:0}
+#more .settings-section-body .bell133-form-grid,#more .settings-section-body .row,#more .settings-section-body .goal-builder-columns,#more .settings-section-body .bell133-profile-context,#more .settings-section-body .bell133-journey-metrics,#more .settings-section-body .bell133-diagnostic-grid{margin-top:14px}
+#more .settings-section-body label{display:grid;gap:7px;color:#c9ced1;font-size:.72rem;font-weight:750;letter-spacing:.025em}
+#more .settings-section-body input,#more .settings-section-body select,#more .settings-section-body textarea{min-height:44px;border-radius:11px!important;border-color:rgba(255,255,255,.10)!important;background:#090d10!important}
+#more .settings-section-body button{margin-top:14px}
+#more .settings-section-body .row button,#more .settings-section-body .button-row button,#more .settings-section-body .bell1364-equipment-actions button,#more .settings-section-body .how-to-actions button{margin-top:0}
+#more .settings-section-body .bell133-profile-context>div,#more .settings-section-body .bell133-journey-metrics>div,#more .settings-section-body .bell133-diagnostic-grid>div{border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.022)}
+#more .settings-page-route-summary{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:13px;margin:0 0 10px;padding:14px 16px;border:1px solid rgba(217,166,41,.18);border-radius:15px;background:rgba(217,166,41,.045)}
+#more .settings-page-route-summary span:first-child{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:rgba(217,166,41,.10);color:#e4b83e;font-weight:900}
+#more .settings-page-route-summary strong,#more .settings-page-route-summary small{display:block}
+#more .settings-page-route-summary strong{font-size:.88rem}.settings-page-route-summary small{margin-top:3px;color:#929ba1;font-size:.72rem;line-height:1.35}
+@media(max-width:580px){
+ #more .bell1363-settings-detail-head{grid-template-columns:1fr;padding:14px}
+ #more .bell1363-settings-back{justify-self:start}
+ #more .settings-section-toggle{min-height:78px;grid-template-columns:42px minmax(0,1fr) auto;padding:13px}
+ #more .settings-section-toggle-icon{width:40px;height:40px}
+ #more .settings-section-toggle-state span{display:none}
+ #more .settings-section-body{padding:0 13px 15px}
+ #more .settings-section-body .bell133-form-grid,#more .settings-section-body .bell133-form-grid.compact,#more .settings-section-body .row,#more .settings-section-body .row.three,#more .settings-section-body .goal-builder-columns,#more .settings-section-body .bell133-profile-context,#more .settings-section-body .bell133-journey-metrics,#more .settings-section-body .bell133-diagnostic-grid{grid-template-columns:1fr!important}
+}

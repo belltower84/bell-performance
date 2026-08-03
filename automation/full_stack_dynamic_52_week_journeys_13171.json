@@ -1,0 +1,117 @@
+{
+  "version": "13.17.1",
+  "startDate": "2026-08-03",
+  "journeys": [
+    {
+      "id": "strength-to-hypertrophy",
+      "title": "Strength athlete changes to hypertrophy",
+      "identity": "Strength",
+      "objective": "Build Strength",
+      "journeyMode": "development",
+      "goalType": "Powerlifting",
+      "engineMode": "General Conditioning",
+      "weeks": 52,
+      "strengthDays": 4,
+      "engineDays": 1,
+      "behavior": "steady",
+      "expected": ["progress"],
+      "transitions": [
+        {"week": 27, "type": "goal_change", "identity": "Bodybuilding", "objective": "Build Muscle", "goalType": "Hypertrophy", "engineMode": "General Conditioning", "strengthDays": 5, "engineDays": 1}
+      ]
+    },
+    {
+      "id": "hybrid-to-10k",
+      "title": "Hybrid athlete changes to 10K preparation",
+      "identity": "Hybrid",
+      "objective": "Athletic Performance",
+      "journeyMode": "development",
+      "goalType": "General Strength",
+      "engineMode": "Running",
+      "weeks": 52,
+      "strengthDays": 3,
+      "engineDays": 3,
+      "behavior": "rapid",
+      "expected": ["progress", "accelerate"],
+      "transitions": [
+        {"week": 21, "type": "goal_change", "identity": "Endurance", "objective": "10K Performance", "journeyMode": "event_preparation", "eventType": "10K Race", "eventName": "Spring 10K", "goalType": "General Strength", "engineMode": "Running", "strengthDays": 2, "engineDays": 4}
+      ]
+    },
+    {
+      "id": "runner-knee-injury-track-change",
+      "title": "Runner develops knee pain and temporarily switches tracks",
+      "identity": "Endurance",
+      "objective": "Half Marathon Performance",
+      "journeyMode": "event_preparation",
+      "eventType": "Half Marathon",
+      "eventName": "Fall Half Marathon",
+      "goalType": "General Strength",
+      "engineMode": "Running",
+      "weeks": 52,
+      "strengthDays": 2,
+      "engineDays": 4,
+      "behavior": "steady",
+      "expected": ["progress"],
+      "transitions": [
+        {"week": 15, "type": "injury_start", "injury": "knee", "severity": 6},
+        {"week": 16, "type": "track_change", "engineMode": "Cycling", "objective": "Maintain Aerobic Fitness"},
+        {"week": 22, "type": "injury_clear", "injury": "knee"},
+        {"week": 24, "type": "track_change", "engineMode": "Running", "objective": "Half Marathon Performance"}
+      ]
+    },
+    {
+      "id": "recomp-to-powerlifting",
+      "title": "Body-recomposition athlete enters powerlifting preparation",
+      "identity": "Body Recomposition",
+      "objective": "Lose Fat / Recompose",
+      "journeyMode": "development",
+      "goalType": "Hypertrophy",
+      "engineMode": "General Conditioning",
+      "weeks": 52,
+      "strengthDays": 4,
+      "engineDays": 2,
+      "behavior": "inconsistent",
+      "expected": ["observe", "hold"],
+      "transitions": [
+        {"week": 30, "type": "goal_change", "identity": "Strength", "objective": "Powerlifting Meet", "journeyMode": "event_preparation", "eventType": "Powerlifting Meet", "eventName": "Winter Meet", "goalType": "Powerlifting", "engineMode": "General Conditioning", "strengthDays": 4, "engineDays": 1}
+      ]
+    },
+    {
+      "id": "shoulder-injury-return-hybrid",
+      "title": "Strength athlete has shoulder injury, returns, then changes to hybrid",
+      "identity": "Strength",
+      "objective": "Build Strength",
+      "journeyMode": "development",
+      "goalType": "Powerlifting",
+      "engineMode": "General Conditioning",
+      "weeks": 52,
+      "strengthDays": 4,
+      "engineDays": 1,
+      "behavior": "steady",
+      "expected": ["progress"],
+      "transitions": [
+        {"week": 10, "type": "injury_start", "injury": "shoulder", "severity": 7},
+        {"week": 16, "type": "injury_clear", "injury": "shoulder"},
+        {"week": 35, "type": "goal_change", "identity": "Hybrid", "objective": "Athletic Performance", "goalType": "General Strength", "engineMode": "Running", "strengthDays": 3, "engineDays": 3}
+      ]
+    },
+    {
+      "id": "multi-goal-churn",
+      "title": "Athlete changes goals multiple times across one year",
+      "identity": "Strength",
+      "objective": "Build Strength",
+      "journeyMode": "development",
+      "goalType": "Powerlifting",
+      "engineMode": "General Conditioning",
+      "weeks": 52,
+      "strengthDays": 4,
+      "engineDays": 1,
+      "behavior": "steady",
+      "expected": ["progress"],
+      "transitions": [
+        {"week": 14, "type": "goal_change", "identity": "Body Recomposition", "objective": "Lose Fat / Recompose", "goalType": "Hypertrophy", "engineMode": "General Conditioning", "strengthDays": 4, "engineDays": 2},
+        {"week": 28, "type": "goal_change", "identity": "Endurance", "objective": "5K Performance", "journeyMode": "event_preparation", "eventType": "5K Race", "eventName": "Summer 5K", "goalType": "General Strength", "engineMode": "Running", "strengthDays": 2, "engineDays": 4},
+        {"week": 44, "type": "goal_change", "identity": "Hybrid", "objective": "Athletic Performance", "journeyMode": "development", "goalType": "General Strength", "engineMode": "Running", "strengthDays": 3, "engineDays": 3}
+      ]
+    }
+  ]
+}

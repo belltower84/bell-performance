@@ -1,0 +1,20 @@
+BELL PERFORMANCE 13.4.0 INSTALLATION
+
+CUMULATIVE PATCH
+1. Back up the current Bell Performance repository.
+2. Extract Bell_Performance_13_4_0_Bell_Coach_Intelligence_PATCH.zip.
+3. Copy its contents into the repository root.
+4. Allow files to merge and replace matching files.
+5. Commit and push the bell-core-live branch.
+6. Deploy the backend on Render.
+7. Run the new Alembic migration in the deployed backend:
+      alembic upgrade head
+8. Refresh the frontend and clear the old service worker/cache if the previous build remains visible.
+
+COMPLETE BUILD
+Bell_Performance_13_4_0_GitHub_Ready.zip contains the complete repository and may be extracted into a clean repository folder.
+
+SUGGESTED COMMIT
+Build 13.4 Bell Coach intelligence and memory
+
+DO NOT merge to main until mobile, offline, profile-sync, memory-removal, and deployed Bell Core checks pass.

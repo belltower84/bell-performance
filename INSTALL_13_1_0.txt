@@ -1,0 +1,28 @@
+Bell Performance 13.1.0 — Installation
+
+OPTION A — COMPLETE BUILD
+1. Back up your current repository.
+2. Replace the repository contents with the contents of Bell_Performance_13_1_0_GitHub_Ready.zip.
+3. Preserve your Render environment variables and deployment settings.
+4. Commit and push the changes.
+5. Allow Render to redeploy the backend.
+6. Hard-refresh the frontend or remove/reinstall the PWA so the 13.1 service-worker cache is activated.
+
+OPTION B — PATCH
+1. Start from Bell Performance 13.0.1.
+2. Copy the contents of Bell_Performance_13_1_0_Adaptive_Journey_PATCH.zip into the repository root.
+3. Allow files with the same names to be replaced.
+4. Commit and push.
+5. Redeploy Bell Core and hard-refresh the frontend.
+
+Suggested commit message:
+Build 13.1 adaptive Journey planning engine
+
+TEST CHECKLIST
+- Open Mission Control and confirm Current Journey, Current Phase, and Phase Week are populated.
+- Open Plan and confirm the Journey timeline appears above the weekly plan.
+- Test a Powerlifting Meet Preparation objective with a date and confirm the Journey ends in Peak and Taper.
+- Test Fat Loss without an event and confirm the Journey uses Continuous Development.
+- Change the current training week and confirm Phase Week changes independently.
+- Connect Bell Core, sync, and confirm the cloud Journey replaces the local fallback.
+- Confirm existing workout history and max lifts are still present.

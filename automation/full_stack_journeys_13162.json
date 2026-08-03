@@ -1,0 +1,148 @@
+{
+  "version": "13.16.2",
+  "startDate": "2026-08-03",
+  "journeys": [
+    {
+      "id": "steady-strength",
+      "title": "Steady strength responder",
+      "identity": "Strength",
+      "objective": "Build Strength",
+      "journeyMode": "development",
+      "goalType": "Powerlifting",
+      "engineMode": "General Conditioning",
+      "weeks": 8,
+      "strengthDays": 4,
+      "engineDays": 1,
+      "behavior": "steady",
+      "eventType": "",
+      "expected": [
+        "progress"
+      ]
+    },
+    {
+      "id": "rapid-hybrid",
+      "title": "Rapid hybrid responder",
+      "identity": "Hybrid",
+      "objective": "Athletic Performance",
+      "journeyMode": "development",
+      "goalType": "General Strength",
+      "engineMode": "Running",
+      "weeks": 8,
+      "strengthDays": 3,
+      "engineDays": 3,
+      "behavior": "rapid",
+      "eventType": "",
+      "expected": [
+        "progress",
+        "accelerate"
+      ]
+    },
+    {
+      "id": "struggling-10k",
+      "title": "Struggling 10K athlete",
+      "identity": "Endurance",
+      "objective": "10K Performance",
+      "journeyMode": "event_preparation",
+      "goalType": "General Strength",
+      "engineMode": "Running",
+      "weeks": 8,
+      "strengthDays": 2,
+      "engineDays": 4,
+      "behavior": "struggle",
+      "eventType": "10K Race",
+      "eventName": "Autumn 10K",
+      "expected": [
+        "hold",
+        "regress"
+      ]
+    },
+    {
+      "id": "inconsistent-recomp",
+      "title": "Inconsistent body-recomposition athlete",
+      "identity": "Body Recomposition",
+      "objective": "Lose Fat / Recompose",
+      "journeyMode": "development",
+      "goalType": "Hypertrophy",
+      "engineMode": "General Conditioning",
+      "weeks": 8,
+      "strengthDays": 4,
+      "engineDays": 2,
+      "behavior": "inconsistent",
+      "eventType": "",
+      "expected": [
+        "observe",
+        "hold"
+      ]
+    },
+    {
+      "id": "pain-interrupted",
+      "title": "Pain-interrupted strength athlete",
+      "identity": "Strength",
+      "objective": "Build Strength",
+      "journeyMode": "development",
+      "goalType": "Powerlifting",
+      "engineMode": "General Conditioning",
+      "weeks": 8,
+      "strengthDays": 4,
+      "engineDays": 1,
+      "behavior": "pain",
+      "eventType": "",
+      "expected": [
+        "protect",
+        "reentry"
+      ]
+    },
+    {
+      "id": "travel-return",
+      "title": "Travel interruption and return",
+      "identity": "Hybrid",
+      "objective": "Athletic Performance",
+      "journeyMode": "development",
+      "goalType": "General Strength",
+      "engineMode": "Running",
+      "weeks": 8,
+      "strengthDays": 3,
+      "engineDays": 2,
+      "behavior": "travel",
+      "eventType": "",
+      "expected": [
+        "rebuild"
+      ]
+    },
+    {
+      "id": "taper-protection",
+      "title": "10K taper protection",
+      "identity": "Endurance",
+      "objective": "10K Performance",
+      "journeyMode": "event_preparation",
+      "goalType": "General Strength",
+      "engineMode": "Running",
+      "weeks": 8,
+      "strengthDays": 2,
+      "engineDays": 4,
+      "behavior": "rapid",
+      "eventType": "10K Race",
+      "eventName": "Target 10K",
+      "expected": [
+        "hold"
+      ]
+    },
+    {
+      "id": "messy-sync",
+      "title": "Messy input and duplicate sync",
+      "identity": "Hybrid",
+      "objective": "Athletic Performance",
+      "journeyMode": "development",
+      "goalType": "General Strength",
+      "engineMode": "Running",
+      "weeks": 8,
+      "strengthDays": 3,
+      "engineDays": 2,
+      "behavior": "messy",
+      "eventType": "",
+      "expected": [
+        "observe"
+      ]
+    }
+  ]
+}

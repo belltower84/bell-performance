@@ -1,0 +1,12 @@
+"use strict";
+const fs=require("fs"),vm=require("vm"),path=require("path");
+const ctx={console,globalThis:{}};ctx.window=ctx.globalThis;vm.createContext(ctx);
+vm.runInContext(fs.readFileSync(path.join(__dirname,"../js/real-world-chaos-13160.js"),"utf8"),ctx);
+const f=ctx.globalThis.bellCompletionFingerprint,g=ctx.globalThis.bellRealWorldConfidenceGate;
+const base=(week,date,key="squat-main")=>({session_id:key,session_type:"strength",session_rpe:7.5,completed_duration_minutes:45,pain_severity:0,completion_identity:{athleteId:"a1",planId:"p1",weekIndex:week,scheduledDate:date,sessionKey:key,attempt:1},exercises:[{exercise_name:"Squat",planned_sets:3,completed_sets:3}]});
+const checks=[];const check=(name,ok)=>{checks.push([name,!!ok]);console.log(`${ok?"PASS":"FAIL"} ${name}`)};
+const w1=base(1,"2026-08-03"),w2=base(2,"2026-08-10"),same=JSON.parse(JSON.stringify(w1)),other=base(1,"2026-08-03","session-b");
+check("same template in later week is new",f(w1)!==f(w2)&&!g(w2,[w1]).duplicate);
+check("same scheduled occurrence is duplicate",f(w1)===f(same)&&g(same,[w1]).duplicate);
+check("identical exercises in different session are new",f(w1)!==f(other)&&!g(other,[w1]).duplicate);
+if(checks.some(x=>!x[1]))process.exit(1);console.log(`${checks.length}/${checks.length} completion identity checks passed`);

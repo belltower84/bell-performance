@@ -1,0 +1,23 @@
+BELL PERFORMANCE 13.3.0 — INSTALLATION
+
+CUMULATIVE PATCH
+1. Back up or commit your current Bell Performance repository.
+2. Extract Bell_Performance_13_3_0_Athlete_Experience_PATCH.zip.
+3. Copy every extracted file and folder into the repository root.
+4. Allow matching files to be replaced.
+5. Commit and push the changes to the bell-core-live branch.
+6. Let Render redeploy Bell Core if your backend is connected.
+7. Hard-refresh the browser or clear the old Bell Performance service-worker cache.
+
+COMPLETE BUILD
+Bell_Performance_13_3_0_GitHub_Ready.zip contains the complete repository. Extract it into a clean folder and publish that folder as the repository contents.
+
+SUGGESTED COMMIT MESSAGE
+Build 13.3 athlete profile and settings experience
+
+VALIDATION
+From backend/ run:
+pytest -q
+
+Expected result:
+24 passed

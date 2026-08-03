@@ -5,108 +5,125 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <meta content="#0b1220" name="theme-color"/>
+<meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
-<title>Bell Performance 11.0 — Daily Coach</title>
-<link href="./css/app.css?v=11000" rel="stylesheet"/>
+<link href="./assets/logo-shield.svg?v=13720" rel="icon" type="image/svg+xml"/>
+<title>Bell Performance 13.17.4 — Atomic Session Identity & Workout Title Integrity</title>
+<link href="./css/app.css?v=13710" rel="stylesheet"/>
+<link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
+<link href="./css/independent-daily-sessions-1382.css?v=13840" rel="stylesheet"/>
+<link href="./css/bell13.css?v=13300" rel="stylesheet"/>
+<link href="./css/bell134.css?v=13620" rel="stylesheet"/>
+<link href="./css/bell135.css?v=13712" rel="stylesheet"/>
+<link href="./css/bell1364.css?v=13640" rel="stylesheet"/>
+<link href="./css/guided-tour-1374.css?v=13740" rel="stylesheet"/>
+<link href="./css/settings-1376.css?v=13760" rel="stylesheet"/>
+<link href="./css/workout-experience-1385.css?v=13850" rel="stylesheet"/>
+<link href="./css/athlete-response-13130.css?v=131400" rel="stylesheet"/>
+<link href="./css/guided-workout-13186.css?v=131860" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
-.brand-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:#07090b;border-bottom:1px solid #2b3035}
+.brand-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:#07090b;border-bottom:1px solid rgba(218,169,52,.28)}
 .brand-lockup{display:flex;align-items:center;gap:12px;min-width:0}
-.brand-lockup>img{width:52px!important;height:62px!important;max-width:52px!important;object-fit:contain!important;flex:0 0 52px}
-.brand-lockup h1{font-size:20px;line-height:1;margin:0}.brand-lockup h1 span{display:block;font-size:.72em}.brand-tagline{font-size:10px;letter-spacing:.28em;color:#d9a629;margin-top:5px}
+.brand-lockup>img{width:52px!important;height:50px!important;max-width:52px!important;object-fit:contain!important;flex:0 0 52px}
+.brand-copy{display:grid;gap:3px;min-width:0}
+.brand-lockup h1{margin:0;font-size:22px;line-height:.9;letter-spacing:.18em;color:#e0b13b}
+.brand-subline{display:flex;align-items:center;gap:8px;font-size:10px;line-height:1;letter-spacing:.42em;text-transform:uppercase;color:#ece8e0;white-space:nowrap}
+.brand-subline:before,.brand-subline:after{content:"";display:block;width:18px;height:1px;background:linear-gradient(90deg,transparent,#c79a2d)}
+.brand-subline:after{background:linear-gradient(90deg,#c79a2d,transparent)}
+.brand-tagline{font-size:10px;letter-spacing:.12em;color:#d9a629;white-space:nowrap}
 main{display:block}.screen{display:none}.screen.active{display:block}
 .training-card>img,.workout-hero>img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;max-width:none!important}
-@media(max-width:430px){.brand-lockup>img{width:44px!important;height:52px!important;max-width:44px!important;flex-basis:44px}.brand-lockup h1{font-size:18px}}
+@media(max-width:430px){.brand-lockup>img{width:44px!important;height:42px!important;max-width:44px!important;flex-basis:44px}.brand-lockup h1{font-size:18px}.brand-subline{font-size:8px;letter-spacing:.32em;gap:5px}.brand-subline:before,.brand-subline:after{width:10px}.brand-tagline{display:none}}
 </style>
 </head>
 <body>
 <header class="brand-header">
-<div class="brand-lockup"><img alt="Bell Performance shield" src="./assets/logo-shield.svg?v=11000"/><div><h1>BELL PERFORMANCE</h1></div></div>
+<div class="brand-lockup"><img alt="Bell Performance emblem" src="./assets/logo-bell-emblem.png?v=12210"/><div class="brand-copy"><h1>BELL</h1><div class="brand-subline">PERFORMANCE</div><div class="brand-tagline">Strength. Endurance. Purpose.</div></div></div>
 <div class="header-actions"><button aria-label="Open notifications" id="notificationButton" onclick="openNotificationCenter()">◌<span id="notificationBadge">0</span></button><button aria-label="Open athlete profile" id="profileButton" onclick="openAthleteProfile()">◉</button></div>
 </header>
 <main>
 <section class="screen active" id="home">
-<div class="dashboard-greeting"><div><div class="mission-title" id="greetingOut">Good Morning</div><div class="hint">Discipline today. Freedom tomorrow.</div></div><div class="premium-greeting-chips"><div class="streak-chip">🔥 <strong id="streakDaysOut">0</strong> <span id="streakLabelOut">DAY STREAK</span></div><div class="week-chip" id="premiumWeekChip">Week 1 of 12</div></div></div>
-<div class="premium-dashboard bell11-dashboard" id="premiumDashboard">
-<section class="bell11-hero" aria-label="Mission status">
-  <div>
-    <span class="premium-kicker">Daily Performance Briefing</span>
-    <h2 id="bell11Greeting">Ready for today</h2>
-    <p id="bell11MissionStatus">Stay consistent and execute the next useful action.</p>
-  </div>
-  <div class="bell11-plan-progress">
-    <div><span>Mission Plan</span><strong id="premiumMissionProgressText">Week 1 of 12</strong></div>
-    <div class="dashboard-mission-progress-track"><i id="premiumMissionProgressBar"></i></div>
-  </div>
-</section>
+<div class="dashboard-greeting command-hidden-bindings" aria-hidden="true"><div><div class="mission-title" id="greetingOut">Good Morning</div><div class="hint">Discipline today. Freedom tomorrow.</div></div><div class="premium-greeting-chips"><div class="streak-chip">🔥 <strong id="streakDaysOut">0</strong> <span id="streakLabelOut">DAY STREAK</span></div><div class="week-chip" id="premiumWeekChip">Week 1 of 12</div></div></div>
+<div class="premium-dashboard command-center" id="premiumDashboard">
+  <section class="command-topbar" aria-label="Dashboard status">
+    <div class="command-date-line"><span class="command-top-icon" aria-hidden="true">▣</span><strong id="commandDayOut">Day 1</strong><i>•</i><span id="commandDateOut">Today</span></div>
+    <button class="command-sync-status" type="button" onclick="bellCloudConnected()?bellManualSync():showScreen('more')"><span class="command-sync-dot" id="commandSyncDot"></span><span id="commandSyncOut">Local mode</span></button>
+    <button class="command-athlete-button" type="button" onclick="openAthleteProfile()"><span class="command-avatar" aria-hidden="true">●</span><span id="commandAthleteOut">Athlete</span><b>⌄</b></button>
+  </section>
 
-<section class="premium-readiness-card bell11-readiness" id="premiumReadinessCard">
-  <div class="bell11-section-banner">Readiness</div>
-  <div class="bell11-readiness-body">
-    <strong class="bell11-readiness-score" id="premiumReadinessScore">—</strong>
-    <b class="bell11-readiness-status" id="premiumReadinessStatus">CHECK IN</b>
-    <p id="premiumReadinessDetail">Complete today’s check-in to personalize your training.</p>
-    <button class="premium-outline-button premium-readiness-update" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')" type="button">Check In</button>
-  </div>
-</section>
+  <section class="command-brief-strip" aria-label="Daily command briefing">
+    <article class="command-card command-readiness" id="premiumReadinessCard">
+      <header><span class="command-card-icon">⌁</span><h2>Readiness</h2></header>
+      <div class="command-readiness-layout">
+        <div class="command-score-ring" id="commandReadinessRing"><div><strong id="premiumReadinessScore">—</strong><small>/100</small><b id="premiumReadinessStatus">CHECK IN</b></div></div>
+        <div class="command-readiness-metrics">
+          <span>Sleep <b id="premiumSleep">—</b></span>
+          <span>Soreness <b id="premiumSoreness">—</b></span>
+          <span>Energy <b id="premiumEnergy">—</b></span>
+          <span>Body <b id="premiumBody">—</b></span>
+          <span>Pain <b id="commandPain">—</b></span>
+          <span>Time <b id="commandTime">—</b></span>
+        </div>
+      </div>
+      <p class="command-visually-hidden" id="premiumReadinessDetail">Complete today’s check-in to personalize your training.</p>
+      <button class="command-text-action premium-readiness-update" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')" type="button">Update Check-In ›</button>
+    </article>
 
-<section class="bell11-brief-card">
-  <div class="bell11-section-banner">Today’s Brief</div>
-  <div class="bell11-brief-grid">
-    <div class="bell11-word">
-      <span class="premium-kicker">Word for Today</span>
+    <article class="command-card command-briefing">
+      <header><span class="command-card-icon">▤</span><h2>Today’s Briefing</h2></header>
+      <strong class="command-visually-hidden" id="premiumCoachTitle">Current phase guidance</strong>
+      <p id="premiumCoachText">Your programming guidance will appear here.</p>
+      <div class="command-focus-tags"><span id="commandBriefFocus">Focus</span><span id="commandBriefQuality">Quality</span><span id="commandBriefControl">Control</span></div>
+      <button class="command-text-action" type="button" onclick="openCommandTile('coaching')">View rationale ›</button>
+    </article>
+
+    <article class="command-card command-daily-brief">
+      <header><span class="command-card-icon">★</span><h2>Daily Brief</h2><button aria-label="Show another quote" onclick="rotatePremiumQuote()" type="button">↻</button></header>
       <blockquote id="premiumQuoteText">Consistency beats perfection. Win today.</blockquote>
       <cite id="premiumQuoteSource">Bell Performance Coach</cite>
-      <button aria-label="Show another quote" class="premium-icon-button" onclick="rotatePremiumQuote()" type="button">↻</button>
+      <div class="command-countdown"><span id="commandMissionCountdownLabel">Current mission</span><strong id="commandMissionCountdown">In progress</strong></div>
+      <button class="command-text-action" type="button" onclick="openCommandTile('mission')">View full brief ›</button>
+    </article>
+  </section>
+
+  <section class="command-mission-card" aria-labelledby="commandMissionTitle">
+    <div class="command-mission-heading">
+      <div><span class="command-kicker">Today’s Mission</span><h2 id="commandMissionTitle">Preparing today’s training</h2><p id="commandMissionPurpose">Bell is loading the prescribed work.</p></div>
+      <div class="command-day-nav"><button aria-label="Previous day" onclick="navigateDashboardDay(-1)">‹</button><span id="premiumMissionDate">Today</span><button aria-label="Next day" onclick="navigateDashboardDay(1)">›</button><button class="command-return-today" id="premiumTodayButton" onclick="resetDashboardToToday()">Today</button></div>
     </div>
-    <div class="bell11-coach">
-      <span class="premium-kicker">Coach’s Instruction</span>
-      <strong id="premiumCoachTitle">Current phase guidance</strong>
-      <p id="premiumCoachText">Your programming guidance will appear here.</p>
+    <div class="command-mission-layout">
+      <div class="command-mission-main">
+        <div class="command-mission-meta"><span>◷ <b id="commandMissionDuration">—</b></span><span>◈ <b id="commandMissionType">Training</b></span><span>▥ <b id="commandMissionPriority">Priority</b></span></div>
+        <div class="premium-session-stack command-session-summary" id="premiumSessionStack"></div>
+      </div>
+      <aside class="command-mission-actions">
+        <div class="command-adjustment" id="commandAdjustment"><span>✓ Adjusted for today</span><strong id="commandAdjustmentTitle">Loading</strong><small id="commandAdjustmentDetail">Bell is checking your plan.</small></div>
+        <button class="command-start-button" id="commandStartWorkout" type="button">▶ Start Workout</button>
+        <div class="command-secondary-actions"><button id="commandViewSession" type="button">☷ View Session</button><button id="commandModifySession" type="button">✎ Modify</button></div>
+      </aside>
     </div>
-  </div>
-</section>
+    <div class="command-visually-hidden" aria-hidden="true"><div id="premiumCompletionRing"><strong id="premiumCompletionCount">0</strong><span id="premiumCompletionTotal">of 0</span><small id="premiumCompletionLabel">REST DAY</small></div></div>
+  </section>
 
-<section class="premium-mission-card bell11-mission-card">
-  <div class="premium-mission-banner">Today’s Mission</div>
-  <div class="premium-section-heading premium-mission-heading">
-    <div><h2 id="premiumMissionDate">Today</h2><p>Complete the prescribed sessions in the order shown.</p></div>
-    <div class="premium-day-nav"><button aria-label="Previous day" onclick="navigateDashboardDay(-1)">‹</button><button id="premiumTodayButton" onclick="resetDashboardToToday()">Today</button><button aria-label="Next day" onclick="navigateDashboardDay(1)">›</button></div>
-  </div>
-  <div class="premium-session-stack bell11-session-stack" id="premiumSessionStack"></div>
-  <div class="bell11-mission-summary" aria-hidden="true">
-    <div class="premium-completion-ring" id="premiumCompletionRing"><div><strong id="premiumCompletionCount">0</strong><span id="premiumCompletionTotal">of 0</span><small id="premiumCompletionLabel">REST DAY</small></div></div>
-  </div>
-</section>
+  <section class="command-tile-grid" aria-label="Performance tools">
+    <article class="command-tile command-week-tile" tabindex="0" role="button" onclick="openCommandTile('weekly')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCommandTile('weekly')}"><header><span>▣</span><h3>Weekly Plan</h3></header><div class="command-week-heading"><strong id="premiumWeekTitle">Current block</strong><small id="premiumWeekKicker">Weekly Schedule</small></div><div class="command-week-days" id="premiumWeekDays"></div><span class="command-open-label">Open ›</span></article>
+    <article class="command-tile" tabindex="0" role="button" onclick="openCommandTile('recovery')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCommandTile('recovery')}"><header><span>♥</span><h3>Recovery</h3></header><div class="command-tile-metric"><strong id="commandRecoverySleep">—</strong><b id="commandRecoveryScore">—</b></div><p><span>Sleep</span><span>Readiness</span></p><small id="commandRecoverySoreness">Check in to personalize recovery.</small><span class="command-open-label">Open ›</span></article>
+    <article class="command-tile" tabindex="0" role="button" onclick="openCommandTile('performance')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCommandTile('performance')}"><header><span>▥</span><h3>Performance</h3></header><p class="command-tile-title" id="commandPerformanceTitle">Strength trend</p><strong class="command-positive" id="premiumStrengthTrend">—</strong><small>vs prior four weeks</small><div class="command-sparkline"><i></i><i></i><i></i><i></i><i></i></div><span class="command-open-label">Open ›</span></article>
+    <article class="command-tile" tabindex="0" role="button" onclick="openCommandTile('nutrition')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCommandTile('nutrition')}"><header><span>⚑</span><h3>Nutrition</h3></header><strong class="command-large-metric" id="commandNutritionCalories">—</strong><small id="commandNutritionMode">Target today</small><p id="commandNutritionMacros">Complete your profile for targets.</p><span class="command-open-label">Open ›</span></article>
+    <article class="command-tile" tabindex="0" role="button" onclick="openCommandTile('mission')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCommandTile('mission')}"><header><span class="command-orange">◎</span><h3>Mission</h3></header><p class="command-tile-title" id="commandMissionGoal">Current mission</p><strong id="commandMissionTarget">In progress</strong><div class="command-progress-track"><i id="premiumMissionProgressBar"></i></div><small id="premiumMissionProgressText">No active plan</small><span class="command-open-label">Open ›</span></article>
+    <article class="command-tile" tabindex="0" role="button" onclick="openCommandTile('compliance')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCommandTile('compliance')}"><header><span>✓</span><h3>Compliance</h3></header><strong class="command-large-metric" id="commandComplianceCount">0 of 0</strong><small>workouts this week</small><p>🔥 Streak: <b id="commandComplianceStreak">0 days</b></p><span class="command-open-label">Open ›</span></article>
+    <article class="command-tile" tabindex="0" role="button" onclick="openCommandTile('coaching')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCommandTile('coaching')}"><header><span>☀</span><h3>Coaching</h3></header><p class="command-tile-title" id="commandInsightTitle">Bell Insight</p><strong id="commandInsightCount">Today’s guidance</strong><small id="commandInsightText">Your current coaching rationale appears here.</small><span class="command-open-label">Open ›</span></article>
+    <article class="command-tile" tabindex="0" role="button" onclick="openCommandTile('library')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCommandTile('library')}"><header><span>◫</span><h3>Training Library</h3></header><p class="command-tile-title">Exercises & Programs</p><strong>Search · Save · Learn</strong><small>Movement education and substitutions</small><span class="command-open-label">Open ›</span></article>
+  </section>
 
-<section class="bell11-optional-card">
-  <div class="bell11-section-heading-row"><div><span class="premium-kicker">Optional Training</span><h2>Core & Mobility</h2></div><small>Does not affect mission completion</small></div>
-  <div class="premium-support-panel bell11-support-panel" id="premiumSupportPanel"><div id="premiumSupportContent"></div></div>
-</section>
+  <section class="command-quick-actions" aria-label="Quick actions"><strong>Quick Actions</strong><button type="button" onclick="showScreen('history')">✓ Log Workout</button><button type="button" onclick="openCommandTile('coaching')">▤ Add Note</button><button type="button" onclick="openAthleteProfile()">⚖ Check Body Weight</button><button type="button" onclick="openAthleteProfile()">▣ Take Photo</button><button type="button" onclick="openCommandTile('coaching')">◌ Ask Bell</button></section>
 
-<section class="premium-standards-card bell11-standards-card">
-  <div class="premium-section-heading"><div><span class="premium-kicker">Daily Standards</span><h2 id="premiumStandardsTitle">Today’s Checklist</h2></div><button class="premium-text-button" onclick="showScreen('habits')">Manage ›</button></div>
-  <div class="premium-standards-grid" id="premiumStandardsGrid"></div>
-</section>
-
-<section class="premium-next-card" id="premiumNextCard">
-  <div><span class="premium-kicker">Next Up</span><strong id="premiumNextTitle">Tomorrow · Recovery</strong><small id="premiumNextDetail">View your upcoming schedule</small></div>
-  <button class="premium-text-button" onclick="showScreen('plan')">Full Schedule ›</button>
-</section>
-
-<section class="premium-progress-card bell11-progress-card">
-  <div class="premium-section-heading"><div><span class="premium-kicker">Progress Snapshot</span><h2>Last Four Weeks</h2></div><button class="premium-text-button" onclick="showScreen('history')">Details ›</button></div>
-  <div class="premium-progress-grid">
-    <button onclick="showScreen('history')"><i>↗</i><span>Consistency</span><strong id="premiumConsistency">—</strong><small id="premiumConsistencyNote">Building</small></button>
-    <button onclick="showScreen('history')"><i>🏋</i><span>Strength Volume</span><strong id="premiumStrengthTrend">—</strong><small>vs prior 4 weeks</small></button>
-    <button onclick="showScreen('history')"><i>♡</i><span>Zone 2</span><strong id="premiumEngineTrend">—</strong><small>vs prior 4 weeks</small></button>
-    <button onclick="showScreen('more')"><i>⚖</i><span>Body Weight</span><strong id="premiumWeightTrend">—</strong><small>Current profile</small></button>
-  </div>
-</section>
+  <div class="command-hidden-bindings" aria-hidden="true"><span id="bell11Greeting"></span><span id="bell11MissionStatus"></span><span id="premiumNextTitle"></span><span id="premiumNextDetail"></span><span id="premiumConsistency">—</span><span id="premiumConsistencyNote">Building</span><span id="premiumEngineTrend">—</span><span id="premiumWeightTrend">—</span><div id="premiumWeekSelectedSummary"></div></div>
 </div>
 <div class="legacy-dashboard">
 <section aria-labelledby="weeklyScheduleTitle" class="weekly-schedule-strip">
@@ -135,7 +152,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="mission-status-card green" id="trainingStatusCard">
 <div class="status-emblem"><div class="status-shield">✓</div></div>
 <div class="status-copy"><span class="metric-label">Mission Status</span><strong id="trainingStatusOut">Ready to Train</strong><p id="missionPurpose">You are recovered and cleared for a full training day.</p><button class="ghost-button" onclick="document.getElementById('readinessDetailPanel').classList.toggle('hidden')">Why am I here? ›</button></div>
-<div class="readiness-summary"><div class="readiness-summary-header"><span class="metric-label">Today's Readiness</span><button class="readiness-checkin-button" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')">Update Check-In</button></div><div class="readiness-line"><span>☾ Sleep</span><b id="dashSleep">Good</b><i></i></div><div class="readiness-line"><span>♨ Soreness</span><b id="dashSoreness">Low</b><i></i></div><div class="readiness-line"><span>ϟ Energy</span><b id="dashEnergy">High</b><i></i></div><div class="readiness-line"><span>🔥 Motivation</span><b id="dashMotivation">High</b><i></i></div><div class="readiness-line"><span>◷ Time</span><b id="dashTime">60–75 min</b><i></i></div></div>
+<div class="readiness-summary"><div class="readiness-summary-header"><span class="metric-label">Today's Readiness</span><button class="readiness-checkin-button" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')">Update Check-In</button></div><div class="readiness-line"><span>☾ Sleep</span><b id="dashSleep">Good</b><i></i></div><div class="readiness-line"><span>♨ Soreness</span><b id="dashSoreness">Low</b><i></i></div><div class="readiness-line"><span>ϟ Energy</span><b id="dashEnergy">High</b><i></i></div><div class="readiness-line"><span>⚠ Pain</span><b id="dashPain">None</b><i></i></div><div class="readiness-line"><span>◷ Time</span><b id="dashTime">60–75 min</b><i></i></div></div>
 </div>
 <div class="card hidden" id="readinessDetailPanel"><div class="hint" id="readinessExplanation">Your readiness details will appear here.</div></div>
 <div class="dashboard-grid readiness-dashboard-grid">
@@ -164,15 +181,31 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </div>
 </section>
 <section class="screen" id="plan"><h2 class="section-title">Training Plan</h2><div id="planProgressArea"></div><div class="list" id="planList"></div></section>
-<section class="screen" id="workouts"><div class="section-heading"><h2 class="section-title">Training Library</h2><button onclick="openExerciseLibrary()" type="button">Exercise Library ›</button></div><div class="card"><div class="status-line"><div><h3>Current Rotation</h3><div class="mission-title" id="libraryRotation">Week 1</div><div class="hint">Strength sessions rotate every four weeks while preserving the same training purpose.</div></div></div></div><div class="list" id="workoutLibrary"></div></section>
+<section class="screen" id="workouts">
+  <div class="training-hub-shell">
+    <div class="section-heading training-hub-heading"><div><span class="metric-label">Training</span><h2 class="section-title">Today’s Training</h2><p class="sub">Your prescribed sessions live in one place. The full workout catalog is no longer shown here.</p></div></div>
+    <div id="trainingHubCurrent"></div>
+  </div>
+</section>
 <section class="screen" id="exerciseLibrary">
-<div class="section-heading"><div><span class="metric-label">Movement Education &amp; Substitution</span><h2 class="section-title">Exercise Intelligence Library</h2></div><button onclick="showScreen('more')" type="button">Settings ›</button></div>
-<div class="card exercise-library-intro"><div><h3>Understand it. Perform it. Replace it intelligently.</h3><p class="sub">Search every movement currently used by Bell Performance. Open an exercise for setup, execution, muscles trained, common mistakes, and purpose-matched alternatives.</p></div><div class="library-count"><strong id="exerciseLibraryCount">0</strong><span>movements</span></div></div>
-<div class="card exercise-library-controls">
-<label class="library-search">Search exercises<input id="exerciseLibrarySearch" oninput="renderExerciseLibrary()" placeholder="Try squat, chest, dumbbell, running…" type="search"/></label>
-<div class="library-filter-grid"><label>Movement pattern<select id="exercisePatternFilter" onchange="renderExerciseLibrary()"><option value="all">All patterns</option></select></label><label>Equipment<select id="exerciseEquipmentFilter" onchange="renderExerciseLibrary()"><option value="all">All equipment</option></select></label><label>Training role<select id="exerciseRoleFilter" onchange="renderExerciseLibrary()"><option value="all">All roles</option><option value="strength">Strength</option><option value="hypertrophy">Hypertrophy</option><option value="power">Power</option><option value="conditioning">Conditioning</option><option value="mobility">Mobility</option></select></label></div>
+<div class="library-shell">
+<div class="library-main-column">
+<div class="section-heading library-heading"><div><span class="metric-label">Training Library</span><h2 class="section-title">Training Library</h2><p class="sub">Learn every movement with Bell-style coaching guides.</p></div><button class="secondary" onclick="showScreen('workouts')" type="button">Back to Training ›</button></div>
+<div class="library-top-controls"><label class="library-search-bar"><span aria-hidden="true">⌕</span><input id="exerciseLibrarySearch" oninput="renderExerciseLibrary()" placeholder="Search exercises..." type="search"/></label><button class="secondary" id="libraryFavoritesButton" onclick="toggleLibraryFavoritesFilter()" type="button">View My Favorites</button></div>
+<div class="library-chip-row" id="libraryCategoryChips"></div>
+<div class="card library-featured-wrap"><div class="library-block-heading"><div><span class="metric-label">Pilot Library</span><h3>Featured Guides</h3></div><div class="library-results-meta"><strong id="exerciseLibraryCount">0</strong><span>guides shown</span></div></div><div class="library-guide-grid" id="exerciseLibraryGrid"></div></div>
+<div class="card library-principles-card"><div><span class="metric-label">Bell Performance</span><h3>Built on Bell Performance principles.</h3><p class="sub">Evidence-based training. Real-world results. This pilot library lets us test the guide structure before we expand it across the full exercise catalog.</p></div><button class="secondary" onclick="showScreen('more')" type="button">Settings &amp; Data</button></div>
 </div>
-<div class="exercise-library-grid" id="exerciseLibraryGrid"></div>
+<aside class="library-sidebar-column"><button class="good" id="librarySidebarFavoritesButton" onclick="toggleLibraryFavoritesFilter()" type="button">View My Favorites</button><div class="card library-sidebar-card"><div class="library-block-heading compact"><div><span class="metric-label">Guide Structure</span><h3>Guide Template Includes</h3></div></div><ul class="library-sidebar-list"><li><strong>Instructional artwork</strong><span>Clear images with key coaching callouts.</span></li><li><strong>Setup</strong><span>Step-by-step starting position.</span></li><li><strong>Execution</strong><span>Detailed movement breakdown.</span></li><li><strong>Bell Coaching Cues</strong><span>Simple cues that improve performance fast.</span></li><li><strong>Common Mistakes</strong><span>What to avoid and why.</span></li><li><strong>Muscles Worked</strong><span>Primary and secondary focus.</span></li><li><strong>Scale or Substitute</strong><span>Options for every athlete.</span></li></ul></div><div class="card library-sidebar-card"><div class="library-block-heading compact"><div><span class="metric-label">Explore</span><h3>Browse by Pattern</h3></div><button class="small-button" onclick="setExerciseLibraryPattern('all')" type="button">Reset</button></div><div class="library-pattern-grid" id="libraryPatternButtons"></div></div></aside>
+</div>
+</section>
+<section class="screen exercise-guide-screen" id="exerciseGuide">
+<div class="exercise-page-head">
+  <div class="exercise-page-title-block"><button class="exercise-back-link" onclick="closeExerciseDetail()" type="button">← Back to Library</button><span class="metric-label">Training Library</span><h2 class="section-title" id="exerciseGuideTitle">Exercise Guide</h2><div class="exercise-page-tags" id="exerciseGuideTags"></div></div>
+  <div class="exercise-page-tools"><label class="library-search-bar exercise-page-search"><span aria-hidden="true">⌕</span><input id="exerciseGuideSearch" onkeydown="if(event.key==='Enter')searchExerciseGuideLibrary()" placeholder="Search exercises..." type="search"/></label></div>
+  <div class="exercise-page-actions"><button class="good" id="exerciseDetailFavoriteButton" onclick="toggleExerciseFavorite(currentExerciseDetailName)" type="button">☆ Save to Favorites</button><button class="secondary" onclick="scrollExerciseSimilarLifts()" type="button">View Similar Lifts</button></div>
+</div>
+<div class="exercise-page-layout"><div class="exercise-page-main"><div id="exerciseGuideArtwork"></div><div class="exercise-page-lower" id="exerciseGuideLower"></div></div><aside class="exercise-page-sidebar" id="exerciseGuideSidebar"></aside></div>
 </section>
 <section class="screen" id="habits">
 <div class="section-heading"><div><span class="metric-label">Daily Consistency</span><h2 class="section-title">Habits</h2></div><button onclick="addCustomHabit()" type="button">+ Add Habit</button></div>
@@ -198,7 +231,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="performance-callout" id="habitWeekSummary">No habit history yet.</div>
 </div>
 </section>
-<section class="screen" id="history"><h2 class="section-title">Performance Review</h2><div id="weeklyReview"></div><div id="blockReview"></div><div id="milestoneReview"></div><h2 class="section-title">Training History</h2><div class="list" id="historyList"></div></section>
+<section class="screen" id="history"><h2 class="section-title">Performance Review</h2><div id="athleteResponseReview"></div><div id="weeklyReview"></div><div id="blockReview"></div><div id="milestoneReview"></div><h2 class="section-title">Training History</h2><div class="list" id="historyList"></div></section>
 <section class="screen" id="more">
 <h2 class="section-title">Settings &amp; Data</h2>
 <div class="settings-section-heading"><span class="metric-label">Support</span><h3>Help</h3></div>
@@ -206,8 +239,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="how-to-copy">
 <span class="metric-label">Bell Performance Help</span>
 <h3>How to Use the App</h3>
-<p class="sub">Replay the premium guided tour or jump directly to the training and weight-logging section.</p>
-<div class="how-to-actions"><button onclick="openHowToGuide(0)" type="button">Start Guided Tour</button><button class="secondary" onclick="openHowToGuide(4)" type="button">Training &amp; Weight Logging</button></div>
+<p class="sub">Replay the contextual guided tour or jump directly to the workout-execution section.</p>
+<div class="how-to-actions"><button onclick="openHowToGuide(0)" type="button">Start Guided Tour</button><button class="secondary" onclick="openHowToGuide(5)" type="button">Workouts &amp; Logging</button></div>
 </div>
 <div aria-hidden="true" class="how-to-preview"><span>1</span><span>2</span><span>3</span><b>▶</b></div>
 </div>
@@ -235,12 +268,17 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="row"><button class="secondary" onclick="openFirstFlight(1)" type="button">Review Movement Limitations</button><button class="good" id="markRecoveredButton" onclick="openRecoveryClearance()" type="button">Mark Recovered / Cleared</button></div>
 <div class="hint" id="injuryRecoveryHistorySummary" style="margin-top:10px"></div>
 </div>
-<div class="card">
-<h3>Training Locations &amp; Equipment</h3>
-<div class="hint">Save multiple setups. Bell Performance will preserve the workout's training purpose while substituting unavailable exercises.</div>
-<div class="row"><div><label>Active location</label><select id="activeLocationInput" onchange="loadEquipmentLocation()"></select></div><div><label>Location name</label><input id="equipmentLocationName" placeholder="Home Gym"/></div><div><label>Environment</label><select id="equipmentEnvironment" onchange="applyEquipmentPreset('equipment',this.value)"><option value="commercial">Commercial gym</option><option value="home">Home gym</option><option value="minimal">Minimal equipment</option><option value="bodyweight">Bodyweight only</option><option value="travel">Travel</option><option value="custom">Custom</option></select></div></div>
-<div class="equipment-grid" id="equipmentGrid"></div>
-<div class="row three"><button onclick="saveEquipmentLocation()">Save Location</button><button class="secondary" onclick="addEquipmentLocation()">Add Location</button><button class="danger" onclick="deleteEquipmentLocation()">Delete Location</button></div>
+<div class="card bell1364-equipment-card">
+<div class="bell133-card-heading"><div><span class="metric-label">Training Locations</span><h3>Training Locations &amp; Equipment</h3><p>Save the setups you actually use. Bell preserves the workout's purpose while substituting movements that require unavailable equipment.</p></div><button class="secondary" onclick="addEquipmentLocation()" type="button">Add Location</button></div>
+<div class="bell1364-equipment-table" id="equipmentLocationTable" aria-live="polite"></div>
+<select class="hidden" id="activeLocationInput" onchange="loadEquipmentLocation()" aria-label="Active training location"></select>
+<div class="bell1364-equipment-editor hidden" id="equipmentEditor">
+<div class="bell1364-equipment-editor-head"><div><span class="metric-label">Location Editor</span><h4 id="equipmentEditorTitle">Edit Training Location</h4><p>Checkboxes only appear while this location is being edited.</p></div><button class="secondary small-button" onclick="cancelEquipmentEdit()" type="button">Close</button></div>
+<div class="bell133-form-grid compact"><label>Location name<input id="equipmentLocationName" placeholder="Home Gym"/></label><label>Environment<select id="equipmentEnvironment" onchange="applyEquipmentPreset('equipment',this.value)"><option value="commercial">Commercial gym</option><option value="home">Home gym</option><option value="minimal">Minimal equipment</option><option value="bodyweight">Bodyweight only</option><option value="travel">Travel</option><option value="custom">Custom</option></select></label></div>
+<div class="bell1364-equipment-selection-head"><div><strong>Equipment available</strong><small id="equipmentSelectionCount">0 selected</small></div><div><button class="text-button" onclick="selectAllEquipment()" type="button">Select all</button><button class="text-button" onclick="clearEquipmentSelection()" type="button">Clear</button></div></div>
+<div class="equipment-grid bell1364-equipment-grid" id="equipmentGrid"></div>
+<div class="bell1364-equipment-actions"><button onclick="saveEquipmentLocation()" type="button">Save Location</button><button class="secondary" onclick="cancelEquipmentEdit()" type="button">Cancel</button><button class="danger" onclick="deleteEquipmentLocation()" type="button">Delete</button></div>
+</div>
 </div>
 <div class="card dual-goal-builder">
 <h3>Dual Mission Goal Builder</h3>
@@ -263,7 +301,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div id="engineTargetFields"></div>
 </section>
 </div>
-<div class="coordination-panel"><h4>Training Coordination</h4><div class="row"><div><label>Weekly training days</label><select id="blockTrainingDays"><option value="3">3</option><option value="4">4</option><option selected="" value="5">5</option><option value="6">6</option><option value="7">7</option></select></div><div><label>Session limit</label><select id="blockSessionMinutes"><option value="45">45 minutes</option><option value="60">60 minutes</option><option selected="" value="75">75 minutes</option><option value="90">90 minutes</option></select></div><div><label>Strength + Engine scheduling</label><select id="trainingCoordination"><option selected="" value="Coach Decides">Coach Decides</option><option value="Alternate Days">Alternate Days</option><option value="Same Session">Integrated Same Session</option><option value="Two-a-Day">Two Sessions Same Day</option></select></div><div><label>Block length</label><select id="blockLength"><option value="8">8 weeks</option><option value="10">10 weeks</option><option selected="" value="12">12 weeks</option><option value="16">16 weeks</option><option value="20">20 weeks</option><option value="24">24 weeks</option></select></div></div><div class="compatibility-callout" id="goalCompatibilityMessage"></div></div>
+<div class="coordination-panel"><h4>Training Coordination</h4><div class="row"><div><label>Weekly training days</label><select id="blockTrainingDays"><option value="3">3</option><option value="4">4</option><option selected="" value="5">5</option><option value="6">6</option><option value="7">7</option></select></div><div><label>Session limit</label><select id="blockSessionMinutes"><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option><option selected="" value="75">75 minutes</option><option value="90">90 minutes</option><option value="105">105 minutes</option><option value="120">120 minutes</option></select></div><div><label>Strength + Engine scheduling</label><select id="trainingCoordination"><option selected="" value="Coach Decides">Coach Decides</option><option value="Alternate Days">Alternate Days</option><option value="Same Session">Integrated Same Session</option><option value="Two-a-Day">Two Sessions Same Day</option></select></div><div><label>Block length</label><select id="blockLength"><option value="8">8 weeks</option><option value="10">10 weeks</option><option selected="" value="12">12 weeks</option><option value="16">16 weeks</option><option value="20">20 weeks</option><option value="24">24 weeks</option></select></div></div><div class="compatibility-callout" id="goalCompatibilityMessage"></div></div>
 <div class="hidden compatibility-fields"><select id="blockGoalType"><option value="General Hybrid">General Hybrid</option></select><input id="blockTargetMinutes" type="number" value="60"/><select id="blockSecondaryGoal"><option>Maintain Strength</option></select><input checked="" id="blockMaintainStrength" type="checkbox"/><div id="bodybuildingFocusWrap"><select id="blockBodybuildingFocus"><option>Balanced</option><option>Shoulders &amp; Arms</option><option>Chest &amp; Back</option><option>Legs</option><option>Glutes &amp; Hamstrings</option><option>Glute Development</option><option>Lower Body / Wellness</option><option>Athletic Shape</option></select></div><div id="bodybuildingPhaseWrap"><select id="blockBodybuildingPhase"><option>Lean Gain</option><option selected="">Recomposition</option><option>Cut</option></select></div><div id="targetTimeWrap"></div></div>
 <div class="row"><button onclick="updateCurrentTrainingBlock()">Apply Changes to Current Block</button><button class="secondary" onclick="generateTrainingBlock()">Start New Block With Changes</button></div>
 <div class="hint" id="goalBuilderHint" style="margin-top:9px"></div>
@@ -329,23 +367,29 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
 </section>
 </main>
-<div aria-labelledby="howToTitle" aria-modal="true" class="modal hidden" id="howToModal" role="dialog">
-<div class="modal-box how-to-modal-box">
-<div class="how-to-shell">
-<div class="how-to-header">
-<div><span class="metric-label">Bell Performance Guide</span><h2 id="howToTitle">Follow the On-Screen Instructions</h2></div>
-<button aria-label="Close guide" class="modal-close" onclick="closeHowToGuide()">×</button>
+<div class="command-drawer hidden" id="commandDrawer" aria-hidden="true">
+  <button class="command-drawer-backdrop" aria-label="Close details" type="button" onclick="closeCommandTile()"></button>
+  <section class="command-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="commandDrawerTitle">
+    <header><div><span class="command-kicker" id="commandDrawerKicker">Bell Performance</span><h2 id="commandDrawerTitle">Details</h2></div><button class="command-drawer-close" aria-label="Close details" type="button" onclick="closeCommandTile()">×</button></header>
+    <div class="command-drawer-body" id="commandDrawerBody"></div>
+    <footer class="command-drawer-actions" id="commandDrawerActions"></footer>
+  </section>
 </div>
-<div class="how-to-progress"><i id="howToProgress"></i></div>
-<div class="how-to-slide" id="howToSlide"></div>
-<div class="how-to-footer">
-<button class="secondary" id="howToBack" onclick="previousHowToSlide()">Back</button>
-<div aria-label="Guide progress" class="how-to-dots" id="howToDots"></div>
-<button id="howToNext" onclick="nextHowToSlide()">Next</button>
-</div>
-<button class="how-to-autoplay" id="howToAutoPlay" onclick="toggleHowToAutoplay()">▶ Auto-Advance</button>
-</div>
-</div>
+
+<div aria-labelledby="howToTitle" aria-modal="true" class="guided-tour hidden" id="howToModal" role="dialog">
+<div aria-hidden="true" class="guided-tour-spotlight" id="howToSpotlight"></div>
+<section class="guided-tour-panel" id="howToPanel" tabindex="-1">
+<header class="guided-tour-header">
+<div class="guided-tour-meta"><span class="guided-tour-kicker" id="howToKicker">Bell Performance</span><span class="guided-tour-step" id="howToStepCount">1 of 8</span></div>
+<button class="guided-tour-skip" onclick="skipHowToGuide()" type="button">Skip tour</button>
+</header>
+<div class="guided-tour-progress"><i id="howToProgress"></i></div>
+<div aria-live="polite" class="guided-tour-content" id="howToSlide"><h2 id="howToTitle">Bell Performance Guided Tour</h2></div>
+<footer class="guided-tour-footer">
+<button id="howToBack" onclick="previousHowToSlide()" type="button">Back</button>
+<button id="howToNext" onclick="nextHowToSlide()" type="button">Next</button>
+</footer>
+</section>
 </div>
 <div aria-labelledby="onboardingTitle" aria-modal="true" class="modal hidden" id="onboardingModal" role="dialog">
 <div class="modal-box first-flight-box">
@@ -373,7 +417,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div><label>Bodyweight (lb)</label><input id="onboardingBodyweight" max="700" min="50" placeholder="Bodyweight" step="0.1" type="number"/></div>
 <div class="height-profile-field"><label>Height</label><div class="height-inputs"><input id="onboardingHeightFeet" max="7" min="3" placeholder="ft" type="number"/><input id="onboardingHeightInches" max="11" min="0" placeholder="in" type="number"/></div></div>
 </div>
-<input id="onboardingGoalWeight" type="hidden"/><input id="onboardingBenchMax" type="hidden"/><input id="onboardingSquatMax" type="hidden"/><input id="onboardingDeadliftMax" type="hidden"/><input id="onboardingPushPressMax" type="hidden"/>
+<input id="onboardingGoalWeight" type="hidden"/>
 <div class="first-flight-callout"><strong>Why we ask</strong><span>Age, height, and bodyweight help set sensible training volume, exercise scaling, and nutrition estimates.</span></div>
 </section>
 <section class="onboarding-step" data-onboarding-step="1">
@@ -403,7 +447,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <span class="first-flight-kicker">Flight Check 04</span><h3>Build a schedule you can sustain</h3>
 <p class="sub">Choose the weekly commitment, session length, and equipment Bell Performance should program around.</p>
 <div class="schedule-choice-panel">
-<div class="row"><div><label>Training days per week</label><select id="onboardingTrainingDays"><option>3</option><option>4</option><option selected="">5</option><option>6</option></select></div><div><label>Typical session length</label><select id="onboardingSessionMinutes"><option value="45">45 minutes</option><option selected="" value="60">60 minutes</option><option value="75">75 minutes</option><option value="90">90 minutes</option></select></div></div>
+<input id="onboardingTrainingDays" type="hidden" value="5"/><label>Which days can you normally train?</label><div class="bell-weekday-grid" id="onboardingWeekdayChoices"></div><div class="row"><div><label>Typical session length</label><select id="onboardingSessionMinutes"><option value="30">30 minutes</option><option value="45">45 minutes</option><option selected="" value="60">60 minutes</option><option value="75">75 minutes</option><option value="90">90 minutes</option><option value="105">105 minutes</option><option value="120">120 minutes</option></select></div></div>
 <label>Primary training environment</label><div class="environment-choice-grid" id="onboardingEnvironmentChoices">
 <label><input checked="" name="onboardingSimpleEnvironment" type="radio" value="commercial"/><span><strong>Commercial Gym</strong><small>Full equipment access</small></span></label>
 <label><input name="onboardingSimpleEnvironment" type="radio" value="home"/><span><strong>Home Gym</strong><small>Rack, barbell, dumbbells, or similar</small></span></label>
@@ -414,6 +458,17 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <section class="onboarding-step" data-onboarding-step="4">
 <span class="first-flight-kicker">Flight Check 05</span><h3>Set your starting point</h3>
 <p class="sub">Training experience, current limitations, and readiness help Bell Performance scale the first week responsibly.</p>
+<div class="onboarding-strength-baseline" id="onboardingStrengthBaseline">
+<span class="first-flight-kicker">Strength Baseline</span><h3>Enter your current max lifts</h3>
+<p class="sub">Bell uses these numbers to calculate starting weights and automatic back-off sets. Powerlifting athletes must enter squat, bench press, and deadlift maxes.</p>
+<div class="profile-basics-grid">
+<div><label>Back Squat 1RM (lb)</label><input id="onboardingSquatMax" inputmode="decimal" min="1" placeholder="Example: 405" type="number"/></div>
+<div><label>Bench Press 1RM (lb)</label><input id="onboardingBenchMax" inputmode="decimal" min="1" placeholder="Example: 275" type="number"/></div>
+<div><label>Deadlift 1RM (lb)</label><input id="onboardingDeadliftMax" inputmode="decimal" min="1" placeholder="Example: 455" type="number"/></div>
+<div><label>Push Press 1RM (optional)</label><input id="onboardingPushPressMax" inputmode="decimal" min="1" placeholder="Optional" type="number"/></div>
+</div>
+<div class="first-flight-callout"><strong>Use a reliable training max</strong><span>Enter a recent true 1RM or a conservative estimated 1RM. These can be updated later in Athlete Settings.</span></div>
+</div>
 <label>Training experience</label><div class="experience-choice-grid">
 <label><input name="onboardingExperience" type="radio" value="Beginner"/><span><strong>Beginner</strong><small>New or returning after a long break</small></span></label>
 <label><input checked="" name="onboardingExperience" type="radio" value="Intermediate"/><span><strong>Intermediate</strong><small>Consistent training experience</small></span></label>
@@ -459,16 +514,38 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </div>
 </div>
 </div>
-<div class="modal hidden" id="dailyReadinessModal"><div class="modal-box onboarding-box readiness-modal-box"><div class="card premium-form-card readiness-slider-form"><div class="readiness-form-heading"><div><span class="metric-label">Daily Readiness</span><h2>How are you showing up?</h2><p class="sub">Slide each answer once. Every 1–5 scale runs in the same direction: 1 is your lowest status and 5 is your best.</p></div><button aria-label="Close readiness check-in" class="modal-close" onclick="document.getElementById('dailyReadinessModal').classList.add('hidden')" type="button">×</button></div>
-<div class="readiness-slider-list">
-<label class="readiness-slider-row sleep-slider-row" for="promptSleepDurationMinutes"><div class="readiness-slider-heading"><span>Sleep duration</span><strong id="promptSleepDurationValue">7h 30m</strong></div><input id="promptSleepDurationMinutes" max="720" min="180" oninput="updateReadinessSliderDisplay()" step="15" type="range" value="450"/><div class="readiness-slider-ends"><span>3h</span><small>15-minute increments</small><span>12h</span></div></label>
-<label class="readiness-slider-row" for="promptsleepQuality"><div class="readiness-slider-heading"><span>Sleep quality</span><strong id="promptsleepQualityValue">4 · Good</strong></div><input id="promptsleepQuality" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="4"/><div class="readiness-slider-ends"><span>1 · Poor</span><span>5 · Excellent</span></div></label>
-<label class="readiness-slider-row" for="promptenergy"><div class="readiness-slider-heading"><span>Energy</span><strong id="promptenergyValue">4 · Energized</strong></div><input id="promptenergy" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="4"/><div class="readiness-slider-ends"><span>1 · Depleted</span><span>5 · Fully energized</span></div></label>
-<label class="readiness-slider-row" for="promptrecoveryStatus"><div class="readiness-slider-heading"><span>Muscle and joint recovery</span><strong id="promptrecoveryStatusValue">4 · Mostly fresh</strong></div><input id="promptrecoveryStatus" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="4"/><div class="readiness-slider-ends"><span>1 · Very sore</span><span>5 · Fresh and pain-free</span></div></label>
-<label class="readiness-slider-row" for="promptmotivation"><div class="readiness-slider-heading"><span>Motivation</span><strong id="promptmotivationValue">4 · Ready</strong></div><input id="promptmotivation" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="4"/><div class="readiness-slider-ends"><span>1 · Very low</span><span>5 · Highly motivated</span></div></label>
-<label class="readiness-slider-row" for="prompttimeAvailability"><div class="readiness-slider-heading"><span>Time available</span><strong id="prompttimeAvailabilityValue">3 · 45–60 min</strong></div><input id="prompttimeAvailability" max="5" min="1" oninput="updateReadinessSliderDisplay()" step="1" type="range" value="3"/><div class="readiness-slider-ends"><span>1 · 20–30 min</span><span>5 · 90+ min</span></div></label>
+<div class="modal hidden" id="dailyReadinessModal"><div class="modal-box onboarding-box readiness-modal-box"><div class="card premium-form-card quick-readiness-form"><div class="readiness-form-heading"><div><span class="metric-label">10-Second Daily Check-In</span><h2>How are you showing up?</h2><p class="sub">Choose the answer that best matches today. Bell uses sleep, body recovery, and energy to calculate readiness. Time only changes session length.</p></div><button aria-label="Close readiness check-in" class="modal-close" onclick="document.getElementById('dailyReadinessModal').classList.add('hidden')" type="button">×</button></div>
+<div class="quick-readiness-list">
+<section class="quick-readiness-question" data-question="sleep"><div class="quick-question-heading"><span>1</span><div><h3>How did you sleep?</h3><p>Think about both duration and quality.</p></div></div><div class="quick-choice-grid three" role="group" aria-label="How did you sleep?">
+<button type="button" data-readiness-group="sleep" data-value="poor" aria-pressed="false" onclick="selectDailyReadinessChoice('sleep','poor')"><strong>Poor</strong><small>Short or restless</small></button>
+<button type="button" data-readiness-group="sleep" data-value="okay" aria-pressed="false" onclick="selectDailyReadinessChoice('sleep','okay')"><strong>Okay</strong><small>Enough to function</small></button>
+<button type="button" data-readiness-group="sleep" data-value="good" aria-pressed="false" onclick="selectDailyReadinessChoice('sleep','good')"><strong>Good</strong><small>Rested and recovered</small></button>
+</div></section>
+<section class="quick-readiness-question" data-question="body"><div class="quick-question-heading"><span>2</span><div><h3>How does your body feel?</h3><p>Rate normal muscle and joint recovery—not an injury.</p></div></div><div class="quick-choice-grid three" role="group" aria-label="How does your body feel?">
+<button type="button" data-readiness-group="body" data-value="beat-up" aria-pressed="false" onclick="selectDailyReadinessChoice('body','beat-up')"><strong>Beat Up</strong><small>Very sore or stiff</small></button>
+<button type="button" data-readiness-group="body" data-value="normal" aria-pressed="false" onclick="selectDailyReadinessChoice('body','normal')"><strong>Normal</strong><small>Expected soreness</small></button>
+<button type="button" data-readiness-group="body" data-value="fresh" aria-pressed="false" onclick="selectDailyReadinessChoice('body','fresh')"><strong>Fresh</strong><small>Loose and recovered</small></button>
+</div></section>
+<section class="quick-readiness-question" data-question="energy"><div class="quick-question-heading"><span>3</span><div><h3>How is your energy?</h3><p>Choose your current physical and mental drive.</p></div></div><div class="quick-choice-grid three" role="group" aria-label="How is your energy?">
+<button type="button" data-readiness-group="energy" data-value="drained" aria-pressed="false" onclick="selectDailyReadinessChoice('energy','drained')"><strong>Drained</strong><small>Low battery</small></button>
+<button type="button" data-readiness-group="energy" data-value="steady" aria-pressed="false" onclick="selectDailyReadinessChoice('energy','steady')"><strong>Steady</strong><small>Normal day</small></button>
+<button type="button" data-readiness-group="energy" data-value="fired-up" aria-pressed="false" onclick="selectDailyReadinessChoice('energy','fired-up')"><strong>Fired Up</strong><small>Strong and motivated</small></button>
+</div></section>
+<section class="quick-readiness-question compact" data-question="pain"><div class="quick-question-heading"><span>4</span><div><h3>Any pain or injury concern today?</h3><p>Keep pain separate from ordinary training soreness.</p></div></div><div class="quick-choice-grid two" role="group" aria-label="Any pain or injury concern today?">
+<button type="button" data-readiness-group="pain" data-value="no" aria-pressed="false" onclick="selectDailyPain('no')"><strong>No</strong><small>No concern</small></button>
+<button type="button" data-readiness-group="pain" data-value="yes" aria-pressed="false" onclick="selectDailyPain('yes')"><strong>Yes</strong><small>Flag it for Bell</small></button>
+</div><div class="quick-pain-detail hidden" id="quickPainDetail"><label for="promptPainNotes">What is bothering you?<textarea id="promptPainNotes" oninput="updateQuickReadinessSubmitState()" placeholder="Example: sharp pain in my right shoulder during pressing"></textarea></label><div class="quick-safety-note">Do not train through sharp pain, chest pain, dizziness, weakness, or other concerning symptoms. Stop and seek appropriate medical guidance.</div></div></section>
+<section class="quick-readiness-question compact" data-question="time" id="dailyTimeQuestion"><div class="quick-question-heading"><span>5</span><div><h3>How much time do you have?</h3><p>This changes session length, not your readiness score.</p></div></div><div class="quick-choice-grid time" role="group" aria-label="Time available today">
+<button type="button" data-readiness-group="time" data-value="30" aria-pressed="false" onclick="selectDailyTime(30)"><strong>30</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="45" aria-pressed="false" onclick="selectDailyTime(45)"><strong>45</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="60" aria-pressed="false" onclick="selectDailyTime(60)"><strong>60</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="75" aria-pressed="false" onclick="selectDailyTime(75)"><strong>75</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="90" aria-pressed="false" onclick="selectDailyTime(90)"><strong>90</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="105" aria-pressed="false" onclick="selectDailyTime(105)"><strong>105</strong><small>min</small></button>
+<button type="button" data-readiness-group="time" data-value="120" aria-pressed="false" onclick="selectDailyTime(120)"><strong>120</strong><small>min</small></button>
+</div></section>
 </div>
-<div class="readiness-scale-note">Higher is always better. “Muscle and joint recovery” replaces the old soreness scale, so 5 means fresh and ready rather than highly sore.</div><button class="good premium-primary-button" onclick="saveDailyReadinessPrompt()">Set Today’s Mission Status</button></div></div></div>
+<div class="quick-readiness-footer"><p id="quickReadinessProgress" aria-live="polite">Answer each question to continue.</p><button class="good premium-primary-button" id="quickReadinessSubmit" disabled onclick="saveDailyReadinessPrompt()" type="button">Build Today’s Mission</button></div></div></div></div>
 <div class="modal hidden" id="sessionFeedbackModal"><div class="modal-box onboarding-box"><div class="card"><span class="metric-label">Training Debrief</span><h2 id="feedbackTitle">How did that session land?</h2><p class="sub" id="feedbackIntro">This feedback helps regulate future training load.</p>
 <div id="strengthFeedbackFields"><div class="feedback-grid"><label>How did the training feel?<select id="feedbackSessionQuality"><option value="1">1 — Poor</option><option value="2">2 — Below average</option><option selected="" value="3">3 — Solid</option><option value="4">4 — Very good</option><option value="5">5 — Excellent</option></select></label><label>Energy afterward<select id="feedbackPostEnergy"><option value="1">1 — Drained</option><option value="2">2 — Low</option><option selected="" value="3">3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Energized</option></select></label><label>How do you feel overall?<select id="feedbackOverallFeeling"><option value="1">1 — Rough</option><option value="2">2 — Below normal</option><option selected="" value="3">3 — Normal</option><option value="4">4 — Good</option><option value="5">5 — Great</option></select></label><label>Muscle/joint strain<select id="feedbackStrain"><option value="1">1 — None</option><option value="2">2 — Mild</option><option selected="" value="3">3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Concerning</option></select></label></div></div>
 <div class="hidden" id="engineFeedbackFields"><div class="feedback-grid"><label>Did you match the prescribed effort?<select id="engineFeedbackEffort"><option value="1">1 — Far too hard</option><option value="2">2 — Somewhat too hard</option><option selected="" value="3">3 — On target</option><option value="4">4 — Slightly easier than planned</option><option value="5">5 — Very controlled</option></select></label><label>Breathing control<select id="engineFeedbackBreathing"><option value="1">1 — Could not control</option><option value="2">2 — Struggled</option><option selected="" value="3">3 — Appropriate</option><option value="4">4 — Comfortable</option><option value="5">5 — Very comfortable</option></select></label><label>Leg freshness afterward<select id="engineFeedbackLegs"><option value="1">1 — Heavy / depleted</option><option value="2">2 — More tired than expected</option><option selected="" value="3">3 — Normal</option><option value="4">4 — Fresh</option><option value="5">5 — Very fresh</option></select></label><label>Pain or concerning symptoms<select id="engineFeedbackSymptoms"><option selected="" value="1">1 — None</option><option value="2">2 — Minor irritation</option><option value="3">3 — Noticeable discomfort</option><option value="4">4 — Significant pain</option><option value="5">5 — Stop / seek guidance</option></select></label></div></div>
@@ -476,7 +553,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div aria-labelledby="recoveryClearanceTitle" aria-modal="true" class="modal hidden" id="recoveryClearanceModal" role="dialog"><div class="modal-box onboarding-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Movement Status</span><h2 id="recoveryClearanceTitle">Mark Injury Recovered</h2></div><button class="modal-close" onclick="closeRecoveryClearance()">×</button></div><p class="sub">This archives the current restrictions and returns workout selection to normal. Prior adjusted workouts and injury history remain saved.</p><label>Recovery / clearance date<input id="recoveryClearanceDate" type="date"/></label><label>Clearance status<select id="recoveryClearanceType"><option value="self">Symptoms resolved — self reported</option><option value="clinician">Cleared by a qualified clinician</option><option value="return-plan">Cleared for gradual return to normal training</option></select></label><label>Recovery note<textarea id="recoveryClearanceNotes" placeholder="Optional: what improved, remaining precautions, or return-to-training guidance"></textarea></label><label class="injury-status-toggle"><input id="recoveryGradualReturn" type="checkbox"/> Use a one-week gradual return with reduced volume</label><div class="row"><button class="good" onclick="confirmRecoveryClearance()">Resume Normal Movement Selection</button><button class="secondary" onclick="closeRecoveryClearance()">Cancel</button></div><div class="hint">Pain, weakness, instability, or recurring symptoms should be evaluated by an appropriate healthcare professional.</div></div></div></div>
 <div class="modal hidden" id="historyEditModal"><div class="modal-box onboarding-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Training History</span><h2>Edit Workout Record</h2></div><button class="modal-close" onclick="closeHistoryEditor()">×</button></div><input id="historyEditIndex" type="hidden"/><div class="feedback-grid"><label>Workout name<input id="historyEditLabel"/></label><label>Completed date<input id="historyEditDate" type="datetime-local"/></label><label>Official time<input id="historyEditTime" placeholder="HH:MM:SS or MM:SS"/></label><label>Distance<input id="historyEditDistance" min="0" step="0.01" type="number"/></label><label>Distance unit<select id="historyEditDistanceUnit"><option value="mi">Miles</option><option value="km">Kilometers</option><option value="m">Meters</option><option value="yd">Yards</option></select></label><label>Average heart rate<input id="historyEditHeartRate" max="240" min="0" type="number"/></label><label>Elevation gain<input id="historyEditElevation" min="0" step="1" type="number"/></label><label>Session RPE<input id="historyEditRpe" max="10" min="1" type="number"/></label></div><label>Training notes<textarea id="historyEditNotes"></textarea></label><div class="row"><button class="good" onclick="saveHistoryEdit()">Save Changes</button><button class="secondary" onclick="closeHistoryEditor()">Cancel</button></div><button class="danger" onclick="deleteHistoryRecord()">Delete Workout Record</button><div class="hint" style="margin-top:10px">Changes immediately update weekly reviews, milestones, mileage, pace, and block summaries.</div></div></div></div>
 <div class="modal hidden" id="notificationModal"><div class="modal-box notification-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Bell Performance</span><h2>Coach Notifications</h2></div><button class="modal-close" onclick="closeNotificationCenter()">×</button></div><div class="notification-list" id="notificationList"></div><button class="secondary" onclick="markNotificationsReviewed()">Mark Reviewed</button></div></div></div>
-<div aria-labelledby="exerciseDetailTitle" aria-modal="true" class="modal hidden" id="exerciseDetailModal" role="dialog"><div class="modal-box exercise-detail-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Exercise Intelligence</span><h2 id="exerciseDetailTitle">Exercise</h2></div><button class="modal-close" onclick="closeExerciseDetail()">×</button></div><div id="exerciseDetailContent"></div></div></div></div>
+
 <div aria-labelledby="weeklyDebriefTitle" aria-modal="true" class="modal hidden" id="weeklyDebriefModal" role="dialog">
   <div class="modal-box weekly-debrief-box">
     <div class="card weekly-debrief-card">
@@ -552,22 +629,22 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div aria-labelledby="weekPreviewTitle" aria-modal="true" class="modal hidden" id="weekPreviewModal" role="dialog"><div class="modal-box onboarding-box week-preview-modal"><div class="card"><div class="notification-header"><div><span class="metric-label">Training Timeline</span><h2 id="weekPreviewTitle">Week Preview</h2><p class="sub" id="weekPreviewSubtitle"></p></div><button class="modal-close" onclick="bpCloseWeekPreview()" aria-label="Close week preview">×</button></div><div class="week-coach-brief" id="weekPreviewCoachBrief"></div><div id="weekPreviewList"></div><div class="row"><button class="secondary" onclick="bpPreviewAdjacentWeek(-1)">‹ Previous Week</button><button class="secondary" onclick="bpPreviewAdjacentWeek(1)">Next Week ›</button></div><button class="good" id="weekPreviewBuildButton" onclick="bpBuildPreviewedWeek()">Rebuild This Week</button></div></div></div>
 <div aria-labelledby="workoutPreviewTitle" aria-modal="true" class="modal hidden" id="workoutPreviewModal" role="dialog"><div class="modal-box preview-workout-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Workout Preview</span><h2 id="workoutPreviewTitle">Today’s Mission</h2><p class="sub" id="workoutPreviewMeta"></p></div><button class="modal-close" onclick="closeWorkoutPreview()" aria-label="Close workout preview">×</button></div><div id="workoutPreviewContent"></div><div class="row"><button class="secondary" onclick="closeWorkoutPreview()">Back</button><button class="good" id="previewBeginButton">Begin Workout</button></div></div></div></div>
 <div class="modal hidden" id="workoutModal">
-<div class="modal-box">
+<div class="modal-box workout-shell-1385">
 <div class="workout-top">
-<div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><button class="modal-menu">•••</button></div>
+<div class="workout-modal-header"><button class="modal-back" onclick="closeWorkout()">‹</button><div><span class="metric-label" id="activeTrainingType">Strength Training</span><strong id="activeTitle"></strong></div><span class="workout-header-spacer" aria-hidden="true"></span></div>
 <div class="scorebar"><div id="workoutProgressBar"></div></div><div class="progress-label"><span id="workoutProgressText"></span><span id="workoutZoneLabel">Ready to Train</span></div>
 </div>
 <div class="workout-hero" id="workoutHero"><img alt="Athlete training" id="workoutHeroArt" src="./assets/artwork/strength/powerlifting.jpg?v=10006"/><div><span class="metric-label">Today's Mission</span><h2 id="workoutHeroTitle">Strength Training</h2><p id="workoutHeroFocus">Execute quality work.</p><div class="hero-pills"><span id="workoutHeroDuration">75 min</span><span id="workoutHeroStatus">Hard</span><span id="workoutHeroWeek">Week 1 • Training</span></div></div></div>
 <div class="mission-briefing-grid" id="missionBriefing">
-  <section class="card mission-coach-brief"><span class="metric-label">Coach's Brief</span><h3 id="workoutBriefHeading">Why today matters</h3><p id="workoutCoachBrief">Your briefing will appear here.</p><div class="mission-focus-list" id="workoutFocusList"></div></section>
-  <section class="card mission-session-breakdown"><span class="metric-label">Session Breakdown</span><div id="workoutSectionList"></div><div class="mission-total"><span>Total estimated time</span><strong id="workoutBreakdownTotal">—</strong></div></section>
+  <section class="card mission-coach-brief"><span class="metric-label">Bell Coach</span><h3 id="workoutBriefHeading">Why today matters</h3><p id="workoutCoachBrief">Your briefing will appear here.</p><div class="mission-focus-list" id="workoutFocusList"></div></section>
+  <section class="card mission-session-breakdown"><span class="metric-label">Today's Plan</span><div id="workoutSectionList"></div><div class="mission-total"><span>Total estimated time</span><strong id="workoutBreakdownTotal">—</strong></div></section>
   <section class="card mission-success-card"><span class="metric-label">Success Today</span><div id="workoutSuccessList"></div></section>
   <section class="card mission-details-card"><span class="metric-label">Mission Details</span><div class="mission-detail-metrics"><div><strong id="workoutSetCount">—</strong><span>Work Sets</span></div><div><strong id="workoutIntensity">—</strong><span>Intensity</span></div></div><div class="mission-equipment"><span>Equipment</span><p id="workoutEquipment">—</p></div><div class="mission-next"><span>Next Session</span><strong id="workoutNextTitle">No session scheduled</strong><small id="workoutNextDetail"></small></div></section>
 </div>
-<div class="workout-stage-actions" id="workoutBriefActions"><button class="secondary" onclick="previewActiveWorkout()">Preview Full Workout</button><button class="good" onclick="beginWorkoutFlow()">Begin Workout</button></div>
-<div class="workout-stage-actions hidden" id="warmupActions"><button class="good" onclick="advanceToTraining()">Advance to Training</button></div>
+<div class="workout-stage-actions" id="workoutBriefActions"><button class="secondary" onclick="previewActiveWorkout()">View Exercise List</button><button class="good" onclick="beginWorkoutFlow()">Start Session</button></div>
+<div class="workout-stage-actions hidden" id="warmupActions"><button class="good" onclick="advanceToTraining()">Begin Working Sets</button></div>
 <div class="card workout-control-card" id="workoutControlCard">
-<h3>Training Timer</h3><div class="timer" id="workoutTimer">00:00</div>
+<h3>Session Timer</h3><div class="timer" id="workoutTimer">00:00</div>
 <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
 <div class="rest-panel hidden" id="restPanel"><span class="metric-label">Rest Timer</span><div class="rest-time" id="restTimer">00:00</div><div class="row three"><button class="secondary" onclick="adjustRestTimer(-30)">−30 sec</button><button class="secondary" onclick="adjustRestTimer(30)">+30 sec</button><button class="danger" onclick="skipRestTimer()">Skip</button></div></div>
 <div class="row"><button class="secondary" onclick="closeWorkout()">Save &amp; Exit</button><button class="danger" onclick="discardWorkout()">Discard</button></div>
@@ -587,46 +664,77 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="performance-callout" id="enginePacePreview">Enter time and distance to calculate pace.</div>
 </div>
 <div id="activeExercises"></div>
-<div class="card" id="workoutCompletionCard"><label>Session RPE</label><input id="sessionRpe" max="10" min="1" type="number"/><label>Training Notes</label><textarea id="sessionNotes"></textarea><button class="good" onclick="completeWorkout()">Finish Training</button></div>
+<div class="card athlete-response-finish" id="workoutCompletionCard"><div class="workout-finish-heading"><span class="metric-label">Finish Session</span><h3>Record how the workout went</h3><p>Bell compares the planned prescription with what you completed before changing future training.</p></div><div class="workout-finish-fields athlete-response-fields"><label>Session RPE<input id="sessionRpe" max="10" min="1" placeholder="1–10" step="0.5" type="number"/></label><label>Overall difficulty<select id="sessionDifficulty"><option value="easy">Easier than expected</option><option value="right" selected>About right</option><option value="hard">Harder than expected</option><option value="very_hard">Near limit</option></select></label><label>Pain severity<input id="sessionPainSeverity" max="10" min="0" placeholder="0–10" type="number" value="0"/></label><label>Pain area<input id="sessionPainArea" placeholder="None, knee, shoulder…" type="text"/></label><label class="athlete-response-check"><input id="sessionTechniqueIssue" onchange="toggleSessionTechniqueDetail()" type="checkbox"/><span>Technique or movement issue</span></label><label class="hidden athlete-response-wide" id="sessionTechniqueDetail">Technique concern<input id="sessionTechniqueNote" placeholder="What broke down or felt limited?" type="text"/></label><label class="athlete-response-wide">Training Notes<textarea id="sessionNotes" placeholder="Optional notes for Bell Coach"></textarea></label></div><button class="good workout-finish-button" onclick="completeWorkout()">Complete Session</button></div>
 </div>
 </div>
-<nav>
-<button class="active" data-screen="home"><span class="icon">⌂</span>Home</button>
-<button data-screen="plan"><span class="icon">☷</span>Plan</button>
-<button data-screen="workouts"><span class="icon strength-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6"/><path d="M6 7v10"/><path d="M9 6v12"/><path d="M15 6v12"/><path d="M18 7v10"/><path d="M21 9v6"/><path d="M9 12h6"/></svg></span>Training</button>
-<button data-screen="history"><span class="icon">◷</span>History</button>
-<button data-screen="more"><span class="icon">⚙</span>Settings</button>
+
+<div class="modal hidden" id="bellWeeklyCheckInModal"><div class="modal-box bell-weekly-modal"><div class="modal-header"><div><span class="metric-label">Weekly Schedule Check-In</span><h2>Plan <span id="bellWeeklyTargetLabel">Next Week</span></h2></div><button type="button" onclick="bellCloseWeeklyCheckIn()">×</button></div><p class="sub">Keep this quick. Tell Bell whether your training days are changing.</p><div class="bell-weekly-mode-list"><label><input type="radio" name="bellWeeklyMode" value="normal" checked><span><strong>Keep my normal schedule</strong><small>Use my saved training days.</small></span></label><label><input type="radio" name="bellWeeklyMode" value="custom"><span><strong>Choose different days</strong><small>Select the days available next week.</small></span></label><label><input type="radio" name="bellWeeklyMode" value="vacation"><span><strong>Vacation / planned week off</strong><small>Pause formal training. Mobility remains optional.</small></span></label></div><div class="hidden" id="bellWeeklyCustomWrap"><label>Available next week</label><div class="bell-weekday-grid" id="bellWeeklyCustomDays"></div></div><div class="row"><button class="secondary" type="button" onclick="bellCloseWeeklyCheckIn()">Cancel</button><button class="good" type="button" onclick="bellSaveWeeklyCheckIn()">Build Next Week</button></div></div></div>
+<nav class="app-nav" aria-label="Primary navigation">
+<button class="active" data-screen="home"><span class="icon">⌂</span><span>Dashboard</span></button>
+<button data-screen="plan"><span class="icon">▣</span><span>Calendar</span></button>
+<button data-screen="workouts"><span class="icon strength-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6"/><path d="M6 7v10"/><path d="M9 6v12"/><path d="M15 6v12"/><path d="M18 7v10"/><path d="M21 9v6"/><path d="M9 12h6"/></svg></span><span>Workouts</span></button>
+<button data-screen="history"><span class="icon">▥</span><span>Performance</span></button>
+<button class="desktop-nav-item" type="button" onclick="openCommandTile('nutrition')"><span class="icon">⚑</span><span>Nutrition</span></button>
+<button class="desktop-nav-item" type="button" onclick="openCommandTile('recovery')"><span class="icon">♥</span><span>Recovery</span></button>
+<button class="desktop-nav-item" type="button" onclick="openCommandTile('coaching')"><span class="icon">☊</span><span>Coaching</span></button>
+<button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
+<button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "11.0.0-daily-coach";</script>
+<script>window.BELL_APP_VERSION = "13.18.5-guided-workout-data-bridge";</script>
 <script src="./data/workouts.js?v=10007"></script>
-<script src="./js/exercise-library.js?v=10006"></script>
-<script src="./js/storage.js?v=10006"></script>
-<script src="./js/readiness.js?v=10006"></script>
-<script src="./js/equipment.js?v=10006"></script>
-<script>document.getElementById("equipmentGrid").innerHTML=equipmentCheckboxesHtml("equipment");document.getElementById("onboardingEquipmentGrid").innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");</script>
-<script src="./js/training-blocks.js?v=10006"></script>
-<script src="./js/mobility.js?v=10006"></script>
+<script src="./js/exercise-library.js?v=13710"></script>
+<script src="./js/storage.js?v=13841"></script>
+<script src="./js/readiness.js?v=13840"></script>
+<script src="./js/equipment.js?v=13640"></script>
+<script>{const grid=document.getElementById("equipmentGrid");if(grid)grid.innerHTML=equipmentCheckboxesHtml("equipment");const onboardingGrid=document.getElementById("onboardingEquipmentGrid");if(onboardingGrid)onboardingGrid.innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");}</script>
+<script src="./js/training-blocks.js?v=13600"></script>
+<script src="./js/mobility.js?v=13650"></script>
 <script src="./js/nutrition.js?v=10006"></script>
 <script src="./js/milestones.js?v=10006"></script>
 <script src="./js/progression.js?v=10006"></script>
-<script src="./js/workout-model.js?v=10006"></script>
-<script src="./js/workouts.js?v=11000"></script>
+<script src="./js/workout-model.js?v=13850"></script>
+<script src="./js/workouts.js?v=131300"></script>
 <script src="./js/missed-sessions.js?v=10006"></script>
 <script src="./js/performance-review.js?v=10006"></script>
 <script src="./js/artwork.js?v=10006"></script>
 <script src="./js/quote-cache.js?v=10006"></script>
-<script src="./js/ui.js?v=10006"></script>
+<script src="./js/ui.js?v=13850"></script>
 <script src="./js/habits.js?v=10006"></script>
 <script src="./js/dual-goals.js?v=10006"></script>
-<script src="./js/version-8.js?v=10006"></script>
+<script src="./js/version-8.js?v=13718"></script>
 <script src="./js/mission-planner.js?v=10006"></script>
-<script src="./js/coaching-pathways.js?v=10006"></script>
-<script src="./js/event-coaching.js?v=10006"></script>
-<script src="./js/how-to.js?v=10006"></script>
-<script src="./js/premium-dashboard.js?v=11000"></script>
+<script src="./js/coaching-pathways.js?v=13600"></script>
+<script src="./js/event-coaching.js?v=13721"></script>
+<script src="./js/real-world-chaos-13160.js?v=131670"></script>
+<script src="./js/longitudinal-progression-13140.js?v=131600"></script>
+<script src="./js/prescription-application-13150.js?v=131600"></script>
+<script src="./js/athlete-response-13130.js?v=131670"></script>
+<script src="./js/how-to.js?v=13740"></script>
+<script src="./js/workout-display-names.js?v=131740"></script>
+<script src="./js/premium-dashboard.js?v=13790"></script>
 <script src="./js/block-lifecycle.js?v=10006"></script>
-<script src="./js/weekly-debrief.js?v=10006"></script>
+<script src="./js/weekly-debrief.js?v=131300"></script>
 <script src="./js/plan-progress.js?v=10006"></script>
-<script src="./js/app.js?v=10006"></script>
+<script src="./js/bell-api.js?v=131300"></script>
+<script src="./js/api-integration.js?v=131300"></script>
+<script src="./js/dashboard-command-center.js?v=13650"></script>
+<script src="./js/adaptive-weekly-schedule.js?v=13730"></script>
+<script src="./js/powerlifting-programming.js?v=12212"></script>
+<script src="./js/powerlifting-meet-prep.js?v=12213"></script>
+<script src="./js/app.js?v=12101"></script>
+<script src="./js/bell-coaching-engine.js?v=13200"></script>
+<script src="./js/bell13-dashboard.js?v=13850"></script>
+<script src="./js/bell13-athlete-experience.js?v=13650"></script>
+<script src="./js/first-flight-1372.js?v=13721"></script>
+<script src="./js/bell13-coach-intelligence.js?v=13620"></script>
+<script src="./js/bell13-commercial-home.js?v=13850"></script>
+<script src="./js/settings-1376.js?v=13760"></script>
+<script src="./js/daily-mission-13710.js?v=13718"></script>
+<script src="./js/completion-engine-13717.js?v=13718"></script>
+<script src="./js/independent-daily-sessions-1382.js?v=13850"></script>
+<script src="./js/training-hub-1385.js?v=13850"></script>
+<script src="./js/mission-routing-1385.js?v=13850"></script>
+<script src="./js/longitudinal-coaching-1390.js?v=13910"></script>
+<script src="./js/guided-workout-13186.js?v=131860"></script>
 </body>
 </html>

@@ -1,0 +1,36 @@
+/* Bell Performance 13.7.2 — First Flight & Mission Alignment */
+.first-flight-box{scroll-behavior:auto}
+.first-flight-body{scroll-behavior:auto}
+.onboarding-step[data-onboarding-step="0"]>.onboarding-strength-baseline{margin-top:18px}
+.desired-weight-field input{width:100%}
+.baseline-heading-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px}
+.baseline-heading-row h3{margin:2px 0 5px}.baseline-heading-row .sub{margin:0}
+.baseline-optional-badge{flex:0 0 auto;padding:6px 9px;border:1px solid rgba(217,171,74,.28);border-radius:999px;color:#e8bf63;background:rgba(217,171,74,.08);font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.bell-primary-baselines{margin-top:0}
+.baseline-expand-button{width:100%;margin-top:12px;display:flex;align-items:center;justify-content:space-between;text-align:left}
+.baseline-expand-button i{font-style:normal;font-size:1.2rem;color:#edc558}.baseline-expand-button.open{border-color:rgba(237,197,88,.55)}
+.performance-baseline-advanced{display:grid;gap:14px;margin-top:14px}.performance-baseline-advanced.hidden{display:none}
+.baseline-group{padding:15px;border:1px solid #2e3740;border-radius:14px;background:linear-gradient(145deg,#10161c,#0a0f13)}
+.baseline-group>span{display:block;margin-bottom:12px;color:#d8aa49;font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.journey-mode-first{margin:18px 0}.journey-specific-panel{margin-top:16px;padding:18px;border:1px solid #303943;border-radius:16px;background:linear-gradient(145deg,#11171d,#0b1014)}
+.journey-specific-panel.hidden{display:none}.journey-specific-panel h4{margin:5px 0 14px;font-size:1.05rem;color:#fff}.journey-specific-panel .first-flight-kicker{margin:0}
+.event-type-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.event-type-grid label{display:block}.event-type-grid input{position:absolute;opacity:0;pointer-events:none}
+.event-type-grid label span{display:flex;flex-direction:column;min-height:88px;padding:14px;border:1px solid #303943;border-radius:14px;background:#0b1014;cursor:pointer;transition:.18s ease}
+.event-type-grid label strong{color:#fff}.event-type-grid label small{margin-top:5px;color:#9aa5af;line-height:1.35}.event-type-grid input:checked+span{border-color:#d8a632;background:linear-gradient(145deg,rgba(216,166,50,.18),#10161c);box-shadow:inset 0 0 0 1px rgba(237,197,88,.22)}
+.event-type-grid input:focus-visible+span{outline:2px solid #edc558;outline-offset:2px}
+.coach-style-preview{margin-top:16px;padding:18px;border:1px solid rgba(216,166,50,.32);border-radius:16px;background:linear-gradient(145deg,rgba(216,166,50,.09),#0b1014)}
+.coach-style-preview strong{display:block;margin:5px 0 8px;color:#edc558;font-size:1.05rem}.coach-style-preview p{margin:0;color:#dce2e8;line-height:1.55}
+.coach-style-preview[data-style="Off"]{border-color:#303943;background:#0b1014}.coach-style-preview[data-style="Off"] strong{color:#aeb7c0}
+.onboarding-step[data-onboarding-step="4"] .injury-status-toggle{margin-top:18px}
+.onboarding-step[data-onboarding-step="5"] .bell-recovery-profile-fields{margin-top:18px}
+@media(max-width:700px){
+  .profile-basics-grid{grid-template-columns:1fr}.height-profile-field{grid-column:auto}.event-type-grid{grid-template-columns:1fr}.baseline-heading-row{display:block}.baseline-optional-badge{display:inline-flex;margin-top:8px}.journey-specific-panel{padding:14px}.bell-onboarding-event-fields{grid-template-columns:1fr!important}.onboarding-coach-preference{grid-template-columns:1fr!important}
+}
+@media(max-width:520px){
+  #howToModal .how-to-footer{grid-template-columns:minmax(88px,1fr) auto minmax(88px,1fr);gap:8px;padding:10px}
+  #howToModal .how-to-footer>button{min-width:0;padding:11px 8px;font-size:14px}
+  #howToModal .how-to-dots{gap:4px;min-width:0}
+  #howToModal .how-to-dots button{width:6px;height:6px;min-width:6px}
+  #howToModal .how-to-dots button.active{width:18px}
+  #howToModal .how-to-autoplay{max-width:calc(100% - 20px);font-size:11px}
+}

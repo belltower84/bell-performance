@@ -167,7 +167,7 @@ function readinessWord(value, reverse=false) {
   return v >= 4 ? "High" : v === 3 ? "Moderate" : "Low";
 }
 function timeAvailabilityLabel(value) {
-  return ({1:"20–30 min",2:"30–45 min",3:"45–60 min",4:"60–75 min",5:"75–90+ min"})[Number(value)] || "45–60 min";
+  return ({1:"30 min",2:"45 min",3:"60 min",4:"75 min",5:"90 min",6:"105 min",7:"120 min"})[Number(value)] || `${Math.max(30,Number(value)||60)} min`;
 }
 function renderVisualProfile(template, status) {
   const sex = data.settings.sex || "Male";
@@ -185,11 +185,11 @@ function renderVisualProfile(template, status) {
     if (engineArt) engineArt.src = "./assets/engine-mountain-trail.jpg?v=8530";
   }
   const r = data.settings.readiness || {};
-  setText("dashSleep", readinessWord(r.sleepQuality));
-  setText("dashSoreness", readinessWord(r.recoveryStatus));
-  setText("dashEnergy", readinessWord(r.energy));
-  setText("dashMotivation", readinessWord(r.motivation));
-  setText("dashTime", timeAvailabilityLabel(r.timeAvailability));
+  setText("dashSleep", typeof readinessSleepLabel==="function"?readinessSleepLabel(r):readinessWord(r.sleepQuality));
+  setText("dashBody", typeof readinessBodyLabel==="function"?readinessBodyLabel(r):readinessWord(r.recoveryStatus));
+  setText("dashEnergy", typeof readinessEnergyLabel==="function"?readinessEnergyLabel(r):readinessWord(r.energy));
+  setText("dashPain", typeof readinessPainLabel==="function"?readinessPainLabel(r):"None");
+  setText("dashTime", typeof readinessTimeLabel==="function"?readinessTimeLabel(r):timeAvailabilityLabel(r.timeAvailability));
   setText("engineSessionTitle", cardio === "Cycling" ? "Zone 2 Cycle" : cardio === "Air Bike" ? "Zone 2 Air Bike" : cardio === "Rower" ? "Zone 2 Row" : "Zone 2 Run");
   setText("engineSessionPurpose", status === "RED" ? "Easy recovery work only." : status === "YELLOW" ? "Controlled aerobic work. Keep it easy." : "Build your base. Fuel your engine.");
   setText("mobilityDashboardTitle", `${data.mobility.minutes || 10} min ${resolvedMobilityFocus()} Mobility`);
@@ -350,24 +350,9 @@ function togglePlan(index, checked) {
 }
 
 function renderWorkoutLibrary() {
-  const container = byId("workoutLibrary");
-  container.innerHTML = "";
-  setText("libraryRotation", `Week ${getRotationWeek()}`);
-  allWorkoutNames().forEach(name => {
-    const scaled = scaledTemplate(name);
-    if (!scaled) return;
-    const blocks = [...new Set(scaled.exercises.map(exercise => exercise.block).filter(Boolean))].join(" • ");
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="status-line">
-        <div><h3>${name}</h3><div class="workout-library-title">${scaled.label}</div><div class="sub">${scaled.duration} min • ${blocks}</div></div>
-        <button class="compact-button" onclick="beginWorkout('${name.replaceAll("'", "\\'")}')">Begin</button>
-      </div>
-      <div class="hint">${scaled.exercises.map(exercise => `${exercise.name}: ${exercise.sets} × ${exercise.reps}`).join(" • ")}</div>
-    `;
-    container.appendChild(card);
-  });
+  // Bell 13.8.5: the Train tab is a focused daily-training hub, not a catalog
+  // of every workout the coaching engine could prescribe.
+  if (typeof renderTrainingHub === "function") renderTrainingHub();
 }
 
 function renderHistory() {
@@ -396,25 +381,65 @@ function deleteHistoryRecord(){const index=Number(byId("historyEditIndex").value
 
 function currentDayName(dateKey=selectedDashboardDateKey()){return new Intl.DateTimeFormat("en-US",{weekday:"long"}).format(localDateFromKey(dateKey));}
 function sessionCompletionKey(planItem, slot, sessionIndex){return `${planItem.id||planItem.day}:${slot}${Number.isInteger(sessionIndex)?`:${sessionIndex}`:""}`;}
+function bellCanonicalCompletionMission(value){return typeof bellCanonicalWorkoutMission==="function"?bellCanonicalWorkoutMission(value):String(value||"");}
+function bellHistoryCompletesPlannedSession(item,sessionKey,mission,scheduledDate){
+  const same=(a,b)=>String(a??"")===String(b??"");
+  const targetMission=bellCanonicalCompletionMission(mission);
+  const targetDate=scheduledDate||item?.scheduledDate||(typeof planDateKey==="function"?planDateKey(item):"");
+  return (data.history||[]).some(record=>{
+    if(!(record?.completed||record?.status==="completed"))return false;
+    if(record.planSessionKey&&same(record.planSessionKey,sessionKey))return true;
+    if(record.planId&&!same(record.planId,item?.id))return false;
+    const recordDate=record.scheduledDate||String(record.completedAt||"").slice(0,10);
+    if(targetDate&&recordDate&&recordDate!==targetDate)return false;
+    return same(bellCanonicalCompletionMission(record.name||record.mission),targetMission);
+  });
+}
+function bellPlannedSessionCompleted(item,sessionKey,mission,scheduledDate){
+  return Boolean(item?.sessionCompletions?.[sessionKey]||item?.done||bellHistoryCompletesPlannedSession(item,sessionKey,mission,scheduledDate));
+}
 function sessionsFromPlanItem(item){
   if(!item)return[];
   const sessions=[];
-  const push=(session,slot,index)=>{if(!session?.mission)return;const sessionKey=sessionCompletionKey(item,slot,index);sessions.push({...session,sessionKey,completed:Boolean(item.sessionCompletions?.[sessionKey]||item.done),scheduledDate:item.scheduledDate||planDateKey(item)});};
+  const push=(session,slot,index)=>{if(!session?.mission)return;const sessionKey=sessionCompletionKey(item,slot,index),scheduledDate=item.scheduledDate||planDateKey(item);sessions.push({...session,sessionKey,completed:bellPlannedSessionCompleted(item,sessionKey,session.mission,scheduledDate),scheduledDate});};
   push({mission:item.mission,label:item.customLabel,detail:item.detail,prescribedDuration:item.prescribedDuration,primary:true,planId:item.id},"primary");
   push({mission:item.secondaryMission,label:item.secondaryLabel,detail:item.secondaryDetail,prescribedDuration:item.secondaryDuration,primary:false,planId:item.id},"secondary");
   if(Array.isArray(item.sessions))item.sessions.forEach((session,index)=>push({mission:session.mission,label:session.label||session.customLabel,detail:session.detail,prescribedDuration:session.prescribedDuration||session.duration,primary:false,planId:item.id,sessionIndex:index},"session",index));
   return sessions.filter(x=>!String(x.mission||'').startsWith('M-'));
 }
-function dashboardPrimaryPlanItem(){const key=selectedDashboardDateKey();return(data.plan||[]).find(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status))||null;}
+function dashboardPrimaryPlanItem(){const key=selectedDashboardDateKey();const items=typeof bellActivePlanItemsForDate==='function'?bellActivePlanItemsForDate(key):(data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status));return items[0]||null;}
 function dashboardSessionsForToday(){
   const key=selectedDashboardDateKey();
-  const items=(data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status));
+  const items=typeof bellActivePlanItemsForDate==='function'?bellActivePlanItemsForDate(key):(data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status));
   const sessions=items.flatMap(sessionsFromPlanItem).filter(session=>!session.completed);
   const unique=[];
   sessions.forEach(session=>{const identity=session.sessionKey; if(!unique.some(x=>x.sessionKey===identity))unique.push(session);});
   return unique;
 }
-function beginPlannedWorkout(planId,sessionKey,mission){const item=(data.plan||[]).find(x=>x.id===planId);beginWorkout(mission,{planId,sessionKey,scheduledDate:item?.scheduledDate||selectedDashboardDateKey()});}
+function resolvePlannedSession(planId,sessionKey,mission){
+  const item=(data.plan||[]).find(x=>String(x.id)===String(planId))||null;
+  const itemSessions=item?sessionsFromPlanItem(item):[];
+  let session=itemSessions.find(x=>String(x.sessionKey)===String(sessionKey))||null;
+  if(!session&&mission)session=itemSessions.find(x=>x.mission===mission)||null;
+  if(!session){
+    const all=typeof premiumAllSessions==='function'?premiumAllSessions():[];
+    session=all.find(x=>String(x.sessionKey)===String(sessionKey))||all.find(x=>x.mission===mission)||null;
+  }
+  return {item,session};
+}
+function beginPlannedWorkout(planId,sessionKey,mission){
+  const resolved=resolvePlannedSession(planId,sessionKey,mission),item=resolved.item,session=resolved.session;
+  const rawMission=session?.mission||mission;
+  const actualMission=typeof bellCanonicalWorkoutMission==='function'?bellCanonicalWorkoutMission(rawMission):rawMission;
+  if(!actualMission){console.error('Bell: planned session could not be resolved',{planId,sessionKey,mission});return;}
+  const actualPlanId=item?.id??session?.planId??planId;
+  const actualSessionKey=session?.sessionKey||sessionKey;
+  const scheduledDate=typeof bellCanonicalPlanDateKey==='function'?bellCanonicalPlanDateKey(item,data.trainingBlock,Number(data.trainingBlock?.currentWeek||1)):(item?.scheduledDate||session?.scheduledDate||selectedDashboardDateKey());
+  const daySessions=item?sessionsFromPlanItem(item):(typeof premiumAllSessions==='function'?premiumAllSessions():[]);
+  const budget=typeof bellDailySessionBudget==='function'?bellDailySessionBudget(daySessions,scheduledDate):null;
+  const allocation=budget?.sessions?.find(x=>String(x.sessionKey)===String(actualSessionKey));
+  beginWorkout(actualMission,{planId:actualPlanId,sessionKey:actualSessionKey,scheduledDate,prescribedDuration:allocation?.minutes||session?.allocatedMinutes||session?.prescribedDuration});
+}
 function optionalSessionHtml(primaryType){if(primaryType==='strength')return `<span class="metric-label">Optional Support</span><h3>Add Easy Cardio</h3><p class="hint">Add 20–30 minutes of easy Zone 2 work only when readiness is Green or Yellow and it will not compromise tomorrow's training.</p><div class="row"><button class="secondary" onclick="beginWorkout('R-1 Recovery Run')">Start Optional Cardio</button><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Choose Mobility Instead</button></div>`;return `<span class="metric-label">Optional Support</span><h3>Add Mobility</h3><p class="hint">A conditioning-only day can be paired with extra mobility, breathing, or easy recovery work without adding another hard session.</p><button class="secondary" onclick="document.getElementById('mobilityFocus').scrollIntoView({behavior:'smooth'})">Open Daily Mobility</button>`;}
 function renderTodayTrainingCards(){
   renderDashboardDayNavigation();
@@ -644,6 +669,7 @@ function saveFirstFlightProfile(){
   if(!Number.isFinite(feet)||feet<3||feet>7||!Number.isFinite(inches)||inches<0||inches>11){byId("onboardingHeightFeet").focus();alert("Enter a valid height in feet and inches.");return false;}
   const invalidMax=Object.entries(onboardingMaxes).find(([,value])=>Number.isNaN(value));
   if(invalidMax){const id={bench:"onboardingBenchMax",squat:"onboardingSquatMax",deadlift:"onboardingDeadliftMax",pushPress:"onboardingPushPressMax"}[invalidMax[0]];byId(id).focus();alert("Enter a positive max lift or leave the field blank.");return false;}
+  if(bpPrimaryGoal()==="Powerlifting"&&![onboardingMaxes.squat,onboardingMaxes.bench,onboardingMaxes.deadlift].every(value=>Number.isFinite(Number(value))&&Number(value)>0)){byId("onboardingSquatMax").focus();alert("Powerlifting coaching requires current squat, bench press, and deadlift maxes so Bell can calculate top sets and back-off work.");return false;}
   data.settings.athleteName=name;
   data.settings.sex=byId("onboardingSex").value||"Prefer not to say";
   data.settings.athleteMode=byId("onboardingAthleteMode").value||"Hybrid Athlete";

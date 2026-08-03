@@ -1,0 +1,12 @@
+Bell Performance 13.5.0 Installation
+
+Recommended upgrade from 13.4.0:
+1. Extract the cumulative patch.
+2. Copy its contents into the existing Bell Performance repository root.
+3. Replace matching files.
+4. Open GitHub Desktop on branch bell-core-live.
+5. Commit: Build 13.5 commercial Home experience
+6. Push and test before merging to main.
+
+A complete GitHub-ready build is also supplied for replacing the full working folder.
+No database migration is required for 13.5.0.

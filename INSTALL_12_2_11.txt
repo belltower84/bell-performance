@@ -1,0 +1,12 @@
+Bell Performance 12.2.11 — Weekly Plan List
+
+Copy these files into the root of the Bell Performance repository and replace the existing versions:
+- index.html
+- css/app.css
+- js/dashboard-command-center.js
+- sw.js
+
+Commit message:
+Build 12.2.11 weekly plan list
+
+After starting the local server, hard refresh with Ctrl + Shift + R. If the previous tile remains, clear the site data/service worker cache and reload.

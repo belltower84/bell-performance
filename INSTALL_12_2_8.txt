@@ -1,0 +1,12 @@
+Bell Performance 12.2.8 — Midweek Launch & Availability Enforcement
+
+1. Confirm GitHub Desktop is on bell-core-live.
+2. Commit or stash current changes.
+3. Extract this ZIP and copy its contents into the repository root.
+4. Replace matching files.
+5. Commit with: Build 12.2.8 midweek launch and availability enforcement
+6. Push origin and wait for Render to redeploy.
+7. Start the local frontend with: py -m http.server 5173
+8. Hard refresh with Ctrl+Shift+R.
+
+Retest by starting a block midweek. Past weekdays must contain no actionable workouts; Friday must be used for strength when selected and required.

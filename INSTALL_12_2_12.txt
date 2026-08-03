@@ -1,0 +1,26 @@
+Bell Performance 12.2.12 — Legit Powerlifting Programming
+
+1. Confirm GitHub Desktop is on bell-core-live.
+2. Commit or stash current changes.
+3. Extract this ZIP.
+4. Copy everything inside the extracted folder into the root of the bell-performance repository.
+5. Choose Replace files in destination.
+6. Commit with: Build 12.2.12 legit powerlifting programming
+7. Push origin and wait for Render to redeploy.
+8. Hard refresh the local app or clear the service-worker cache.
+
+Retest with:
+- Primary discipline: Powerlifting
+- Four or more selected training days
+- Start next Monday for a full Week 1
+
+Expected strength sessions:
+- Squat Focus
+- Bench Focus
+- Deadlift Focus
+- Secondary Squat + Bench
+
+Expected engine behavior:
+- 1 low-intensity aerobic recovery session for a normal 4–5 day schedule
+- Up to 2 low-intensity sessions for 6–7 available days
+- No default intervals, threshold session, mixed-modal conditioning, or long run

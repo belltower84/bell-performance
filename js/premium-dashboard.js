@@ -2,33 +2,41 @@
 
 let premiumQuoteOffset = 0;
 
-function premiumSelectedItems(){
-  const key=selectedDashboardDateKey();
-  return (data.plan||[]).filter(item=>planDateKey(item)===key&&!['skipped','replaced'].includes(item.status));
+function bellCanonicalPlanDateKey(item,block=data.trainingBlock,week=Number(data.trainingBlock?.currentWeek||1)){
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const dayIndex=days.indexOf(item?.day);
+  const monday=typeof bpWeekStartKey==='function'
+    ? bpWeekStartKey(block,week)
+    : (typeof planWeekStartKey==='function'?planWeekStartKey():mondayKeyFor(localDateKey()));
+  if(dayIndex>=0)return addLocalDays(monday,dayIndex);
+  return item?.scheduledDate||'';
 }
+function bellActivePlanItemsForDate(key=selectedDashboardDateKey()){
+  const block=data.trainingBlock;
+  const week=Math.max(1,Number(block?.currentWeek)||1);
+  const plan=typeof bpWeekPlan==='function'&&block?bpWeekPlan(block,week):(data.plan||[]);
+  return (plan||[]).filter(item=>{
+    if(['skipped','replaced'].includes(item?.status))return false;
+    return bellCanonicalPlanDateKey(item,block,week)===key;
+  });
+}
+function bellRepairActivePlanDates(){
+  const block=data.trainingBlock;if(!block)return false;
+  const week=Math.max(1,Number(block.currentWeek)||1);
+  let changed=false;
+  (data.plan||[]).forEach(item=>{
+    const canonical=bellCanonicalPlanDateKey(item,block,week);
+    if(canonical&&item.scheduledDate!==canonical){item.scheduledDate=canonical;changed=true;}
+  });
+  if(changed&&typeof saveData==='function')saveData({render:false});
+  return changed;
+}
+function premiumSelectedItems(){return bellActivePlanItemsForDate(selectedDashboardDateKey());}
 function premiumAllSessions(){return premiumSelectedItems().flatMap(sessionsFromPlanItem);}
 function premiumSessionType(session){return scheduleTypeForMission(session?.mission,session?.label,session?.detail)||'strength';}
 function premiumDisplayLabel(session){
-  const raw=String(session?.label||scaledTemplate(session?.mission)?.label||session?.mission||'Training')
-    .replace(/^\s*(?:AM|A\.?M\.?|PM|P\.?M\.?)\s*[-–—:|•]*\s*/i,'')
-    .replace(/\s*[-–—:|•]*\s*(?:AM|A\.?M\.?|PM|P\.?M\.?)\s*$/i,'')
-    .replace(/\s*\((?:AM|A\.?M\.?|PM|P\.?M\.?)\)\s*/ig,' ')
-    .trim();
-  const type=premiumSessionType(session);
-  if(type==='engine'){
-    return raw
-      .replace(/^\s*(?:engine|conditioning|cardio)\s*[-–—:|•]*\s*/i,'')
-      .replace(/\s*[-–—:|•]*\s*(?:engine|conditioning|cardio)\s*$/i,'')
-      .trim()||String(data.settings?.cardioType||'Engine');
-  }
-  const parts=raw.split(/\s+[—–|:]\s+/).map(x=>x.trim()).filter(Boolean);
-  if(parts.length>1&&/\b(?:upper|lower|full body|strength|hypertrophy|power|powerbuilding|bodybuilding|session|workout)\b/i.test(parts[0])){
-    return parts.slice(1).join(' — ');
-  }
-  return raw
-    .replace(/^\s*(?:upper|lower|full body)?\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|training|workout|session)(?:\s+[A-Z])?\s*[-–—:|•]*\s*/i,'')
-    .replace(/\s*[-–—:|•]*\s*(?:strength|hypertrophy|power|powerbuilding|bodybuilding|training|workout|session)\s*$/i,'')
-    .trim()||'Full Body';
+  if(typeof bellWorkoutDisplayLabel==="function")return bellWorkoutDisplayLabel(session);
+  return String(session?.label||scaledTemplate(session?.mission)?.label||session?.mission||"Training").trim();
 }
 function premiumInlineIcon(kind){
   const icons={
@@ -104,7 +112,7 @@ function renderPremiumMission(){
 }
 
 function premiumWeekSessionChip(session){
-  const type=premiumSessionType(session), title=escapeHtml(session.label||scaledTemplate(session.mission)?.label||session.mission);
+  const type=premiumSessionType(session), title=escapeHtml(premiumDisplayLabel(session));
   return `<div class="premium-week-chip ${type} ${session.completed?'completed':''}" title="${title}">${premiumInlineIcon(type)}${session.completed?'<i class="premium-week-chip-check">✓</i>':''}</div>`;
 }
 function premiumWeekRestChip(){return `<div class="premium-week-chip rest" title="Rest day">${premiumInlineIcon('rest')}</div>`;}
@@ -124,7 +132,7 @@ function renderPremiumWeek(){
   const host=byId('premiumWeekDays');if(!host)return;
   host.innerHTML=days.map((day,index)=>{
     const key=addLocalDays(monday,index),items=plan.filter(x=>(x.day===fullDays[index]||planDateKey(x)===key)&&!['skipped','replaced'].includes(x.status)),sessions=items.flatMap(sessionsFromPlanItem),allDone=sessions.length&&sessions.every(x=>x.completed),chips=sessions.length?sessions.slice(0,2).map(premiumWeekSessionChip).join(''):premiumWeekRestChip();
-    const label=sessions.length?sessions.map(x=>x.label||scaledTemplate(x.mission)?.label||x.mission).join(', '):'Rest / recovery';
+    const label=sessions.length?sessions.map(premiumDisplayLabel).join(', '):'Rest / recovery';
     const isActive=block===data.trainingBlock&&week===Number(block.currentWeek||1);
     const action=isActive?`setDashboardDate('${key}')`:`bpPreviewWeek(${week})`;
     return `<button class="premium-week-day-card ${key===selected?'selected':''} ${key===localDateKey()?'today':''} ${allDone?'completed':''} ${sessions.length>1?'two-a-day':''}" onclick="${action}" aria-label="${day} ${localDateFromKey(key).getDate()}: ${escapeHtml(label)}"><span>${day}</span><strong>${localDateFromKey(key).getDate()}</strong><div class="premium-week-chips">${chips}</div></button>`;
@@ -139,13 +147,13 @@ function renderPremiumWeek(){
 }
 
 function premiumReadinessMetric(value){return `${Math.max(1,Math.min(5,Math.round(Number(value)||1)))}/5`;}
-function premiumSleepDuration(r){const h=Math.max(0,Number(r.sleepHours)||0),m=Math.max(0,Number(r.sleepMinutes)||0);return `${h}h ${String(m).padStart(2,'0')}m`;}
+function premiumSleepDuration(r){if(typeof readinessSleepLabel==='function'&&(r?.checkInVersion==='quick-v1'||r?.sleepState))return readinessSleepLabel(r);const h=Math.max(0,Number(r.sleepHours)||0),m=Math.max(0,Number(r.sleepMinutes)||0);return `${h}h ${String(m).padStart(2,'0')}m`;}
 function renderPremiumReadiness(){
   const score=readinessScore(),status=readinessStatus(score),r=data.settings.readiness||{};
   const checkedIn=r.lastPromptDate===todayKey();
   const descriptions={GREEN:'High readiness. You are recovered and ready for the full training prescription.',YELLOW:'Moderate readiness. Train with purpose and let quality lead the day.',RED:'Low readiness. Recovery comes first, so today’s demand has been adjusted.'};
   setText('premiumReadinessScore',checkedIn?String(score):'—');setText('premiumReadinessStatus',checkedIn?status:'CHECK IN');setText('premiumReadinessDetail',checkedIn?descriptions[status]:'Complete today’s check-in to personalize your training.');
-  setText('premiumSleep',premiumSleepDuration(r));setText('premiumEnergy',premiumReadinessMetric(r.energy));setText('premiumSoreness',premiumReadinessMetric(r.recoveryStatus));setText('premiumMotivation',premiumReadinessMetric(r.motivation));
+  setText('premiumSleep',premiumSleepDuration(r));setText('premiumBody',typeof readinessBodyLabel==='function'?readinessBodyLabel(r):premiumReadinessMetric(r.recoveryStatus));setText('premiumEnergy',typeof readinessEnergyLabel==='function'?readinessEnergyLabel(r):premiumReadinessMetric(r.energy));setText('commandPain',typeof readinessPainLabel==='function'?readinessPainLabel(r):'None');setText('commandTime',typeof readinessTimeLabel==='function'?readinessTimeLabel(r):timeAvailabilityLabel(r.timeAvailability));
   const card=byId('premiumReadinessCard');if(card){card.dataset.status=status.toLowerCase();card.dataset.complete=checkedIn?'true':'false';card.setAttribute('aria-label',checkedIn?`Readiness ${score}, ${status}`:'Readiness check-in not completed');}
   const btn=card?.querySelector('.premium-readiness-update');if(btn)btn.textContent=(checkedIn?'Update':'Check In');
 }
@@ -194,7 +202,7 @@ function renderPremiumNext(){
   }
   if(!found){setText('premiumNextTitle','No upcoming session');setText('premiumNextDetail','Open the full schedule to plan ahead.');return;}
   const date=localDateFromKey(found.key), template=scaledTemplate(found.session.mission);
-  setText('premiumNextTitle',`${date.toLocaleDateString('en-US',{weekday:'long'})} · ${found.session.label||template?.label||found.session.mission}`);
+  setText('premiumNextTitle',`${date.toLocaleDateString('en-US',{weekday:'long'})} · ${premiumDisplayLabel(found.session)}`);
   setText('premiumNextDetail',`${Number(found.session.prescribedDuration)||Number(template?.duration)||30} min · Tap for full schedule`);
 }
 function renderPremiumDashboard(){renderPremiumQuote();renderPremiumReadiness();renderPremiumMission();renderPremiumNext();renderPremiumSupport();renderPremiumProgress();renderPremiumCoach();renderPremiumStandards();}

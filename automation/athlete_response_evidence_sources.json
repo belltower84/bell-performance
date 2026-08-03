@@ -1,0 +1,78 @@
+{
+  "version": "13.13.0",
+  "scope": "Primary human studies informing structured athlete-response inputs and conservative adaptive guardrails. These sources support measurement choices and cautious decision rules; they do not validate Bell as a medical device or guarantee outcomes.",
+  "sources": [
+    {
+      "id": "ranieri-2025-running-prescription",
+      "title": "Performance and Physiological Effects of Race Pace-Based Versus Heart Rate Variability-Guided Training Prescription in Runners",
+      "year": 2025,
+      "study_type": "randomized controlled trial",
+      "pmid": "39935030",
+      "doi": "10.1249/MSS.0000000000003671",
+      "supports": ["event-pace, heart-rate, and HRV information can represent distinct endurance-prescription signals", "individual response variation should be expected"]
+    },
+    {
+      "id": "silbernagel-2007-pain-monitoring",
+      "title": "Continued sports activity, using a pain-monitoring model, during rehabilitation in patients with Achilles tendinopathy: a randomized controlled study",
+      "year": 2007,
+      "study_type": "randomized controlled trial",
+      "pmid": "17307888",
+      "doi": "10.1177/0363546506298279",
+      "supports": ["pain should be explicitly monitored when training decisions are adjusted", "pain-monitoring rules must remain condition- and context-specific"]
+    },
+    {
+      "id": "dello-iacono-2023-autoregulation",
+      "title": "Personalizing Resistance Training Mitigates Neuromuscular and Perceived Fatigue: The Autoregulation Cluster Training Method",
+      "year": 2023,
+      "study_type": "randomized crossover study",
+      "pmid": "36918018",
+      "doi": "10.1123/ijspp.2022-0382",
+      "supports": ["personalized resistance-training structure can reduce fatigue", "completed performance and perceived fatigue are useful together"]
+    },
+    {
+      "id": "yang-2024-session-rpe",
+      "title": "Research application of session-RPE in monitoring the training load of elite endurance athletes",
+      "year": 2024,
+      "study_type": "observational training study",
+      "pmid": "38846717",
+      "pmcid": "PMC11155691",
+      "doi": "10.3389/fnins.2024.1341972",
+      "supports": ["session RPE and actual duration are useful internal-load inputs", "planned-versus-actual duration matters when interpreting session load"]
+    },
+    {
+      "id": "brink-2010-load-recovery-performance",
+      "title": "Monitoring load, recovery, and performance in young elite soccer players",
+      "year": 2010,
+      "study_type": "prospective cohort",
+      "pmid": "20145570",
+      "doi": "10.1519/JSC.0b013e3181c4d38b",
+      "supports": ["training duration, session RPE, recovery, and repeated field performance should be considered longitudinally", "frequent performance checks are preferable to one isolated observation"]
+    },
+    {
+      "id": "campbell-2021-wellness-caution",
+      "title": "Analysing the predictive capacity and dose-response of wellness in load monitoring",
+      "year": 2021,
+      "study_type": "multi-sport observational analysis",
+      "pmid": "33404378",
+      "doi": "10.1080/02640414.2020.1870303",
+      "supports": ["wellness responses alone have limited predictive capacity", "readiness should not independently drive large prescription changes"]
+    },
+    {
+      "id": "vesterinen-2013-hrv-adaptation",
+      "title": "Heart rate variability in prediction of individual adaptation to endurance training in recreational endurance runners",
+      "year": 2013,
+      "study_type": "longitudinal training study",
+      "pmid": "21812828",
+      "doi": "10.1111/j.1600-0838.2011.01365.x",
+      "supports": ["endurance adaptation varies between athletes", "recovery physiology can add context but should be interpreted with performance data"]
+    },
+    {
+      "id": "wearable-sleep-2025",
+      "title": "Monitoring Sleep and Nightly Recovery with Wrist-Worn Wearables: Links to Training Load and Performance Adaptations",
+      "year": 2025,
+      "study_type": "longitudinal monitoring study",
+      "pmid": "39860902",
+      "supports": ["sleep and nightly recovery can be tracked alongside training load", "recovery signals are contextual inputs rather than deterministic prescriptions"]
+    }
+  ]
+}

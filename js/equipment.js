@@ -109,29 +109,78 @@ function adaptExerciseToEquipment(exercise){
   return {...exercise,name:pick[1],cue:`Substituted for ${exercise.name} at ${activeEquipmentLocation().name}. ${exercise.cue||""}`,equipmentAdjusted:true,originalExercise:exercise.name};
 }
 function applyEquipmentToTemplate(template){return {...template,equipmentLocation:activeEquipmentLocation().name,exercises:template.exercises.map(adaptExerciseToEquipment).map(adaptExerciseToInjuries)};}
-function equipmentCheckboxesHtml(prefix,onchange=""){const change=onchange?` onchange="${onchange}"`:"";return EQUIPMENT_OPTIONS.map(([id,label])=>`<label class="equipment-option"><input type="checkbox" id="${prefix}-${id}" value="${id}"${change}> <span>${label}</span></label>`).join("");}
+let equipmentEditingLocationId="";
+let equipmentDraftLocationId="";
+function equipmentCheckboxesHtml(prefix,onchange=""){
+  const handler=onchange||(prefix==="equipment"?"updateEquipmentSelectionCount()":"");
+  const change=handler?` onchange="${handler}"`:"";
+  return EQUIPMENT_OPTIONS.map(([id,label])=>`<label class="equipment-option"><input type="checkbox" id="${prefix}-${id}" value="${id}"${change}> <span>${label}</span></label>`).join("");
+}
 function setEquipmentChecks(prefix,items){EQUIPMENT_OPTIONS.forEach(([id])=>{const el=document.getElementById(`${prefix}-${id}`);if(el)el.checked=items.includes(id);});}
 function readEquipmentChecks(prefix){return EQUIPMENT_OPTIONS.map(([id])=>id).filter(id=>document.getElementById(`${prefix}-${id}`)?.checked);}
-function applyEquipmentPreset(prefix,value){setEquipmentChecks(prefix,EQUIPMENT_PRESETS[value]||[]);}
+function applyEquipmentPreset(prefix,value){setEquipmentChecks(prefix,EQUIPMENT_PRESETS[value]||[]);if(prefix==="equipment")updateEquipmentSelectionCount();}
+function equipmentEscape(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char]);}
+function equipmentEnvironmentLabel(value){return ({commercial:"Commercial gym",home:"Home gym",minimal:"Minimal equipment",bodyweight:"Bodyweight only",travel:"Travel",custom:"Custom"})[value]||"Custom";}
+function equipmentEditorLocation(){normalizeEquipmentSettings();return data.settings.equipmentSetup.locations.find(x=>x.id===equipmentEditingLocationId)||null;}
+function equipmentNames(location){const selected=new Set(location?.equipment||[]);return EQUIPMENT_OPTIONS.filter(([id])=>selected.has(id)).map(([,label])=>label);}
+function equipmentSummaryText(location){const names=equipmentNames(location);if(!names.length)return "No equipment selected";const visible=names.slice(0,3).join(", ");return names.length>3?`${visible} +${names.length-3}`:visible;}
+function renderEquipmentLocationTable(){
+  const host=document.getElementById("equipmentLocationTable");if(!host)return;
+  normalizeEquipmentSettings();const setup=data.settings.equipmentSetup,active=activeEquipmentLocation();
+  host.innerHTML=`<div class="bell1364-equipment-table-head" aria-hidden="true"><span>Location</span><span>Setup</span><span>Equipment</span><span>Actions</span></div>${setup.locations.map(location=>{
+    const isActive=location.id===active.id,isDraft=location.id===equipmentDraftLocationId,id=equipmentEscape(location.id),name=equipmentEscape(location.name),environment=equipmentEscape(equipmentEnvironmentLabel(location.environment)),summary=equipmentEscape(equipmentSummaryText(location));
+    const badge=isActive?'<span>Active</span>':isDraft?'<span class="draft">Unsaved</span>':'';
+    return `<div class="bell1364-equipment-row ${isActive?"active":""} ${isDraft?"draft":""}"><div class="bell1364-equipment-location"><strong>${name}</strong>${badge}</div><div class="bell1364-equipment-environment">${environment}</div><div class="bell1364-equipment-summary"><strong>${location.equipment.length} items</strong><small>${summary}</small></div><div class="bell1364-equipment-row-actions">${isActive||isDraft?'':`<button class="secondary small-button" type="button" onclick="setActiveEquipmentLocation('${id}')">Use</button>`}<button class="secondary small-button" type="button" onclick="editEquipmentLocation('${id}')">Edit</button></div></div>`;
+  }).join("")}`;
+}
+function updateEquipmentSelectionCount(){const count=readEquipmentChecks("equipment").length;const out=document.getElementById("equipmentSelectionCount");if(out)out.textContent=`${count} selected`;}
 function renderEquipmentSettings(){
-  normalizeEquipmentSettings(); const setup=data.settings.equipmentSetup, active=activeEquipmentLocation();
-  const select=document.getElementById("activeLocationInput"); if(select){select.innerHTML=setup.locations.map(x=>`<option value="${x.id}">${x.name}</option>`).join("");select.value=active.id;}
-  const quick=document.getElementById("activeLocationQuick");if(quick){quick.innerHTML=setup.locations.map(x=>`<option value="${x.id}">${x.name}</option>`).join("");quick.value=active.id;}
-  const name=document.getElementById("equipmentLocationName");if(name)name.value=active.name;
-  const env=document.getElementById("equipmentEnvironment");if(env)env.value=active.environment||"custom";
-  setEquipmentChecks("equipment",active.equipment);
+  normalizeEquipmentSettings();const setup=data.settings.equipmentSetup,active=activeEquipmentLocation();
+  const select=document.getElementById("activeLocationInput");if(select){select.innerHTML=setup.locations.map(x=>`<option value="${equipmentEscape(x.id)}">${equipmentEscape(x.name)}</option>`).join("");select.value=active.id;}
+  const quick=document.getElementById("activeLocationQuick");if(quick){quick.innerHTML=setup.locations.map(x=>`<option value="${equipmentEscape(x.id)}">${equipmentEscape(x.name)}</option>`).join("");quick.value=active.id;}
+  renderEquipmentLocationTable();
+  const editor=document.getElementById("equipmentEditor"),editing=equipmentEditorLocation();
+  if(editor&&!editor.classList.contains("hidden")&&editing){
+    const name=document.getElementById("equipmentLocationName");if(name)name.value=editing.name;
+    const env=document.getElementById("equipmentEnvironment");if(env)env.value=editing.environment||"custom";
+    const title=document.getElementById("equipmentEditorTitle");if(title)title.textContent=`Edit ${editing.name}`;
+    setEquipmentChecks("equipment",editing.equipment);updateEquipmentSelectionCount();
+  }
   const label=document.getElementById("activeLocationLabel");if(label)label.textContent=active.name;
   const summary=document.getElementById("equipmentSummary");if(summary)summary.textContent=`${active.name}: ${active.equipment.length} equipment options available. Workouts will substitute unavailable movements automatically.`;
 }
-function switchEquipmentLocation(id){data.settings.equipmentSetup.activeLocationId=id;saveData();}
-function loadEquipmentLocation(){data.settings.equipmentSetup.activeLocationId=document.getElementById("activeLocationInput").value;saveData();}
+function setActiveEquipmentLocation(id){normalizeEquipmentSettings();if(!data.settings.equipmentSetup.locations.some(x=>x.id===id))return;data.settings.equipmentSetup.activeLocationId=id;saveData();renderEquipmentSettings();}
+function switchEquipmentLocation(id){setActiveEquipmentLocation(id);}
+function loadEquipmentLocation(){const select=document.getElementById("activeLocationInput");if(select)setActiveEquipmentLocation(select.value);}
+function editEquipmentLocation(id){normalizeEquipmentSettings();if(!data.settings.equipmentSetup.locations.some(x=>x.id===id))return;equipmentEditingLocationId=id;const editor=document.getElementById("equipmentEditor");if(editor)editor.classList.remove("hidden");renderEquipmentSettings();window.requestAnimationFrame(()=>editor?.scrollIntoView({behavior:"smooth",block:"nearest"}));}
+function cancelEquipmentEdit(){
+  normalizeEquipmentSettings();
+  if(equipmentDraftLocationId&&equipmentEditingLocationId===equipmentDraftLocationId){data.settings.equipmentSetup.locations=data.settings.equipmentSetup.locations.filter(x=>x.id!==equipmentDraftLocationId);equipmentDraftLocationId="";}
+  equipmentEditingLocationId="";document.getElementById("equipmentEditor")?.classList.add("hidden");renderEquipmentLocationTable();
+}
 function saveEquipmentLocation(){
-  normalizeEquipmentSettings();const active=activeEquipmentLocation();active.name=document.getElementById("equipmentLocationName").value.trim()||active.name;active.environment=document.getElementById("equipmentEnvironment").value;active.equipment=readEquipmentChecks("equipment");saveData();alert("Equipment location saved. Future workouts will adapt automatically.");
+  normalizeEquipmentSettings();const location=equipmentEditorLocation();if(!location)return;
+  location.name=document.getElementById("equipmentLocationName")?.value.trim()||location.name;
+  location.environment=document.getElementById("equipmentEnvironment")?.value||"custom";
+  location.equipment=readEquipmentChecks("equipment");
+  if(equipmentDraftLocationId===location.id)equipmentDraftLocationId="";
+  equipmentEditingLocationId="";document.getElementById("equipmentEditor")?.classList.add("hidden");saveData();renderEquipmentSettings();alert("Training location saved. Future workouts will adapt automatically.");
 }
 function addEquipmentLocation(){
-  normalizeEquipmentSettings();const name=prompt("Name this training location (for example Home, Commercial Gym, or Travel):","New Location");if(!name)return;const id=`location-${Date.now()}`;data.settings.equipmentSetup.locations.push({id,name,environment:"minimal",equipment:[...EQUIPMENT_PRESETS.minimal]});data.settings.equipmentSetup.activeLocationId=id;saveData();
+  normalizeEquipmentSettings();
+  if(equipmentDraftLocationId)data.settings.equipmentSetup.locations=data.settings.equipmentSetup.locations.filter(x=>x.id!==equipmentDraftLocationId);
+  const id=`location-${Date.now()}`;data.settings.equipmentSetup.locations.push({id,name:`Location ${data.settings.equipmentSetup.locations.length+1}`,environment:"minimal",equipment:[...EQUIPMENT_PRESETS.minimal]});equipmentDraftLocationId=id;equipmentEditingLocationId=id;editEquipmentLocation(id);
 }
-function deleteEquipmentLocation(){normalizeEquipmentSettings();if(data.settings.equipmentSetup.locations.length<=1){alert("Keep at least one training location.");return;}const active=activeEquipmentLocation();if(!confirm(`Delete ${active.name}?`))return;data.settings.equipmentSetup.locations=data.settings.equipmentSetup.locations.filter(x=>x.id!==active.id);data.settings.equipmentSetup.activeLocationId=data.settings.equipmentSetup.locations[0].id;saveData();}
+function deleteEquipmentLocation(){
+  normalizeEquipmentSettings();if(data.settings.equipmentSetup.locations.length<=1){alert("Keep at least one training location.");return;}
+  const location=equipmentEditorLocation();if(!location)return;if(!confirm(`Delete ${location.name}?`))return;
+  data.settings.equipmentSetup.locations=data.settings.equipmentSetup.locations.filter(x=>x.id!==location.id);
+  if(data.settings.equipmentSetup.activeLocationId===location.id)data.settings.equipmentSetup.activeLocationId=data.settings.equipmentSetup.locations[0].id;
+  if(equipmentDraftLocationId===location.id)equipmentDraftLocationId="";
+  equipmentEditingLocationId="";document.getElementById("equipmentEditor")?.classList.add("hidden");saveData();renderEquipmentSettings();
+}
+function selectAllEquipment(){setEquipmentChecks("equipment",EQUIPMENT_OPTIONS.map(([id])=>id));updateEquipmentSelectionCount();}
+function clearEquipmentSelection(){setEquipmentChecks("equipment",[]);updateEquipmentSelectionCount();}
 function saveOnboardingEquipment(){
   if(!onboardingLocations.length) initializeOnboardingLocationEditor();
   data.settings.equipmentSetup={

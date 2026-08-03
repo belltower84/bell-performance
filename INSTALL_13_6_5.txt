@@ -1,0 +1,9 @@
+Bell Performance 13.6.5 — GitHub Pages Installation
+
+1. Back up the current repository.
+2. Replace the repository contents with the contents of this package.
+3. Commit and push the changes.
+4. Wait for GitHub Pages to deploy.
+5. Hard refresh the app once so the 13.6.5 service worker replaces the prior cache.
+
+No data migration is required. Existing local profile and workout data remain compatible.

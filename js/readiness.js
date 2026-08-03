@@ -1,5 +1,11 @@
 "use strict";
 
+function bellAppControlMode() {
+  const mode = data?.settings?.appControlMode || data?.athleteProfile?.coaching?.controlMode || "coach";
+  return mode === "planner" ? "planner" : "coach";
+}
+function bellCoachModeEnabled() { return bellAppControlMode() === "coach"; }
+
 function sleepDurationScore(readiness = data.settings.readiness || {}) {
   const total=Math.max(0,(Number(readiness.sleepHours)||0)+(Number(readiness.sleepMinutes)||0)/60);
   if(total>=7&&total<=9)return 10;
@@ -10,6 +16,15 @@ function sleepDurationScore(readiness = data.settings.readiness || {}) {
 }
 function rawDailyReadinessScore(readiness = data.settings.readiness || {}) {
   const five=(value,fallback=4)=>Math.max(1,Math.min(5,Number.isFinite(+value)?+value:fallback));
+  const quickCheckIn=readiness.checkInVersion==="quick-v1"||Boolean(readiness.sleepState||readiness.bodyState||readiness.energyState);
+  if(quickCheckIn){
+    const sleep=five(readiness.sleepQuality,4);
+    const body=five(readiness.recoveryStatus,4);
+    const energy=five(readiness.energy,4);
+    let score=Math.round((sleep*.35+body*.35+energy*.30)*20);
+    if(readiness.painToday===true||readiness.painToday==="yes")score=Math.min(score,45);
+    return Math.max(0,Math.min(100,score));
+  }
   const duration=sleepDurationScore(readiness);
   const sleepQuality=five(readiness.sleepQuality)*2;
   const energy=five(readiness.energy)*2;
@@ -57,6 +72,8 @@ function readinessScore() {
   let adjusted = weekly.hasData ? Math.round(today * .72 + weekly.score * .28) : today;
   if (weekly.lowFeedbackCount >= 2) adjusted = Math.min(adjusted, 68);
   if (weekly.lowFeedbackCount >= 3) adjusted = Math.min(adjusted, 50);
+  const current=data.settings.readiness||{};
+  if(current.lastPromptDate===todayKey()&&(current.painToday===true||current.painToday==="yes"))adjusted=Math.min(adjusted,45);
   return Math.max(0, Math.min(100, adjusted));
 }
 
@@ -73,16 +90,20 @@ function trainingStatusText(status = readinessStatus()) {
 }
 
 function timeCapacityMinutes() {
-  return ({1:30, 2:45, 3:60, 4:75, 5:90})[Number(data.settings.readiness?.timeAvailability) || 3];
+  const readiness=data.settings.readiness||{};
+  const direct=Number(readiness.timeMinutes);
+  if(Number.isFinite(direct)&&direct>=30)return Math.min(120,direct);
+  return ({1:30,2:45,3:60,4:75,5:90,6:105,7:120})[Number(readiness.timeAvailability)||3];
 }
 
 function scalingProfile() {
-  const status = readinessStatus();
+  const actualStatus = readinessStatus();
   const timeMinutes = timeCapacityMinutes();
   const weekly = weeklyReadinessSummary();
-  if (status === "GREEN") return { status, load:1, sets:1, conditioning:1, timeMinutes, label:"You're ready for quality work. Today's Strength and Engine plan will fit the time you have.", weekly };
-  if (status === "YELLOW") return { status, load:.90, sets:.72, conditioning:.65, timeMinutes, label:"Train smart today. Keep the primary work, reduce accessory volume, and make Engine work easy or optional.", weekly };
-  return { status, load:.75, sets:.45, conditioning:.35, timeMinutes, label:"Recovery is the priority. Bell Performance has reduced today's demand and shifted Engine work toward easy recovery.", weekly };
+  if (!bellCoachModeEnabled()) return { status:"GREEN", actualStatus, adaptive:false, load:1, sets:1, conditioning:1, timeMinutes:999, reportedTimeMinutes:timeMinutes, label:"Workout Planner mode keeps the scheduled session unchanged. Readiness remains visible so you can decide whether to train, modify, or recover.", weekly };
+  if (actualStatus === "GREEN") return { status:actualStatus, actualStatus, adaptive:true, load:1, sets:1, conditioning:1, timeMinutes, label:"You're ready for quality work. Today's Strength and Engine plan will fit the time you have.", weekly };
+  if (actualStatus === "YELLOW") return { status:actualStatus, actualStatus, adaptive:true, load:.90, sets:.72, conditioning:.65, timeMinutes, label:"Train smart today. Keep the primary work, reduce accessory volume, and make Engine work easy or optional.", weekly };
+  return { status:actualStatus, actualStatus, adaptive:true, load:.75, sets:.45, conditioning:.35, timeMinutes, label:"Recovery is the priority. Bell Performance has reduced today's demand and shifted Engine work toward easy recovery.", weekly };
 }
 
 function hasTodayReadiness() {
@@ -116,14 +137,26 @@ function commitReadiness(values) {
 function saveReadiness() {
   commitReadiness(collectReadinessFrom(""));
   saveData();
-  alert(`Check-in saved. Mission Status: ${trainingStatusText()}.`);
+  alert(bellCoachModeEnabled()?`Check-in saved. Mission Status: ${trainingStatusText()}.`:`Check-in saved. Readiness: ${readinessScore()}/100. Workout Planner mode left the scheduled session unchanged.`);
 }
 
 function saveDailyReadinessPrompt() {
-  commitReadiness(collectReadinessFrom("prompt"));
+  if(!quickReadinessIsComplete()){
+    updateQuickReadinessSubmitState();
+    return;
+  }
+  commitReadiness(collectQuickReadinessFromPrompt());
   document.getElementById("dailyReadinessModal")?.classList.add("hidden");
-  saveData();
+  const launchTour=Boolean(data.settings.pendingFirstFlightTour&&!data.settings.firstFlightTourComplete);
+  saveData({render:false});
   renderApp();
+  if(launchTour){
+    data.settings.pendingFirstFlightTour=false;
+    saveData({render:false});
+    window.setTimeout(()=>{
+      if(typeof launchFirstFlightTour==="function")launchFirstFlightTour();
+    },300);
+  }
 }
 
 function readinessSliderLabel(name,value){
@@ -132,30 +165,144 @@ function readinessSliderLabel(name,value){
     energy:["","Depleted","Low","Functional","Energized","Fully energized"],
     recoveryStatus:["","Very sore","Sore","Manageable","Mostly fresh","Fresh and pain-free"],
     motivation:["","Very low","Low","Willing","Ready","Highly motivated"],
-    timeAvailability:["","20–30 min","30–45 min","45–60 min","60–75 min","90+ min"]
+    timeAvailability:["","30 min","45 min","60 min","75 min","90 min","105 min","120 min"]
   };
   return labels[name]?.[value]||String(value);
 }
+
+let quickReadinessDraft={sleep:null,body:null,energy:null,pain:null,time:null};
+const QUICK_READINESS_MAP={
+  sleep:{poor:2,okay:4,good:5},
+  body:{"beat-up":2,normal:4,fresh:5},
+  energy:{drained:2,steady:4,"fired-up":5},
+  time:{30:1,45:2,60:3,75:4,90:5,105:6,120:7}
+};
+
+function readinessSleepLabel(readiness=data.settings.readiness||{}){
+  if(readiness.sleepState)return ({poor:"Poor",okay:"Okay",good:"Good"})[readiness.sleepState]||"Okay";
+  const value=Number(readiness.sleepQuality)||3;
+  return value>=5?"Good":value>=3?"Okay":"Poor";
+}
+function readinessBodyLabel(readiness=data.settings.readiness||{}){
+  if(readiness.bodyState)return ({"beat-up":"Beat Up",normal:"Normal",fresh:"Fresh"})[readiness.bodyState]||"Normal";
+  const value=Number(readiness.recoveryStatus)||3;
+  return value>=5?"Fresh":value>=3?"Normal":"Beat Up";
+}
+function readinessEnergyLabel(readiness=data.settings.readiness||{}){
+  if(readiness.energyState)return ({drained:"Drained",steady:"Steady","fired-up":"Fired Up"})[readiness.energyState]||"Steady";
+  const value=Number(readiness.energy)||3;
+  return value>=5?"Fired Up":value>=3?"Steady":"Drained";
+}
+function readinessPainLabel(readiness=data.settings.readiness||{}){
+  return readiness.painToday===true||readiness.painToday==="yes"?"Review":"None";
+}
+function readinessTimeLabel(readiness=data.settings.readiness||{}){
+  const minutes=Number(readiness.timeMinutes)||timeCapacityMinutes();
+  return `${minutes} min`;
+}
+
+function updateReadinessControlModeUI(){
+  const coachMode=bellCoachModeEnabled();
+  const dailyTime=document.getElementById("dailyTimeQuestion");if(dailyTime)dailyTime.hidden=!coachMode;
+  const onboardingTime=document.getElementById("onboardingTimeAvailability")?.closest("label");if(onboardingTime)onboardingTime.hidden=!coachMode;
+  const submit=document.getElementById("quickReadinessSubmit");if(submit)submit.textContent=coachMode?"Build Today’s Mission":"Save Today’s Check-In";
+}
 function updateReadinessSliderDisplay(){
+  updateReadinessControlModeUI();
   const sleep=document.getElementById("promptSleepDurationMinutes");
   if(sleep){const minutes=+sleep.value||0;const output=document.getElementById("promptSleepDurationValue");if(output)output.textContent=`${Math.floor(minutes/60)}h ${String(minutes%60).padStart(2,"0")}m`;}
   ["sleepQuality","energy","recoveryStatus","motivation","timeAvailability"].forEach(name=>{
     const input=document.getElementById(`prompt${name}`),output=document.getElementById(`prompt${name}Value`);if(input&&output)output.textContent=`${input.value} · ${readinessSliderLabel(name,+input.value)}`;
   });
 }
+function setQuickChoiceUI(group,value){
+  document.querySelectorAll(`[data-readiness-group="${group}"]`).forEach(button=>{
+    const selected=String(button.dataset.value)===String(value);
+    button.classList.toggle("selected",selected);
+    button.setAttribute("aria-pressed",selected?"true":"false");
+  });
+}
+function selectDailyReadinessChoice(group,value){
+  if(!["sleep","body","energy"].includes(group))return;
+  quickReadinessDraft[group]=value;
+  setQuickChoiceUI(group,value);
+  updateQuickReadinessSubmitState();
+}
+function selectDailyPain(value){
+  quickReadinessDraft.pain=value;
+  setQuickChoiceUI("pain",value);
+  const detail=document.getElementById("quickPainDetail");if(detail)detail.classList.toggle("hidden",value!=="yes");
+  if(value!=="yes"){const notes=document.getElementById("promptPainNotes");if(notes)notes.value="";}
+  updateQuickReadinessSubmitState();
+}
+function selectDailyTime(minutes){
+  quickReadinessDraft.time=Number(minutes);
+  setQuickChoiceUI("time",Number(minutes));
+  updateQuickReadinessSubmitState();
+}
+function quickReadinessIsComplete(){
+  const core=Boolean(quickReadinessDraft.sleep&&quickReadinessDraft.body&&quickReadinessDraft.energy&&quickReadinessDraft.pain);
+  const timeReady=!bellCoachModeEnabled()||Number.isFinite(Number(quickReadinessDraft.time));
+  const painNote=String(document.getElementById("promptPainNotes")?.value||"").trim();
+  const painReady=quickReadinessDraft.pain!=="yes"||painNote.length>=3;
+  return core&&timeReady&&painReady;
+}
+function updateQuickReadinessSubmitState(){
+  updateReadinessControlModeUI();
+  const submit=document.getElementById("quickReadinessSubmit"),progress=document.getElementById("quickReadinessProgress");
+  const required=bellCoachModeEnabled()?5:4;
+  const complete=[quickReadinessDraft.sleep,quickReadinessDraft.body,quickReadinessDraft.energy,quickReadinessDraft.pain].filter(Boolean).length+(bellCoachModeEnabled()&&quickReadinessDraft.time?1:0);
+  const painNote=String(document.getElementById("promptPainNotes")?.value||"").trim();
+  const needsPainNote=quickReadinessDraft.pain==="yes"&&painNote.length<3;
+  if(submit)submit.disabled=!quickReadinessIsComplete();
+  if(progress)progress.textContent=needsPainNote?"Add a short pain note so Bell knows what to protect.":complete>=required?"Check-in complete. Your score will appear on the dashboard.":`${complete} of ${required} answered`;
+}
+function collectQuickReadinessFromPrompt(){
+  const sleep=quickReadinessDraft.sleep,body=quickReadinessDraft.body,energyState=quickReadinessDraft.energy;
+  const sleepMinutes=({poor:330,okay:405,good:480})[sleep]||420;
+  const energy=QUICK_READINESS_MAP.energy[energyState]||4;
+  const time=Number(quickReadinessDraft.time)||60;
+  return {
+    checkInVersion:"quick-v1",
+    sleepState:sleep,
+    bodyState:body,
+    energyState,
+    painToday:quickReadinessDraft.pain==="yes",
+    painNotes:String(document.getElementById("promptPainNotes")?.value||"").trim(),
+    timeMinutes:time,
+    timeAvailability:QUICK_READINESS_MAP.time[time]||3,
+    sleepHours:Math.floor(sleepMinutes/60),
+    sleepMinutes:sleepMinutes%60,
+    sleepQuality:QUICK_READINESS_MAP.sleep[sleep]||4,
+    recoveryStatus:QUICK_READINESS_MAP.body[body]||4,
+    energy,
+    motivation:energy
+  };
+}
 function populateReadinessPrompt(){
-  const r=data.settings.readiness||{};
-  const sleep=document.getElementById("promptSleepDurationMinutes");if(sleep)sleep.value=Math.max(180,Math.min(720,(Number(r.sleepHours)||7)*60+(Number(r.sleepMinutes)||0)));
-  const defaults={sleepQuality:4,recoveryStatus:4,energy:4,motivation:4,timeAvailability:3};
-  Object.keys(defaults).forEach(name=>{const el=document.getElementById(`prompt${name}`);if(el)el.value=r[name]??defaults[name];});
-  updateReadinessSliderDisplay();
+  updateReadinessControlModeUI();
+  const r=data.settings.readiness||{},todayComplete=r.lastPromptDate===todayKey();
+  quickReadinessDraft={
+    sleep:todayComplete?(r.sleepState||((Number(r.sleepQuality)||3)>=5?"good":(Number(r.sleepQuality)||3)>=3?"okay":"poor")):null,
+    body:todayComplete?(r.bodyState||((Number(r.recoveryStatus)||3)>=5?"fresh":(Number(r.recoveryStatus)||3)>=3?"normal":"beat-up")):null,
+    energy:todayComplete?(r.energyState||((Number(r.energy)||3)>=5?"fired-up":(Number(r.energy)||3)>=3?"steady":"drained")):null,
+    pain:todayComplete?(r.painToday?"yes":"no"):null,
+    time:todayComplete?(Number(r.timeMinutes)||({1:30,2:45,3:60,4:75,5:90,6:105,7:120})[Number(r.timeAvailability)]||60):null
+  };
+  ["sleep","body","energy","pain","time"].forEach(group=>setQuickChoiceUI(group,quickReadinessDraft[group]));
+  const notes=document.getElementById("promptPainNotes");if(notes)notes.value=todayComplete?String(r.painNotes||""):"";
+  const detail=document.getElementById("quickPainDetail");if(detail)detail.classList.toggle("hidden",quickReadinessDraft.pain!=="yes");
+  updateQuickReadinessSubmitState();
+}
+function openDailyReadiness(){
+  populateReadinessPrompt();
+  document.getElementById("dailyReadinessModal")?.classList.remove("hidden");
 }
 function maybePromptDailyReadiness() {
-  if (!data.settings.coachMessages?.setupComplete || hasTodayReadiness()) return;
+  if (!data.settings.coachMessages?.setupComplete || hasTodayReadiness() || !bellCoachModeEnabled()) return;
   const modal = document.getElementById("dailyReadinessModal");
   if (!modal) return;
-  populateReadinessPrompt();
-  modal.classList.remove("hidden");
+  openDailyReadiness();
 }
 
 function pendingFeedbackSession(){return (data.history||[]).find(x=>x.completedAt===data.pendingFeedbackSessionId);}

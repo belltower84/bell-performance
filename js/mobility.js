@@ -144,8 +144,9 @@ function renderMobilityRoutineScreen() {
   const minutesSelect = document.getElementById("mobilityRoutineMinutesSelect");
   if (focusSelect) focusSelect.value = data.mobility.focus || "Auto";
   if (minutesSelect) minutesSelect.value = String(minutes);
-  setText("mobilityRoutineTitle", done ? "Mobility Complete" : "Daily Mobility");
-  setText("mobilityRoutineHeroTitle", `${minutes} min ${focus}`);
+  const recoveryOnlyDay = typeof premiumAllSessions === "function" && premiumAllSessions().length === 0;
+  setText("mobilityRoutineTitle", done ? "Recovery Complete" : recoveryOnlyDay ? "Recovery Session" : "Daily Mobility");
+  setText("mobilityRoutineHeroTitle", recoveryOnlyDay ? `${minutes} min ${focus} Recovery` : `${minutes} min ${focus}`);
   setText("mobilityRoutineDuration", `${minutes} min`);
   setText("mobilityRoutineFocus", focus);
   setText("mobilityRoutineReason", data.mobility.focus === "Auto" ? `Auto-selected ${focus} to support today's training.` : `${focus} recovery routine selected.`);
@@ -166,7 +167,7 @@ function renderMobilityRoutineScreen() {
   const hint = document.getElementById("mobilityRoutineFinishHint");
   if (finish) {
     finish.disabled = done || completed < total;
-    finish.textContent = done ? "Mobility Completed ✓" : completed < total ? `Complete ${total - completed} More Movement${total - completed === 1 ? "" : "s"}` : "Finish Mobility Routine";
+    finish.textContent = done ? "Recovery Completed ✓" : completed < total ? `Complete ${total - completed} More Movement${total - completed === 1 ? "" : "s"}` : recoveryOnlyDay ? "Finish Recovery Session" : "Finish Mobility Routine";
   }
   if (hint) hint.textContent = done ? "Recovery mobility is complete for this day." : completed < total ? "Check off every movement before finishing the routine." : "Routine complete. Finish to record recovery work and earn XP.";
 }

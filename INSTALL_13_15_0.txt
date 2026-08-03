@@ -1,0 +1,34 @@
+BELL PERFORMANCE 13.15.0 INSTALLATION
+Closed-Loop Prescription Application
+
+SAFE UPGRADE
+1. In GitHub Desktop, confirm the active Bell Performance branch.
+2. Commit or stash any current work.
+3. Extract Bell_Performance_13_15_0_Closed_Loop_Prescription_Application_GitHub_Ready.zip.
+4. Open the extracted folder and copy every file and folder inside it.
+5. Paste the contents into the root of the Bell Performance repository.
+6. Choose Replace files in the destination when Windows asks.
+7. Confirm index.html, js/, css/, backend/, automation/, manifest.json, and sw.js remain directly in the repository root.
+8. Commit with: Add closed-loop prescription application 13.15.0
+9. Push the working branch and allow Bell Core to redeploy.
+10. Hard-refresh the web app or reinstall the PWA so cache bell-performance-13-15-0 replaces the prior cache.
+
+NO DATABASE MIGRATION
+13.15.0 stores prescription applications inside the existing athlete profile and plan JSON documents. Bell Core does not require a schema migration.
+
+VALIDATION
+From the repository root in PowerShell:
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+.\automation\run-closed-loop-prescription-validation.ps1
+
+Expected result: 20/20 closed-loop prescription cases passed.
+Report: automation\prescription_application_reports\latest\index.html
+
+MANUAL SMOKE TEST
+- Complete a successful strength session twice and confirm the next comparable strength prescription progresses.
+- Confirm an intervening engine session is unchanged.
+- Reload before starting the adapted workout and confirm the application remains assigned.
+- Complete the adapted workout and confirm the application is consumed rather than applied again.
+- Record pain on one movement and confirm only that movement receives a protected variation.
+- Trigger a safety hold fixture and confirm the next hard exposure becomes recovery.

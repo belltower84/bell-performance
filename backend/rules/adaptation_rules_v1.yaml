@@ -1,0 +1,74 @@
+{
+  "adaptation_rulebook_version": "1.0.0",
+  "status": "draft-approved",
+  "governance": {
+    "principle": "Preserve the mission-critical adaptation while reducing avoidable risk and fatigue.",
+    "medical_boundary": "Bell does not diagnose injury or illness. Red-flag symptoms stop training and prompt appropriate medical evaluation.",
+    "hard_safety_rules_override_training_priority": true,
+    "all_changes_require_an_audit_record": true
+  },
+  "readiness_weights": {
+    "sleep": 0.22,
+    "muscular": 0.18,
+    "cardiovascular": 0.15,
+    "psychological": 0.12,
+    "stress": 0.13,
+    "pain_safety": 0.20
+  },
+  "readiness_bands": {
+    "green": {"minimum": 80, "default_action": "proceed"},
+    "yellow": {"minimum": 65, "default_action": "modify_light"},
+    "orange": {"minimum": 45, "default_action": "modify_major"},
+    "red": {"minimum": 0, "default_action": "recovery_or_stop"}
+  },
+  "thresholds": {
+    "sleep_hours_severe": 4.5,
+    "sleep_hours_low": 6.0,
+    "soreness_high": 7,
+    "soreness_moderate": 5,
+    "pain_stop": 8,
+    "pain_modify": 5,
+    "stress_high": 8,
+    "motivation_low": 3,
+    "performance_rpe_drift": 1.5,
+    "underperformance_percent": 8,
+    "minimum_training_minutes": 20
+  },
+  "red_flags": [
+    "chest pain", "fainting", "severe shortness of breath", "new neurological symptoms",
+    "suspected concussion", "uncontrolled bleeding", "acute deformity", "inability to bear weight"
+  ],
+  "illness_rules": {
+    "fever": "stop",
+    "vomiting_or_diarrhea": "stop",
+    "chest_symptoms": "stop",
+    "systemic_body_aches": "recovery",
+    "mild_above_neck_only": "reduce"
+  },
+  "action_modifiers": {
+    "proceed": {"volume": 1.0, "intensity": 1.0, "rest": 1.0},
+    "modify_light": {"volume": 0.85, "intensity": 0.95, "rest": 1.10},
+    "modify_major": {"volume": 0.60, "intensity": 0.85, "rest": 1.20},
+    "recovery": {"volume": 0.0, "intensity": 0.0, "rest": 1.0}
+  },
+  "regional_rules": {
+    "low back": {"avoid_patterns": ["Hinge"], "reduce_patterns": ["Squat"], "preferred_changes": ["remove_axial_loading", "supported_variation"]},
+    "knee": {"avoid_patterns": ["Lunge"], "reduce_patterns": ["Squat", "Run", "Sprint"], "preferred_changes": ["reduced_rom", "low_impact"]},
+    "shoulder": {"avoid_patterns": ["Vertical Push"], "reduce_patterns": ["Horizontal Push"], "preferred_changes": ["neutral_grip", "supported_variation"]},
+    "elbow": {"reduce_patterns": ["Elbow Flexion", "Elbow Extension", "Horizontal Push", "Vertical Pull"], "preferred_changes": ["neutral_grip"]},
+    "hamstring": {"avoid_patterns": ["Sprint"], "reduce_patterns": ["Hinge", "Run"], "preferred_changes": ["low_impact"]},
+    "ankle": {"avoid_patterns": ["Jump", "Sprint"], "reduce_patterns": ["Run", "Lunge"], "preferred_changes": ["cycle_or_row"]}
+  },
+  "time_priority": ["Primary Lift", "Secondary Compound", "Hypertrophy Compound", "Accessory", "Core", "Finisher"],
+  "missed_session_rules": {
+    "do_not_double_high_systemic_sessions": true,
+    "maximum_shift_days": 2,
+    "drop_priority_order": ["Accessory", "Aerobic Base", "Hypertrophy"],
+    "preserve_priority_order": ["Event Specific", "Primary Strength", "Threshold", "Long Run"]
+  },
+  "follow_up": {
+    "orange_recheck_hours": 24,
+    "pain_recheck_hours": 24,
+    "repeated_underperformance_sessions": 2
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "reasoning_rulebook_version": "1.0.0",
+  "decision_thresholds": {
+    "minimum_option_score": 60,
+    "minimum_confidence": 0.55,
+    "medical_red_flag_override": true,
+    "maximum_hard_sessions_rolling_4_days": 3,
+    "minimum_hours_between_high_lower_sessions": 48
+  },
+  "weights": {
+    "mission_alignment": 0.24,
+    "safety": 0.24,
+    "recovery_fit": 0.16,
+    "progression_continuity": 0.14,
+    "schedule_fit": 0.10,
+    "evidence_strength": 0.07,
+    "athlete_preference": 0.05
+  },
+  "actions": {
+    "proceed": {"base": 72, "description": "Keep the planned session."},
+    "modify_session": {"base": 70, "description": "Preserve the objective while reducing cost or risk."},
+    "swap_session": {"base": 64, "description": "Use a different session to preserve the weekly objective."},
+    "move_session": {"base": 62, "description": "Move the session to a safer recovery window."},
+    "recovery": {"base": 60, "description": "Replace training with recovery work."},
+    "deload": {"base": 58, "description": "Reduce several days of volume and intensity."},
+    "escalate": {"base": 100, "description": "Stop training and seek appropriate evaluation."}
+  },
+  "conflict_precedence": [
+    "medical_safety",
+    "acute_pain",
+    "illness",
+    "mission_criticality",
+    "recovery_capacity",
+    "progression_continuity",
+    "schedule_preference",
+    "novelty"
+  ],
+  "reason_codes": {
+    "RED_FLAG": "A medical red flag overrides training objectives.",
+    "PAIN_HIGH": "High pain makes loading the affected region inappropriate.",
+    "READINESS_LOW": "Low readiness raises the cost of the planned session.",
+    "FATIGUE_HIGH": "Accumulated fatigue reduces the expected benefit-to-cost ratio.",
+    "COMPLIANCE_LOW": "The plan should be simplified before adding complexity.",
+    "MISSION_CRITICAL": "This session has high mission value and should be preserved when safe.",
+    "TIME_LIMIT": "The session must fit the athlete's available time.",
+    "PLATEAU": "Repeated underperformance suggests progression should pause or change.",
+    "TRAVEL": "Environment or equipment constraints require substitution.",
+    "RECOVERY_TREND": "Recent recovery data supports a conservative adjustment."
+  }
+}

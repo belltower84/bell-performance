@@ -1,6 +1,6 @@
 "use strict";
 
-/* Bell Performance 8.3: expert event-coaching systems. */
+/* Bell Performance 13.12.3: event routing, canonical roles, and scope-aware coaching. */
 const BELL_EVENT_FAMILIES = {
   running: {
     label:"Running Event",
@@ -13,6 +13,18 @@ const BELL_EVENT_FAMILIES = {
     readinessYellow:"Keep the planned duration but convert hard running to easy aerobic work when mechanics or recovery are compromised.",
     readinessRed:"Replace running intensity with walking, mobility, or brief easy cross-training. Resume quality only after recovery improves.",
     eventDay:"Use the rehearsed warm-up, pacing, fueling, shoes, and race strategy. Nothing new on event day."
+  },
+  cycling: {
+    label:"Cycling Event",
+    events:["Cycling Time Trial"],
+    taperWeeks:2,
+    simulationEvery:3,
+    priorities:["aerobic volume consistency","threshold power","event pacing","position durability","taper freshness"],
+    progression:"Build easy riding volume first, then extend threshold and event-paced work while protecting the long ride and strength support.",
+    missedRule:"Do not stack missed intensity. Preserve the long ride and one quality session, then resume the plan.",
+    readinessYellow:"Keep the planned duration but convert threshold or event-paced work to easy spinning when recovery is compromised.",
+    readinessRed:"Use easy spinning, walking, mobility, or rest. Remove hard intervals and long event simulations.",
+    eventDay:"Use the rehearsed warm-up, pacing, position, equipment, hydration, and fueling plan. Nothing new on event day."
   },
   multisport: {
     label:"Multisport Endurance",
@@ -100,6 +112,23 @@ function currentEventFamily(){
   const id=currentEventFamilyId();
   return id?BELL_EVENT_FAMILIES[id]:null;
 }
+function customEventDemandProfile(mission=currentEventMission()){
+  if(!mission||mission.eventType!=="Custom Sport Event")return null;
+  return mission.eventDemandProfile||mission.customDemandProfile||null;
+}
+function customEventScopeStatus(mission=currentEventMission()){
+  if(!mission||mission.eventType!=="Custom Sport Event")return {status:"EVENT_SPECIFIC",reason:"Known event type uses a calibrated event family."};
+  const profile=customEventDemandProfile(mission)||{};
+  const movement=Array.isArray(profile.movementDemands)?profile.movementDemands.filter(Boolean):String(profile.movementDemands||"").trim();
+  const equipment=Array.isArray(profile.equipment)?profile.equipment.filter(Boolean):String(profile.equipment||"").trim();
+  const duration=Number(profile.durationMinutes||profile.eventDurationMinutes||0);
+  const scoring=String(profile.scoringFormat||profile.scoring||"").trim();
+  const workRest=String(profile.workRestPattern||profile.workToRest||"").trim();
+  const complete=duration>0&&Boolean(movement&&movement.length)&&Boolean(equipment&&equipment.length)&&Boolean(scoring)&&Boolean(workRest);
+  return complete
+    ?{status:"DEFINED",reason:"Custom event duration, scoring, movement, equipment, and work-to-rest demands are defined.",profile}
+    :{status:"SCOPE_LIMITED",reason:"Custom event needs duration, scoring, movement, equipment, and work-to-rest demands before Bell can claim event-specific scientific routing.",profile};
+}
 function eventWeeksRemaining(){
   const block=data.trainingBlock||{};
   return Math.max(0,(Number(block.lengthWeeks)||12)-(Number(block.currentWeek)||1));
@@ -118,11 +147,13 @@ function eventPhaseDetail(){
   return {id:"competition",label:"Competition Preparation",volumeScale:.82,intensityScale:1,specificity:.92};
 }
 function eventReadinessDecision(){
-  const family=currentEventFamily(),status=typeof readinessStatus==="function"?readinessStatus(readinessScore()):"GREEN";
+  const family=currentEventFamily(),actualStatus=typeof readinessStatus==="function"?readinessStatus(readinessScore()):"GREEN";
   if(!family)return null;
-  if(status==="RED")return {status,setScale:.5,intensityScale:.78,engineMode:"recovery",message:family.readinessRed};
-  if(status==="YELLOW")return {status,setScale:.75,intensityScale:.9,engineMode:"easy",message:family.readinessYellow};
-  return {status,setScale:1,intensityScale:1,engineMode:"planned",message:"Proceed with the prescribed event-specific work and finish with repeatable quality."};
+  const coachMode=typeof bellCoachModeEnabled!=="function"||bellCoachModeEnabled();
+  if(!coachMode)return {status:actualStatus,setScale:1,intensityScale:1,engineMode:"planned",message:"Workout Planner mode keeps the scheduled event session unchanged. Readiness is informational."};
+  if(actualStatus==="RED")return {status:actualStatus,setScale:.5,intensityScale:.78,engineMode:"recovery",message:family.readinessRed};
+  if(actualStatus==="YELLOW")return {status:actualStatus,setScale:.75,intensityScale:.9,engineMode:"easy",message:family.readinessYellow};
+  return {status:actualStatus,setScale:1,intensityScale:1,engineMode:"planned",message:"Proceed with the prescribed event-specific work and finish with repeatable quality."};
 }
 function eventSimulationWeek(){
   const family=currentEventFamily(),phase=eventPhaseDetail(),week=Math.max(1,Number(data.trainingBlock?.currentWeek)||1);
@@ -133,7 +164,7 @@ function eventEntry(day,mission,label,detail,duration,role){
   return {day,mission,customLabel:label,detail,prescribedDuration:duration,eventRole:role||"support",status:"planned",done:false};
 }
 function recoveryEntry(day,detail="Recovery, walking, mobility, and preparation for the next key session"){
-  return eventEntry(day,"M-1 Daily Reset","Recovery Day",detail,20,"recovery");
+  return eventEntry(day,"M-1 Daily Reset","Recovery Day",detail,20,"recovery_day");
 }
 function eventSpecificPlan(){
   const mission=currentEventMission(),familyId=currentEventFamilyId(),phase=eventPhaseDetail(),sim=eventSimulationWeek();
@@ -143,33 +174,42 @@ function eventSpecificPlan(){
     const distance=event.replace(" Race","");
     return [
       eventEntry("Monday","S-1 Upper Strength","Runner Strength A",taper?"Brief total-body durability work; no soreness":"Single-leg durability, calf capacity, posterior chain, and trunk strength",45,"strength_support"),
-      eventEntry("Tuesday","R-4 Intervals",`${distance} Quality Session`,taper?"Short race-pace sharpening with full recovery":"Threshold, VO₂, or goal-pace work selected for the current phase",taper?32:50,"quality"),
-      eventEntry("Wednesday","R-2 Easy Run","Easy Aerobic Run","Conversational running that builds volume and restores mechanics",taper?25:40,"easy"),
+      eventEntry("Tuesday","R-4 Intervals",`${distance} Quality Session`,taper?"Short race-pace sharpening with full recovery":"Threshold, VO₂, or goal-pace work selected for the current phase",taper?32:50,"quality_run"),
+      eventEntry("Wednesday","R-2 Easy Run","Easy Aerobic Run","Conversational running that builds volume and restores mechanics",taper?25:40,"easy_run"),
       eventEntry("Thursday","S-2 Lower Strength","Runner Strength B",taper?"Light technique and tissue-capacity work":"Lower-volume strength, plyometric stiffness, calves, hips, and trunk",taper?30:45,"strength_support"),
-      eventEntry("Friday","R-2 Easy Run","Easy Run + Strides",taper?"Brief easy running with a few relaxed strides":"Easy aerobic volume followed by relaxed, technically clean strides",taper?22:38,"easy"),
-      eventEntry("Saturday","R-5 Long Run",sim?`${distance} Race Rehearsal`:`${distance} Long Run`,taper?"Reduced long run with short event-pace rehearsal":sim?"Controlled event-specific rehearsal including pacing, fueling, and equipment":"Progressive long-run durability at an appropriately easy effort",taper?40:75,"long"),
+      eventEntry("Friday","R-2 Easy Run","Easy Run + Strides",taper?"Brief easy running with a few relaxed strides":"Easy aerobic volume followed by relaxed, technically clean strides",taper?22:38,"easy_run"),
+      eventEntry("Saturday","R-5 Long Run",sim?`${distance} Race Rehearsal`:`${distance} Long Run`,taper?"Reduced long run with short event-pace rehearsal":sim?"Controlled event-specific rehearsal including pacing, fueling, and equipment":"Progressive long-run durability at an appropriately easy effort",taper?40:75,"long_run"),
       recoveryEntry("Sunday")
     ];
   }
+  if(familyId==="cycling")return [
+    eventEntry("Monday","S-1 Upper Strength","Cyclist Strength A",taper?"Brief durability work with no soreness":"Single-leg strength, posterior chain, trunk, and position durability",taper?30:45,"strength_support"),
+    eventEntry("Tuesday","R-4 Intervals","Bike Quality",taper?"Short event-pace sharpening with full recovery":"Threshold, VO₂, or event-paced cycling selected for the phase",taper?35:60,"bike_quality"),
+    eventEntry("Wednesday","R-2 Easy Run","Easy Endurance Ride","Conversational spinning that builds aerobic volume and supports recovery",taper?30:50,"easy_ride"),
+    eventEntry("Thursday","S-2 Lower Strength","Cyclist Strength B",taper?"Light technique and tissue-capacity work":"Lower-volume strength, single-leg control, calves, hips, and trunk",taper?25:45,"strength_support"),
+    eventEntry("Friday","R-2 Easy Run","Recovery Spin + Cadence","Low-stress riding with relaxed cadence drills and position practice",taper?25:40,"easy_ride"),
+    eventEntry("Saturday","R-5 Long Run",sim?"Cycling Event Rehearsal":"Long Endurance Ride",taper?"Reduced long ride with short event-pace rehearsal":sim?"Controlled event-specific pacing, equipment, hydration, and fueling rehearsal":"Progressive long-ride durability at an appropriately easy effort",taper?50:100,sim?"cycling_rehearsal":"long_ride"),
+    recoveryEntry("Sunday")
+  ];
   if(familyId==="multisport")return [
-    eventEntry("Monday","R-2 Easy Run","Swim Technique + Aerobic","Technique-led swimming with relaxed aerobic volume",45,"swim"),
+    eventEntry("Monday","R-2 Easy Run","Swim Technique + Aerobic","Technique-led swimming with relaxed aerobic volume",45,"triathlon_swim"),
     eventEntry("Tuesday","R-4 Intervals","Bike Quality",taper?"Short race-pace cycling with full recovery":"Threshold or race-specific bike intervals with controlled power",taper?35:60,"bike_quality"),
     eventEntry("Wednesday","S-1 Upper Strength","Triathlon Strength","Shoulder health, single-leg durability, posterior chain, and trunk strength",taper?30:45,"strength_support"),
-    eventEntry("Thursday","R-4 Intervals","Run Quality",taper?"Short race-pace run sharpening":"Threshold, hills, or race-pace running selected for the phase",taper?30:50,"run_quality"),
-    eventEntry("Friday","R-2 Easy Run","Recovery Swim / Easy Spin","Low-stress technique and aerobic recovery in the weaker discipline",35,"easy"),
-    eventEntry("Saturday","R-5 Long Run",sim?"Race-Specific Brick":"Long Bike–Run Brick",taper?"Reduced brick with transition rehearsal":sim?"Race-specific pacing, transitions, equipment, and fueling rehearsal":"Progressive bike-to-run durability with practiced fueling",taper?55:100,"simulation"),
+    eventEntry("Thursday","R-4 Intervals","Run Quality",taper?"Short race-pace run sharpening":"Threshold, hills, or race-pace running selected for the phase",taper?30:50,"triathlon_run_quality"),
+    eventEntry("Friday","R-2 Easy Run","Recovery Swim / Easy Spin","Low-stress technique and aerobic recovery in the weaker discipline",35,"triathlon_recovery"),
+    eventEntry("Saturday","R-5 Long Run",sim?"Race-Specific Brick":"Long Bike–Run Brick",taper?"Reduced brick with transition rehearsal":sim?"Race-specific pacing, transitions, equipment, and fueling rehearsal":"Progressive bike-to-run durability with practiced fueling",taper?55:100,sim?"brick_rehearsal":"long_brick"),
     recoveryEntry("Sunday")
   ];
   if(familyId==="functional"){
     const isCrossFit=event==="CrossFit Competition",isCombat=event==="Combat Sports Tournament";
     return [
       eventEntry("Monday",isCrossFit?"S-3 Athletic Upper":"S-2 Lower Strength",isCombat?"Fight Strength & Power":isCrossFit?"Olympic Lift + Gymnastics Skill":"HYROX Strength",taper?"Brief technique and power primers":"Event-relevant strength, skill, and structural durability",taper?35:60,"strength_skill"),
-      eventEntry("Tuesday","R-4 Intervals",isCombat?"Competition Rounds":isCrossFit?"Mixed-Modal Repeatability":"Compromised 1 km Intervals",taper?"Short sharp event-specific efforts; stop fresh":"Repeatable competition-paced work with disciplined transitions",taper?30:55,"quality"),
-      eventEntry("Wednesday","R-2 Easy Run","Aerobic Recovery + Skill","Easy aerobic work plus low-fatigue technical practice",35,"easy_skill"),
+      eventEntry("Tuesday","R-4 Intervals",isCombat?"Competition Rounds":isCrossFit?"Mixed-Modal Repeatability":"Compromised 1 km Intervals",taper?"Short sharp event-specific efforts; stop fresh":"Repeatable competition-paced work with disciplined transitions",taper?30:55,isCombat?"round_conditioning":isCrossFit?"mixed_modal_quality":"hyrox_compromised_run"),
+      eventEntry("Wednesday","R-2 Easy Run","Aerobic Recovery + Skill","Easy aerobic work plus low-fatigue technical practice",35,"aerobic_recovery"),
       eventEntry("Thursday",isCrossFit?"S-4 Athletic Lower":"S-1 Upper Strength",isCombat?"Relative Strength + Durability":isCrossFit?"Strength + Weakness Practice":"Station Strength + Carries","Build event-specific strength without duplicating Tuesday fatigue",taper?35:60,"strength_skill"),
       recoveryEntry("Friday"),
-      eventEntry("Saturday","R-5 Long Run",sim?(isCombat?"Tournament Round Simulation":isCrossFit?"Competition Simulation":"HYROX Simulation"):(isCombat?"Round Capacity":isCrossFit?"Competition Piece Practice":"Run–Station Capacity"),taper?"Reduced rehearsal with event pacing and full recovery":"Controlled simulation emphasizing pacing, standards, and repeatability",taper?35:70,"simulation"),
-      eventEntry("Sunday","R-2 Easy Run","Easy Aerobic Reset","Conversational effort that improves recovery between hard sessions",30,"easy")
+      eventEntry("Saturday","R-5 Long Run",sim?(isCombat?"Tournament Round Simulation":isCrossFit?"Competition Simulation":"HYROX Simulation"):(isCombat?"Round Capacity":isCrossFit?"Competition Piece Practice":"Run–Station Capacity"),taper?"Reduced rehearsal with event pacing and full recovery":"Controlled simulation emphasizing pacing, standards, and repeatability",taper?35:70,sim?(isCombat?"tournament_simulation":isCrossFit?"crossfit_simulation":"hyrox_simulation"):(isCombat?"round_capacity":isCrossFit?"competition_piece":"run_station_capacity")),
+      eventEntry("Sunday","R-2 Easy Run","Easy Aerobic Reset","Conversational effort that improves recovery between hard sessions",30,"easy_aerobic")
     ];
   }
   if(familyId==="strength_competition"){
@@ -177,39 +217,39 @@ function eventSpecificPlan(){
     return [
       eventEntry("Monday","S-2 Lower Strength",strongman?"Deadlift / Squat Strength":"Competition Squat",taper?"Brief opener-range technique; no fatigue":"Primary competition pattern with controlled heavy work and back-offs",taper?40:75,"primary_lift"),
       eventEntry("Tuesday","S-1 Upper Strength",strongman?"Overhead Event Strength":"Competition Bench",taper?"Brief opener-range technique":"Primary press exposure plus event-relevant supplemental work",taper?40:70,"primary_lift"),
-      eventEntry("Wednesday","R-2 Easy Run","Recovery Aerobic Support","Low-impact Zone 2 and mobility; stop before leg fatigue",25,"recovery"),
+      eventEntry("Wednesday","R-2 Easy Run","Recovery Aerobic Support","Low-impact Zone 2 and mobility; stop before leg fatigue",25,"aerobic_recovery"),
       eventEntry("Thursday","S-4 Athletic Lower",strongman?"Event Strength + Loading":"Competition Deadlift",taper?"Short technique exposure only":"Heavy event pattern with low-junk-volume assistance",taper?35:75,"primary_lift"),
       eventEntry("Friday","S-3 Athletic Upper",strongman?"Upper Back, Grip + Press Support":"Bench Technique + Upper Support","Lower-fatigue secondary exposure that reinforces weak points",taper?30:60,"secondary_lift"),
-      eventEntry("Saturday",strongman?"R-5 Long Run":"R-2 Easy Run",strongman?(sim?"Strongman Event Simulation":"Carries + Event Capacity"):"Recovery Cardio / Meet Preparation",strongman?(taper?"Reduced implements and transitions":"Controlled event practice, carries, loading, and recovery between efforts"):"Easy movement, mobility, commands, and attempt-plan review",strongman?(taper?35:70):25,strongman?"simulation":"recovery"),
+      eventEntry("Saturday",strongman?"R-5 Long Run":"R-2 Easy Run",strongman?(sim?"Strongman Event Simulation":"Carries + Event Capacity"):"Recovery Cardio / Meet Preparation",strongman?(taper?"Reduced implements and transitions":"Controlled event practice, carries, loading, and recovery between efforts"):"Easy movement, mobility, commands, and attempt-plan review",strongman?(taper?35:70):25,strongman?(sim?"strongman_simulation":"strongman_event_capacity"):"meet_preparation"),
       recoveryEntry("Sunday")
     ];
   }
   if(familyId==="tactical")return [
     eventEntry("Monday","S-2 Lower Strength","Usable Strength A","Lower-body strength, carries, trunk, and task durability",60,"strength"),
-    eventEntry("Tuesday","R-4 Intervals","Test / Task Intervals",taper?"Short sharp event-specific efforts":"Timed running, repeated efforts, or task-specific work-to-rest intervals",taper?30:50,"quality"),
-    eventEntry("Wednesday","R-2 Easy Run","Aerobic Base","Easy running or approved low-impact aerobic work",40,"easy"),
-    eventEntry("Thursday","S-1 Upper Strength","Usable Strength B","Upper-body relative strength, pulling, grip, and trunk endurance",55,"strength"),
-    eventEntry("Friday","S-3 Athletic Upper","Calisthenics + Task Skill",taper?"Brief standards rehearsal":"Technique, standards, carries, or occupational task practice without exhaustion",taper?30:45,"skill"),
-    eventEntry("Saturday","R-5 Long Run",sim?"Full Test / Tactical Simulation":"Loaded Endurance + Work Capacity",taper?"Reduced event rehearsal with equipment check":sim?"Controlled full rehearsal using exact standards, transitions, and pacing":"Ruck, carry, run, or mixed task progression matched to the event",taper?40:75,"simulation"),
+    eventEntry("Tuesday","R-4 Intervals","Test / Task Intervals",taper?"Short sharp event-specific efforts":"Timed running, repeated efforts, or task-specific work-to-rest intervals",taper?30:50,"task_intervals"),
+    eventEntry("Wednesday","R-2 Easy Run","Aerobic Base","Easy running or approved low-impact aerobic work",40,"easy_aerobic"),
+    eventEntry("Thursday","S-1 Upper Strength","Usable Strength B","Upper-body relative strength, pulling, grip, and trunk endurance",55,"grip_strength"),
+    eventEntry("Friday","S-3 Athletic Upper","Calisthenics + Task Skill",taper?"Brief standards rehearsal":"Technique, standards, carries, or occupational task practice without exhaustion",taper?30:45,"strength_skill"),
+    eventEntry("Saturday","R-5 Long Run",sim?"Full Test / Tactical Simulation":"Loaded Endurance + Work Capacity",taper?"Reduced event rehearsal with equipment check":sim?"Controlled full rehearsal using exact standards, transitions, and pacing":"Ruck, carry, run, or mixed task progression matched to the event",taper?40:75,sim?"test_simulation":"loaded_endurance"),
     recoveryEntry("Sunday")
   ];
   if(familyId==="obstacle_loaded")return [
-    eventEntry("Monday","S-1 Upper Strength","Grip + Pulling Strength","Pulling, grip, carries, climbing strength, and trunk control",55,"strength"),
-    eventEntry("Tuesday","R-4 Intervals","Hill / Trail Intervals",taper?"Short hill sharpening":"Uphill power, controlled descents, and trail-specific intervals",taper?30:50,"quality"),
-    eventEntry("Wednesday","R-2 Easy Run","Easy Trail Run","Conversational trail volume and footwork practice",40,"easy"),
+    eventEntry("Monday","S-1 Upper Strength","Grip + Pulling Strength","Pulling, grip, carries, climbing strength, and trunk control",55,"grip_strength"),
+    eventEntry("Tuesday","R-4 Intervals","Hill / Trail Intervals",taper?"Short hill sharpening":"Uphill power, controlled descents, and trail-specific intervals",taper?30:50,"trail_quality"),
+    eventEntry("Wednesday","R-2 Easy Run","Easy Trail Run","Conversational trail volume and footwork practice",40,"easy_trail"),
     eventEntry("Thursday","S-2 Lower Strength","Trail Durability Strength","Single-leg strength, calves, posterior chain, carries, and landing control",55,"strength"),
-    eventEntry("Friday","S-3 Athletic Upper","Obstacle Skill + Grip","Low-fatigue hangs, climbs, transitions, crawls, and carry technique",40,"skill"),
-    eventEntry("Saturday","R-5 Long Run",sim?"OCR Course Simulation":"Long Trail + Obstacles",taper?"Reduced trail and obstacle rehearsal":sim?"Event-specific terrain, obstacle density, grip strategy, equipment, and fueling":"Long trail durability with controlled obstacle or carry insertions",taper?40:80,"simulation"),
+    eventEntry("Friday","S-3 Athletic Upper","Obstacle Skill + Grip","Low-fatigue hangs, climbs, transitions, crawls, and carry technique",40,"strength_skill"),
+    eventEntry("Saturday","R-5 Long Run",sim?"OCR Course Simulation":"Long Trail + Obstacles",taper?"Reduced trail and obstacle rehearsal":sim?"Event-specific terrain, obstacle density, grip strategy, equipment, and fueling":"Long trail durability with controlled obstacle or carry insertions",taper?40:80,sim?"course_simulation":"long_trail_obstacles"),
     recoveryEntry("Sunday")
   ];
   if(familyId==="physique")return [
-    eventEntry("Monday","B-1 Chest & Back","Physique Upper A","Maintain muscle, symmetry, and weak-point quality without unnecessary failure",taper?40:70,"hypertrophy"),
-    eventEntry("Tuesday","B-2 Legs","Physique Lower A",taper?"Low-soreness pump and technique only":"Productive lower-body volume matched to division and recovery",taper?35:70,"hypertrophy"),
+    eventEntry("Monday","B-1 Chest & Back","Physique Upper A","Maintain muscle, symmetry, and weak-point quality without unnecessary failure",taper?40:70,"resistance_upper"),
+    eventEntry("Tuesday","B-2 Legs","Physique Lower A",taper?"Low-soreness pump and technique only":"Productive lower-body volume matched to division and recovery",taper?35:70,"resistance_lower"),
     eventEntry("Wednesday","R-2 Easy Run","Contest Prep Cardio","Low-impact aerobic work at a recoverable effort",taper?20:35,"cardio"),
-    eventEntry("Thursday","B-3 Shoulders & Arms","Physique Upper B","Delts, arms, presentation muscles, symmetry, and weak points",taper?35:65,"hypertrophy"),
-    eventEntry("Friday","R-2 Easy Run","Cardio + Presentation Practice","Low-impact cardio followed by brief stage-presentation practice",taper?20:35,"cardio_skill"),
-    eventEntry("Saturday","B-4 Back & Posterior","Physique Lower / Posterior B",taper?"Brief full-body pump; avoid soreness":"Posterior chain, glutes, back detail, and division-specific emphasis",taper?35:70,"hypertrophy"),
-    eventEntry("Sunday","R-2 Easy Run","Recovery Cardio + Mobility","Easy low-impact movement, mobility, and recovery monitoring",taper?15:30,"recovery")
+    eventEntry("Thursday","B-3 Shoulders & Arms","Physique Upper B","Delts, arms, symmetry, and weak-point development",taper?35:65,"resistance_upper"),
+    eventEntry("Friday","R-2 Easy Run","Cardio + Mobility","Low-impact cardio followed by brief mobility and recovery work",taper?20:35,"cardio_recovery"),
+    eventEntry("Saturday","B-4 Back & Posterior","Physique Lower / Posterior B",taper?"Brief full-body pump; avoid soreness":"Posterior chain, glutes, back detail, and division-specific emphasis",taper?35:70,"resistance_lower"),
+    eventEntry("Sunday","R-2 Easy Run","Recovery Cardio + Mobility","Easy low-impact movement, mobility, and recovery monitoring",taper?15:30,"cardio_recovery")
   ];
   return null;
 }
@@ -224,7 +264,11 @@ function applyEventCoachingArchitecture(){
   data.trainingBlock.eventPhase=phase.label;
   data.trainingBlock.eventWeeksRemaining=eventWeeksRemaining();
   data.trainingBlock.eventSimulationWeek=eventSimulationWeek();
-  data.trainingBlock.eventCoach={progression:family.progression,missedRule:family.missedRule,eventDay:family.eventDay,priorities:family.priorities};
+  const scope=customEventScopeStatus(mission);
+  data.trainingBlock.eventScopeStatus=scope.status;
+  data.trainingBlock.eventScopeReason=scope.reason;
+  data.trainingBlock.eventDemandProfile=scope.profile||null;
+  data.trainingBlock.eventCoach={progression:family.progression,missedRule:family.missedRule,eventDay:family.eventDay,priorities:family.priorities,scopeStatus:scope.status,scopeReason:scope.reason};
   (data.plan||[]).forEach((item,index)=>{
     item.id=`w${data.trainingBlock.currentWeek||1}-${index}-${String(item.day||"day").toLowerCase()}`;
     item.eventFamily=familyId;
@@ -238,6 +282,9 @@ function applyEventCoachingArchitecture(){
     item.coachingIntent=`${family.label}: ${item.detail}`;
     item.rotationCadenceWeeks=family.simulationEvery;
     item.coachingPathway=`event_${familyId}`;
+    item.eventScopeStatus=scope.status;
+    item.eventScopeReason=scope.reason;
+    if(scope.status==="SCOPE_LIMITED"&&!String(item.detail||"").includes("Scope limited:"))item.detail=`Scope limited: ${scope.reason} ${item.detail}`;
     item.status=item.status||"planned";
     item.done=Boolean(item.done);
     if(!String(item.detail||"").includes("Coach intent:"))item.detail=`${item.detail} • Coach intent: ${family.progression}`;
@@ -280,7 +327,8 @@ if(typeof coachRecommendation==="function"){
 function eventCoachingSummary(){
   const mission=currentEventMission(),family=currentEventFamily(),phase=eventPhaseDetail();
   if(!mission||!family||!phase)return null;
-  return {event:mission.eventType,family:currentEventFamilyId(),label:family.label,phase:phase.label,weeksRemaining:eventWeeksRemaining(),simulationWeek:eventSimulationWeek(),priorities:family.priorities,progression:family.progression,missedRule:family.missedRule,eventDay:family.eventDay};
+  const scope=customEventScopeStatus(mission);
+  return {event:mission.eventType,family:currentEventFamilyId(),label:family.label,phase:phase.label,weeksRemaining:eventWeeksRemaining(),simulationWeek:eventSimulationWeek(),priorities:family.priorities,progression:family.progression,missedRule:family.missedRule,eventDay:family.eventDay,scopeStatus:scope.status,scopeReason:scope.reason};
 }
 
 /* Make missed-session guidance discipline-specific. */

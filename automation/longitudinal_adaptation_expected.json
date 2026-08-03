@@ -1,0 +1,1385 @@
+{
+  "version": "13.14.0",
+  "cases": {
+    "steady-strength-responder": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.077,
+        "volume_factor": 1.125,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.077,
+        "volume_factor": 1.125,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.077,
+        "volume_factor": 1.125,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "rapid-strength-responder": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "noisy-alternating-response": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "persistent-underperformance": [
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "regress",
+        "raw_status": "regress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.8,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "deload",
+        "raw_status": "regress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.75,
+        "engine_duration_factor": 0.8
+      },
+      {
+        "status": "deload",
+        "raw_status": "regress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.75,
+        "engine_duration_factor": 0.8
+      },
+      {
+        "status": "regress",
+        "raw_status": "regress",
+        "intensity_factor": 0.902,
+        "volume_factor": 0.7,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "hold",
+        "raw_status": "regress",
+        "intensity_factor": 0.9,
+        "volume_factor": 0.7,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "regress",
+        "intensity_factor": 0.9,
+        "volume_factor": 0.7,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "regress",
+        "raw_status": "regress",
+        "intensity_factor": 0.9,
+        "volume_factor": 0.7,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "deload",
+        "raw_status": "regress",
+        "intensity_factor": 0.9,
+        "volume_factor": 0.7,
+        "engine_duration_factor": 0.8
+      },
+      {
+        "status": "deload",
+        "raw_status": "regress",
+        "intensity_factor": 0.9,
+        "volume_factor": 0.7,
+        "engine_duration_factor": 0.8
+      }
+    ],
+    "interruption-reentry": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "rebuild",
+        "raw_status": "rebuild",
+        "intensity_factor": 0.974,
+        "volume_factor": 0.832,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.974,
+        "volume_factor": 0.832,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.023,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "moderate-pain-reentry": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "protect",
+        "raw_status": "protect",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.75,
+        "engine_duration_factor": 0.85
+      },
+      {
+        "status": "reentry",
+        "raw_status": "observe",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "reentry",
+        "raw_status": "progress",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.077,
+        "volume_factor": 1.125,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "severe-pain-reentry": [
+      {
+        "status": "safety_hold",
+        "raw_status": "safety_hold",
+        "intensity_factor": 0.9,
+        "volume_factor": 0.6,
+        "engine_duration_factor": 0.7
+      },
+      {
+        "status": "reentry",
+        "raw_status": "observe",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "reentry",
+        "raw_status": "progress",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "reentry",
+        "raw_status": "progress",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "fatigue-deload": [
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "deload",
+        "raw_status": "hold",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.75,
+        "engine_duration_factor": 0.8
+      },
+      {
+        "status": "deload",
+        "raw_status": "hold",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.75,
+        "engine_duration_factor": 0.8
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "taper-phase-protection": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "hold",
+        "raw_status": "progress",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      }
+    ],
+    "post-event-recovery-protection": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "hold",
+        "raw_status": "progress",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      }
+    ],
+    "mixed-channel-independence": [
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "regress",
+        "raw_status": "regress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.8,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.8,
+        "engine_duration_factor": 1.05
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.8,
+        "engine_duration_factor": 1.05
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.8,
+        "engine_duration_factor": 1.05
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.8,
+        "engine_duration_factor": 1.103
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.8,
+        "engine_duration_factor": 1.103
+      }
+    ],
+    "missed-training-no-catchup": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "rebuild",
+        "raw_status": "rebuild",
+        "intensity_factor": 0.974,
+        "volume_factor": 0.832,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.974,
+        "volume_factor": 0.832,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "hold-preserves-earned-target": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 1.03,
+        "volume_factor": 0.973,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 1.03,
+        "volume_factor": 0.973,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 1.03,
+        "volume_factor": 0.973,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.051,
+        "volume_factor": 1.082,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.077,
+        "volume_factor": 1.125,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.077,
+        "volume_factor": 1.125,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "long-horizon-cumulative-caps": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.1,
+        "volume_factor": 1.15,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "event-specificity-invariant": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.05
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.05
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.05
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.966
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.966
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.966
+      },
+      {
+        "status": "hold",
+        "raw_status": "accelerate",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.966
+      }
+    ],
+    "deload-cooldown": [
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "deload",
+        "raw_status": "hold",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.75,
+        "engine_duration_factor": 0.8
+      },
+      {
+        "status": "deload",
+        "raw_status": "hold",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.75,
+        "engine_duration_factor": 0.8
+      },
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 1.004,
+        "volume_factor": 0.936,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 1.004,
+        "volume_factor": 0.936,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 1.004,
+        "volume_factor": 0.936,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "deload",
+        "raw_status": "hold",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.75,
+        "engine_duration_factor": 0.8
+      }
+    ],
+    "pain-overrides-fast-improvement": [
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 1.0,
+        "volume_factor": 1.0,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.025,
+        "volume_factor": 1.04,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "protect",
+        "raw_status": "protect",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.75,
+        "engine_duration_factor": 0.85
+      },
+      {
+        "status": "reentry",
+        "raw_status": "observe",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "reentry",
+        "raw_status": "progress",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "accelerate",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "accelerate",
+        "intensity_factor": 1.076,
+        "volume_factor": 1.123,
+        "engine_duration_factor": 1.0
+      }
+    ],
+    "regress-then-recover": [
+      {
+        "status": "hold",
+        "raw_status": "hold",
+        "intensity_factor": 0.98,
+        "volume_factor": 0.9,
+        "engine_duration_factor": 0.92
+      },
+      {
+        "status": "regress",
+        "raw_status": "regress",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.8,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "observe",
+        "intensity_factor": 0.95,
+        "volume_factor": 0.8,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 0.974,
+        "volume_factor": 0.832,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.974,
+        "volume_factor": 0.832,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.974,
+        "volume_factor": 0.832,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "progress",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      },
+      {
+        "status": "observe",
+        "raw_status": "progress",
+        "intensity_factor": 0.998,
+        "volume_factor": 0.865,
+        "engine_duration_factor": 1.0
+      }
+    ]
+  }
+}

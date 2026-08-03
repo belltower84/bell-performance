@@ -1,0 +1,20 @@
+Bell Performance 12.2.3 — Athlete Schedule Adaptation
+
+1. Confirm GitHub Desktop is on bell-core-live.
+2. Commit or stash any current changes.
+3. Extract this ZIP.
+4. Copy everything inside the extracted patch folder into the root of the bell-performance repository.
+5. Allow Windows to replace matching files.
+6. Commit with: Build 12.2.3 athlete schedule adaptation
+7. Push origin.
+8. Wait for Render to finish redeploying and verify /ready returns database true.
+9. Start the frontend locally: py -m http.server 5173
+10. Open http://localhost:5173 and hard refresh with Ctrl+Shift+R.
+
+Test:
+- Reset and run First Flight; select exact weekdays.
+- Confirm no workout is scheduled on an unselected day.
+- Open Settings and change Training Availability.
+- Open Plan Next Week and test normal, custom, and vacation modes.
+- Confirm Mobility and Optional Core are visible in Today's Mission.
+- Complete a workout and confirm cloud sync still succeeds.

@@ -1,0 +1,567 @@
+{
+  "rulebook_version": "1.0.1",
+  "status": "draft-approved",
+  "governance": {
+    "principle": "Plan adaptations before sessions and sessions before exercises.",
+    "minimum_week_score": 85,
+    "hard_rules_override_preferences": true,
+    "all_rule_changes_require_version_increment": true
+  },
+  "phase_modifiers": {
+    "Foundation": {
+      "volume": 0.85,
+      "intensity": 0.9,
+      "complexity": 0.85
+    },
+    "Build": {
+      "volume": 1.0,
+      "intensity": 1.0,
+      "complexity": 1.0
+    },
+    "Peak": {
+      "volume": 0.65,
+      "intensity": 1.1,
+      "complexity": 0.8
+    },
+    "Deload": {
+      "volume": 0.55,
+      "intensity": 0.8,
+      "complexity": 0.7
+    },
+    "Recovery": {
+      "volume": 0.4,
+      "intensity": 0.65,
+      "complexity": 0.6
+    }
+  },
+  "experience_volume_targets": {
+    "Beginner": {
+      "sets_per_pattern_min": 4,
+      "sets_per_pattern_max": 8
+    },
+    "Novice": {
+      "sets_per_pattern_min": 5,
+      "sets_per_pattern_max": 10
+    },
+    "Intermediate": {
+      "sets_per_pattern_min": 6,
+      "sets_per_pattern_max": 14
+    },
+    "Advanced": {
+      "sets_per_pattern_min": 8,
+      "sets_per_pattern_max": 18
+    },
+    "Elite": {
+      "sets_per_pattern_min": 8,
+      "sets_per_pattern_max": 20
+    }
+  },
+  "recovery_spacing_hours": {
+    "heavy_squat_to_heavy_squat": 72,
+    "heavy_hinge_to_heavy_hinge": 72,
+    "heavy_lower_to_max_sprint": 48,
+    "max_sprint_to_heavy_lower": 48,
+    "threshold_to_long_run": 36,
+    "long_run_to_heavy_lower": 36,
+    "same_pattern_strength": 48,
+    "same_pattern_hypertrophy": 24
+  },
+  "weekly_limits": {
+    "max_high_systemic_days": 3,
+    "max_consecutive_training_days": 4,
+    "minimum_recovery_days": 1,
+    "max_primary_strength_sessions_per_pattern": 2,
+    "max_high_impact_days": 3
+  },
+  "mission_profiles": {
+    "general_strength": {
+      "objectives": [
+        "Maximum Strength",
+        "General Hypertrophy",
+        "Trunk Stability"
+      ],
+      "default_sessions": [
+        "Lower Strength",
+        "Upper Strength",
+        "Lower Volume",
+        "Upper Volume"
+      ]
+    },
+    "body_recomposition": {
+      "objectives": [
+        "General Hypertrophy",
+        "Aerobic Base",
+        "Muscular Endurance"
+      ],
+      "default_sessions": [
+        "Upper Hypertrophy",
+        "Lower Hypertrophy",
+        "Full Body Hypertrophy",
+        "Aerobic Base"
+      ]
+    },
+    "hybrid": {
+      "objectives": [
+        "Maximum Strength",
+        "Aerobic Base",
+        "Lactate Threshold",
+        "Running Economy"
+      ],
+      "default_sessions": [
+        "Lower Strength",
+        "Upper Strength",
+        "Threshold",
+        "Easy Run",
+        "Long Run"
+      ]
+    },
+    "10k": {
+      "objectives": [
+        "Aerobic Base",
+        "Lactate Threshold",
+        "VO2 Max",
+        "Running Economy",
+        "Lower Body Durability"
+      ],
+      "default_sessions": [
+        "Easy Run",
+        "Threshold",
+        "Upper Strength",
+        "Lower Strength",
+        "Long Run"
+      ]
+    },
+    "tactical": {
+      "objectives": [
+        "Maximum Strength",
+        "Aerobic Capacity",
+        "Anaerobic Capacity",
+        "Grip Strength",
+        "Work Capacity"
+      ],
+      "default_sessions": [
+        "Lower Strength",
+        "Upper Strength",
+        "Intervals",
+        "Mixed Modal",
+        "Long Aerobic"
+      ]
+    },
+    "physique": {
+      "objectives": [
+        "General Hypertrophy",
+        "Weak Point Hypertrophy",
+        "Aerobic Base"
+      ],
+      "default_sessions": [
+        "Push",
+        "Pull",
+        "Legs",
+        "Upper",
+        "Lower"
+      ]
+    },
+    "powerlifting": {
+      "objectives": [
+        "Competition Squat Strength",
+        "Competition Bench Press Strength",
+        "Competition Deadlift Strength",
+        "Powerlifting Technique",
+        "Weak-Point Development"
+      ],
+      "default_sessions": [
+        "Powerlifting Squat Focus",
+        "Powerlifting Bench Focus",
+        "Powerlifting Deadlift Focus",
+        "Powerlifting Secondary Squat + Bench",
+        "Powerlifting Aerobic Recovery"
+      ]
+    },
+    "powerlifting_meet": {
+      "objectives": [
+        "Peak Competition Squat",
+        "Peak Competition Bench Press",
+        "Peak Competition Deadlift",
+        "Meet Command Practice",
+        "Fatigue Reduction",
+        "Attempt Readiness"
+      ],
+      "default_sessions": [
+        "Powerlifting Squat Focus",
+        "Powerlifting Bench Focus",
+        "Powerlifting Deadlift Focus",
+        "Powerlifting Secondary Squat + Bench",
+        "Powerlifting Aerobic Recovery"
+      ]
+    }
+  },
+  "session_templates": {
+    "Lower Strength": {
+      "session_type": "strength",
+      "systemic_load": "high",
+      "slots": [
+        {
+          "name": "Primary squat",
+          "movement_pattern": "Squat",
+          "programming_role": "Primary Lift",
+          "adaptation": "Maximum Strength"
+        },
+        {
+          "name": "Secondary hinge",
+          "movement_pattern": "Hinge",
+          "programming_role": "Secondary Compound",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Single-leg accessory",
+          "movement_pattern": "Lunge",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Trunk stability",
+          "movement_pattern": "Anti-Extension",
+          "programming_role": "Accessory",
+          "adaptation": "Trunk Stability"
+        }
+      ]
+    },
+    "Upper Strength": {
+      "session_type": "strength",
+      "systemic_load": "moderate",
+      "slots": [
+        {
+          "name": "Primary press",
+          "movement_pattern": "Horizontal Push",
+          "programming_role": "Primary Lift",
+          "adaptation": "Maximum Strength"
+        },
+        {
+          "name": "Primary pull",
+          "movement_pattern": "Horizontal Pull",
+          "programming_role": "Secondary Compound",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Vertical pull",
+          "movement_pattern": "Vertical Pull",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Shoulder accessory",
+          "movement_pattern": "Vertical Push",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        }
+      ]
+    },
+    "Lower Volume": {
+      "session_type": "hypertrophy",
+      "systemic_load": "moderate",
+      "slots": [
+        {
+          "name": "Squat compound",
+          "movement_pattern": "Squat",
+          "programming_role": "Hypertrophy Compound",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Hinge compound",
+          "movement_pattern": "Hinge",
+          "programming_role": "Secondary Compound",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Single leg",
+          "movement_pattern": "Lunge",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Core",
+          "movement_pattern": "Anti-Rotation",
+          "programming_role": "Accessory",
+          "adaptation": "Trunk Stability"
+        }
+      ]
+    },
+    "Upper Volume": {
+      "session_type": "hypertrophy",
+      "systemic_load": "moderate",
+      "slots": [
+        {
+          "name": "Chest compound",
+          "movement_pattern": "Horizontal Push",
+          "programming_role": "Hypertrophy Compound",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Back compound",
+          "movement_pattern": "Horizontal Pull",
+          "programming_role": "Hypertrophy Compound",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Vertical pull",
+          "movement_pattern": "Vertical Pull",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Vertical press",
+          "movement_pattern": "Vertical Push",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        }
+      ]
+    },
+    "Full Body Hypertrophy": {
+      "session_type": "hypertrophy",
+      "systemic_load": "moderate",
+      "slots": [
+        {
+          "name": "Knee dominant",
+          "movement_pattern": "Squat",
+          "programming_role": "Hypertrophy Compound",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Push",
+          "movement_pattern": "Horizontal Push",
+          "programming_role": "Hypertrophy Compound",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Pull",
+          "movement_pattern": "Horizontal Pull",
+          "programming_role": "Hypertrophy Compound",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Hinge",
+          "movement_pattern": "Hinge",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        }
+      ]
+    },
+    "Push": {
+      "inherits": "Upper Volume"
+    },
+    "Pull": {
+      "inherits": "Upper Volume"
+    },
+    "Legs": {
+      "inherits": "Lower Volume"
+    },
+    "Upper": {
+      "inherits": "Upper Volume"
+    },
+    "Lower": {
+      "inherits": "Lower Volume"
+    },
+    "Aerobic Base": {
+      "session_type": "engine",
+      "systemic_load": "low",
+      "engine_prescription": {
+        "mode": "easy cyclical",
+        "duration_minutes": 35,
+        "intensity": "Zone 2 / conversational"
+      }
+    },
+    "Easy Run": {
+      "session_type": "engine",
+      "systemic_load": "low",
+      "engine_prescription": {
+        "mode": "run",
+        "duration_minutes": 35,
+        "intensity": "Zone 2 / conversational"
+      }
+    },
+    "Long Run": {
+      "session_type": "engine",
+      "systemic_load": "moderate",
+      "engine_prescription": {
+        "mode": "run",
+        "duration_minutes": 60,
+        "intensity": "Easy steady"
+      }
+    },
+    "Threshold": {
+      "session_type": "engine",
+      "systemic_load": "high",
+      "engine_prescription": {
+        "mode": "run or cyclical",
+        "work": "3 x 8 min",
+        "recovery": "2 min easy",
+        "intensity": "Threshold / controlled hard"
+      }
+    },
+    "Intervals": {
+      "session_type": "engine",
+      "systemic_load": "high",
+      "engine_prescription": {
+        "mode": "run, row, bike, or ski",
+        "work": "6 x 3 min",
+        "recovery": "2 min easy",
+        "intensity": "VO2-focused"
+      }
+    },
+    "Mixed Modal": {
+      "session_type": "engine",
+      "systemic_load": "high",
+      "engine_prescription": {
+        "mode": "mixed modal",
+        "duration_minutes": 30,
+        "intensity": "RPE 7-8"
+      }
+    },
+    "Long Aerobic": {
+      "session_type": "engine",
+      "systemic_load": "moderate",
+      "engine_prescription": {
+        "mode": "run, ruck, bike, or row",
+        "duration_minutes": 60,
+        "intensity": "Zone 2"
+      }
+    },
+    "Powerlifting Squat Focus": {
+      "session_type": "strength",
+      "systemic_load": "high",
+      "slots": [
+        {
+          "name": "Competition squat",
+          "movement_pattern": "Squat",
+          "programming_role": "Primary Lift",
+          "adaptation": "Maximum Strength"
+        },
+        {
+          "name": "Secondary bench exposure",
+          "movement_pattern": "Horizontal Push",
+          "programming_role": "Secondary Compound",
+          "adaptation": "Maximum Strength"
+        },
+        {
+          "name": "Posterior-chain assistance",
+          "movement_pattern": "Hinge",
+          "programming_role": "Accessory",
+          "adaptation": "Weak-Point Development"
+        },
+        {
+          "name": "Powerlifting trunk",
+          "movement_pattern": "Anti-Extension",
+          "programming_role": "Accessory",
+          "adaptation": "Trunk Stability"
+        }
+      ]
+    },
+    "Powerlifting Bench Focus": {
+      "session_type": "strength",
+      "systemic_load": "moderate",
+      "slots": [
+        {
+          "name": "Competition bench press",
+          "movement_pattern": "Horizontal Push",
+          "programming_role": "Primary Lift",
+          "adaptation": "Maximum Strength"
+        },
+        {
+          "name": "Bench variation",
+          "movement_pattern": "Horizontal Push",
+          "programming_role": "Secondary Compound",
+          "adaptation": "Weak-Point Development"
+        },
+        {
+          "name": "Upper-back strength",
+          "movement_pattern": "Horizontal Pull",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Triceps assistance",
+          "movement_pattern": "Elbow Extension",
+          "programming_role": "Accessory",
+          "adaptation": "Weak-Point Development"
+        }
+      ]
+    },
+    "Powerlifting Deadlift Focus": {
+      "session_type": "strength",
+      "systemic_load": "high",
+      "slots": [
+        {
+          "name": "Competition deadlift",
+          "movement_pattern": "Hinge",
+          "programming_role": "Primary Lift",
+          "adaptation": "Maximum Strength"
+        },
+        {
+          "name": "Secondary squat exposure",
+          "movement_pattern": "Squat",
+          "programming_role": "Secondary Compound",
+          "adaptation": "Maximum Strength"
+        },
+        {
+          "name": "Upper-back strength",
+          "movement_pattern": "Horizontal Pull",
+          "programming_role": "Accessory",
+          "adaptation": "Weak-Point Development"
+        },
+        {
+          "name": "Hamstring assistance",
+          "movement_pattern": "Knee Flexion",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        }
+      ]
+    },
+    "Powerlifting Secondary Squat + Bench": {
+      "session_type": "strength",
+      "systemic_load": "moderate",
+      "slots": [
+        {
+          "name": "Squat variation",
+          "movement_pattern": "Squat",
+          "programming_role": "Secondary Compound",
+          "adaptation": "Weak-Point Development"
+        },
+        {
+          "name": "Bench volume or technique",
+          "movement_pattern": "Horizontal Push",
+          "programming_role": "Primary Lift",
+          "adaptation": "Maximum Strength"
+        },
+        {
+          "name": "Unilateral lower assistance",
+          "movement_pattern": "Lunge",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        },
+        {
+          "name": "Upper-back assistance",
+          "movement_pattern": "Horizontal Pull",
+          "programming_role": "Accessory",
+          "adaptation": "General Hypertrophy"
+        }
+      ]
+    },
+    "Powerlifting Aerobic Recovery": {
+      "session_type": "engine",
+      "systemic_load": "low",
+      "engine_prescription": {
+        "mode": "bike, incline walk, row, or sled drag",
+        "duration_minutes": 30,
+        "intensity": "Zone 2 / conversational; low impact"
+      }
+    }
+  },
+  "week_score_weights": {
+    "goal_alignment": 0.25,
+    "recovery_balance": 0.2,
+    "schedule_fit": 0.15,
+    "volume_distribution": 0.15,
+    "fatigue_management": 0.15,
+    "session_quality": 0.1
+  }
+}

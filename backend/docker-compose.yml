@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bell
+      POSTGRES_USER: bell
+      POSTGRES_PASSWORD: bell
+    volumes: [bell_pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bell -d bell"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  api:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      BELL_DATABASE_URL: postgresql+psycopg://bell:bell@db:5432/bell
+      BELL_JWT_SECRET: development-secret-change-before-production
+      BELL_CORS_ORIGINS: http://localhost:3000,http://localhost:5173
+      BELL_AUTO_CREATE_SCHEMA: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  bell_pgdata:

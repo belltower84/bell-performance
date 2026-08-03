@@ -1,0 +1,28 @@
+Bell Performance 12.2.2 — Unified Mission Flow
+
+This patch changes both the frontend and Bell Core backend.
+
+SAFE INSTALL
+1. In GitHub Desktop, confirm you are on bell-core-live.
+2. Commit or stash any current changes before installing this patch.
+3. Copy the contents of this package into the repository root.
+4. Allow Windows to replace matching files.
+5. Commit with: Build 12.2.2 unified mission flow
+6. Push bell-core-live. Render should redeploy the backend automatically.
+7. Wait for https://bell-core-api.onrender.com/ready to report database true.
+8. Run the frontend locally with: py -m http.server 5173
+9. Hard refresh or clear the prior service worker cache.
+
+PRIMARY FILES CHANGED
+frontend/index.html
+frontend/sw.js
+frontend/css/app.css
+frontend/js/bell-api.js
+frontend/js/dashboard-command-center.js
+backend/app/services/core.py
+backend/app/api/v1/routes.py
+backend/tests/test_vertical_slice.py
+
+REPOSITORY LAYOUT NOTE
+Your GitHub Pages frontend lives at the repository root, not inside a frontend folder.
+Use the separate PATCH zip supplied with this release for the easiest copy operation.

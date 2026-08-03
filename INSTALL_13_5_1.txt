@@ -1,0 +1,19 @@
+BELL PERFORMANCE 13.5.1 INSTALLATION
+
+Recommended method when your repository already contains Bell 13.5.0:
+
+1. Extract Bell_Performance_13_5_1_Dashboard_Refinement_PATCH.zip.
+2. Copy all files inside the extracted folder.
+3. Paste them into the root of your existing Bell Performance repository.
+4. Choose Replace files in the destination when prompted.
+5. Open GitHub Desktop and verify you are on the bell-core-live branch.
+6. Review the changed files.
+7. Commit with:
+   Refine 13.5 dashboard layout and navigation
+8. Push the bell-core-live branch.
+
+You may instead use the complete GitHub-ready build by copying its contents into the repository root. Do not place the extracted build inside an extra nested folder.
+
+No database migration is required for 13.5.1.
+
+After deployment, refresh once or close and reopen the installed PWA so the 13.5.1 service worker can replace the older cached interface.

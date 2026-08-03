@@ -1,0 +1,863 @@
+{
+  "version": "13.12.3",
+  "primaryCompliance": 0.9,
+  "scope": "Clean-control calibration for canonical event routing, event-critical session preservation, rehearsal evidence, taper, recovery, and scope-aware custom events.",
+  "commonGuardrails": [
+    "52 formal weeks generated without browser errors",
+    "event family and event type persist correctly",
+    "general, build, specific, competition, taper, and event-week architecture appears when prep length permits",
+    "event-specific sessions and at least one controlled rehearsal are present",
+    "taper reduces prescribed volume without deleting event-specific work",
+    "post-event recovery removes simulation and high-stress event work",
+    "required sessions fit declared time availability"
+  ],
+  "eventTypes": [
+    {
+      "id": "5k-race",
+      "eventType": "5K Race",
+      "family": "running",
+      "identity": "Endurance Athlete",
+      "objective": "Improve Endurance",
+      "goalType": "Hybrid",
+      "engineMode": "Running",
+      "engineGoal": "5k-time",
+      "prepWeeks": 10,
+      "taperWeeks": 1,
+      "usualMinutes": 75,
+      "strengthDays": 2,
+      "engineDays": 4,
+      "minLongMinutes": 55,
+      "evidence": [
+        "endurance-taper-2023"
+      ],
+      "concepts": {
+        "Quality running": [
+          "quality_run",
+          "quality session",
+          "threshold",
+          "vo\u2082",
+          "vo2",
+          "race-pace"
+        ],
+        "Easy aerobic running": [
+          "easy_run",
+          "easy aerobic run",
+          "easy run + strides"
+        ],
+        "Long-run durability": [
+          "long_run",
+          "long run",
+          "race rehearsal"
+        ],
+        "Strength support": [
+          "strength_support",
+          "runner strength"
+        ]
+      },
+      "limitation": "Validates running-event structure and dose differentiation, not an individual race-time prediction.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "race_rehearsal",
+        "event_rehearsal"
+      ],
+      "doseRoles": [
+        "long_run",
+        "race_rehearsal",
+        "event_rehearsal"
+      ]
+    },
+    {
+      "id": "10k-race",
+      "eventType": "10K Race",
+      "family": "running",
+      "identity": "Endurance Athlete",
+      "objective": "Improve Endurance",
+      "goalType": "Hybrid",
+      "engineMode": "Running",
+      "engineGoal": "10k-time",
+      "prepWeeks": 12,
+      "taperWeeks": 1,
+      "usualMinutes": 75,
+      "strengthDays": 2,
+      "engineDays": 4,
+      "minLongMinutes": 70,
+      "evidence": [
+        "endurance-taper-2023"
+      ],
+      "concepts": {
+        "Threshold or race-pace work": [
+          "quality_run",
+          "threshold",
+          "goal-pace",
+          "race-pace",
+          "10k quality"
+        ],
+        "Easy aerobic running": [
+          "easy_run",
+          "easy aerobic run",
+          "easy run + strides"
+        ],
+        "Long-run durability": [
+          "long_run",
+          "10k long run",
+          "race rehearsal"
+        ],
+        "Strength support": [
+          "strength_support",
+          "runner strength"
+        ]
+      },
+      "limitation": "Validates event-specific structure and conservative dose thresholds, not an individual race-time prediction.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "race_rehearsal",
+        "event_rehearsal"
+      ],
+      "doseRoles": [
+        "long_run",
+        "race_rehearsal",
+        "event_rehearsal"
+      ]
+    },
+    {
+      "id": "half-marathon",
+      "eventType": "Half Marathon",
+      "family": "running",
+      "identity": "Endurance Athlete",
+      "objective": "Improve Endurance",
+      "goalType": "Hybrid",
+      "engineMode": "Running",
+      "engineGoal": "half-marathon",
+      "prepWeeks": 16,
+      "taperWeeks": 2,
+      "usualMinutes": 105,
+      "strengthDays": 2,
+      "engineDays": 4,
+      "minLongMinutes": 90,
+      "evidence": [
+        "endurance-taper-2023"
+      ],
+      "concepts": {
+        "Threshold or goal-pace work": [
+          "quality_run",
+          "threshold",
+          "goal-pace",
+          "race-pace"
+        ],
+        "Easy aerobic running": [
+          "easy_run",
+          "easy aerobic run",
+          "easy run + strides"
+        ],
+        "Long-run durability": [
+          "long_run",
+          "half marathon long run",
+          "race rehearsal"
+        ],
+        "Fueling rehearsal": [
+          "fueling",
+          "hydration"
+        ],
+        "Strength support": [
+          "strength_support",
+          "runner strength"
+        ]
+      },
+      "limitation": "Validates event-specific structure and dose differentiation, not an individual race-time prediction.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "race_rehearsal",
+        "event_rehearsal"
+      ],
+      "doseRoles": [
+        "long_run",
+        "race_rehearsal",
+        "event_rehearsal"
+      ]
+    },
+    {
+      "id": "marathon",
+      "eventType": "Marathon",
+      "family": "running",
+      "identity": "Endurance Athlete",
+      "objective": "Improve Endurance",
+      "goalType": "Hybrid",
+      "engineMode": "Running",
+      "engineGoal": "marathon",
+      "prepWeeks": 20,
+      "taperWeeks": 2,
+      "usualMinutes": 120,
+      "strengthDays": 2,
+      "engineDays": 5,
+      "minLongMinutes": 110,
+      "evidence": [
+        "endurance-taper-2023",
+        "endurance-taper-2007"
+      ],
+      "concepts": {
+        "Race-pace or threshold work": [
+          "quality_run",
+          "threshold",
+          "goal-pace",
+          "race-pace"
+        ],
+        "Easy aerobic running": [
+          "easy_run",
+          "easy aerobic run",
+          "easy run + strides"
+        ],
+        "Marathon long-run durability": [
+          "long_run",
+          "marathon long run",
+          "race rehearsal"
+        ],
+        "Fueling and equipment rehearsal": [
+          "fueling",
+          "hydration",
+          "equipment"
+        ],
+        "Strength support": [
+          "strength_support",
+          "runner strength"
+        ]
+      },
+      "limitation": "Validates event architecture and minimum long-session differentiation, not race-time or injury outcomes.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "race_rehearsal",
+        "event_rehearsal"
+      ],
+      "doseRoles": [
+        "long_run",
+        "race_rehearsal",
+        "event_rehearsal"
+      ]
+    },
+    {
+      "id": "cycling-time-trial",
+      "eventType": "Cycling Time Trial",
+      "family": "cycling",
+      "identity": "Endurance Athlete",
+      "objective": "Improve Endurance",
+      "goalType": "Hybrid",
+      "engineMode": "Cycling",
+      "engineGoal": "cycling-event",
+      "prepWeeks": 12,
+      "taperWeeks": 2,
+      "usualMinutes": 105,
+      "strengthDays": 2,
+      "engineDays": 5,
+      "minLongMinutes": 90,
+      "evidence": [
+        "endurance-taper-2023"
+      ],
+      "concepts": {
+        "Threshold or event-paced cycling": [
+          "bike_quality",
+          "bike quality",
+          "threshold",
+          "event-paced cycling"
+        ],
+        "Easy endurance riding": [
+          "easy_ride",
+          "easy endurance ride",
+          "recovery spin"
+        ],
+        "Long-ride durability": [
+          "long_ride",
+          "long endurance ride",
+          "cycling event rehearsal"
+        ],
+        "Position and pacing rehearsal": [
+          "position",
+          "pacing"
+        ],
+        "Equipment, hydration, and fueling": [
+          "equipment",
+          "hydration",
+          "fueling"
+        ]
+      },
+      "limitation": "Validates time-trial preparation structure, not power targets or aerodynamic fit.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "cycling_rehearsal"
+      ],
+      "doseRoles": [
+        "long_ride",
+        "cycling_rehearsal"
+      ]
+    },
+    {
+      "id": "triathlon",
+      "eventType": "Triathlon",
+      "family": "multisport",
+      "identity": "Endurance Athlete",
+      "objective": "Improve Endurance",
+      "goalType": "Hybrid",
+      "engineMode": "Running",
+      "engineGoal": "triathlon",
+      "prepWeeks": 16,
+      "taperWeeks": 2,
+      "usualMinutes": 120,
+      "strengthDays": 2,
+      "engineDays": 5,
+      "minLongMinutes": 90,
+      "evidence": [
+        "triathlon-taper-1999",
+        "endurance-taper-2023"
+      ],
+      "concepts": {
+        "Swim preparation": [
+          "swim",
+          "swim technique"
+        ],
+        "Bike preparation": [
+          "bike_quality",
+          "bike quality",
+          "cycling"
+        ],
+        "Run preparation": [
+          "run_quality",
+          "run quality",
+          "race-pace run"
+        ],
+        "Brick rehearsal": [
+          "brick",
+          "transition"
+        ],
+        "Fueling practice": [
+          "fueling",
+          "hydration"
+        ],
+        "Strength support": [
+          "strength_support",
+          "triathlon strength"
+        ]
+      },
+      "limitation": "Validates balanced multisport architecture; race distance and athlete swim proficiency still require individualization.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "brick_rehearsal"
+      ],
+      "doseRoles": [
+        "long_brick",
+        "brick_rehearsal"
+      ]
+    },
+    {
+      "id": "hyrox",
+      "eventType": "HYROX",
+      "family": "functional",
+      "identity": "Hybrid Athlete",
+      "objective": "Improve Performance",
+      "goalType": "Hybrid",
+      "engineMode": "Running",
+      "engineGoal": "hyrox",
+      "prepWeeks": 12,
+      "taperWeeks": 1,
+      "usualMinutes": 90,
+      "strengthDays": 3,
+      "engineDays": 4,
+      "minLongMinutes": 60,
+      "evidence": [
+        "hyrox-demands-2025",
+        "hybrid-hift-2025"
+      ],
+      "concepts": {
+        "Running under compromised conditions": [
+          "compromised 1 km",
+          "run\u2013station",
+          "run-station"
+        ],
+        "Station strength and carries": [
+          "station strength",
+          "carries",
+          "hyrox strength"
+        ],
+        "Aerobic recovery": [
+          "aerobic recovery",
+          "easy aerobic reset"
+        ],
+        "Competition simulation": [
+          "hyrox simulation",
+          "controlled simulation"
+        ],
+        "Strength retention": [
+          "strength_skill",
+          "strength"
+        ]
+      },
+      "limitation": "Validates broad HYROX demands; exact division loads and station standards require athlete-entered competition details.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "hyrox_simulation"
+      ],
+      "doseRoles": [
+        "hyrox_simulation",
+        "run_station_capacity"
+      ]
+    },
+    {
+      "id": "crossfit-competition",
+      "eventType": "CrossFit Competition",
+      "family": "functional",
+      "identity": "Functional Fitness",
+      "objective": "Improve Performance",
+      "goalType": "Hybrid",
+      "engineMode": "General Conditioning",
+      "engineGoal": "functional-fitness",
+      "prepWeeks": 10,
+      "taperWeeks": 1,
+      "usualMinutes": 90,
+      "strengthDays": 4,
+      "engineDays": 3,
+      "minLongMinutes": 50,
+      "evidence": [
+        "crossfit-predictors-2023",
+        "crossfit-demands-2024"
+      ],
+      "concepts": {
+        "Olympic-lift or gymnastics skill": [
+          "olympic lift",
+          "gymnastics skill",
+          "skill"
+        ],
+        "Structured strength": [
+          "strength + weakness",
+          "strength_skill",
+          "strength"
+        ],
+        "Mixed-modal repeatability": [
+          "mixed-modal repeatability",
+          "competition piece"
+        ],
+        "Competition simulation": [
+          "crossfit competition simulation",
+          "competition simulation"
+        ],
+        "Aerobic recovery": [
+          "aerobic recovery",
+          "easy aerobic reset"
+        ]
+      },
+      "limitation": "Validates balanced competition preparation; unknown event programming prevents exact event prediction.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "crossfit_simulation"
+      ],
+      "doseRoles": [
+        "crossfit_simulation",
+        "competition_piece"
+      ]
+    },
+    {
+      "id": "combat-sports",
+      "eventType": "Combat Sports Tournament",
+      "family": "functional",
+      "identity": "Functional Fitness",
+      "objective": "Improve Performance",
+      "goalType": "Hybrid",
+      "engineMode": "General Conditioning",
+      "engineGoal": "combat-rounds",
+      "prepWeeks": 10,
+      "taperWeeks": 1,
+      "usualMinutes": 75,
+      "strengthDays": 3,
+      "engineDays": 3,
+      "minLongMinutes": 45,
+      "evidence": [
+        "combat-hiit-2019"
+      ],
+      "concepts": {
+        "Round-specific conditioning": [
+          "competition rounds",
+          "round capacity",
+          "tournament round simulation"
+        ],
+        "Strength and power support": [
+          "fight strength & power",
+          "relative strength"
+        ],
+        "Technical-skill support": [
+          "skill",
+          "technical practice"
+        ],
+        "Tournament simulation": [
+          "tournament round simulation"
+        ],
+        "Aerobic recovery": [
+          "aerobic recovery",
+          "easy aerobic reset"
+        ]
+      },
+      "limitation": "Bell validates physical preparation only; technical-tactical combat coaching and weight-cut management require qualified sport professionals.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "tournament_simulation"
+      ],
+      "doseRoles": [
+        "tournament_simulation",
+        "round_capacity"
+      ]
+    },
+    {
+      "id": "powerlifting-meet-event",
+      "eventType": "Powerlifting Meet",
+      "family": "strength_competition",
+      "identity": "Powerlifting",
+      "objective": "Increase Strength",
+      "goalType": "Powerlifting",
+      "engineMode": "None / Recovery Only",
+      "engineGoal": "recovery-only",
+      "prepWeeks": 12,
+      "taperWeeks": 2,
+      "usualMinutes": 90,
+      "strengthDays": 4,
+      "engineDays": 1,
+      "minLongMinutes": 0,
+      "evidence": [
+        "powerlifting-taper-2020"
+      ],
+      "concepts": {
+        "Competition squat": [
+          "competition_squat",
+          "competition squat"
+        ],
+        "Competition bench": [
+          "competition_bench",
+          "competition bench"
+        ],
+        "Competition deadlift": [
+          "competition_deadlift",
+          "competition deadlift"
+        ],
+        "Attempt and command preparation": [
+          "attempt",
+          "commands",
+          "opener"
+        ],
+        "Low-fatigue aerobic support": [
+          "recovery aerobic",
+          "easy movement"
+        ]
+      },
+      "limitation": "Validates meet architecture and specificity, not individualized attempt selection or medical readiness.",
+      "rehearsalRequired": true,
+      "rehearsalMode": "powerlifting_openers",
+      "rehearsalRoles": [],
+      "doseRoles": []
+    },
+    {
+      "id": "strongman-competition",
+      "eventType": "Strongman Competition",
+      "family": "strength_competition",
+      "identity": "Powerlifting",
+      "objective": "Improve Performance",
+      "goalType": "Powerlifting",
+      "engineMode": "General Conditioning",
+      "engineGoal": "strongman",
+      "prepWeeks": 12,
+      "taperWeeks": 1,
+      "usualMinutes": 105,
+      "strengthDays": 4,
+      "engineDays": 2,
+      "minLongMinutes": 60,
+      "evidence": [
+        "strongman-practices-2011",
+        "strongman-biomechanics-2020"
+      ],
+      "concepts": {
+        "Maximal lower-body strength": [
+          "deadlift / squat strength",
+          "deadlift",
+          "squat"
+        ],
+        "Overhead event strength": [
+          "overhead event strength",
+          "press"
+        ],
+        "Carries and loading": [
+          "carries",
+          "loading",
+          "event strength + loading"
+        ],
+        "Grip and upper-back support": [
+          "grip",
+          "upper back"
+        ],
+        "Implement or event simulation": [
+          "strongman event simulation",
+          "event practice"
+        ]
+      },
+      "limitation": "Validates broad strongman preparation; actual contest implements, event order, and weights must be entered by the athlete or coach.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "strongman_simulation"
+      ],
+      "doseRoles": [
+        "strongman_simulation",
+        "strongman_event_capacity"
+      ]
+    },
+    {
+      "id": "tactical-games",
+      "eventType": "Tactical Games",
+      "family": "tactical",
+      "identity": "Tactical Athlete",
+      "objective": "Improve Performance",
+      "goalType": "Hybrid",
+      "engineMode": "Running",
+      "engineGoal": "tactical-games",
+      "prepWeeks": 12,
+      "taperWeeks": 1,
+      "usualMinutes": 90,
+      "strengthDays": 3,
+      "engineDays": 4,
+      "minLongMinutes": 60,
+      "evidence": [
+        "load-carriage-2012",
+        "load-carriage-biomechanics-2018"
+      ],
+      "concepts": {
+        "Usable strength": [
+          "usable strength",
+          "strength"
+        ],
+        "Loaded movement and carries": [
+          "loaded endurance",
+          "ruck",
+          "carry"
+        ],
+        "Running and repeated efforts": [
+          "test / task intervals",
+          "timed running",
+          "repeat efforts"
+        ],
+        "Task-skill support": [
+          "task skill",
+          "standards rehearsal",
+          "shooting"
+        ],
+        "Full-event simulation": [
+          "full test / tactical simulation",
+          "tactical simulation"
+        ]
+      },
+      "limitation": "Validates physical and task-support preparation; firearms instruction and operational tactics are outside Bell\u2019s coaching scope.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "test_simulation"
+      ],
+      "doseRoles": [
+        "test_simulation",
+        "loaded_endurance"
+      ]
+    },
+    {
+      "id": "fitness-test",
+      "eventType": "Military / Law-Enforcement Fitness Test",
+      "family": "tactical",
+      "identity": "Tactical Athlete",
+      "objective": "Improve Performance",
+      "goalType": "Hybrid",
+      "engineMode": "Running",
+      "engineGoal": "fitness-test",
+      "prepWeeks": 10,
+      "taperWeeks": 1,
+      "usualMinutes": 75,
+      "strengthDays": 3,
+      "engineDays": 4,
+      "minLongMinutes": 45,
+      "evidence": [
+        "load-carriage-2012"
+      ],
+      "concepts": {
+        "Timed running or repeated efforts": [
+          "test / task intervals",
+          "timed running",
+          "repeat efforts"
+        ],
+        "Calisthenics and standards": [
+          "calisthenics",
+          "standards rehearsal",
+          "task skill"
+        ],
+        "Usable strength": [
+          "usable strength",
+          "strength"
+        ],
+        "Aerobic base": [
+          "aerobic base",
+          "easy running"
+        ],
+        "Full-test simulation": [
+          "full test / tactical simulation",
+          "full test"
+        ]
+      },
+      "limitation": "Validates generic test preparation; agencies with exact standards require a standard-specific test definition.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "test_simulation"
+      ],
+      "doseRoles": [
+        "test_simulation",
+        "loaded_endurance"
+      ]
+    },
+    {
+      "id": "custom-sport-event",
+      "eventType": "Custom Sport Event",
+      "family": "tactical",
+      "identity": "Performance & Health",
+      "objective": "Improve Performance",
+      "goalType": "Hybrid",
+      "engineMode": "General Conditioning",
+      "engineGoal": "custom-event",
+      "prepWeeks": 10,
+      "taperWeeks": 1,
+      "usualMinutes": 75,
+      "strengthDays": 3,
+      "engineDays": 3,
+      "minLongMinutes": 0,
+      "evidence": [
+        "acsm-2009"
+      ],
+      "concepts": {
+        "General strength": [
+          "usable strength",
+          "strength"
+        ],
+        "Conditioning": [
+          "intervals",
+          "aerobic base",
+          "work capacity"
+        ],
+        "Skill or standards practice": [
+          "task skill",
+          "standards rehearsal",
+          "technique"
+        ]
+      },
+      "limitation": "Without a complete demand profile, Bell must label the plan SCOPE_LIMITED and make no event-specific scientific claim.",
+      "rehearsalRequired": false,
+      "scopeLimitedWhenUndefined": true,
+      "rehearsalRoles": [],
+      "doseRoles": []
+    },
+    {
+      "id": "obstacle-course-race",
+      "eventType": "Obstacle Course Race",
+      "family": "obstacle_loaded",
+      "identity": "Tactical Athlete",
+      "objective": "Improve Performance",
+      "goalType": "Hybrid",
+      "engineMode": "Running",
+      "engineGoal": "ocr",
+      "prepWeeks": 12,
+      "taperWeeks": 1,
+      "usualMinutes": 90,
+      "strengthDays": 3,
+      "engineDays": 4,
+      "minLongMinutes": 70,
+      "evidence": [
+        "ocr-demands-2019"
+      ],
+      "concepts": {
+        "Trail and hill running": [
+          "hill / trail intervals",
+          "easy trail run",
+          "trail"
+        ],
+        "Grip and pulling strength": [
+          "grip + pulling strength",
+          "grip",
+          "pulling"
+        ],
+        "Obstacle skill": [
+          "obstacle skill",
+          "climbs",
+          "hangs"
+        ],
+        "Long trail durability": [
+          "long trail",
+          "ocr course simulation"
+        ],
+        "Carries and transitions": [
+          "carry",
+          "transitions"
+        ]
+      },
+      "limitation": "OCR evidence remains limited; validates broad demands rather than a specific race brand or obstacle inventory.",
+      "rehearsalRequired": true,
+      "rehearsalRoles": [
+        "course_simulation"
+      ],
+      "doseRoles": [
+        "course_simulation",
+        "long_trail_obstacles"
+      ]
+    },
+    {
+      "id": "physique-competition",
+      "eventType": "Bodybuilding / Physique Competition",
+      "family": "physique",
+      "identity": "Bodybuilding",
+      "objective": "Body Recomposition",
+      "goalType": "Bodybuilding",
+      "engineMode": "General Conditioning",
+      "engineGoal": "physique-stage",
+      "prepWeeks": 20,
+      "taperWeeks": 1,
+      "usualMinutes": 90,
+      "strengthDays": 5,
+      "engineDays": 4,
+      "minLongMinutes": 0,
+      "evidence": [
+        "bodybuilding-training-2014",
+        "bodybuilding-nutrition-2014"
+      ],
+      "concepts": {
+        "Upper-body resistance training": [
+          "resistance_upper",
+          "physique upper",
+          "hypertrophy"
+        ],
+        "Lower-body resistance training": [
+          "resistance_lower",
+          "physique lower",
+          "legs",
+          "posterior"
+        ],
+        "Recoverable contest cardio": [
+          "contest prep cardio",
+          "cardio + mobility"
+        ],
+        "Weak-point and symmetry emphasis": [
+          "weak-point",
+          "symmetry"
+        ],
+        "Peak-week fatigue reduction": [
+          "peak week fatigue reduction",
+          "low-soreness",
+          "brief full-body pump"
+        ]
+      },
+      "limitation": "Validates training architecture only. Diet, fluid, posing, and peak-week manipulation require qualified professional oversight.",
+      "rehearsalRequired": false,
+      "rehearsalRoles": [],
+      "doseRoles": []
+    }
+  ],
+  "acceptance": [
+    "All 16 clean event controls pass their context-appropriate rubric.",
+    "Event-critical sessions survive availability trimming and retain canonical roles.",
+    "Running prescriptions state the target event identity and preserve differentiated long-session doses.",
+    "Powerlifting opener and command practice counts as controlled meet rehearsal without requiring a mock meet.",
+    "Physique validation uses lower-body roles and peak-week fatigue reduction without prescribing posing as a workout.",
+    "Undefined custom events return SCOPE_LIMITED rather than a false event-specific claim."
+  ],
+  "nextTrack": "13.12.4 can extend the locked event controls into athlete-profile, equipment, and schedule-boundary stress testing."
+}

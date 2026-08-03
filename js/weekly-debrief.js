@@ -39,11 +39,18 @@ function categoryMetricHtml(name,rec){
   const pct=Math.round(rec.completed/rec.scheduled*100);
   return`<div class="weekly-debrief-metric"><span>${name}</span><strong>${rec.completed}/${rec.scheduled} complete</strong><small>${gradeFromPercent(pct)} performance</small></div>`;
 }
+function athleteResponseForDebrief(){
+  return typeof bellAthleteResponseSummary==="function"?bellAthleteResponseSummary():{status:"collecting",label:"Collecting response data",detail:"Bell is still building a comparable response trend.",factors:{intensity:1,volume:1,engine:1}};
+}
 function coachAssessmentForWeek(s){
-  if(s.pct>=90&&(!s.avgReadiness||s.avgReadiness>=70))return"You handled the week well. Completion and recovery support a measured progression next week. Bell will increase the training stimulus without making unnecessary changes.";
-  if(s.pct>=75)return"You completed most of the important work. Next week will progress conservatively while preserving the sessions that matter most for your training focus.";
-  if(s.avgReadiness!==null&&s.avgReadiness<60)return"Recovery was the main limiter this week. Bell will protect the core plan, reduce optional volume, and avoid forcing progression until your readiness improves.";
-  return"Consistency was below the level needed for an aggressive progression. Bell will repeat key exposures and keep next week achievable rather than adding load too quickly.";
+  const response=athleteResponseForDebrief();
+  if(["safety_hold","protect"].includes(response.status))return`${response.detail} Weekly completion does not override pain or movement-quality feedback.`;
+  if(["rebuild","regress","hold"].includes(response.status))return`${response.detail} Bell will preserve the mission while keeping the next exposure achievable.`;
+  if(["progress","accelerate"].includes(response.status))return`${response.detail} Progression remains capped and is based on repeated completed work, not one exceptional session.`;
+  if(s.pct>=90&&(!s.avgReadiness||s.avgReadiness>=70))return"You handled the week well. Bell is recording the response and will wait for enough comparable evidence before making a larger change.";
+  if(s.pct>=75)return"You completed most of the important work. Next week will preserve the priority sessions while Bell continues to compare actual performance with the prescription.";
+  if(s.avgReadiness!==null&&s.avgReadiness<60)return"Recovery was the main limiter this week. Bell will protect the core plan, reduce optional volume, and avoid forcing progression until readiness and completed performance improve.";
+  return"Consistency was below the level needed for progression. Bell will repeat key exposures and will not assign catch-up volume.";
 }
 function renderWeeklyDebriefSummary(){
   const s=weeklyDebriefSummary();weeklyDebriefState.summary=s;
@@ -70,7 +77,7 @@ function hasIncompleteSundayTraining(){
 }
 function remainingWeekSessions(){return(data.plan||[]).filter(x=>x.status!=="replaced"&&!x.done&&x.status!=="completed");}
 function openWeeklyDebrief(manual=false){
-  if(!data.trainingBlock?.enabled){alert("Create or activate a training block first.");return false;}
+  if(!data.trainingBlock?.enabled){if(manual)alert("Create or activate a training block first.");return false;}
   const isSunday=new Date().getDay()===0;
   if(!manual&& !isSunday)return false;
   if(!manual&&hasIncompleteSundayTraining())return false;
@@ -92,10 +99,12 @@ function showWeeklyCheckIn(){document.getElementById("weeklyDebriefSummaryStep")
 function showWeeklySummary(){document.getElementById("weeklyDebriefCheckInStep").classList.add("hidden");document.getElementById("weeklyDebriefSummaryStep").classList.remove("hidden");}
 function selectWeeklyDifficulty(button){weeklyDebriefState.difficulty=button.dataset.value;document.querySelectorAll("#weeklyDifficultyChoices button").forEach(x=>x.classList.toggle("selected",x===button));}
 function nextWeekCoachPlan(summary,difficulty,pain,energy){
-  if(pain!=="none")return"A pain flag was reported. Next week will avoid aggressive progression and prioritize pain-free substitutions. Update your limitations or seek qualified medical guidance if symptoms persist.";
-  if(difficulty==="hard"||energy<=2||summary.avgReadiness!==null&&summary.avgReadiness<60)return"Next week will keep the main progression but trim optional volume and cap high-intensity conditioning. The goal is to restore momentum without adding avoidable fatigue.";
-  if(summary.pct>=90&&difficulty!=="hard")return"Next week progresses as planned: a small strength increase, a measured engine progression, and the same mobility and core standards. Quality stays ahead of volume.";
-  return"Next week repeats the most important movement and engine exposures before adding more work. Consistency earns progression; missed sessions are not punished with catch-up volume.";
+  const response=athleteResponseForDebrief();
+  if(pain!=="none"||["safety_hold","protect"].includes(response.status))return`${response.detail} Update your limitations or seek qualified medical guidance if symptoms persist or worsen.`;
+  if(["rebuild","regress","hold"].includes(response.status))return response.detail;
+  if(["progress","accelerate"].includes(response.status))return`${response.detail} Bell will retain the same mission structure and apply only the capped dose change.`;
+  if(difficulty==="hard"||energy<=2||summary.avgReadiness!==null&&summary.avgReadiness<60)return"Next week keeps the main progression but trims optional volume and caps high-intensity conditioning. The goal is to restore momentum without avoidable fatigue.";
+  return"Bell will keep the prescription stable while it gathers another comparable response. Missed sessions are not punished with catch-up volume.";
 }
 function buildWeeklyPreview(){
   if(!weeklyDebriefState.difficulty){alert("Choose how difficult the week felt before continuing.");return;}
@@ -105,14 +114,16 @@ function buildWeeklyPreview(){
   setTimeout(()=>{
     const progression=typeof strengthProgression==="function"?strengthProgression():{label:"Progressive training"};
     const phase=typeof blockPhase==="function"?blockPhase():"Build";
-    document.getElementById("nextWeekPreviewGrid").innerHTML=`<div class="weekly-debrief-metric"><span>Strength</span><strong>${progression.label}</strong><small>Progress only from clean completed work</small></div><div class="weekly-debrief-metric"><span>Engine</span><strong>${phase}</strong><small>Goal-specific aerobic progression</small></div><div class="weekly-debrief-metric"><span>Recovery</span><strong>${pain==="none"?"Maintain mobility":"Protect reported area"}</strong><small>Mobility and core remain in every week</small></div><div class="weekly-debrief-metric"><span>Expected schedule</span><strong>${data.trainingBlock.trainingDays||5} training days</strong><small>${data.trainingBlock.sessionMinutes||75}-minute target sessions</small></div>`;
+    const response=athleteResponseForDebrief();
+    const responseFactors=`Load ${Math.round((response.factors?.intensity||1)*100)}% • Volume ${Math.round((response.factors?.volume||1)*100)}% • Engine ${Math.round((response.factors?.engine||1)*100)}%`;
+    document.getElementById("nextWeekPreviewGrid").innerHTML=`<div class="weekly-debrief-metric"><span>Strength</span><strong>${progression.label}</strong><small>Planned versus completed sets, reps, load, RPE, and RIR</small></div><div class="weekly-debrief-metric"><span>Engine</span><strong>${phase}</strong><small>Time, distance, pace, heart rate, and completed effort</small></div><div class="weekly-debrief-metric"><span>Athlete response</span><strong>${response.label}</strong><small>${responseFactors}</small></div><div class="weekly-debrief-metric"><span>Recovery</span><strong>${pain==="none"?"Maintain mobility":"Protect reported area"}</strong><small>Pain and technique flags override progression</small></div><div class="weekly-debrief-metric"><span>Expected schedule</span><strong>${data.trainingBlock.trainingDays||5} training days</strong><small>${data.trainingBlock.sessionMinutes||75}-minute target sessions • no catch-up volume</small></div>`;
     document.getElementById("nextWeekCoachPlan").textContent=nextWeekCoachPlan(summary,weeklyDebriefState.difficulty,pain,energy);
     document.getElementById("beginNextWeekButton").textContent=data.trainingBlock.currentWeek>=data.trainingBlock.lengthWeeks?"Complete Training Block":"Begin Next Week";
     document.getElementById("buildingWeekState").classList.add("hidden");document.getElementById("nextWeekPreviewContent").classList.remove("hidden");
   },650);
 }
 function confirmAdvanceTrainingWeek(){
-  const summary=weeklyDebriefState.summary||weeklyDebriefSummary(),entry={id:weeklyDebriefId(),week:data.trainingBlock.currentWeek,completedAt:new Date().toISOString(),completed:true,summary,difficulty:weeklyDebriefState.difficulty,painArea:document.getElementById("weeklyPainArea").value,energy:Number(document.getElementById("weeklyEnergy").value)||3,notes:document.getElementById("weeklyNotes").value.trim()};
+  const summary=weeklyDebriefState.summary||weeklyDebriefSummary(),entry={id:weeklyDebriefId(),week:data.trainingBlock.currentWeek,completedAt:new Date().toISOString(),completed:true,summary,athleteResponse:athleteResponseForDebrief(),difficulty:weeklyDebriefState.difficulty,painArea:document.getElementById("weeklyPainArea").value,energy:Number(document.getElementById("weeklyEnergy").value)||3,notes:document.getElementById("weeklyNotes").value.trim()};
   data.performanceReviews.weeklyDebriefs=data.performanceReviews.weeklyDebriefs||[];const old=data.performanceReviews.weeklyDebriefs.findIndex(x=>x.id===entry.id);if(old>=0)data.performanceReviews.weeklyDebriefs[old]=entry;else data.performanceReviews.weeklyDebriefs.push(entry);
   if(data.trainingBlock.currentWeek<data.trainingBlock.lengthWeeks){if(typeof archiveUnresolvedPlanSessions==="function")archiveUnresolvedPlanSessions("weekly_debrief");data.trainingBlock.currentWeek++;if(typeof bpPrepareBlockPlan==="function")bpPrepareBlockPlan(data.trainingBlock);if(typeof bpLoadActiveWeekFromPlan==="function")bpLoadActiveWeekFromPlan();else buildCurrentWeekPlan();}
   else{data.trainingBlock.completedAt=new Date().toISOString();data.trainingBlock.status="completed";if(typeof bpArchiveBlock==="function")bpArchiveBlock(data.trainingBlock,"block_completed");data.trainingBlock.enabled=false;data.plan=[];}

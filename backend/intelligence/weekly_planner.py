@@ -1,0 +1,427 @@
+from __future__ import annotations
+
+import argparse
+import copy
+import json
+from datetime import date, datetime
+from pathlib import Path
+from typing import Any
+
+from .session_builder import BellSessionBuilder
+from .discipline_library import BellDisciplineLibrary
+
+VERSION = "13.2.0"
+DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+
+def _norm(value: Any) -> str:
+    return " ".join(str(value or "").strip().lower().replace("_", " ").split())
+
+
+class BellWeeklyPlanningEngine:
+    """Decomposes a mission into objectives, schedules sessions, builds them, and validates the week."""
+
+    def __init__(self, database_path: str | Path, rulebook_path: str | Path):
+        self.database_path = str(database_path)
+        self.rulebook_path = Path(rulebook_path)
+        self.rules = json.loads(self.rulebook_path.read_text())
+        self.session_builder = BellSessionBuilder(database_path)
+
+    def close(self) -> None:
+        self.session_builder.close()
+
+    def _mission_key(self, request: dict[str, Any]) -> str:
+        text = _norm(" ".join(str(request.get(k, "")) for k in ("mission", "goal", "specialization", "event")))
+        if "powerlifting" in text:
+            competition_date = request.get("competition_date")
+            event_text = _norm(request.get("event"))
+            if competition_date and ("meet" in text or "competition" in text or "meet" in event_text):
+                return "powerlifting_meet"
+            return "powerlifting"
+        if "10k" in text:
+            return "10k"
+        if any(x in text for x in ("recomp", "body composition", "fat loss")):
+            return "body_recomposition"
+        if any(x in text for x in ("tactical", "police", "military", "fire")):
+            return "tactical"
+        if any(x in text for x in ("physique", "bodybuilding", "hypertrophy")):
+            return "physique"
+        if any(x in text for x in ("hybrid", "running and strength")):
+            return "hybrid"
+        return "general_strength"
+
+    def _meet_phase(self, request: dict[str, Any]) -> tuple[str, int | None]:
+        raw = request.get("competition_date")
+        if not raw:
+            return str(request.get("phase") or "Build"), None
+        try:
+            target = datetime.strptime(str(raw)[:10], "%Y-%m-%d").date()
+            days = max(0, (target - date.today()).days)
+        except (TypeError, ValueError):
+            return str(request.get("phase") or "Build"), None
+        weeks = (days + 6) // 7
+        if days <= 7:
+            return "Meet Week", weeks
+        if weeks <= 2:
+            return "Taper & Openers", weeks
+        if weeks <= 5:
+            return "Competition Peak", weeks
+        if weeks <= 10:
+            return "Meet Strength Block", weeks
+        return "Meet Base Building", weeks
+
+    def _resolve_template(self, name: str) -> dict[str, Any]:
+        templates = self.rules["session_templates"]
+        template = copy.deepcopy(templates[name])
+        if "inherits" in template:
+            parent = copy.deepcopy(templates[template.pop("inherits")])
+            parent.update(template)
+            template = parent
+        return template
+
+    def _available_days(self, request: dict[str, Any]) -> list[str]:
+        available = request.get("available_days") or DAYS
+        normalized = {_norm(x): x for x in DAYS}
+        result = [normalized[_norm(x)] for x in available if _norm(x) in normalized]
+        return result or DAYS
+
+    @staticmethod
+    def _preferred_order(session_names: list[str]) -> list[str]:
+        # Place high-fatigue lower and engine days apart before filling moderate sessions.
+        priorities = {
+            "Powerlifting Squat Focus": 8, "Powerlifting Bench Focus": 12,
+            "Powerlifting Deadlift Focus": 22, "Powerlifting Secondary Squat + Bench": 38,
+            "Lower Strength": 10, "Threshold": 20, "Intervals": 20, "Long Run": 30,
+            "Long Aerobic": 30, "Upper Strength": 40, "Lower Volume": 50,
+            "Legs": 50, "Upper Volume": 60, "Push": 60, "Pull": 60,
+            "Upper": 60, "Lower": 60, "Full Body Hypertrophy": 70,
+            "Easy Run": 80, "Aerobic Base": 80, "Mixed Modal": 25,
+        }
+        return sorted(session_names, key=lambda x: priorities.get(x, 65))
+
+    def _assign_days(self, sessions: list[str], available_days: list[str], preferred: dict[str, str]) -> list[dict[str, Any]]:
+        """Assign every requested exposure, allowing compatible same-day pairings."""
+        available_idx = [DAYS.index(d) for d in available_days]
+        ordered = self._preferred_order(sessions)
+        assigned: dict[str, list[str]] = {day: [] for day in DAYS}
+
+        def profile(name: str) -> dict[str, bool]:
+            template = self._resolve_template(name)
+            kind = template.get("session_type", "strength")
+            lower = kind != "engine" and any(x in name for x in ("Lower", "Squat", "Deadlift", "Legs"))
+            upper = kind != "engine" and any(x in name for x in ("Upper", "Bench", "Push", "Pull"))
+            long_engine = kind == "engine" and "Long" in name
+            hard_engine = kind == "engine" and any(x in name for x in ("Threshold", "Intervals", "Tempo", "Sprint", "Quality"))
+            easy_engine = kind == "engine" and not long_engine and not hard_engine
+            return {"engine": kind == "engine", "strength": kind != "engine", "lower": lower,
+                    "upper": upper, "long_engine": long_engine, "hard_engine": hard_engine,
+                    "easy_engine": easy_engine}
+
+        def day_score(day: str, name: str) -> float:
+            idx = DAYS.index(day)
+            candidate = profile(name)
+            existing = [profile(x) for x in assigned[day]]
+            score = len(existing) * 35.0
+            if candidate["long_engine"]:
+                score += 0 if day == "Saturday" else 80
+                if existing:
+                    score += 400
+            if candidate["strength"]:
+                if day == "Friday":
+                    score -= 12
+                if any(x["long_engine"] for x in existing):
+                    score += 500
+            if candidate["engine"]:
+                if any(x["upper"] for x in existing):
+                    score -= 28
+                if any(x["lower"] for x in existing):
+                    score += 18 if candidate["easy_engine"] else 160
+                if any(x["strength"] and not x["lower"] and not x["upper"] for x in existing):
+                    score += 8 if candidate["easy_engine"] else 75
+            for other_day, names in assigned.items():
+                distance = abs(DAYS.index(other_day) - idx)
+                for other_name in names:
+                    other = profile(other_name)
+                    if candidate["hard_engine"] and other["lower"] and distance <= 1:
+                        score += 45
+                    if candidate["lower"] and other["hard_engine"] and distance <= 1:
+                        score += 45
+                    if candidate["lower"] and other["lower"] and distance <= 1:
+                        score += 35
+            if not existing and day in ("Wednesday", "Thursday") and candidate["engine"]:
+                score -= 6
+            return score
+
+        for name in ordered:
+            pref = preferred.get(name)
+            candidates = [pref] if pref in available_days else available_days
+            chosen = min(candidates, key=lambda d: day_score(d, name))
+            assigned[chosen].append(name)
+
+        schedule: list[dict[str, Any]] = []
+        for day in DAYS:
+            if assigned[day]:
+                schedule.extend({"day": day, "session_name": name, "status": "training"} for name in assigned[day])
+            else:
+                schedule.append({"day": day, "session_name": None, "status": "recovery"})
+        return schedule
+
+    def _build_engine_session(self, name: str, template: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
+        rx = copy.deepcopy(template["engine_prescription"])
+        phase = request.get("load_phase") or request.get("phase", "Build")
+        modifier = self.rules["phase_modifiers"].get(phase, self.rules["phase_modifiers"]["Build"])["volume"]
+        if "duration_minutes" in rx:
+            rx["duration_minutes"] = max(15, round(rx["duration_minutes"] * modifier))
+        return {
+            "name": name,
+            "session_type": "engine",
+            "estimated_total_minutes": rx.get("duration_minutes", request.get("session_minutes", 45)),
+            "engine_prescription": rx,
+            "bell_score": 90.0,
+            "validation": {"passed": True, "warnings": []},
+            "coach_summary": f"{name} supports the week's endurance objective while respecting the {phase} phase.",
+        }
+
+    def _build_strength_session(self, name: str, template: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
+        session_request = {
+            "name": name,
+            "session_type": template.get("session_type", "strength"),
+            "primary_adaptation": template.get("slots", [{}])[0].get("adaptation", "General Strength"),
+            "bell_system": request.get("bell_system", "Performance"),
+            "phase": request.get("load_phase") or request.get("phase", "Build"),
+            "athlete_skill": request.get("athlete_skill", "Intermediate"),
+            "readiness": request.get("readiness", 7),
+            "max_systemic_fatigue": request.get("max_systemic_fatigue", 9),
+            "session_minutes": request.get("session_minutes", 70),
+            "warmup_minutes": request.get("warmup_minutes", 10),
+            "cooldown_minutes": request.get("cooldown_minutes", 5),
+            "environment": request.get("environment", "Commercial Gym"),
+            "available_equipment": request.get("available_equipment", []),
+            "required_equipment_policy": request.get("required_equipment_policy", "strict"),
+            "strict_pattern": True,
+            "recent_exercise_ids": request.get("recent_exercise_ids", []),
+            "excluded_exercise_ids": request.get("excluded_exercise_ids", []),
+            "slots": copy.deepcopy(template.get("slots", [])),
+        }
+        return self.session_builder.build_session(session_request)
+
+    def _validate_week(self, schedule: list[dict[str, Any]], objectives: list[str], built: list[dict[str, Any]], available_days: list[str]) -> dict[str, Any]:
+        warnings: list[str] = []
+        high_days = []
+        training_indices = []
+        session_scores = []
+        for i, item in enumerate(schedule):
+            if item["session_name"]:
+                training_indices.append(i)
+                template = self._resolve_template(item["session_name"])
+                if template.get("systemic_load") == "high":
+                    high_days.append(i)
+        for session in built:
+            session_scores.append(float(session.get("bell_score", session.get("validation", {}).get("bell_score", 85))))
+
+        names = [item["session_name"] for item in schedule if item.get("session_name")]
+        duplicate_names = sorted({name for name in names if names.count(name) > 1})
+        if duplicate_names:
+            warnings.append("Duplicate weekly session templates detected: " + ", ".join(duplicate_names))
+        long_sessions = [name for name in names if name in ("Long Run", "Long Aerobic")]
+        if len(long_sessions) > 1:
+            warnings.append("More than one long-endurance session was generated.")
+
+        limits = self.rules["weekly_limits"]
+        if len(high_days) > limits["max_high_systemic_days"]:
+            warnings.append("High-systemic session limit exceeded.")
+        if any(b - a == 1 for a, b in zip(high_days, high_days[1:])):
+            warnings.append("Consecutive high-systemic sessions detected.")
+        streak = max_streak = 0
+        for i in range(7):
+            if i in training_indices:
+                streak += 1
+                max_streak = max(max_streak, streak)
+            else:
+                streak = 0
+        if max_streak > limits["max_consecutive_training_days"]:
+            warnings.append("Maximum consecutive training-day rule exceeded.")
+        recovery_days = 7 - len(training_indices)
+        if recovery_days < limits["minimum_recovery_days"]:
+            warnings.append("Minimum weekly recovery-day rule not met.")
+
+        if any(name.startswith("Powerlifting") for name in names):
+            required = {"Powerlifting Squat Focus", "Powerlifting Bench Focus", "Powerlifting Deadlift Focus"}
+            missing = sorted(required.difference(names))
+            if missing:
+                warnings.append("Powerlifting week is missing required competition-lift roles: " + ", ".join(missing))
+            prohibited = [name for name in names if any(token in name for token in ("Intervals", "Threshold", "Long Run", "Mixed Modal"))]
+            if prohibited:
+                warnings.append("Powerlifting engine work must remain low-intensity aerobic support: " + ", ".join(prohibited))
+
+        alignment = 100 if objectives else 70
+        recovery = max(0, 100 - 18 * len(warnings))
+        schedule_fit = round(100 * len(training_indices) / max(1, min(len(available_days), len(training_indices)))) if training_indices else 0
+        volume = 92 if len(training_indices) >= 3 else 72
+        fatigue = 100 if not high_days or not any(b - a == 1 for a, b in zip(high_days, high_days[1:])) else 72
+        session_quality = sum(session_scores) / len(session_scores) if session_scores else 80
+        components = {
+            "goal_alignment": alignment,
+            "recovery_balance": recovery,
+            "schedule_fit": min(100, schedule_fit),
+            "volume_distribution": volume,
+            "fatigue_management": fatigue,
+            "session_quality": round(session_quality, 1),
+        }
+        weights = self.rules["week_score_weights"]
+        score = round(sum(components[k] * weights[k] for k in weights), 1)
+        passed = score >= self.rules["governance"]["minimum_week_score"] and not any("exceeded" in w for w in warnings)
+        return {"passed": passed, "bell_score": score, "components": components, "warnings": warnings}
+
+    def build_week(self, request: dict[str, Any]) -> dict[str, Any]:
+        mission_key = self._mission_key(request)
+        if mission_key == "powerlifting_meet":
+            resolved_phase, weeks_to_competition = self._meet_phase(request)
+            request = copy.deepcopy(request)
+            request["phase"] = resolved_phase
+            request["weeks_to_competition"] = weeks_to_competition
+        profile = self.rules["mission_profiles"][mission_key]
+        objectives = request.get("weekly_objectives") or profile["objectives"]
+        available_days = self._available_days(request)
+        requested_strength = max(0, int(request.get("strength_days", 0) or 0))
+        requested_engine = max(0, int(request.get("engine_days", 0) or 0))
+        identity = str(request.get("identity") or request.get("discipline") or request.get("goal") or mission_key)
+        objective = str(request.get("objective") or request.get("goal") or "Continuous Development")
+        journey_phase = str(request.get("journey_phase") or request.get("phase") or "Foundation")
+        discipline_library = BellDisciplineLibrary()
+        discipline_rules = discipline_library.weekly_rules(
+            identity, objective, journey_phase,
+            training_days=max(2, min(7, int(request.get("training_days", len(available_days)) or len(available_days)))),
+            requested_strength=requested_strength or None,
+            requested_engine=requested_engine if request.get("engine_days") is not None else None,
+        )
+        strength_target = discipline_rules["strength_target"]
+        engine_target = discipline_rules["engine_target"]
+        request = copy.deepcopy(request)
+        request["load_phase"] = discipline_rules["load_phase"]
+        defaults = [name for name in discipline_rules["session_order"] if name in self.rules["session_templates"]]
+        for name in profile["default_sessions"]:
+            if name not in defaults:
+                defaults.append(name)
+        strength_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") != "engine"]
+        engine_pool = [name for name in defaults if self._resolve_template(name).get("session_type", "strength") == "engine"]
+        if not strength_target and not engine_target:
+            requested_sessions = int(request.get("training_days", len(defaults)))
+            sessions = defaults[:requested_sessions]
+        else:
+            sessions = []
+            # Build distinct exposure roles. Never satisfy a target by cycling the same template.
+            strength_fallback = (["Powerlifting Squat Focus", "Powerlifting Bench Focus", "Powerlifting Deadlift Focus", "Powerlifting Secondary Squat + Bench"]
+                                 if mission_key in ("powerlifting", "powerlifting_meet") else
+                                 ["Upper Strength", "Lower Strength", "Upper Volume", "Lower Volume", "Full Body Hypertrophy", "Push", "Pull", "Legs", "Upper", "Lower"])
+            engine_fallback = (["Powerlifting Aerobic Recovery", "Aerobic Base"] if mission_key in ("powerlifting", "powerlifting_meet") else
+                               ["Easy Run", "Threshold", "Aerobic Base", "Intervals", "Long Run", "Mixed Modal", "Long Aerobic"])
+            def unique_pool(primary: list[str], fallback: list[str]) -> list[str]:
+                result: list[str] = []
+                for name in [*primary, *fallback]:
+                    if name in self.rules["session_templates"] and name not in result:
+                        result.append(name)
+                return result
+            strength_pool = unique_pool(strength_pool, strength_fallback)
+            engine_pool = unique_pool(engine_pool, engine_fallback)
+            if strength_target > len(strength_pool):
+                raise ValueError(f"Bell cannot create {strength_target} unique strength exposures from {len(strength_pool)} templates.")
+            if engine_target > len(engine_pool):
+                raise ValueError(f"Bell cannot create {engine_target} unique engine exposures from {len(engine_pool)} templates.")
+            sessions.extend(strength_pool[:strength_target])
+            sessions.extend(engine_pool[:engine_target])
+            requested_sessions = len(sessions)
+        preferred = request.get("preferred_session_days", {})
+        schedule = self._assign_days(sessions, available_days, preferred)
+
+        built_sessions = []
+        for item in schedule:
+            name = item["session_name"]
+            if not name:
+                item["recovery_guidance"] = "Rest or complete 20-30 minutes of easy walking and mobility as needed."
+                continue
+            template = self._resolve_template(name)
+            if template.get("session_type") == "engine":
+                built = self._build_engine_session(name, template, request)
+            else:
+                built = self._build_strength_session(name, template, request)
+            name_lower = name.lower()
+            is_engine = template.get("session_type") == "engine"
+            is_long = "long" in name_lower
+            is_lower = any(token in name_lower for token in ("lower", "squat", "deadlift", "legs"))
+            is_upper = any(token in name_lower for token in ("upper", "bench", "push", "pull"))
+            mobility_focus = "Hips, Ankles & Posterior Chain" if (is_engine or is_lower) else "Shoulders & Thoracic Spine" if is_upper else "Full Body Reset"
+            core_required = (not is_engine) and (not is_long)
+            core_optional = is_engine and (not is_long)
+            integrated_support = {
+                "mobility": {"included": True, "placement": "cooldown", "minutes": 8 if is_long else 10, "focus": mobility_focus},
+                "core": {"included": core_required or core_optional, "required": core_required, "optional": core_optional, "minutes": 8 if core_required else 6 if core_optional else 0, "focus": "Trunk stability and bracing"},
+            }
+            built["integrated_support"] = integrated_support
+            item["integrated_support"] = integrated_support
+            item["session"] = built
+            base_minutes = built.get("estimated_total_minutes", built.get("estimated_minutes", request.get("session_minutes", 60)))
+            item["estimated_minutes"] = base_minutes + integrated_support["mobility"]["minutes"] + integrated_support["core"]["minutes"]
+            built_sessions.append(built)
+
+        validation = self._validate_week(schedule, objectives, built_sessions, available_days)
+        return {
+            "engine_version": VERSION,
+            "rulebook_version": self.rules["rulebook_version"],
+            "mission": request.get("mission") or request.get("goal") or mission_key,
+            "mission_profile": mission_key,
+            "discipline": discipline_rules["discipline_id"],
+            "discipline_label": discipline_rules["discipline_label"],
+            "phase": request.get("phase", "Build"),
+            "journey_phase": journey_phase,
+            "load_phase": discipline_rules["load_phase"],
+            "competition_date": request.get("competition_date"),
+            "weeks_to_competition": request.get("weeks_to_competition"),
+            "weekly_objectives": objectives,
+            "schedule": schedule,
+            "validation": validation,
+            "coach_summary": f"Bell built a {len(built_sessions)}-session {discipline_rules['discipline_label']} week for {journey_phase} with a score of {validation['bell_score']}.",
+            "coaching_rules": {
+                "protected_sessions": discipline_rules["protected_sessions"],
+                "progression_rule": discipline_rules["progression_rule"],
+                "missed_session_rule": discipline_rules["missed_session_rule"],
+                "readiness_yellow": discipline_rules["readiness_yellow"],
+                "readiness_red": discipline_rules["readiness_red"],
+                "assessment_metrics": discipline_rules["assessment_metrics"],
+                "weekly_architecture": discipline_rules["weekly_architecture"],
+                "discipline_library_version": discipline_library.version,
+            },
+            "decision_trace": {
+                "available_days": available_days,
+                "requested_training_days": requested_sessions,
+                "requested_strength_exposures": strength_target,
+                "requested_engine_exposures": engine_target,
+                "selected_session_templates": sessions,
+                "rules_applied": ["discipline library", "journey phase", "mission profile", "phase modifiers", "recovery spacing", "weekly fatigue limits", "week scoring"],
+                "discipline_session_order": discipline_rules["session_order"],
+            },
+        }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Bell Weekly Planning Engine")
+    parser.add_argument("request")
+    parser.add_argument("--database", required=True)
+    parser.add_argument("--rulebook", required=True)
+    parser.add_argument("--output")
+    args = parser.parse_args()
+    request = json.loads(Path(args.request).read_text())
+    engine = BellWeeklyPlanningEngine(args.database, args.rulebook)
+    try:
+        result = engine.build_week(request)
+    finally:
+        engine.close()
+    text = json.dumps(result, indent=2)
+    if args.output:
+        Path(args.output).write_text(text)
+    else:
+        print(text)
+
+
+if __name__ == "__main__":
+    main()

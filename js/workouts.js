@@ -442,7 +442,10 @@ function renderWorkoutStage(){
   warm?.classList.toggle('hidden',stage!=='warmup');warmActions?.classList.toggle('hidden',stage!=='warmup');
   control?.classList.toggle('hidden',stage==='briefing');exercises?.classList.toggle('hidden',stage!=='training');completion?.classList.toggle('hidden',stage!=='training');
   if(stage==='briefing'){active.timerRunning=false;setText('currentExerciseOut','Review the mission, then begin when ready');}
-  if(stage==='warmup')setText('currentExerciseOut','Complete the warm-up, then advance to training');
+  if(stage==='warmup'){
+    renderWarmupPanel();
+    setText('currentExerciseOut','Complete the warm-up, then advance to training');
+  }
   if(stage==='training'){
     if(typeof gwMaterializeWorkout==='function')gwMaterializeWorkout(active);
     const nextExercise=active.exercises?.find(exercise=>exercise.sets?.some(set=>!set.done));

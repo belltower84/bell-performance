@@ -37,8 +37,12 @@
     active.exercises=active.exercises.map(materializeExercise).filter(Boolean);
     return active.exercises.some(ex=>Array.isArray(ex.sets)&&ex.sets.length);
   }
+  function appData(){
+    try { if (typeof data !== 'undefined' && data) return data; } catch (_) {}
+    return window.data || null;
+  }
   function locate(){
-    const a=window.data?.activeWorkout;
+    const a=appData()?.activeWorkout;
     if(!a||!materializeWorkout(a))return null;
     for(let ei=0;ei<a.exercises.length;ei++){
       const sets=Array.isArray(a.exercises[ei].sets)?a.exercises[ei].sets:[];

@@ -1,0 +1,17 @@
+(function(){
+  'use strict';
+  function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function locate(){const a=window.data?.activeWorkout;if(!a)return null;for(let ei=0;ei<a.exercises.length;ei++){const si=a.exercises[ei].sets.findIndex(s=>!s.done);if(si>=0)return{a,ei,si,ex:a.exercises[ei],set:a.exercises[ei].sets[si]};}return{a,done:true};}
+  function nextLabel(a,ei,si){const ex=a.exercises[ei];if(si+1<ex.sets.length)return `${ex.name} — Set ${si+2}`;const n=a.exercises.slice(ei+1).find(x=>x.sets.some(s=>!s.done));return n?`${n.name} — Set 1`:'Session review';}
+  window.gwToggle=function(id){document.getElementById(id)?.classList.toggle('open');};
+  window.gwCompleteCurrent=function(){const p=locate();if(!p||p.done)return;const w=document.getElementById('gwWeight'),r=document.getElementById('gwReps');if(w)p.set.weight=w.value;if(r)p.set.reps=r.value;p.set.done=true;window.saveData?.({render:false});if(window.beginRestTimer){const hasMore=p.a.exercises.some(x=>x.sets.some(s=>!s.done));if(hasMore)window.beginRestTimer(p.ex.rest||60,nextLabel(p.a,p.ei,p.si));}window.renderActiveWorkout();};
+  window.renderActiveWorkout=function(){
+    const c=document.getElementById('activeExercises');if(!c)return;const p=locate();if(!p){c.innerHTML='';return;}const card=document.getElementById('workoutCompletionCard');
+    const total=p.a.exercises.reduce((n,x)=>n+x.sets.length,0),done=p.a.exercises.reduce((n,x)=>n+x.sets.filter(s=>s.done).length,0);
+    if(p.done){c.innerHTML=`<div class="gw-done"><h3>Working sets complete</h3><p>Review the session and finish when ready.</p></div>`;card?.classList.add('gw-show');window.updateWorkoutProgress?.();return;}
+    card?.classList.remove('gw-show');
+    const pct=total?Math.round(done/total*100):0;const weight=p.set.weight||p.set.plannedWeight||'';const reps=p.set.reps||p.set.plannedReps||'';
+    c.innerHTML=`<section class="gw-shell"><div class="gw-progress"><span style="width:${pct}%"></span></div><div class="gw-topline"><span><strong>Exercise ${p.ei+1}</strong> of ${p.a.exercises.length}</span><span>${done}/${total} sets</span></div><article class="gw-current"><div><div class="gw-kicker">Current exercise</div><h2 class="gw-title">${esc(p.ex.name)}</h2><div class="gw-sub">Set ${p.si+1} of ${p.ex.sets.length}</div></div><div class="gw-prescription">${esc(weight||'Choose load')} × ${esc(reps||p.ex.plannedReps||'target reps')}</div>${p.ex.cue?`<div class="gw-sub">${esc(p.ex.cue)}</div>`:''}<button class="gw-complete" onclick="gwCompleteCurrent()">Complete Set ${p.si+1}</button><div class="gw-next">Next: <b>${esc(nextLabel(p.a,p.ei,p.si))}</b></div><button class="gw-more" onclick="gwToggle('gwTools')">More options</button><div class="gw-tools" id="gwTools"><button onclick="gwToggle('gwAdjust')">Adjust result</button><button onclick="openExerciseGuide?.('${esc(p.ex.name).replace(/'/g,'&#39;')}')">Exercise guide</button><button onclick="openExerciseReplacement?.(${p.ei})">Replace exercise</button><button onclick="closeWorkout?.()">Save & exit</button></div><div class="gw-adjust" id="gwAdjust"><label>Weight<input id="gwWeight" inputmode="decimal" value="${esc(weight)}"></label><label>Reps<input id="gwReps" inputmode="text" value="${esc(reps)}"></label></div></article></section>`;
+    window.setText?.('currentExerciseOut',p.ex.name);window.updateTimerDisplay?.();window.updateWorkoutProgress?.();
+  };
+})();

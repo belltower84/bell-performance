@@ -1,0 +1,93 @@
+:root{
+  --bell-bg:#080a0e;
+  --bell-surface:#11151b;
+  --bell-surface-2:#171c24;
+  --bell-border:rgba(255,255,255,.09);
+  --bell-text:#f7f7f4;
+  --bell-muted:#a9b0bb;
+  --bell-gold:#d6b45c;
+  --bell-gold-strong:#f0c86a;
+  --bell-radius:18px;
+  --bell-radius-sm:12px;
+  --bell-space-1:8px;
+  --bell-space-2:12px;
+  --bell-space-3:16px;
+  --bell-space-4:24px;
+  --bell-space-5:32px;
+  --bell-shadow:0 18px 50px rgba(0,0,0,.28);
+}
+body{background:var(--bell-bg);color:var(--bell-text);font-family:Inter,Segoe UI,Arial,sans-serif;letter-spacing:-.01em}
+.card,.command-card,.command-tile,.command-mission-card,.workout-control-card,.exercise-card{border-color:var(--bell-border)!important;border-radius:var(--bell-radius)!important;box-shadow:none}
+button,input,select,textarea{font:inherit}
+button{min-height:44px;border-radius:12px;font-weight:750;transition:transform .15s ease,filter .15s ease,border-color .15s ease}
+button:active{transform:translateY(1px)}
+.good,.premium-primary-button,.command-start-button{background:linear-gradient(135deg,var(--bell-gold-strong),var(--bell-gold))!important;color:#15120b!important;border:0!important;box-shadow:0 10px 26px rgba(214,180,92,.18)}
+.secondary,.command-secondary-actions button{background:rgba(255,255,255,.045)!important;border:1px solid var(--bell-border)!important;color:var(--bell-text)!important}
+.metric-label,.command-kicker{text-transform:uppercase;letter-spacing:.13em;font-size:.72rem;font-weight:800;color:var(--bell-gold)!important}
+.hint,.sub,small{color:var(--bell-muted)}
+
+/* Today's Mission */
+.command-mission-card{padding:clamp(18px,3vw,30px)!important;background:radial-gradient(circle at 85% 0%,rgba(214,180,92,.11),transparent 34%),linear-gradient(150deg,#141922,#0e1218)!important;box-shadow:var(--bell-shadow)!important}
+.command-mission-heading{gap:18px;align-items:flex-start!important}
+.command-mission-heading h2{font-size:clamp(1.65rem,4vw,2.65rem)!important;line-height:1.03;margin:.35rem 0 .55rem!important}
+#commandMissionPurpose{max-width:62ch;color:var(--bell-muted);font-size:1rem}
+.command-mission-layout{gap:clamp(20px,4vw,42px)!important;align-items:stretch!important}
+.command-mission-main{display:flex;flex-direction:column;gap:16px}
+.command-mission-meta{display:flex;flex-wrap:wrap;gap:8px!important}
+.command-mission-meta span{background:rgba(255,255,255,.045);border:1px solid var(--bell-border);border-radius:999px;padding:8px 12px}
+.command-session-summary{display:grid;gap:10px}
+.command-mission-actions{min-width:min(100%,310px);display:flex!important;flex-direction:column;gap:12px!important}
+.command-start-button{min-height:58px!important;font-size:1.03rem!important}
+.command-adjustment{border:1px solid var(--bell-border)!important;background:rgba(255,255,255,.035)!important;border-radius:14px!important;padding:15px!important}
+.command-adjustment>span{color:var(--bell-gold)!important;font-weight:800}
+.command-adjustment strong{display:block;margin:5px 0 3px;font-size:1rem}
+.bell-why-button{width:100%;margin-top:11px;min-height:38px!important;background:transparent;border:1px solid rgba(214,180,92,.35);color:var(--bell-gold-strong);font-size:.88rem}
+.bell-coaching-why{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--bell-border)}
+.bell-coaching-why.open{display:block}
+.bell-coaching-why ul{margin:7px 0 0;padding-left:18px;color:var(--bell-muted)}
+.bell-coaching-why li+li{margin-top:5px}
+
+/* 10-second check-in */
+.readiness-modal-box{max-width:760px!important}
+.quick-readiness-form{padding:clamp(18px,4vw,30px)!important}
+.quick-readiness-list{display:grid;gap:12px!important}
+.quick-readiness-question{background:var(--bell-surface-2)!important;border:1px solid var(--bell-border)!important;border-radius:16px!important;padding:16px!important}
+.quick-question-heading{margin-bottom:12px!important}
+.quick-question-heading>span{background:rgba(214,180,92,.14)!important;color:var(--bell-gold-strong)!important;border:1px solid rgba(214,180,92,.28)!important}
+.quick-question-heading h3{font-size:1rem!important;margin:0!important}
+.quick-question-heading p{display:none}
+.quick-choice-grid button{min-height:58px!important;padding:10px!important;background:#0d1117!important;border:1px solid var(--bell-border)!important;color:var(--bell-text)!important}
+.quick-choice-grid button small{display:block;margin-top:3px;font-size:.72rem}
+.quick-choice-grid button.selected{border-color:var(--bell-gold)!important;background:rgba(214,180,92,.12)!important;box-shadow:inset 0 0 0 1px rgba(214,180,92,.25)}
+.quick-readiness-footer{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(17,21,27,.15),#11151b 25%);padding-top:14px;z-index:2}
+#quickReadinessProgress{font-size:.88rem}
+
+/* Workout execution */
+#workoutHero{border-radius:var(--bell-radius)!important;overflow:hidden;min-height:250px!important}
+#workoutHero h2{font-size:clamp(1.7rem,4vw,2.6rem)!important}
+.workout-stage-actions{position:sticky;bottom:76px;z-index:20;padding:10px;background:rgba(8,10,14,.88);backdrop-filter:blur(12px);border:1px solid var(--bell-border);border-radius:16px!important}
+.workout-stage-actions button{flex:1;min-height:52px!important}
+.workout-control-card{position:sticky;top:10px;z-index:15;background:rgba(17,21,27,.94)!important;backdrop-filter:blur(12px)}
+.exercise-card{background:linear-gradient(150deg,#151a22,#10141a)!important;padding:18px!important;margin-bottom:14px!important}
+.exercise-name{font-size:1.14rem!important;font-weight:850!important}
+.prescription{color:var(--bell-gold-strong)!important;font-weight:750}
+.exercise-primary-cue{color:var(--bell-muted)!important}
+.set-row{border-radius:12px!important;background:rgba(255,255,255,.035)!important;border:1px solid var(--bell-border)!important;padding:12px!important;margin-top:8px!important}
+.set-row input,.set-row select{min-height:46px!important;background:#090c11!important;border:1px solid rgba(255,255,255,.12)!important;color:var(--bell-text)!important;border-radius:10px!important}
+.exercise-card-actions button{min-height:36px!important;padding:6px 10px!important}
+.workout-finish-button{min-height:56px!important;width:100%}
+
+/* Consistency */
+.command-brief-strip,.command-tile-grid,.mission-briefing-grid{gap:14px!important}
+.command-card,.command-tile,.mission-briefing-grid .card{padding:18px!important;background:var(--bell-surface)!important}
+h1,h2,h3,strong{letter-spacing:-.025em}
+
+@media(max-width:760px){
+  .command-mission-layout{display:flex!important;flex-direction:column!important}
+  .command-mission-actions{min-width:0;width:100%}
+  .command-day-nav{width:100%;justify-content:flex-end}
+  .quick-choice-grid.time{grid-template-columns:repeat(4,1fr)!important}
+  .quick-choice-grid button small{display:none}
+  .workout-control-card{position:relative;top:auto}
+}
+.bell-exercise-status{display:inline-flex;margin:0 0 8px 46px;padding:4px 8px;border-radius:999px;background:rgba(214,180,92,.1);color:var(--bell-gold);font-size:.68rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase}

@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13-19-0';
+const CACHE_NAME = 'bell-performance-13-20-0-commercial';
 const CORE = [
   "./",
   "./index.html",
@@ -86,7 +86,10 @@ const CORE = [
   "./js/training-hub-1385.js?v=13850",
   "./js/mission-routing-1385.js?v=13850",
   "./js/longitudinal-coaching-1390.js?v=13910",
-];
+,
+  "./css/guided-workout-13193.css",
+  "./css/commercial-dashboard-13200.css",
+  "./js/guided-workout-13193.js"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));
 });

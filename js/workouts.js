@@ -522,7 +522,7 @@ function renderWorkoutStage(){
   control?.classList.toggle('hidden',stage==='briefing');exercises?.classList.toggle('hidden',stage!=='training');completion?.classList.toggle('hidden',stage!=='training');
   if(stage==='briefing'){active.timerRunning=false;setText('currentExerciseOut','Review the mission, then begin when ready');}
   if(stage==='warmup'){
-    renderWarmupPanel();
+    if(typeof window.bp13209RenderWarmupPanel==='function') window.bp13209RenderWarmupPanel(); else renderWarmupPanel();
     setText('currentExerciseOut','Complete the warm-up, then advance to training');
   }
   if(stage==='training'){

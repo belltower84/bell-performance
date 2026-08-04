@@ -31,6 +31,7 @@
 <link href="./css/guided-workout-13205.css?v=132050" rel="stylesheet"/>
 <link href="./css/guided-workout-13206.css?v=132060" rel="stylesheet"/>
 <link href="./css/workout-preview-warmup-13207.css?v=132080" rel="stylesheet"/>
+<link href="./css/preview-warmup-render-13209.css?v=132090" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -634,7 +635,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 </div>
 
 <div aria-labelledby="weekPreviewTitle" aria-modal="true" class="modal hidden" id="weekPreviewModal" role="dialog"><div class="modal-box onboarding-box week-preview-modal"><div class="card"><div class="notification-header"><div><span class="metric-label">Training Timeline</span><h2 id="weekPreviewTitle">Week Preview</h2><p class="sub" id="weekPreviewSubtitle"></p></div><button class="modal-close" onclick="bpCloseWeekPreview()" aria-label="Close week preview">×</button></div><div class="week-coach-brief" id="weekPreviewCoachBrief"></div><div id="weekPreviewList"></div><div class="row"><button class="secondary" onclick="bpPreviewAdjacentWeek(-1)">‹ Previous Week</button><button class="secondary" onclick="bpPreviewAdjacentWeek(1)">Next Week ›</button></div><button class="good" id="weekPreviewBuildButton" onclick="bpBuildPreviewedWeek()">Rebuild This Week</button></div></div></div>
-<div aria-labelledby="workoutPreviewTitle" aria-modal="true" class="modal hidden" id="workoutPreviewModal" role="dialog"><div class="modal-box preview-workout-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Workout Preview</span><h2 id="workoutPreviewTitle">Today’s Mission</h2><p class="sub" id="workoutPreviewMeta"></p></div><button class="modal-close" onclick="closeWorkoutPreview()" aria-label="Close workout preview">×</button></div><div id="workoutPreviewContent"></div><div class="row"><button class="secondary" onclick="closeWorkoutPreview()">Back</button><button class="good" id="previewBeginButton">Begin Workout</button></div></div></div></div>
+<div aria-labelledby="workoutPreviewTitle" aria-modal="true" class="modal hidden" id="workoutPreviewModal" role="dialog"><div class="modal-box preview-workout-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Workout Preview</span><h2 id="workoutPreviewTitle">Today’s Mission</h2><p class="sub" id="workoutPreviewMeta"></p></div><button class="modal-close" onclick="bp13209CloseWorkoutPreview()" aria-label="Close workout preview">×</button></div><div id="workoutPreviewContent"></div><div class="row"><button class="secondary" onclick="bp13209CloseWorkoutPreview()">Back</button><button class="good" id="previewBeginButton">Begin Workout</button></div></div></div></div>
 <div class="modal hidden" id="workoutModal">
 <div class="modal-box workout-shell-1385">
 <div class="workout-top">
@@ -648,8 +649,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
   <section class="card mission-success-card"><span class="metric-label">Success Today</span><div id="workoutSuccessList"></div></section>
   <section class="card mission-details-card"><span class="metric-label">Mission Details</span><div class="mission-detail-metrics"><div><strong id="workoutSetCount">—</strong><span>Work Sets</span></div><div><strong id="workoutIntensity">—</strong><span>Intensity</span></div></div><div class="mission-equipment"><span>Equipment</span><p id="workoutEquipment">—</p></div><div class="mission-next"><span>Next Session</span><strong id="workoutNextTitle">No session scheduled</strong><small id="workoutNextDetail"></small></div></section>
 </div>
-<div class="workout-stage-actions" id="workoutBriefActions"><button class="secondary" onclick="previewActiveWorkout()">View Exercise List</button><button class="good" onclick="beginWorkoutFlow()">Start Session</button></div>
-<div class="workout-stage-actions hidden" id="warmupActions"><button class="good" onclick="advanceToTraining()">Begin Working Sets</button></div>
+<div class="workout-stage-actions" id="workoutBriefActions"><button class="secondary" onclick="bp13209PreviewActiveWorkout()">Preview Exercises</button><button class="good" onclick="beginWorkoutFlow()">Start Session</button></div>
 <div class="card workout-control-card" id="workoutControlCard">
 <h3>Session Timer</h3><div class="timer" id="workoutTimer">00:00</div>
 <div class="current-exercise"><span class="metric-label">Current Focus</span><strong id="currentExerciseOut">Begin with the first exercise</strong></div>
@@ -657,6 +657,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="row"><button class="secondary" onclick="closeWorkout()">Save &amp; Exit</button><button class="danger" onclick="discardWorkout()">Discard</button></div>
 </div>
 <div class="card hidden" id="warmupPanel"></div>
+<div class="workout-stage-actions hidden" id="warmupActions"><button class="good" onclick="advanceToTraining()">Begin Working Sets</button></div>
 <div class="card hidden" id="engineResultCard">
 <span class="metric-label">Official Engine Result</span><h3>Enter the result from your watch or tracking app</h3>
 <p class="hint">The in-app timer is only a convenience. These editable fields become the official history record.</p>
@@ -687,7 +688,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.20.7-preview-warmup-grid-polish";</script>
+<script>window.BELL_APP_VERSION = "13.20.9-preview-warmup-render-completion";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=13710"></script>
 <script src="./js/storage.js?v=13841"></script>
@@ -747,6 +748,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/guided-workout-13204.js?v=132040"></script>
 <script src="./js/guided-workout-13205.js?v=132050"></script>
 <script src="./js/guided-workout-13206.js?v=132060"></script>
+<script src="./js/preview-warmup-render-13209.js?v=132090"></script>
 
 </body>
 </html>

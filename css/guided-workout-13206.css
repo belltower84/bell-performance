@@ -1,0 +1,124 @@
+/* Bell Performance 13.20.6 — Responsive Dock & Set Action Polish */
+
+/* Keep the scrollable workout content clear of the real, rendered dock height at every zoom level. */
+.gw-stable-13204{
+  --gw-dock-clearance:20px;
+}
+.gw-stable-13204 .gw-commercial-shell{
+  box-sizing:border-box!important;
+  padding-bottom:calc(var(--gw-action-dock-height,168px) + var(--gw-dock-clearance) + env(safe-area-inset-bottom,0px))!important;
+  scroll-padding-bottom:calc(var(--gw-action-dock-height,168px) + var(--gw-dock-clearance) + env(safe-area-inset-bottom,0px))!important;
+}
+.gw-stable-13204 .gw-action-spacer{
+  height:calc(var(--gw-action-dock-height,168px) + var(--gw-dock-clearance))!important;
+  min-height:calc(var(--gw-action-dock-height,168px) + var(--gw-dock-clearance))!important;
+  flex:0 0 auto!important;
+}
+.gw-stable-13204 .gw-action-dock{
+  box-sizing:border-box!important;
+  max-height:min(46dvh,420px);
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+.gw-stable-13204 .gw-feel.gw-feel-reveal,
+.gw-stable-13204 .gw-next-preview{
+  scroll-margin-bottom:calc(var(--gw-action-dock-height,168px) + var(--gw-dock-clearance) + 12px)!important;
+}
+
+/* Commercial set-result controls: clear states, restrained color, consistent geometry. */
+.gw-stable-13204 .gw-log-row{
+  align-items:center!important;
+}
+.gw-stable-13204 .gw-status{
+  min-width:94px!important;
+  padding:0 14px!important;
+  border-radius:999px!important;
+  border:1px solid #d7a817!important;
+  background:linear-gradient(180deg,#e7b51d,#c99408)!important;
+  color:#090c0f!important;
+  box-shadow:0 5px 14px rgba(215,168,23,.14)!important;
+  letter-spacing:.035em!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  text-transform:uppercase!important;
+  transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease,background .14s ease!important;
+}
+.gw-stable-13204 .gw-status:hover{
+  transform:translateY(-1px);
+  box-shadow:0 7px 18px rgba(215,168,23,.22)!important;
+}
+.gw-stable-13204 .gw-status:active{
+  transform:translateY(0) scale(.985);
+}
+.gw-stable-13204 .gw-status.is-done{
+  border-color:#3f995f!important;
+  background:linear-gradient(180deg,#277849,#1c6039)!important;
+  color:#f5fff8!important;
+  box-shadow:none!important;
+}
+.gw-stable-13204 .gw-status.is-skipped{
+  border-color:#4b5661!important;
+  background:#151b21!important;
+  color:#b9c1c9!important;
+  box-shadow:none!important;
+}
+.gw-stable-13204 .gw-row-skip{
+  min-width:48px!important;
+  height:32px!important;
+  padding:0 8px!important;
+  border:1px solid transparent!important;
+  border-radius:999px!important;
+  background:transparent!important;
+  color:#8e99a4!important;
+  font-size:9px!important;
+  font-weight:850!important;
+  letter-spacing:.05em!important;
+  text-decoration:none!important;
+  text-transform:uppercase!important;
+  transition:background .14s ease,color .14s ease,border-color .14s ease!important;
+}
+.gw-stable-13204 .gw-row-skip:hover{
+  background:#151b21!important;
+  border-color:#36414b!important;
+  color:#eef2f4!important;
+}
+.gw-stable-13204 .gw-log-row.is-done{
+  background:linear-gradient(90deg,rgba(38,116,71,.10),transparent 70%)!important;
+}
+.gw-stable-13204 .gw-log-row.is-skipped{
+  opacity:.78;
+  background:linear-gradient(90deg,rgba(91,102,114,.08),transparent 70%)!important;
+}
+
+/* Primary dock actions use the same premium hierarchy as the set rows. */
+.gw-stable-13204 .gw-skip-current{
+  border:1px solid #46515c!important;
+  background:#121820!important;
+  color:#dbe1e6!important;
+  box-shadow:none!important;
+}
+.gw-stable-13204 .gw-skip-current:hover{
+  background:#18212a!important;
+  border-color:#66727d!important;
+}
+.gw-stable-13204 .gw-next-current{
+  border:1px solid #edbd28!important;
+  background:linear-gradient(180deg,#e9b91f,#d49e08)!important;
+  color:#090c0f!important;
+  box-shadow:0 8px 22px rgba(215,168,23,.18)!important;
+}
+.gw-stable-13204 .gw-next-current:hover{
+  box-shadow:0 10px 26px rgba(215,168,23,.27)!important;
+}
+
+@media(max-width:900px){
+  .gw-stable-13204{--gw-dock-clearance:16px}
+  .gw-stable-13204 .gw-action-dock{max-height:min(52dvh,430px)}
+  .gw-stable-13204 .gw-status{min-width:82px!important;padding:0 10px!important;font-size:9px!important}
+  .gw-stable-13204 .gw-row-skip{min-width:42px!important;padding:0 5px!important}
+}
+@media(max-width:620px){
+  .gw-stable-13204{--gw-dock-clearance:12px}
+  .gw-stable-13204 .gw-status{min-width:74px!important;padding:0 8px!important}
+  .gw-stable-13204 .gw-row-skip{min-width:38px!important;font-size:8px!important}
+}

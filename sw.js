@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-18-6";
+const CACHE_NAME = "bell-performance-13-18-8";
 const CORE = [
   "./",
   "./index.html",
@@ -15,7 +15,7 @@ const CORE = [
   "./css/settings-1376.css?v=13760",
   "./css/workout-experience-1385.css?v=13850",
   "./css/athlete-response-13130.css?v=131400",
-  "./css/guided-workout-13186.css?v=131860",
+  "./css/guided-workout-13188.css?v=131880",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/logo-shield.svg?v=13720",
   "./assets/icons/engine-shoe.svg?v=10006",
@@ -49,7 +49,7 @@ const CORE = [
   "./js/progression.js?v=10006",
   "./js/workout-model.js?v=13850",
   "./js/workouts.js?v=131300",
-  "./js/guided-workout-13186.js?v=131860",
+  "./js/guided-workout-13188.js?v=131880",
   "./js/missed-sessions.js?v=10006",
   "./js/performance-review.js?v=10006",
   "./js/artwork.js?v=10006",

@@ -146,47 +146,4 @@ renderTodayTrainingCards=function(){
 document.addEventListener("DOMContentLoaded",()=>{normalizeData();performLocalMidnightRollover();if((data.plan||[]).some(item=>!item.scheduledDate))stampCurrentPlanDates();scheduleMidnightRollover();document.addEventListener("visibilitychange",()=>{if(!document.hidden){const before=data.dayNavigation?.lastLocalDate;performLocalMidnightRollover();if(before!==data.dayNavigation?.lastLocalDate)renderApp();}});});
 
 
-// 8.0.1: Every prescribed session receives a visible, session-specific warm-up.
-function bellWarmupRoutine(active=data.activeWorkout){
-  if(!active) return [];
-  if(active.optionalCore)return [{title:"Prepare",detail:"2–3 minutes easy movement and diaphragmatic breathing"},{title:"Mobilize",detail:"Cat-cow • thoracic rotation • gentle hip flexor stretch"},{title:"Prime",detail:"1 easy practice set of the first movement before working sets"}];
-  const isEngine=Boolean(active.cardioType)||String(active.name||"").startsWith("R-");
-  const names=(active.exercises||[]).map(ex=>String(ex.name||"")).join(" ").toLowerCase();
-  const status=active.readiness?.status||readinessStatus();
-  const short=status==="RED";
-  if(isEngine){
-    const modality=String(active.cardioType||data.settings?.cardioType||"Running").toLowerCase();
-    const dynamic=modality.includes("run")||modality.includes("ruck")
-      ? ["Ankle rocks + calf raises","Leg swings, front/back and lateral","Walking lunge with reach","Easy skips or marching drills"]
-      : modality.includes("row")
-        ? ["Easy rowing","Cat-cow + thoracic rotations","Bodyweight hinge","Progressive strokes"]
-        : modality.includes("swim")
-          ? ["Arm circles + band pull-aparts","Thoracic rotations","Easy technique laps","Progressive build laps"]
-          : ["Easy modality pace","Hip and ankle mobility","Bodyweight squat + hinge","Progressive cadence pickups"];
-    return [
-      {title:"Raise",detail:`${short?3:5} minutes very easy ${active.cardioType||"movement"}`},
-      {title:"Mobilize",detail:dynamic.slice(0,2).join(" • ")},
-      {title:"Activate",detail:dynamic.slice(2).join(" • ")},
-      {title:"Build",detail:short?"2 × 15-second controlled pickups":"3 × 20-second pickups, gradually reaching session pace"}
-    ];
-  }
-  const lower=/squat|deadlift|hinge|lunge|split squat|leg press|hamstring|glute|calf/.test(names);
-  const upper=/bench|press|row|pulldown|pull-up|chin-up|curl|triceps|raise|fly/.test(names);
-  const general=[
-    {title:"Raise",detail:`${short?3:5} minutes easy bike, rower, treadmill, or brisk walk`},
-    {title:"Mobilize",detail:lower&&upper?"Ankle rocks • 90/90 hip switches • thoracic rotations • band dislocates":lower?"Ankle rocks • 90/90 hip switches • adductor rock-backs":upper?"Thoracic rotations • band dislocates • scapular wall slides":"Dynamic full-body mobility"},
-    {title:"Activate",detail:lower&&upper?"Glute bridge 2 × 10 • dead bug 2 × 6/side • band pull-apart 2 × 12":lower?"Glute bridge 2 × 10 • dead bug 2 × 6/side • bodyweight squat 2 × 8":upper?"Band pull-apart 2 × 12 • scap push-up 2 × 8 • light external rotation 2 × 10":"Dead bug 2 × 6/side • bird dog 2 × 6/side"}
-  ];
-  const first=(active.exercises||[]).find(ex=>["Primary Strength","Primary Hypertrophy"].includes(ex.block))||(active.exercises||[])[0];
-  const ramp=warmupSetsFor(first);
-  general.push({title:"Ramp",detail:ramp.length?`${first.name}: ${ramp.map(x=>`${x.weight} lb × ${x.reps}`).join(" • ")}`:`Perform 2–4 gradually heavier practice sets for ${first?.name||"the first compound lift"}; none count as working sets.`});
-  return general;
-}
-
-renderWarmupPanel=function(){
-  const panel=document.getElementById("warmupPanel");
-  if(!panel)return;
-  const routine=bellWarmupRoutine();
-  panel.classList.remove("hidden");
-  panel.innerHTML=`<div class="warmup-heading"><div><span class="metric-label">Required Preparation</span><h3>Session Warm-Up</h3></div><span class="warmup-time">8–12 min</span></div><div class="hint">Complete this before the working sets. Keep it crisp—prepared, not fatigued.</div><div class="warmup-grid">${routine.map((item,index)=>`<label class="warmup-step"><input type="checkbox" onchange="this.closest('.warmup-step').classList.toggle('completed',this.checked)"><span><b>${index+1}. ${item.title}</b><small>${item.detail}</small></span></label>`).join("")}</div>`;
-};
+// 13.21.0: warm-up rendering is consolidated in workouts.js.

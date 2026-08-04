@@ -1,0 +1,33 @@
+/* Bell Performance 13.21.0 — preview and warm-up source consolidation */
+#workoutPreviewModal{z-index:260!important;background:rgba(3,6,9,.93)!important;backdrop-filter:blur(14px)}
+#workoutPreviewModal .preview-workout-box{width:min(880px,100%)!important;max-width:880px!important;background:#070b0f!important;padding:20px!important}
+#workoutPreviewModal .card{border:1px solid #303944;background:linear-gradient(145deg,#11171d,#080c10);border-radius:18px;padding:22px}
+#workoutPreviewContent{display:grid;gap:18px;margin:20px 0}
+.bp-preview-section{border:1px solid #2d3741;border-radius:15px;background:#0b1015;overflow:hidden}
+.bp-preview-heading{display:flex;align-items:center;gap:12px;padding:15px 17px;border-bottom:1px solid #2a333d;background:rgba(216,166,50,.05)}
+.bp-preview-heading>span{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid #d8a632;color:#e6b731;font-weight:900}
+.bp-preview-heading small{display:block;color:#9aa4ae;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.bp-preview-heading h3{margin:2px 0 0;font-size:20px}
+.bp-preview-list{display:grid}
+.bp-preview-list article{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;padding:13px 17px;border-bottom:1px solid #232c35}
+.bp-preview-list article:last-child{border-bottom:0}
+.bp-preview-list article>b{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#151c23;color:#e7b52d}
+.bp-preview-list article div{display:grid;gap:3px}.bp-preview-list article strong{font-size:15px}.bp-preview-list article span{color:#a7b0ba;font-size:12px}
+body.workout-open #workoutModal[data-workout-stage="warmup"] #workoutControlCard,
+body.workout-open #workoutModal[data-workout-stage="warmup"] .gw-action-dock,
+body.workout-open #workoutModal[data-workout-stage="warmup"] .gw-action-spacer{display:none!important}
+body.workout-open #workoutModal[data-workout-stage="warmup"] .modal-box{overflow-y:auto!important}
+#workoutModal[data-workout-stage="warmup"] #warmupPanel{display:block!important;margin:0!important;padding:0!important;border:0!important;background:#070b0f!important;box-shadow:none!important}
+.bp-warmup-shell{max-width:900px;margin:0 auto;padding:28px 24px 48px}
+.bp-warmup-header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;padding-bottom:17px;border-bottom:1px solid #303943}
+.bp-warmup-header h2{margin:4px 0 7px;font-size:clamp(28px,5vw,42px);letter-spacing:-.03em}.bp-warmup-header p{margin:0;color:#a8b1ba}.bp-warmup-header>strong{white-space:nowrap;color:#e3b22b;font-size:14px}
+.bp-warmup-progress{height:4px;margin:16px 0 20px;border-radius:99px;background:#242d36;overflow:hidden}.bp-warmup-progress span{display:block;height:100%;background:#d8a632;transition:width .2s ease}
+.bp-warmup-list{display:grid;gap:9px}.bp-warmup-item{display:grid;grid-template-columns:46px 1fr 112px;gap:13px;align-items:center;min-height:72px;padding:10px 12px;border:1px solid #303a44;border-radius:13px;background:#0c1217}
+.bp-warmup-number{display:grid!important;place-items:center!important;width:38px!important;height:38px!important;padding:0!important;margin:0!important;border-radius:50%!important;border:1px solid #d7a62d!important;background:#111820!important;color:#f1c33c!important;font-weight:900!important}
+.bp-warmup-item>div{display:grid;gap:5px}.bp-warmup-item>div strong{font-size:16px}.bp-warmup-item>div span{color:#a7b0ba;font-size:13px;line-height:1.4}
+.bp-warmup-state{height:38px!important;margin:0!important;padding:0 12px!important;border-radius:9px!important;border:1px solid #d8a632!important;background:transparent!important;color:#e8b62d!important;font-size:12px!important;font-weight:900!important}
+.bp-warmup-item.is-done{border-color:#2c7247;background:rgba(24,87,52,.14)}.bp-warmup-item.is-done .bp-warmup-number,.bp-warmup-item.is-done .bp-warmup-state{border-color:#4d9a68!important;color:#78c18f!important}
+.bp-warmup-item.is-skipped{opacity:.62}.bp-warmup-item.is-skipped .bp-warmup-state{border-color:#5a646e!important;color:#aab2ba!important}
+.bp-warmup-actions{display:grid;grid-template-columns:1fr 1.5fr;gap:12px;margin-top:20px}.bp-warmup-actions button{min-height:52px!important;margin:0!important}.bp-warmup-actions button:disabled{opacity:.38;cursor:not-allowed}
+.bp-build-card strong{display:block;margin:8px 0;color:#e6b52d}
+@media(max-width:620px){#workoutPreviewModal .preview-workout-box{padding:10px!important}.bp-warmup-shell{padding:20px 12px 34px}.bp-warmup-header{display:grid}.bp-warmup-item{grid-template-columns:42px 1fr}.bp-warmup-state{grid-column:2;width:100%}.bp-warmup-actions{grid-template-columns:1fr}.bp-preview-list article{padding:12px}.bp-preview-heading{padding:13px}}

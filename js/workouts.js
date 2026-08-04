@@ -168,70 +168,154 @@ function scaledTemplate(name) {
 
 function warmupSetsFor(exercise) {
   if (!exercise || !['Primary Strength','Primary Hypertrophy'].includes(exercise.block)) return [];
-  const work = Number(exercise.recommendedWeight);
+  const work = Number(exercise.recommendedWeight ?? exercise.sets?.[0]?.plannedWeight ?? exercise.sets?.[0]?.weight);
   if (!Number.isFinite(work) || work < 45) return [];
-  const bar = exercise.name.includes("Dumbbell") ? 0 : 45;
+  const bar = String(exercise.name || '').includes("Dumbbell") ? 0 : 45;
   const rounds = [
-    { label: "Warm-up 1", weight: Math.max(bar, roundTo5(work * .40)), reps: "8" },
-    { label: "Warm-up 2", weight: Math.max(bar, roundTo5(work * .60)), reps: "5" },
-    { label: "Warm-up 3", weight: Math.max(bar, roundTo5(work * .78)), reps: "3" }
+    { label: "Ramp 1", weight: Math.max(bar, roundTo5(work * .40)), reps: "8" },
+    { label: "Ramp 2", weight: Math.max(bar, roundTo5(work * .60)), reps: "5" },
+    { label: "Ramp 3", weight: Math.max(bar, roundTo5(work * .78)), reps: "3" }
   ];
   return rounds.filter((x, i, arr) => i === 0 || x.weight > arr[i-1].weight);
 }
 
-function renderWarmupPanel() {
-  const panel = document.getElementById("warmupPanel");
-  const active = data.activeWorkout;
-  if (!panel || !active) return;
-
+function bellWarmupBlueprint(active) {
+  if (!active) return [];
+  const exercises = Array.isArray(active.exercises) ? active.exercises : [];
+  const names = exercises.map(ex => String(ex.name || '')).join(' ').toLowerCase();
+  const isEngine = Boolean(active.cardioType) || String(active.name || '').startsWith('R-');
+  const readiness = active.readiness?.status || (typeof readinessStatus === 'function' ? readinessStatus() : 'GREEN');
+  const short = String(readiness).toUpperCase() === 'RED';
   const items = [];
-  (active.exercises || []).forEach((exercise, exerciseIndex) => {
-    const rampSets = typeof warmupSetsFor === "function" ? (warmupSetsFor(exercise) || []) : [];
-    rampSets.forEach((set, setIndex) => items.push({
-      key: `${exerciseIndex}:${setIndex}`,
-      exercise: exercise.name,
-      label: set.label || `Warm-up ${setIndex + 1}`,
-      weight: set.weight,
-      reps: set.reps
-    }));
-  });
+  const add = (id, title, detail, kind='movement') => items.push({ id, title, detail, kind, done:false, skipped:false });
 
-  active.warmupChecks = active.warmupChecks && typeof active.warmupChecks === "object" ? active.warmupChecks : {};
-  const completeCount = items.filter(item => active.warmupChecks[item.key]).length;
-  const percent = items.length ? Math.round((completeCount / items.length) * 100) : 0;
-
-  panel.classList.remove("hidden");
-  if (!items.length) {
-    panel.innerHTML = `<section class="bp-warmup-shell">
-      <header class="bp-warmup-header"><div><span class="metric-label">Workout Warm-up</span><h2>Prepare to train</h2><p>Complete your normal movement preparation, then begin the working sets.</p></div></header>
-    </section>`;
-    return;
+  if (active.optionalCore) {
+    add('prepare','Prepare','2–3 minutes easy movement and diaphragmatic breathing');
+    add('mobilize','Mobilize','Cat-cow • thoracic rotation • gentle hip-flexor stretch');
+    add('prime','Prime','1 easy practice set of the first movement');
+    return items;
   }
 
-  panel.innerHTML = `<section class="bp-warmup-shell">
-    <header class="bp-warmup-header">
-      <div><span class="metric-label">Workout Warm-up</span><h2>Prepare for the working sets</h2><p>Complete each ramp set in order. Adjust the load if needed.</p></div>
-      <div class="bp-warmup-progress-copy"><strong>${completeCount}/${items.length}</strong><span>complete</span></div>
-    </header>
-    <div class="bp-warmup-progress"><span style="width:${percent}%"></span></div>
-    <div class="bp-warmup-list">${items.map((item,index)=>{
-      const done = Boolean(active.warmupChecks[item.key]);
-      return `<article class="bp-warmup-item ${done ? "is-complete" : ""}">
-        <button type="button" class="bp-warmup-check" onclick="toggleWorkoutWarmupItem('${item.key}')" aria-pressed="${done}">${done ? "✓" : index + 1}</button>
-        <div class="bp-warmup-copy"><strong>${escapeHtml(item.exercise)}</strong><span>${escapeHtml(item.label)}</span></div>
-        <div class="bp-warmup-prescription"><strong>${escapeHtml(item.weight)} lb</strong><span>× ${escapeHtml(item.reps)} reps</span></div>
-      </article>`;
-    }).join("")}</div>
-  </section>`;
+  if (isEngine) {
+    const modality = String(active.cardioType || data.settings?.cardioType || 'Running').toLowerCase();
+    add('raise','Raise',`${short ? 3 : 5} minutes very easy ${active.cardioType || 'movement'}`);
+    if (modality.includes('run') || modality.includes('ruck')) {
+      add('mobilize','Mobilize','Ankle rocks + calf raises • leg swings front/back and lateral');
+      add('activate','Activate','Walking lunge with reach • easy skips or marching drills');
+    } else if (modality.includes('row')) {
+      add('mobilize','Mobilize','Easy rowing • cat-cow + thoracic rotations');
+      add('activate','Activate','Bodyweight hinge • progressive strokes');
+    } else if (modality.includes('swim')) {
+      add('mobilize','Mobilize','Arm circles + band pull-aparts • thoracic rotations');
+      add('activate','Activate','Easy technique laps • progressive build laps');
+    } else {
+      add('mobilize','Mobilize','Hip and ankle mobility • bodyweight squat + hinge');
+      add('activate','Activate','Easy modality pace • progressive cadence pickups');
+    }
+    add('build','Build',short ? '2 × 15-second controlled pickups' : '3 × 20-second pickups, gradually reaching session pace');
+    return items;
+  }
+
+  const lower = /squat|deadlift|hinge|lunge|split squat|leg press|hamstring|glute|calf/.test(names);
+  const upper = /bench|press|row|pulldown|pull-up|chin-up|curl|triceps|raise|fly/.test(names);
+  add('raise','Raise',`${short ? 3 : 5} minutes easy bike, rower, treadmill, or brisk walk`);
+  add('mobilize','Mobilize', lower && upper
+    ? 'Ankle rocks • 90/90 hip switches • thoracic rotations • band dislocates'
+    : lower
+      ? 'Ankle rocks • 90/90 hip switches • adductor rock-backs'
+      : upper
+        ? 'Thoracic rotations • band dislocates • scapular wall slides'
+        : 'Dynamic full-body mobility');
+  add('activate','Activate', lower && upper
+    ? 'Glute bridge 2 × 10 • dead bug 2 × 6/side • band pull-apart 2 × 12'
+    : lower
+      ? 'Glute bridge 2 × 10 • dead bug 2 × 6/side • bodyweight squat 2 × 8'
+      : upper
+        ? 'Band pull-apart 2 × 12 • scap push-up 2 × 8 • light external rotation 2 × 10'
+        : 'Dead bug 2 × 6/side • bird dog 2 × 6/side');
+
+  const first = exercises.find(ex => ['Primary Strength','Primary Hypertrophy'].includes(ex.block)) || exercises[0];
+  const ramps = warmupSetsFor(first);
+  if (first && ramps.length) {
+    ramps.forEach((ramp, index) => add(`ramp-${index+1}`, `${first.name} · ${ramp.label}`, `${ramp.weight} lb × ${ramp.reps}`, 'ramp'));
+  } else if (first) {
+    add('ramp-practice',`${first.name} · Practice Sets`,'Perform 2–4 gradually heavier practice sets; none count as working sets.','ramp');
+  }
+  return items;
 }
 
-function toggleWorkoutWarmupItem(key) {
+function bellEnsureWarmupState(active=data.activeWorkout) {
+  if (!active) return [];
+  const blueprint = bellWarmupBlueprint(active);
+  const existing = new Map((active.warmupItems || []).map(item => [item.id, item]));
+  active.warmupItems = blueprint.map(item => ({
+    ...item,
+    done:Boolean(existing.get(item.id)?.done),
+    skipped:Boolean(existing.get(item.id)?.skipped)
+  }));
+  return active.warmupItems;
+}
+
+function bellWarmupHandled(active=data.activeWorkout) {
+  const items = bellEnsureWarmupState(active);
+  return items.length === 0 || items.every(item => item.done || item.skipped);
+}
+
+function toggleWorkoutWarmupItem(id) {
   const active = data.activeWorkout;
   if (!active) return;
-  active.warmupChecks = active.warmupChecks && typeof active.warmupChecks === "object" ? active.warmupChecks : {};
-  active.warmupChecks[key] = !active.warmupChecks[key];
+  const item = bellEnsureWarmupState(active).find(entry => entry.id === id);
+  if (!item) return;
+  const handled = item.done || item.skipped;
+  item.done = !handled;
+  item.skipped = false;
   saveData({render:false});
   renderWarmupPanel();
+}
+
+function skipWorkoutWarmupRemaining() {
+  const active = data.activeWorkout;
+  if (!active) return;
+  bellEnsureWarmupState(active).forEach(item => {
+    if (!item.done) item.skipped = true;
+  });
+  saveData({render:false});
+  renderWarmupPanel();
+}
+
+function renderWarmupPanel() {
+  const panel = document.getElementById('warmupPanel');
+  const active = data.activeWorkout;
+  if (!panel || !active) return;
+  const items = bellEnsureWarmupState(active);
+  const handled = items.filter(item => item.done || item.skipped).length;
+  const complete = items.length === 0 || handled === items.length;
+  const pct = items.length ? Math.round((handled / items.length) * 100) : 100;
+
+  panel.classList.remove('hidden');
+  panel.innerHTML = `
+    <section class="bp-warmup-shell" aria-labelledby="bpWarmupTitle">
+      <header class="bp-warmup-header">
+        <div><span class="metric-label">Required Preparation</span><h2 id="bpWarmupTitle">Workout Warm-Up</h2><p>Prepare the patterns and ramp the first primary lift without creating fatigue.</p></div>
+        <strong>${handled}/${items.length} complete</strong>
+      </header>
+      <div class="bp-warmup-progress" aria-hidden="true"><span style="width:${pct}%"></span></div>
+      <div class="bp-warmup-list">
+        ${items.map((item,index) => {
+          const state = item.done ? 'is-done' : item.skipped ? 'is-skipped' : '';
+          const label = item.done ? 'Completed' : item.skipped ? 'Skipped' : 'Complete';
+          return `<article class="bp-warmup-item ${state}">
+            <button class="bp-warmup-number" type="button" onclick="toggleWorkoutWarmupItem('${item.id}')" aria-label="${label} ${escapeHtml(item.title)}">${item.done ? '✓' : item.skipped ? '—' : index+1}</button>
+            <div><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.detail)}</span></div>
+            <button class="bp-warmup-state" type="button" onclick="toggleWorkoutWarmupItem('${item.id}')">${label}</button>
+          </article>`;
+        }).join('')}
+      </div>
+      <footer class="bp-warmup-actions">
+        <button class="secondary" type="button" onclick="skipWorkoutWarmupRemaining()" ${complete ? 'disabled' : ''}>Skip Remaining Warm-Up</button>
+        <button class="good" type="button" onclick="advanceToTraining()" ${complete ? '' : 'disabled'}>Begin Working Sets</button>
+      </footer>
+    </section>`;
 }
 
 function beginRestTimer(seconds, exerciseName) {
@@ -472,57 +556,49 @@ function openWorkoutPreview(workout,onBegin){
   const modal=document.getElementById('workoutPreviewModal');
   const content=document.getElementById('workoutPreviewContent');
   if(!modal||!content)return;
-
-  setText('workoutPreviewTitle',typeof bellWorkoutDisplayLabel==='function'?bellWorkoutDisplayLabel(workout):(workout.label||workout.name));
-  const exercises=(workout.exercises||[]).filter(ex=>!/^warm/i.test(String(ex.block||'')));
-  setText('workoutPreviewMeta',`${workout.duration||30} minutes · ${exercises.length} exercises`);
-
-  const warmups=[];
-  exercises.forEach((exercise,exerciseIndex)=>{
-    const rampSets=typeof warmupSetsFor==='function'?(warmupSetsFor(exercise)||[]):[];
-    rampSets.forEach((set,setIndex)=>warmups.push({
-      name:exercise.name,
-      label:set.label||`Warm-up ${setIndex+1}`,
-      prescription:`${set.weight} lb × ${set.reps}`
-    }));
-  });
-
-  const grouped=new Map();
-  exercises.forEach(exercise=>{
-    const label=String(exercise.block||'Working Sets');
-    if(!grouped.has(label))grouped.set(label,[]);
-    grouped.get(label).push(exercise);
-  });
-
-  const row=(name,detail,index,tag='')=>`<article class="bp-preview-exercise"><span class="bp-preview-index">${index+1}</span><div><strong>${escapeHtml(name)}</strong><small>${escapeHtml(detail||'As prescribed')}</small>${tag?`<span class="bp-preview-block">${escapeHtml(tag)}</span>`:''}</div></article>`;
-  const sections=[];
-  if(warmups.length){
-    sections.push(`<section class="bp-preview-section"><div class="bp-preview-heading"><span>Warm-up</span><small>${warmups.length} ramp sets</small></div>${warmups.map((item,index)=>row(`${item.name} — ${item.label}`,item.prescription,index,'Generated Warm-up')).join('')}</section>`);
-  }
-  grouped.forEach((items,label)=>{
-    sections.push(`<section class="bp-preview-section"><div class="bp-preview-heading"><span>${escapeHtml(label)}</span><small>${items.length} exercise${items.length===1?'':'s'}</small></div>${items.map((exercise,index)=>row(exercise.name,exercise.prescription||[exercise.sets,exercise.reps].filter(Boolean).join(' × '),index,label)).join('')}</section>`);
-  });
-  content.innerHTML=sections.join('')||'<p class="hint">No exercises are available for this session.</p>';
+  const title=typeof bellWorkoutDisplayLabel==='function'?bellWorkoutDisplayLabel(workout):(workout.label||workout.name||'Workout');
+  const warmups=bellWarmupBlueprint(workout);
+  const exercises=Array.isArray(workout.exercises)?workout.exercises:[];
+  const prescriptionFor=exercise=>exercise.prescription||`${Array.isArray(exercise.sets)?exercise.sets.length:(exercise.sets||'')} × ${exercise.plannedReps||exercise.reps||''}`;
+  setText('workoutPreviewTitle',title);
+  setText('workoutPreviewMeta',`${workout.duration||30} minutes · ${exercises.length} exercises · ${warmups.length} warm-up items`);
+  content.innerHTML=`
+    <section class="bp-preview-section">
+      <div class="bp-preview-heading"><span>01</span><div><small>Preparation</small><h3>Warm-Up</h3></div></div>
+      <div class="bp-preview-list">${warmups.map((item,index)=>`<article><b>${index+1}</b><div><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.detail)}</span></div></article>`).join('')}</div>
+    </section>
+    <section class="bp-preview-section">
+      <div class="bp-preview-heading"><span>02</span><div><small>Working Plan</small><h3>Exercises</h3></div></div>
+      <div class="bp-preview-list">${exercises.map((exercise,index)=>`<article><b>${index+1}</b><div><strong>${escapeHtml(exercise.name||`Exercise ${index+1}`)}</strong><span>${escapeHtml(prescriptionFor(exercise))}${exercise.block?` · ${escapeHtml(exercise.block)}`:''}</span></div></article>`).join('')}</div>
+    </section>`;
   const btn=document.getElementById('previewBeginButton');
-  if(btn){btn.textContent='Start Session';btn.onclick=onBegin||closeWorkoutPreview;}
+  if(btn){btn.textContent=workout===data.activeWorkout?'Start Session':'Begin Workout';btn.onclick=onBegin||closeWorkoutPreview;}
   modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden','false');
+  document.body.classList.add('workout-preview-open');
+  requestAnimationFrame(()=>modal.querySelector('.modal-box')?.scrollTo({top:0}));
+}
+function closeWorkoutPreview(){
+  const modal=document.getElementById('workoutPreviewModal');
+  modal?.classList.add('hidden');
+  modal?.setAttribute('aria-hidden','true');
+  document.body.classList.remove('workout-preview-open');
 }
 
-function closeWorkoutPreview(){document.getElementById('workoutPreviewModal')?.classList.add('hidden');}
 function beginWorkoutFlow(){
-  const active=data.activeWorkout;if(!active)return;active.stage='warmup';active.startedAt=active.startedAt||new Date().toISOString();active.timerStartedAt=new Date().toISOString();active.timerRunning=true;saveData({render:false});renderWorkoutStage();startTimer();
+  const active=data.activeWorkout;if(!active)return;active.stage='warmup';active.startedAt=active.startedAt||new Date().toISOString();active.timerStartedAt=new Date().toISOString();active.timerRunning=true;bellEnsureWarmupState(active);saveData({render:false});renderWorkoutStage();startTimer();
 }
-function advanceToTraining(){const active=data.activeWorkout;if(!active)return;if(typeof gwMaterializeWorkout==='function'&&!gwMaterializeWorkout(active)){alert('Bell could not prepare the working sets for this session. Return to the workout overview and try again.');return;}active.stage='training';saveData({render:false});renderWorkoutStage();if(typeof window.renderActiveWorkout==='function')window.renderActiveWorkout();}
+function advanceToTraining(){const active=data.activeWorkout;if(!active)return;if(!bellWarmupHandled(active)){alert('Complete or skip every warm-up item before beginning the working sets.');return;}if(typeof gwMaterializeWorkout==='function'&&!gwMaterializeWorkout(active)){alert('Bell could not prepare the working sets for this session. Return to the workout overview and try again.');return;}active.stage='training';saveData({render:false});renderWorkoutStage();if(typeof window.renderActiveWorkout==='function')window.renderActiveWorkout();}
 function renderWorkoutStage(){
   const active=data.activeWorkout;if(!active)return;const stage=active.stage||'training';
   const modal=document.getElementById('workoutModal'),hero=document.getElementById('workoutHero'),briefing=document.getElementById('missionBriefing'),briefActions=document.getElementById('workoutBriefActions'),warm=document.getElementById('warmupPanel'),warmActions=document.getElementById('warmupActions'),control=document.getElementById('workoutControlCard'),exercises=document.getElementById('activeExercises'),completion=document.getElementById('workoutCompletionCard');
   if(modal)modal.dataset.workoutStage=stage;
   hero?.classList.toggle('hidden',stage!=='briefing');briefing?.classList.toggle('hidden',stage!=='briefing');briefActions?.classList.toggle('hidden',stage!=='briefing');
-  warm?.classList.toggle('hidden',stage!=='warmup');warmActions?.classList.toggle('hidden',stage!=='warmup');
+  warm?.classList.toggle('hidden',stage!=='warmup');warmActions?.classList.add('hidden');
   control?.classList.toggle('hidden',stage==='briefing');exercises?.classList.toggle('hidden',stage!=='training');completion?.classList.toggle('hidden',stage!=='training');
   if(stage==='briefing'){active.timerRunning=false;setText('currentExerciseOut','Review the mission, then begin when ready');}
   if(stage==='warmup'){
-    if(typeof window.bp13209RenderWarmupPanel==='function') window.bp13209RenderWarmupPanel(); else renderWarmupPanel();
+    renderWarmupPanel();
     setText('currentExerciseOut','Complete the warm-up, then advance to training');
   }
   if(stage==='training'){

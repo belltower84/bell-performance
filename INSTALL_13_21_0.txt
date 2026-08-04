@@ -1,0 +1,18 @@
+Bell Performance 13.21.0 — Workout UX Source Consolidation
+
+1. Use this folder as the repository/project root.
+2. Start a local server from this folder:
+
+   python -m http.server 8000
+
+3. Open http://localhost:8000
+4. Perform one hard refresh: Ctrl + Shift + R
+5. Open Settings and confirm the Active Build card reads:
+   13.21.0 · Workout UX Source Consolidation
+
+Focused browser check:
+- Start a strength workout.
+- Select Preview Exercises and confirm both Warm-Up and Exercises are listed.
+- Start Session and confirm the warm-up movement/ramp list appears.
+- Complete or skip all warm-up items.
+- Confirm Begin Working Sets becomes enabled and enters the existing working-set screen.

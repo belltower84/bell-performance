@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = 'bell-performance-13-20-4-superset-feedback-gate';
+const CACHE_NAME = 'bell-performance-13-20-5-superset-feedback-gate';
 const CORE = [
   "./",
   "./index.html",
@@ -93,7 +93,10 @@ const CORE = [
   './css/guided-workout-13203.css',
   './js/guided-workout-13203.js',
   './css/guided-workout-13204.css',
-  './js/guided-workout-13204.js'];
+  './js/guided-workout-13204.js',
+  './css/guided-workout-13205.css',
+  './js/guided-workout-13205.js',
+  './assets/library/commercial-lower-body-anatomy.png'];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));
 });

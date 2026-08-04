@@ -181,11 +181,57 @@ function warmupSetsFor(exercise) {
 
 function renderWarmupPanel() {
   const panel = document.getElementById("warmupPanel");
-  const first = data.activeWorkout?.exercises?.find(ex => ["Primary Strength","Primary Hypertrophy"].includes(ex.block));
-  const warmups = warmupSetsFor(first);
-  if (!panel || !first || !warmups.length) { if (panel) panel.classList.add("hidden"); return; }
+  const active = data.activeWorkout;
+  if (!panel || !active) return;
+
+  const items = [];
+  (active.exercises || []).forEach((exercise, exerciseIndex) => {
+    const rampSets = typeof warmupSetsFor === "function" ? (warmupSetsFor(exercise) || []) : [];
+    rampSets.forEach((set, setIndex) => items.push({
+      key: `${exerciseIndex}:${setIndex}`,
+      exercise: exercise.name,
+      label: set.label || `Warm-up ${setIndex + 1}`,
+      weight: set.weight,
+      reps: set.reps
+    }));
+  });
+
+  active.warmupChecks = active.warmupChecks && typeof active.warmupChecks === "object" ? active.warmupChecks : {};
+  const completeCount = items.filter(item => active.warmupChecks[item.key]).length;
+  const percent = items.length ? Math.round((completeCount / items.length) * 100) : 0;
+
   panel.classList.remove("hidden");
-  panel.innerHTML = `<h3>Generated Warm-up — ${first.name}</h3><div class="hint">Complete these before the working sets. Adjust if you need more preparation.</div>${warmups.map(x => `<div class="warmup-row"><strong>${x.label}</strong><span>${x.weight} lb × ${x.reps}</span></div>`).join("")}`;
+  if (!items.length) {
+    panel.innerHTML = `<section class="bp-warmup-shell">
+      <header class="bp-warmup-header"><div><span class="metric-label">Workout Warm-up</span><h2>Prepare to train</h2><p>Complete your normal movement preparation, then begin the working sets.</p></div></header>
+    </section>`;
+    return;
+  }
+
+  panel.innerHTML = `<section class="bp-warmup-shell">
+    <header class="bp-warmup-header">
+      <div><span class="metric-label">Workout Warm-up</span><h2>Prepare for the working sets</h2><p>Complete each ramp set in order. Adjust the load if needed.</p></div>
+      <div class="bp-warmup-progress-copy"><strong>${completeCount}/${items.length}</strong><span>complete</span></div>
+    </header>
+    <div class="bp-warmup-progress"><span style="width:${percent}%"></span></div>
+    <div class="bp-warmup-list">${items.map((item,index)=>{
+      const done = Boolean(active.warmupChecks[item.key]);
+      return `<article class="bp-warmup-item ${done ? "is-complete" : ""}">
+        <button type="button" class="bp-warmup-check" onclick="toggleWorkoutWarmupItem('${item.key}')" aria-pressed="${done}">${done ? "✓" : index + 1}</button>
+        <div class="bp-warmup-copy"><strong>${escapeHtml(item.exercise)}</strong><span>${escapeHtml(item.label)}</span></div>
+        <div class="bp-warmup-prescription"><strong>${escapeHtml(item.weight)} lb</strong><span>× ${escapeHtml(item.reps)} reps</span></div>
+      </article>`;
+    }).join("")}</div>
+  </section>`;
+}
+
+function toggleWorkoutWarmupItem(key) {
+  const active = data.activeWorkout;
+  if (!active) return;
+  active.warmupChecks = active.warmupChecks && typeof active.warmupChecks === "object" ? active.warmupChecks : {};
+  active.warmupChecks[key] = !active.warmupChecks[key];
+  saveData({render:false});
+  renderWarmupPanel();
 }
 
 function beginRestTimer(seconds, exerciseName) {
@@ -417,16 +463,49 @@ function previewPlannedWorkout(planId,sessionKey,name){
   const workout=workoutTemplatePreview(actualName,{planId:resolved.item?.id??planId,sessionKey:resolved.session?.sessionKey||sessionKey});
   openWorkoutPreview(workout,()=>{closeWorkoutPreview();beginPlannedWorkout(planId,sessionKey,actualName);});
 }
-function previewActiveWorkout(){if(!data.activeWorkout)return;openWorkoutPreview(data.activeWorkout,()=>{closeWorkoutPreview();beginWorkoutFlow();});}
+function previewActiveWorkout(){
+  if(!data.activeWorkout)return;
+  openWorkoutPreview(data.activeWorkout,()=>{closeWorkoutPreview();beginWorkoutFlow();});
+}
 function openWorkoutPreview(workout,onBegin){
-  if(!workout)return;const modal=document.getElementById('workoutPreviewModal'),content=document.getElementById('workoutPreviewContent');
-  setText('workoutPreviewTitle',typeof bellWorkoutDisplayLabel==='function'?bellWorkoutDisplayLabel(workout):(workout.label||workout.name));setText('workoutPreviewMeta',`${workout.duration||30} minutes · ${(workout.exercises||[]).length} exercises`);
-  const warmups=(workout.exercises||[]).filter(x=>/warm/i.test(String(x.block||'')));
-  const cooldowns=(workout.exercises||[]).filter(x=>/cool|recovery/i.test(String(x.block||'')));
-  const main=(workout.exercises||[]).filter(x=>!warmups.includes(x)&&!cooldowns.includes(x));
-  const rows=list=>list.map((x,i)=>`<div class="preview-exercise-row"><span>${i+1}</span><div><strong>${escapeHtml(x.name)}</strong><small>${x.prescription||`${x.sets||''} × ${x.reps||''}`}</small></div></div>`).join('');
-  content.innerHTML=`${warmups.length?`<h3>Warm-Up</h3>${rows(warmups)}`:''}${main.length?`<h3>Main Training</h3>${rows(main)}`:''}${cooldowns.length?`<h3>Cooldown</h3>${rows(cooldowns)}`:''}`;
-  const btn=document.getElementById('previewBeginButton');btn.onclick=onBegin||closeWorkoutPreview;modal.classList.remove('hidden');
+  if(!workout)return;
+  const modal=document.getElementById('workoutPreviewModal');
+  const content=document.getElementById('workoutPreviewContent');
+  if(!modal||!content)return;
+
+  setText('workoutPreviewTitle',typeof bellWorkoutDisplayLabel==='function'?bellWorkoutDisplayLabel(workout):(workout.label||workout.name));
+  const exercises=(workout.exercises||[]).filter(ex=>!/^warm/i.test(String(ex.block||'')));
+  setText('workoutPreviewMeta',`${workout.duration||30} minutes · ${exercises.length} exercises`);
+
+  const warmups=[];
+  exercises.forEach((exercise,exerciseIndex)=>{
+    const rampSets=typeof warmupSetsFor==='function'?(warmupSetsFor(exercise)||[]):[];
+    rampSets.forEach((set,setIndex)=>warmups.push({
+      name:exercise.name,
+      label:set.label||`Warm-up ${setIndex+1}`,
+      prescription:`${set.weight} lb × ${set.reps}`
+    }));
+  });
+
+  const grouped=new Map();
+  exercises.forEach(exercise=>{
+    const label=String(exercise.block||'Working Sets');
+    if(!grouped.has(label))grouped.set(label,[]);
+    grouped.get(label).push(exercise);
+  });
+
+  const row=(name,detail,index,tag='')=>`<article class="bp-preview-exercise"><span class="bp-preview-index">${index+1}</span><div><strong>${escapeHtml(name)}</strong><small>${escapeHtml(detail||'As prescribed')}</small>${tag?`<span class="bp-preview-block">${escapeHtml(tag)}</span>`:''}</div></article>`;
+  const sections=[];
+  if(warmups.length){
+    sections.push(`<section class="bp-preview-section"><div class="bp-preview-heading"><span>Warm-up</span><small>${warmups.length} ramp sets</small></div>${warmups.map((item,index)=>row(`${item.name} — ${item.label}`,item.prescription,index,'Generated Warm-up')).join('')}</section>`);
+  }
+  grouped.forEach((items,label)=>{
+    sections.push(`<section class="bp-preview-section"><div class="bp-preview-heading"><span>${escapeHtml(label)}</span><small>${items.length} exercise${items.length===1?'':'s'}</small></div>${items.map((exercise,index)=>row(exercise.name,exercise.prescription||[exercise.sets,exercise.reps].filter(Boolean).join(' × '),index,label)).join('')}</section>`);
+  });
+  content.innerHTML=sections.join('')||'<p class="hint">No exercises are available for this session.</p>';
+  const btn=document.getElementById('previewBeginButton');
+  if(btn){btn.textContent='Start Session';btn.onclick=onBegin||closeWorkoutPreview;}
+  modal.classList.remove('hidden');
 }
 
 function closeWorkoutPreview(){document.getElementById('workoutPreviewModal')?.classList.add('hidden');}

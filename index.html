@@ -11,7 +11,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <link href="./assets/logo-shield.svg?v=13720" rel="icon" type="image/svg+xml"/>
-<title>Bell Performance 13.21.5 — Exercise Exchange & Equipment Change Transparency</title>
+<title>Bell Performance 13.21.6 — Exercise Exchange UX Cleanup</title>
 <link href="./css/app.css?v=13710" rel="stylesheet"/>
 <link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
 <link href="./css/independent-daily-sessions-1382.css?v=13840" rel="stylesheet"/>
@@ -27,10 +27,11 @@
 <link href="./css/guided-workout-13193.css?v=131930" rel="stylesheet"/>
 <link href="./css/commercial-dashboard-13200.css?v=132000" rel="stylesheet"/>
 <link href="./css/guided-workout-13203.css?v=132030" rel="stylesheet"/>
-<link href="./css/guided-workout-13215.css?v=132150" rel="stylesheet"/>
+<link href="./css/guided-workout-13216.css?v=132160" rel="stylesheet"/>
 <link href="./css/guided-workout-13205.css?v=132050" rel="stylesheet"/>
 <link href="./css/guided-workout-13206.css?v=132060" rel="stylesheet"/>
 <link href="./css/guided-workout-13212.css?v=132120" rel="stylesheet"/>
+<link href="./css/guided-workout-cleanup-13216.css?v=132161" rel="stylesheet"/>
 <link href="./css/workout-preview-warmup-13210.css?v=132100" rel="stylesheet"/>
 <link href="./css/readiness-transparency-13213.css?v=132130" rel="stylesheet"/>
 <style id="critical-ui-guard">
@@ -379,7 +380,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="hint">Faith-based messages are always optional and can be changed here at any time.</div>
 </div>
 <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input accept="application/json" id="importFile" onchange="importData(event)" type="file"/><button class="danger" onclick="resetApp()">Reset App</button></div>
-<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.21.5 · Exercise Exchange & Equipment Change Transparency</strong><p class="hint">Replace any working exercise from the live session. Bell now explains automatic equipment substitutions at the workout and exercise level.</p></div>
+<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.21.6 · Exercise Exchange UX Cleanup</strong><p class="hint">A cleaner swap flow with compact workout-adjustment summaries, concise exercise-change labels, and purpose-matched replacement cards.</p></div>
 <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
 </section>
 </main>
@@ -608,7 +609,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
     </div>
   </div>
 </div>
-<div aria-labelledby="exerciseSwapTitle" aria-modal="true" class="modal hidden" id="exerciseSwapModal" role="dialog"><div class="modal-box exercise-swap-box"><div class="card"><div class="notification-header"><div><span class="metric-label">Purpose-Matched Replacement</span><h2 id="exerciseSwapTitle">Replace Exercise</h2></div><button class="modal-close" onclick="closeExerciseSwap()">×</button></div><div class="performance-callout" id="exerciseSwapOriginal"></div><div class="feedback-grid"><label>Why are you replacing it?<select id="exerciseSwapReason" onchange="renderExerciseSwapOptions()"><option value="preference">Exercise preference</option><option value="equipment">Equipment unavailable</option><option value="pain">Pain or discomfort</option><option value="crowded">Gym is crowded</option><option value="setup">Need a faster setup</option><option value="space">Limited space</option><option value="noise">Need a quieter option</option><option value="skill">Need a simpler variation</option><option value="other">Other constraint</option></select></label><label>Apply replacement to<select id="exerciseSwapScope"><option value="today">Today’s workout only</option><option value="block">Current training block</option><option value="always">All future workouts</option></select></label></div><div class="exercise-swap-options" id="exerciseSwapOptions"></div><div class="hint">Pain-based swaps should remain pain-free and are not a diagnosis or medical clearance.</div></div></div></div>
+<div aria-labelledby="exerciseSwapTitle" aria-modal="true" class="modal hidden" id="exerciseSwapModal" role="dialog"><div class="modal-box exercise-swap-box"><div class="card exercise-swap-card"><div class="notification-header exercise-swap-header"><div><span class="metric-label">Exercise Exchange</span><h2 id="exerciseSwapTitle">Swap Exercise</h2><p>Keep the training purpose while changing the movement or equipment.</p></div><button aria-label="Close exercise exchange" class="modal-close" onclick="closeExerciseSwap()">×</button></div><div class="performance-callout exercise-swap-current" id="exerciseSwapOriginal"></div><div class="exercise-swap-controls"><label><span>Reason</span><select id="exerciseSwapReason" onchange="renderExerciseSwapOptions()"><option value="preference">Exercise preference</option><option value="equipment">Equipment unavailable</option><option value="pain">Pain or discomfort</option><option value="crowded">Gym is crowded</option><option value="setup">Need a faster setup</option><option value="space">Limited space</option><option value="noise">Need a quieter option</option><option value="skill">Need a simpler variation</option><option value="other">Other constraint</option></select></label><label><span>Apply to</span><select id="exerciseSwapScope"><option value="today">Today only</option><option value="block">Current training block</option><option value="always">Future workouts</option></select></label></div><div class="exercise-swap-section-label"><span>Purpose-matched options</span><small>Sets and reps stay the same unless you edit them.</small></div><div class="exercise-swap-options" id="exerciseSwapOptions"></div><div class="hint exercise-swap-footnote">Pain-based swaps should be pain-free. Bell does not diagnose an injury or provide medical clearance.</div></div></div></div>
 
 <div aria-labelledby="mobilityRoutineTitle" aria-modal="true" class="modal hidden mobility-routine-modal" id="mobilityRoutineModal" role="dialog" aria-hidden="true">
   <div class="modal-box">
@@ -696,12 +697,12 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.21.5-exercise-exchange-equipment-transparency";</script>
-<script src="./data/workouts.js?v=132150"></script>
-<script src="./js/exercise-library.js?v=132150"></script>
+<script>window.BELL_APP_VERSION = "13.21.6-exercise-exchange-ux-cleanup";</script>
+<script src="./data/workouts.js?v=132160"></script>
+<script src="./js/exercise-library.js?v=132160"></script>
 <script src="./js/storage.js?v=13841"></script>
 <script src="./js/readiness.js?v=132130"></script>
-<script src="./js/equipment.js?v=132150"></script>
+<script src="./js/equipment.js?v=132160"></script>
 <script>{const grid=document.getElementById("equipmentGrid");if(grid)grid.innerHTML=equipmentCheckboxesHtml("equipment");const onboardingGrid=document.getElementById("onboardingEquipmentGrid");if(onboardingGrid)onboardingGrid.innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");}</script>
 <script src="./js/training-blocks.js?v=13600"></script>
 <script src="./js/mobility.js?v=13650"></script>
@@ -709,7 +710,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/milestones.js?v=10006"></script>
 <script src="./js/progression.js?v=10006"></script>
 <script src="./js/workout-model.js?v=13850"></script>
-<script src="./js/workouts.js?v=132150"></script>
+<script src="./js/workouts.js?v=132160"></script>
 <script src="./js/missed-sessions.js?v=10006"></script>
 <script src="./js/performance-review.js?v=10006"></script>
 <script src="./js/artwork.js?v=10006"></script>
@@ -753,7 +754,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/longitudinal-coaching-1390.js?v=13910"></script>
 <script src="./js/guided-workout-13193.js?v=131930"></script>
 <script src="./js/guided-workout-13203.js?v=132030"></script>
-<script src="./js/guided-workout-13215.js?v=132150"></script>
+<script src="./js/guided-workout-13216.js?v=132160"></script>
 <script src="./js/guided-workout-13205.js?v=132050"></script>
 <script src="./js/guided-workout-13206.js?v=132060"></script>
 <script src="./js/guided-workout-13212.js?v=132120"></script>

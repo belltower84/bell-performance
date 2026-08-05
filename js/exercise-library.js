@@ -652,9 +652,14 @@ function openExerciseSwap(index){
   exerciseSwapIndex=index;const exercise=data.activeWorkout?.exercises?.[index];if(!exercise)return;
   const reason=document.getElementById("exerciseSwapReason");if(reason)reason.value=exercise.equipmentAdjusted?"equipment":(exercise.replacementReason||"preference");
   const scope=document.getElementById("exerciseSwapScope");if(scope)scope.value="today";
-  setText("exerciseSwapTitle",`Replace ${exercise.name}`);
+  setText("exerciseSwapTitle","Swap Exercise");
   const original=document.getElementById("exerciseSwapOriginal");
-  if(original){const handled=(exercise.sets||[]).filter(set=>set.done||set.skipped).length;const origin=exercise.originalExercise&&exercise.originalExercise!==exercise.name?`<br><span>Originally programmed: ${escapeHtml(exercise.originalExercise)}</span>`:"";const warning=handled?`<br><span class="replacement-warning">${handled} set${handled===1?"":"s"} already handled. Completed entries will be preserved; only remaining sets receive the new load suggestion.</span>`:"";original.innerHTML=`<strong>Current prescription:</strong> ${escapeHtml(exercise.name)} • ${escapeHtml(exercise.prescription||"")}${origin}${warning}<br><span>The replacement keeps the current sets and rep targets unless you edit them.</span>`;}
+  if(original){
+    const handled=(exercise.sets||[]).filter(set=>set.done||set.skipped).length;
+    const origin=exercise.originalExercise&&exercise.originalExercise!==exercise.name?`<span class="swap-origin">Originally programmed: ${escapeHtml(exercise.originalExercise)}</span>`:"";
+    const warning=handled?`<div class="swap-preserve-note"><strong>${handled} set${handled===1?"":"s"} already logged.</strong><span>Those entries stay intact; Bell only updates the remaining sets.</span></div>`:"";
+    original.innerHTML=`<div class="swap-current"><small>CURRENT EXERCISE</small><strong>${escapeHtml(exercise.name)}</strong><span>${escapeHtml(exercise.prescription||"Keep the current set and rep targets")}</span>${origin}</div>${warning}`;
+  }
   document.getElementById("exerciseSwapModal")?.classList.remove("hidden");renderExerciseSwapOptions();
 }
 function openExerciseReplacement(index){openExerciseSwap(index);}
@@ -663,21 +668,26 @@ function renderExerciseSwapOptions(){
   const exercise=data.activeWorkout?.exercises?.[exerciseSwapIndex];const container=document.getElementById("exerciseSwapOptions");if(!exercise||!container)return;
   const reason=document.getElementById("exerciseSwapReason")?.value||"preference";const location=typeof activeEquipmentLocation==="function"?activeEquipmentLocation():null;
   const options=rankExerciseAlternatives(exercise.originalExercise||exercise.name,reason).slice(0,8);
-  container.innerHTML=options.length?options.map(x=>{const found=findExercise(x.name),equipment=(found.equipment||[]).join(", ")||"No special equipment",availability=reason==="equipment"&&location?`<span class="replacement-availability ${x.available?"available":"unavailable"}">${x.available?`Available at ${escapeHtml(location.name)}`:`Unavailable at ${escapeHtml(location.name)}`}</span>`:"";return `<div class="exercise-swap-option"><div><h3>${escapeHtml(x.name)}</h3><p>${escapeHtml(x.reason)}. ${escapeHtml(equipment)}.</p>${availability}<button class="link-button" onclick="openExerciseDetail('${escapeQuote(x.name)}')" type="button">Open guide</button></div><button ${reason==="equipment"&&!x.available?"disabled":""} onclick="selectExerciseReplacement('${escapeQuote(x.name)}')" type="button">Use This</button></div>`}).join(""):'<div class="performance-callout">No purpose-matched option is available with the current location setup. Keep the movement, change training location, or choose another reason.</div>';
+  container.innerHTML=options.length?options.map(x=>{
+    const found=findExercise(x.name),equipment=(found.equipment||[]).join(", ")||"No special equipment";
+    const availability=reason==="equipment"&&location?`<span class="replacement-availability ${x.available?"available":"unavailable"}">${x.available?`Available at ${escapeHtml(location.name)}`:`Unavailable at ${escapeHtml(location.name)}`}</span>`:"";
+    return `<article class="exercise-swap-option"><div class="swap-option-main"><div class="swap-option-heading"><h3>${escapeHtml(x.name)}</h3>${availability}</div><p>${escapeHtml(x.reason)}</p><small>Equipment: ${escapeHtml(equipment)}</small></div><div class="swap-option-actions"><button class="swap-guide-button" onclick="openExerciseDetail('${escapeQuote(x.name)}')" type="button">Guide</button><button class="swap-select-button" ${reason==="equipment"&&!x.available?"disabled":""} onclick="selectExerciseReplacement('${escapeQuote(x.name)}')" type="button">Select</button></div></article>`;
+  }).join(""):'<div class="performance-callout swap-empty-state"><strong>No suitable match at this location.</strong><span>Choose another reason, keep the current movement, or change the active equipment location.</span></div>';
 }
 function selectExerciseReplacement(replacementName){
   const index=exerciseSwapIndex,active=data.activeWorkout,exercise=active?.exercises?.[index];if(!exercise)return;
   const previousName=exercise.name,originalName=exercise.originalExercise||previousName;const reason=document.getElementById("exerciseSwapReason")?.value||"preference";const scope=document.getElementById("exerciseSwapScope")?.value||"today";
-  const handled=(exercise.sets||[]).filter(set=>set.done||set.skipped).length;if(handled&&!confirm(`${handled} set${handled===1?" has":"s have"} already been handled. Preserve those entries and replace the remaining work?`))return;
+  const handled=(exercise.sets||[]).filter(set=>set.done||set.skipped).length;if(handled&&!confirm(`${handled} set${handled===1?" has":"s have"} already been logged. Keep those entries and swap the remaining work?`))return;
   const location=typeof activeEquipmentLocation==="function"?activeEquipmentLocation():null;const status=active?.readiness?.status||(typeof readinessStatus==="function"?readinessStatus():"GREEN");const rec=typeof recommendedWeight==="function"?recommendedWeight(replacementName,status):null;const guide=findExercise(replacementName);
-  exercise.originalExercise=originalName;exercise.replacedFrom=previousName;exercise.name=replacementName;exercise.userAdjusted=true;exercise.equipmentAdjusted=false;exercise.equipmentAdjustmentReason="";exercise.replacementSource="athlete";exercise.replacementReason=reason;exercise.replacementReasonLabel=exerciseReplacementReasonLabel(reason);exercise.replacementScope=scope;exercise.replacementAt=new Date().toISOString();exercise.replacementLocation=location?.name||active?.equipmentLocation||"";exercise.recommendedWeight=rec?.value??"";exercise.recommendationDisplay=rec?.display||"Choose by effort";exercise.recommendationNote=rec?.note||`Purpose-matched replacement for ${originalName}.`;exercise.cue=`Replaced ${previousName} because: ${exerciseReplacementReasonLabel(reason)}. ${(guide.cues||[])[0]||"Use controlled technique and preserve the intended movement pattern."}`;
+  if(!exercise.originalCue)exercise.originalCue=exercise.cue||"";
+  exercise.originalExercise=originalName;exercise.replacedFrom=previousName;exercise.name=replacementName;exercise.userAdjusted=true;exercise.equipmentAdjusted=false;exercise.equipmentAdjustmentReason="";exercise.replacementSource="athlete";exercise.replacementReason=reason;exercise.replacementReasonLabel=exerciseReplacementReasonLabel(reason);exercise.replacementScope=scope;exercise.replacementAt=new Date().toISOString();exercise.replacementLocation=location?.name||active?.equipmentLocation||"";exercise.recommendedWeight=rec?.value??"";exercise.recommendationDisplay=rec?.display||"Choose by effort";exercise.recommendationNote=rec?.note||`Purpose-matched replacement for ${originalName}.`;exercise.cue=(guide.cues||[])[0]||"Use controlled technique and preserve the intended movement pattern.";
   exercise.sets=(exercise.sets||[]).map(set=>{if(set.done||set.skipped)return set;const load=typeof rec?.value==="number"?rec.value:"";return {...set,plannedWeight:load,weight:load};});
   if(scope!=="today"){
     data.exerciseIntelligence=data.exerciseIntelligence||{replacements:[],personalConstraints:[]};data.exerciseIntelligence.replacements=data.exerciseIntelligence.replacements||[];
     data.exerciseIntelligence.replacements=data.exerciseIntelligence.replacements.filter(r=>!(r.originalName===originalName&&r.scope===scope));
     data.exerciseIntelligence.replacements.push({originalName,replacementName,reason,reasonLabel:exerciseReplacementReasonLabel(reason),scope,blockId:scope==="block"?(data.trainingBlock.generatedAt||data.trainingBlock.startDate||""):"",locationId:location?.id||"",locationName:location?.name||"",createdAt:new Date().toISOString()});
   }
-  persistLibraryState();closeExerciseSwap();if(typeof saveData==="function")saveData({render:false});renderActiveWorkout();
+  persistLibraryState();closeExerciseSwap();if(typeof saveData==="function")saveData({render:false});if(typeof renderActiveWorkout==="function")renderActiveWorkout();
 }
 
 function applySavedExerciseReplacement(exercise){

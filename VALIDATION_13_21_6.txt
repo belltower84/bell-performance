@@ -1,0 +1,20 @@
+Bell Performance 13.21.6 — Exercise Exchange UX Cleanup
+
+Validation completed:
+- guided-workout-13216.js syntax: PASS
+- exercise-library.js syntax: PASS
+- workouts.js syntax: PASS
+- service worker syntax: PASS
+- manifest JSON: PASS
+- HTML local references: 86 checked, 0 missing
+- service-worker local references: 88 checked, 0 missing
+- focused exchange cleanup assertions: PASS
+- desktop replacement modal layout at 1440 × 1000: PASS
+- mobile replacement modal layout at 430 × 900: PASS
+- no horizontal overflow in tested replacement layouts: PASS
+- compact workout adjustment summary rendered: PASS
+- per-exercise change chip rendered: PASS
+- Guide and Swap controls rendered: PASS
+- replacement reason no longer overwrites the new exercise coaching cue: PASS
+
+Note: Browser layout validation used a focused UI harness with the production CSS and representative workout/replacement markup. Full Windows localhost testing remains the real-world confirmation step.

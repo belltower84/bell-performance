@@ -10,8 +10,8 @@ const strengthRotations = {
         {name:"Weighted Pull-up", block:"Primary Strength", sets:4, reps:"5–8", rest:120, cue:"Full hang. Drive chest toward the bar."},
         {name:"Incline Dumbbell Press", block:"Athletic Assistance", sets:3, reps:"8–10", rest:75, cue:"Controlled lowering."},
         {name:"Chest-Supported Row", block:"Athletic Assistance", sets:3, reps:"8–12", rest:75, cue:"Pause at the top."},
-        {name:"Dumbbell Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Superset with curls. Stop short of sloppy reps."},
-        {name:"Incline Dumbbell Curl", block:"Golden Era Finisher", sets:3, reps:"10–12", rest:30, cue:"Superset with lateral raises."}
+        {name:"Dumbbell Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Superset with curls. Stop short of sloppy reps.", supersetId:"s1-upper-a-finisher", supersetPosition:"A", supersetWith:"Incline Dumbbell Curl", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."},
+        {name:"Incline Dumbbell Curl", block:"Golden Era Finisher", sets:3, reps:"10–12", rest:30, cue:"Superset with lateral raises.", supersetId:"s1-upper-a-finisher", supersetPosition:"B", supersetWith:"Dumbbell Lateral Raise", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."}
       ]
     },
     "S-2 Lower Strength": {
@@ -22,8 +22,8 @@ const strengthRotations = {
         {name:"Romanian Deadlift", block:"Primary Strength", sets:3, reps:"6–8", rest:120, cue:"Hinge and keep lats tight."},
         {name:"Reverse Lunge", block:"Athletic Assistance", sets:3, reps:"8/leg", rest:75, cue:"Control the knee and pelvis."},
         {name:"Standing Calf Raise", block:"Athletic Assistance", sets:3, reps:"12–15", rest:45, cue:"Full stretch and pause."},
-        {name:"Leg Extension", block:"Golden Era Finisher", sets:2, reps:"15–20", rest:30, cue:"Pair with ab work."},
-        {name:"Hanging Knee Raise", block:"Golden Era Finisher", sets:2, reps:"10–15", rest:30, cue:"Control the pelvis."}
+        {name:"Leg Extension", block:"Golden Era Finisher", sets:2, reps:"15–20", rest:30, cue:"Pair with ab work.", supersetId:"s2-lower-a-finisher", supersetPosition:"A", supersetWith:"Hanging Knee Raise", supersetRest:30, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 30 seconds."},
+        {name:"Hanging Knee Raise", block:"Golden Era Finisher", sets:2, reps:"10–15", rest:30, cue:"Control the pelvis.", supersetId:"s2-lower-a-finisher", supersetPosition:"B", supersetWith:"Leg Extension", supersetRest:30, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 30 seconds."}
       ]
     },
     "S-3 Athletic Upper": {
@@ -34,8 +34,8 @@ const strengthRotations = {
         {name:"Chin-up", block:"Primary Strength", sets:4, reps:"AMRAP -2", rest:90, cue:"Stop before form breaks."},
         {name:"Single-Arm Dumbbell Row", block:"Athletic Assistance", sets:3, reps:"10/side", rest:60, cue:"Drive elbow toward hip."},
         {name:"Push-up", block:"Athletic Assistance", sets:3, reps:"12–20", rest:45, cue:"Rigid plank position."},
-        {name:"Rear-Delt Fly", block:"Golden Era Finisher", sets:3, reps:"15–20", rest:30, cue:"Superset with triceps."},
-        {name:"Rope Pressdown", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Full lockout without shoulder movement."}
+        {name:"Rear-Delt Fly", block:"Golden Era Finisher", sets:3, reps:"15–20", rest:30, cue:"Superset with triceps.", supersetId:"s3-upper-a-finisher", supersetPosition:"A", supersetWith:"Rope Pressdown", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."},
+        {name:"Rope Pressdown", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Full lockout without shoulder movement.", supersetId:"s3-upper-a-finisher", supersetPosition:"B", supersetWith:"Rear-Delt Fly", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."}
       ]
     },
     "S-4 Athletic Lower": {
@@ -60,8 +60,8 @@ const strengthRotations = {
         {name:"Pendlay Row", block:"Primary Strength", sets:4, reps:"6", rest:105, cue:"Reset each rep from the floor."},
         {name:"Flat Dumbbell Press", block:"Athletic Assistance", sets:3, reps:"8–12", rest:75, cue:"Use a neutral grip if shoulders prefer it."},
         {name:"Neutral-Grip Lat Pulldown", block:"Athletic Assistance", sets:3, reps:"8–12", rest:75, cue:"Drive elbows down."},
-        {name:"Cable Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Superset with hammer curls."},
-        {name:"Hammer Curl", block:"Golden Era Finisher", sets:3, reps:"10–12", rest:30, cue:"Keep elbows pinned."}
+        {name:"Cable Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Superset with hammer curls.", supersetId:"s1-upper-b-finisher", supersetPosition:"A", supersetWith:"Hammer Curl", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."},
+        {name:"Hammer Curl", block:"Golden Era Finisher", sets:3, reps:"10–12", rest:30, cue:"Keep elbows pinned.", supersetId:"s1-upper-b-finisher", supersetPosition:"B", supersetWith:"Cable Lateral Raise", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."}
       ]
     },
     "S-2 Lower Strength": {
@@ -84,8 +84,8 @@ const strengthRotations = {
         {name:"Weighted Chin-up", block:"Primary Strength", sets:4, reps:"5–8", rest:105, cue:"Use a full range."},
         {name:"Landmine Press", block:"Athletic Assistance", sets:3, reps:"8/side", rest:60, cue:"Reach at the top."},
         {name:"Cable Row", block:"Athletic Assistance", sets:3, reps:"10–12", rest:60, cue:"Do not lean back."},
-        {name:"Lean-Away Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Superset with overhead triceps."},
-        {name:"Overhead Triceps Extension", block:"Golden Era Finisher", sets:3, reps:"10–15", rest:30, cue:"Keep upper arms still."}
+        {name:"Lean-Away Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Superset with overhead triceps.", supersetId:"s3-upper-b-finisher", supersetPosition:"A", supersetWith:"Overhead Triceps Extension", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."},
+        {name:"Overhead Triceps Extension", block:"Golden Era Finisher", sets:3, reps:"10–15", rest:30, cue:"Keep upper arms still.", supersetId:"s3-upper-b-finisher", supersetPosition:"B", supersetWith:"Lean-Away Lateral Raise", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."}
       ]
     },
     "S-4 Athletic Lower": {
@@ -110,8 +110,8 @@ const strengthRotations = {
         {name:"Weighted Pull-up", block:"Primary Strength", sets:4, reps:"6", rest:105, cue:"No swinging."},
         {name:"Arnold Press", block:"Athletic Assistance", sets:3, reps:"8–10", rest:75, cue:"Smooth rotation."},
         {name:"T-Bar Row", block:"Athletic Assistance", sets:3, reps:"8–12", rest:75, cue:"Keep chest supported when possible."},
-        {name:"Dumbbell Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"15", rest:30, cue:"Superset with preacher curls."},
-        {name:"Preacher Curl", block:"Golden Era Finisher", sets:3, reps:"10–12", rest:30, cue:"Do not bounce from the bottom."}
+        {name:"Dumbbell Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"15", rest:30, cue:"Superset with preacher curls.", supersetId:"s1-upper-c-finisher", supersetPosition:"A", supersetWith:"Preacher Curl", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."},
+        {name:"Preacher Curl", block:"Golden Era Finisher", sets:3, reps:"10–12", rest:30, cue:"Do not bounce from the bottom.", supersetId:"s1-upper-c-finisher", supersetPosition:"B", supersetWith:"Dumbbell Lateral Raise", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."}
       ]
     },
     "S-2 Lower Strength": {
@@ -134,8 +134,8 @@ const strengthRotations = {
         {name:"Chest-to-Bar Pull-up", block:"Primary Strength", sets:4, reps:"5–8", rest:90, cue:"Stop before speed drops."},
         {name:"Dumbbell Floor Press", block:"Athletic Assistance", sets:3, reps:"10", rest:60, cue:"Pause triceps on floor."},
         {name:"Single-Arm Cable Row", block:"Athletic Assistance", sets:3, reps:"10/side", rest:60, cue:"Resist rotation."},
-        {name:"Rear-Delt Fly", block:"Golden Era Finisher", sets:3, reps:"15–20", rest:30, cue:"Superset with pressdowns."},
-        {name:"Rope Pressdown", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Spread the rope at lockout."}
+        {name:"Rear-Delt Fly", block:"Golden Era Finisher", sets:3, reps:"15–20", rest:30, cue:"Superset with pressdowns.", supersetId:"s3-upper-c-finisher", supersetPosition:"A", supersetWith:"Rope Pressdown", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."},
+        {name:"Rope Pressdown", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:30, cue:"Spread the rope at lockout.", supersetId:"s3-upper-c-finisher", supersetPosition:"B", supersetWith:"Rear-Delt Fly", supersetRest:45, supersetInstruction:"Alternate A1 and B1. Complete both exercises, then rest 45 seconds."}
       ]
     },
     "S-4 Athletic Lower": {
@@ -184,9 +184,9 @@ const strengthRotations = {
         {name:"Neutral-Grip Pull-up", block:"Primary Strength", sets:4, reps:"6–10", rest:90, cue:"Use a smooth cadence."},
         {name:"Push-up", block:"Athletic Assistance", sets:3, reps:"15–20", rest:45, cue:"Stop one rep before form breaks."},
         {name:"Face Pull", block:"Athletic Assistance", sets:3, reps:"15–20", rest:45, cue:"Pull toward forehead."},
-        {name:"Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:20, cue:"Tri-set with curls and triceps."},
-        {name:"EZ-Bar Curl", block:"Golden Era Finisher", sets:3, reps:"10–12", rest:20, cue:"Tri-set with lateral raises and triceps."},
-        {name:"Rope Pressdown", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:45, cue:"Finish the tri-set here."}
+        {name:"Lateral Raise", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:20, cue:"Tri-set with curls and triceps.", supersetId:"s3-upper-d-triset", supersetType:"tri-set", supersetPosition:"A", supersetWith:"EZ-Bar Curl + Rope Pressdown", supersetRest:45, supersetInstruction:"Complete A1, B1, and C1 in sequence, then rest 45 seconds."},
+        {name:"EZ-Bar Curl", block:"Golden Era Finisher", sets:3, reps:"10–12", rest:20, cue:"Tri-set with lateral raises and triceps.", supersetId:"s3-upper-d-triset", supersetType:"tri-set", supersetPosition:"B", supersetWith:"Lateral Raise + Rope Pressdown", supersetRest:45, supersetInstruction:"Complete A1, B1, and C1 in sequence, then rest 45 seconds."},
+        {name:"Rope Pressdown", block:"Golden Era Finisher", sets:3, reps:"12–15", rest:45, cue:"Finish the tri-set here.", supersetId:"s3-upper-d-triset", supersetType:"tri-set", supersetPosition:"C", supersetWith:"Lateral Raise + EZ-Bar Curl", supersetRest:45, supersetInstruction:"Complete A1, B1, and C1 in sequence, then rest 45 seconds."}
       ]
     },
     "S-4 Athletic Lower": {

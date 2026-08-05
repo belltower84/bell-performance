@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-21-3-readiness-transparency";
+const CACHE_NAME = "bell-performance-13-21-4-explicit-superset-identity";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -21,7 +21,7 @@ const APP_SHELL = [
   "./css/guided-workout-13192.css?v=131920",
   "./css/guided-workout-13193.css?v=131930",
   "./css/guided-workout-13203.css?v=132030",
-  "./css/guided-workout-13204.css?v=132040",
+  "./css/guided-workout-13214.css?v=132140",
   "./css/guided-workout-13205.css?v=132050",
   "./css/guided-workout-13206.css?v=132060",
   "./css/guided-workout-13212.css?v=132120",
@@ -30,7 +30,7 @@ const APP_SHELL = [
   "./css/workout-experience-1385.css?v=13850",
   "./css/workout-preview-warmup-13210.css?v=132100",
   "./css/readiness-transparency-13213.css?v=132130",
-  "./data/workouts.js?v=10007",
+  "./data/workouts.js?v=132140",
   "./js/adaptive-weekly-schedule.js?v=13730",
   "./js/api-integration.js?v=131300",
   "./js/app.js?v=12101",
@@ -54,7 +54,7 @@ const APP_SHELL = [
   "./js/first-flight-1372.js?v=13721",
   "./js/guided-workout-13193.js?v=131930",
   "./js/guided-workout-13203.js?v=132030",
-  "./js/guided-workout-13204.js?v=132040",
+  "./js/guided-workout-13214.js?v=132140",
   "./js/guided-workout-13205.js?v=132050",
   "./js/guided-workout-13206.js?v=132060",
   "./js/guided-workout-13212.js?v=132120",
@@ -88,7 +88,7 @@ const APP_SHELL = [
   "./js/weekly-debrief.js?v=131300",
   "./js/workout-display-names.js?v=131740",
   "./js/workout-model.js?v=13850",
-  "./js/workouts.js?v=132100"
+  "./js/workouts.js?v=132140"
 ];
 
 async function networkFirst(request) {

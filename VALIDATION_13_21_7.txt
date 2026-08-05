@@ -1,0 +1,12 @@
+Bell Performance 13.21.7 — Superset Paired-Round Alignment
+
+PASS: A1/B1, A2/B2, and A3/B3 aligned by shared round.
+PASS: guided order A1 -> B1 -> A2 -> B2.
+PASS: desktop and mobile horizontal overflow checks.
+PASS: 9/9 explicit superset identity checks.
+PASS: 8/8 readiness transparency checks.
+PASS: 74 JavaScript syntax checks.
+PASS: service-worker syntax.
+PASS: 89 HTML references.
+PASS: 90 service-worker references.
+PASS: manifest JSON.

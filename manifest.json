@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 13.21.6",
+  "name": "Bell Performance 13.21.7",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Cleaner workout action controls, stacked full-width supersets, and compact equipment-change transparency."
+  "description": "Aligned superset rounds with A and B set controls shown together, plus exercise exchange and equipment-change transparency."
 }

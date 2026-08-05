@@ -1,0 +1,27 @@
+Bell Performance 13.21.9 — Superset Round Completion & Rest Timing
+
+Focused browser validation:
+PASS — Rear-Delt Fly + Band Pressdown renders three paired rounds.
+PASS — Only the active round displays one Complete Round button.
+PASS — No per-exercise Complete buttons render inside superset set cells.
+PASS — A1/B1, A2/B2, and A3/B3 remain vertically aligned.
+PASS — Completing Round 1 records both A1 and B1 together.
+PASS — The programmed 45-second superset rest starts once after the full round.
+PASS — A 30-second individual exercise rest value cannot override the explicit 45-second superset instruction.
+PASS — Completing Round 2 starts one additional 45-second rest.
+PASS — Completing the final round does not start an unnecessary rest timer.
+PASS — Feedback remains hidden until every superset round is handled.
+PASS — Timer language displays NEXT ROUND and ROUND REST during grouped work.
+PASS — Completed and skipped rounds use one shared undo action.
+PASS — Desktop paired cells have equal top positions and heights.
+PASS — Mobile sequence remains A1/B1, A2/B2, A3/B3 with no horizontal overflow.
+PASS — Single-exercise set completion still uses the exercise's programmed rest interval.
+
+Regression validation:
+PASS — 8/8 readiness transparency checks.
+PASS — 9/9 explicit superset identity checks.
+PASS — JavaScript syntax validation for all js/ and data/ files.
+PASS — Service-worker syntax validation.
+PASS — Manifest JSON validation.
+PASS — 89/89 index asset references resolve.
+PASS — 90/90 service-worker asset references resolve.

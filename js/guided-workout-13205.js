@@ -12,6 +12,7 @@
   function fmt(seconds){seconds=Math.max(0,Math.floor(Number(seconds)||0));const h=Math.floor(seconds/3600),m=Math.floor((seconds%3600)/60),s=seconds%60;return h?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
   function workoutElapsed(){const active=dataRef()?.activeWorkout;if(!active)return 0;const base=Number(active.timerAccumulatedSeconds??active.elapsed??0)||0;if(active.timerRunning&&active.timerStartedAt){return base+Math.max(0,Math.floor((Date.now()-new Date(active.timerStartedAt).getTime())/1000));}return base;}
   function restRemaining(){return restEndAt?Math.max(0,Math.ceil((restEndAt-Date.now())/1000)):0;}
+  function activeGroupedRound(){const active=dataRef()?.activeWorkout,api=window.BellWorkoutGrouping13219;if(!active||!api?.groupFor)return false;try{return Boolean(api.groupFor(active,Number(active.gwExerciseIndex)||0)?.isSuperset);}catch(_){return false;}}
 
   window.beginRestTimer=function(seconds,exerciseName){restDuration=Math.max(0,Number(seconds)||0);restEndAt=restDuration?Date.now()+restDuration*1000:0;try{originalBegin?.(seconds,exerciseName);}catch(_){}tick();};
   window.adjustRestTimer=function(delta){if(restEndAt)restEndAt+=Number(delta||0)*1000;try{originalAdjust?.(delta);}catch(_){}tick();};
@@ -19,7 +20,7 @@
   window.gwAdjustRest13205=function(delta){window.adjustRestTimer(delta);};
   window.gwSkipRest13205=function(){window.skipRestTimer();};
 
-  function timerMarkup(){const remain=restRemaining();return `<div class="gw-live-rest ${remain?'is-running':'is-ready'}"><div><small>${remain?'REST TIMER':'READY'}</small><strong>${remain?fmt(remain):'NEXT SET'}</strong></div><div class="gw-live-rest-actions">${remain?`<button type="button" onclick="gwAdjustRest13205(-30)">−30</button><button type="button" onclick="gwAdjustRest13205(30)">+30</button><button type="button" onclick="gwSkipRest13205()">Skip</button>`:''}</div></div>`;}
+  function timerMarkup(){const remain=restRemaining(),grouped=activeGroupedRound();return `<div class="gw-live-rest ${remain?'is-running':'is-ready'}"><div><small>${remain?(grouped?'ROUND REST':'REST TIMER'):'READY'}</small><strong>${remain?fmt(remain):(grouped?'NEXT ROUND':'NEXT SET')}</strong></div><div class="gw-live-rest-actions">${remain?`<button type="button" onclick="gwAdjustRest13205(-30)">−30</button><button type="button" onclick="gwAdjustRest13205(30)">+30</button><button type="button" onclick="gwSkipRest13205()">Skip</button>`:''}</div></div>`;}
 
   function enhance(){
     const shell=document.querySelector('#workoutModal .gw-commercial-shell');if(!shell)return;

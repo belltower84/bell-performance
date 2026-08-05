@@ -1,0 +1,8 @@
+Bell Performance 13.21.9 — Superset Round Completion & Rest Timing
+
+1. Use bell13219_work as the repository/project root.
+2. Continue using the same localhost port to retain the current local athlete profile.
+3. Restart the local server from the new folder.
+4. Hard-refresh once with Ctrl + Shift + R.
+5. Confirm Bell Diagnostics displays:
+   13.21.9 · Superset Round Completion & Rest Timing

@@ -1,0 +1,12 @@
+Bell Performance 13.21.9
+Superset Round Completion & Rest Timing
+
+Build root: bell13219_work
+
+Superset changes:
+- One shared Complete Round action for A1 + B1 (or A1 + B1 + C1).
+- Per-exercise Complete buttons removed from grouped exercises.
+- Rest begins only after the complete round is recorded.
+- Programmed supersetRest is used before individual exercise rest values.
+- Final round does not start an unnecessary rest timer.
+- Shared round skip and undo controls preserve correction capability.

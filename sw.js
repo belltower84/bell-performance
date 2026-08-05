@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-21-8-full-width-superset-adjustment-notice";
+const CACHE_NAME = "bell-performance-13-21-9-superset-round-completion-rest-timing";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -26,7 +26,7 @@ const APP_SHELL = [
   "./css/guided-workout-13206.css?v=132060",
   "./css/guided-workout-13212.css?v=132120",
   "./css/guided-workout-cleanup-13216.css?v=132161",
-  "./css/guided-workout-paired-rounds-13218.css?v=132180",
+  "./css/guided-workout-paired-rounds-13219.css?v=132190",
   "./css/independent-daily-sessions-1382.css?v=13840",
   "./css/settings-1376.css?v=13760",
   "./css/workout-experience-1385.css?v=13850",
@@ -56,8 +56,8 @@ const APP_SHELL = [
   "./js/first-flight-1372.js?v=13721",
   "./js/guided-workout-13193.js?v=131930",
   "./js/guided-workout-13203.js?v=132030",
-  "./js/guided-workout-13218.js?v=132180",
-  "./js/guided-workout-13205.js?v=132050",
+  "./js/guided-workout-13219.js?v=132190",
+  "./js/guided-workout-13205.js?v=132191",
   "./js/guided-workout-13206.js?v=132060",
   "./js/guided-workout-13212.js?v=132120",
   "./js/habits.js?v=10006",

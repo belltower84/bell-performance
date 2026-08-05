@@ -11,7 +11,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <link href="./assets/logo-shield.svg?v=13720" rel="icon" type="image/svg+xml"/>
-<title>Bell Performance 13.21.8 — Full-Width Superset Adjustment Notice</title>
+<title>Bell Performance 13.21.9 — Superset Round Completion & Rest Timing</title>
 <link href="./css/app.css?v=13710" rel="stylesheet"/>
 <link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
 <link href="./css/independent-daily-sessions-1382.css?v=13840" rel="stylesheet"/>
@@ -32,7 +32,7 @@
 <link href="./css/guided-workout-13206.css?v=132060" rel="stylesheet"/>
 <link href="./css/guided-workout-13212.css?v=132120" rel="stylesheet"/>
 <link href="./css/guided-workout-cleanup-13216.css?v=132161" rel="stylesheet"/>
-<link href="./css/guided-workout-paired-rounds-13218.css?v=132180" rel="stylesheet"/>
+<link href="./css/guided-workout-paired-rounds-13219.css?v=132190" rel="stylesheet"/>
 <link href="./css/workout-preview-warmup-13210.css?v=132100" rel="stylesheet"/>
 <link href="./css/readiness-transparency-13213.css?v=132130" rel="stylesheet"/>
 <style id="critical-ui-guard">
@@ -381,7 +381,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="hint">Faith-based messages are always optional and can be changed here at any time.</div>
 </div>
 <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input accept="application/json" id="importFile" onchange="importData(event)" type="file"/><button class="danger" onclick="resetApp()">Reset App</button></div>
-<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.21.8 · Full-Width Superset Adjustment Notice</strong><p class="hint">Equipment and limitation notices now span the complete superset width so both exercise summaries and paired set columns remain vertically aligned.</p></div>
+<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.21.9 · Superset Round Completion & Rest Timing</strong><p class="hint">Supersets now use one shared Complete Round action. Rest begins only after every exercise in the round is completed and uses the programmed superset rest interval.</p></div>
 <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
 </section>
 </main>
@@ -698,7 +698,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.21.8-full-width-superset-adjustment-notice";</script>
+<script>window.BELL_APP_VERSION = "13.21.9-superset-round-completion-rest-timing";</script>
 <script src="./data/workouts.js?v=132160"></script>
 <script src="./js/exercise-library.js?v=132160"></script>
 <script src="./js/storage.js?v=13841"></script>
@@ -755,8 +755,8 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/longitudinal-coaching-1390.js?v=13910"></script>
 <script src="./js/guided-workout-13193.js?v=131930"></script>
 <script src="./js/guided-workout-13203.js?v=132030"></script>
-<script src="./js/guided-workout-13218.js?v=132180"></script>
-<script src="./js/guided-workout-13205.js?v=132050"></script>
+<script src="./js/guided-workout-13219.js?v=132190"></script>
+<script src="./js/guided-workout-13205.js?v=132191"></script>
 <script src="./js/guided-workout-13206.js?v=132060"></script>
 <script src="./js/guided-workout-13212.js?v=132120"></script>
 </body>

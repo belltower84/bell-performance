@@ -1,0 +1,20 @@
+Bell Performance 13.21.5 Validation
+
+PASS — JavaScript syntax:
+- js/equipment.js
+- js/workouts.js
+- js/exercise-library.js
+- js/guided-workout-13215.js
+- sw.js
+
+PASS — Manifest JSON validation
+PASS — 87/87 local HTML references resolved
+PASS — 88/88 service-worker asset references resolved
+PASS — Live workout render contains Replace control
+PASS — Equipment-adapted workout summary is rendered
+PASS — Per-exercise original → replacement notice is rendered
+PASS — Replacement modal opens and returns purpose-matched options
+PASS — Selected replacement updates the active workout and preserves replacement metadata
+PASS — Equipment fallback test: Bench Press → Flat Dumbbell Press at Home Gym with missing-equipment explanation
+
+Note: Chromium navigation to localhost and file:// is blocked by the execution environment's administrator policy. Functional rendering and replacement behavior were validated in a JavaScript DOM harness instead.

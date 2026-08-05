@@ -100,16 +100,20 @@ function adaptExerciseToInjuries(exercise){
   if(!pick)return {...exercise,name:"Coach Review — Movement Omitted",sets:0,reps:"—",cue:`${original} was removed because ${INJURY_PATTERN_LABELS[hit]} is restricted. Use only a clinician-approved, pain-free alternative.`,injuryAdjusted:true,originalExercise:original,restrictedPattern:hit};
   return {...exercise,name:pick[1],cue:`Adjusted for your ${INJURY_PATTERN_LABELS[hit]} restriction. Stop if symptoms appear. ${exercise.cue||""}`,injuryAdjusted:true,originalExercise:original,restrictedPattern:hit};
 }
+function equipmentLabelForKey(key){const item=EQUIPMENT_OPTIONS.find(([id])=>id===key);return item?item[1]:String(key||"equipment");}
 function adaptExerciseToEquipment(exercise){
   const req=exerciseRequirements(exercise.name);
-  if(!req.length||hasAnyEquipment(req))return {...exercise,equipmentAdjusted:false};
+  if(!req.length||hasAnyEquipment(req))return {...exercise,equipmentAdjusted:false,equipmentAdjustmentReason:"",requiredEquipment:req};
+  const location=activeEquipmentLocation();
+  const missing=req.filter(key=>!hasEquipment(key));
+  const missingLabel=(missing.length?missing:req).map(equipmentLabelForKey).join(", ");
   const candidates=EXERCISE_SWAPS[exercise.name]||[];
   const pick=candidates.find(([key])=>modalityKeyAvailable(key));
-  if(!pick)return {...exercise,name:`Bodyweight ${exercise.name}`,reps:exercise.reps,cue:`Equipment-aware fallback. Use controlled tempo and train close to technical failure. ${exercise.cue||""}`,equipmentAdjusted:true,originalExercise:exercise.name};
-  return {...exercise,name:pick[1],cue:`Substituted for ${exercise.name} at ${activeEquipmentLocation().name}. ${exercise.cue||""}`,equipmentAdjusted:true,originalExercise:exercise.name};
+  const original=exercise.originalExercise||exercise.name;
+  if(!pick)return {...exercise,name:`Bodyweight ${exercise.name}`,reps:exercise.reps,cue:`Equipment-aware fallback. Use controlled tempo and train close to technical failure. ${exercise.cue||""}`,equipmentAdjusted:true,originalExercise:original,requiredEquipment:req,equipmentLocation:location.name,equipmentAdjustmentReason:`${missingLabel} unavailable at ${location.name}.`};
+  return {...exercise,name:pick[1],cue:`Substituted for ${exercise.name} at ${location.name}. ${exercise.cue||""}`,equipmentAdjusted:true,originalExercise:original,requiredEquipment:req,equipmentLocation:location.name,equipmentAdjustmentReason:`${missingLabel} unavailable at ${location.name}.`};
 }
-function applyEquipmentToTemplate(template){return {...template,equipmentLocation:activeEquipmentLocation().name,exercises:template.exercises.map(adaptExerciseToEquipment).map(adaptExerciseToInjuries)};}
-let equipmentEditingLocationId="";
+function applyEquipmentToTemplate(template){const location=activeEquipmentLocation();return {...template,equipmentLocation:location.name,exercises:template.exercises.map(adaptExerciseToEquipment).map(adaptExerciseToInjuries)}};let equipmentEditingLocationId="";
 let equipmentDraftLocationId="";
 function equipmentCheckboxesHtml(prefix,onchange=""){
   const handler=onchange||(prefix==="equipment"?"updateEquipmentSelectionCount()":"");

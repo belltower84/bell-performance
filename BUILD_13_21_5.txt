@@ -1,0 +1,9 @@
+Bell Performance 13.21.5 — Exercise Exchange & Equipment Change Transparency
+
+- Replace button restored on every live strength exercise card.
+- Existing purpose-matched replacement modal is wired into the commercial execution screen.
+- Replacement reason and scope remain selectable: today, current block, or all future workouts.
+- Completed set data is preserved when an exercise is replaced mid-session.
+- Remaining set load suggestions are recalculated for the replacement.
+- Automatic equipment substitutions now carry location and missing-equipment metadata.
+- Workout-level and exercise-level adjustment notices explain equipment-driven changes.

@@ -22,7 +22,6 @@ function rawDailyReadinessScore(readiness = data.settings.readiness || {}) {
     const body=five(readiness.recoveryStatus,4);
     const energy=five(readiness.energy,4);
     let score=Math.round((sleep*.35+body*.35+energy*.30)*20);
-    if(readiness.painToday===true||readiness.painToday==="yes")score=Math.min(score,45);
     return Math.max(0,Math.min(100,score));
   }
   const duration=sleepDurationScore(readiness);
@@ -32,13 +31,29 @@ function rawDailyReadinessScore(readiness = data.settings.readiness || {}) {
   const recovery=five(readiness.recoveryStatus)*2;
   return Math.max(0,Math.min(100,Math.round(duration*2.5+sleepQuality*1.5+energy*2.5+recovery*2+motivation*1.5)));
 }
+function readinessFeedbackValue(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 1 && parsed <= 5 ? parsed : null;
+}
+
 function feedbackRecoveryScore(entry) {
-  if (!entry) return null;
-  const n = (value, fallback) => Number.isFinite(+value) ? +value : fallback;
-  const sessionQuality = n(entry.sessionQuality, 3);
-  const postEnergy = n(entry.postEnergy, 3);
-  const overallFeeling = n(entry.overallFeeling, 3);
-  const strainRecovery = 6 - n(entry.strain, 3);
+  if (!entry || typeof entry !== "object") return null;
+  const isEngine = String(entry.type || "").toLowerCase() === "engine" || entry.effortAccuracy != null || entry.legFreshness != null;
+  if (isEngine) {
+    const effort = readinessFeedbackValue(entry.effortAccuracy ?? entry.sessionQuality);
+    const breathing = readinessFeedbackValue(entry.breathing);
+    const legs = readinessFeedbackValue(entry.legFreshness ?? entry.postEnergy);
+    const symptoms = readinessFeedbackValue(entry.symptoms ?? entry.strain);
+    if ([effort, breathing, legs, symptoms].some(value => value == null)) return null;
+    const symptomRecovery = 6 - symptoms;
+    return Math.round((effort * .22 + breathing * .28 + legs * .30 + symptomRecovery * .20) * 20);
+  }
+  const sessionQuality = readinessFeedbackValue(entry.sessionQuality);
+  const postEnergy = readinessFeedbackValue(entry.postEnergy);
+  const overallFeeling = readinessFeedbackValue(entry.overallFeeling);
+  const strain = readinessFeedbackValue(entry.strain);
+  if ([sessionQuality, postEnergy, overallFeeling, strain].some(value => value == null)) return null;
+  const strainRecovery = 6 - strain;
   return Math.round((sessionQuality * .25 + postEnergy * .30 + overallFeeling * .25 + strainRecovery * .20) * 20);
 }
 
@@ -52,29 +67,120 @@ function lastSevenDaysKeys() {
   return keys;
 }
 
+function readinessCompletedSessionIds() {
+  return new Set((data.history || []).map(session => String(session?.completedAt || session?.sessionId || "").trim()).filter(Boolean));
+}
+
+function recentValidSessionFeedback(days = 7) {
+  const allowedDates = new Set(lastSevenDaysKeys().slice(0, Math.max(1, Math.min(7, Number(days) || 7))));
+  const completedIds = readinessCompletedSessionIds();
+  const bySession = new Map();
+  (data.sessionFeedbackLog || []).forEach((entry, index) => {
+    if (!entry || !allowedDates.has(String(entry.date || ""))) return;
+    const sessionId = String(entry.sessionId || "").trim();
+    if (!sessionId) return;
+    if (completedIds.size && !completedIds.has(sessionId)) return;
+    const score = feedbackRecoveryScore(entry);
+    if (!Number.isFinite(score)) return;
+    bySession.set(sessionId, { entry, score, index });
+  });
+  return [...bySession.values()].sort((a,b) => a.index - b.index);
+}
+
+function readinessTrendModifier(summary) {
+  let modifier = 0;
+  const feedbackAverage = Number(summary.feedbackAverage);
+  if (summary.feedbackCount > 0 && Number.isFinite(feedbackAverage)) {
+    if (feedbackAverage >= 82) modifier += 3;
+    else if (feedbackAverage >= 72) modifier += 1;
+    else if (feedbackAverage >= 65) modifier += 0;
+    else if (feedbackAverage >= 58) modifier -= 3;
+    else if (feedbackAverage >= 52) modifier -= 5;
+    else modifier -= 8;
+    if (summary.lowFeedbackCount >= 2) modifier -= 2;
+    if (summary.lowFeedbackCount >= 3) modifier -= 2;
+  }
+  const priorAverage = Number(summary.priorDailyAverage);
+  if (summary.priorCheckIns > 0 && Number.isFinite(priorAverage)) {
+    if (priorAverage >= 85) modifier += 1;
+    else if (priorAverage < 55) modifier -= 3;
+    else if (priorAverage < 65) modifier -= 2;
+  }
+  return Math.max(-15, Math.min(5, Math.round(modifier)));
+}
+
 function weeklyReadinessSummary() {
   const keys = new Set(lastSevenDaysKeys());
-  const daily = (data.readinessLog || []).filter(x => keys.has(x.date)).map(x => Number(x.score)).filter(Number.isFinite);
-  const feedback = (data.sessionFeedbackLog || []).filter(x => keys.has(x.date)).map(feedbackRecoveryScore).filter(Number.isFinite);
+  const dailyByDate = new Map();
+  (data.readinessLog || []).forEach(entry => {
+    const date = String(entry?.date || "");
+    const score = Number(entry?.score);
+    if (keys.has(date) && Number.isFinite(score) && score >= 0 && score <= 100) dailyByDate.set(date, score);
+  });
+  const daily = [...dailyByDate.values()];
+  const priorDaily = [...dailyByDate.entries()].filter(([date]) => date !== todayKey()).map(([,score]) => score);
+  const validFeedback = recentValidSessionFeedback(7);
+  const feedback = validFeedback.map(item => item.score);
   const hasData = daily.length > 0 || feedback.length > 0;
-  if (!hasData) return { score:null, dailyAverage:null, feedbackAverage:null, checkIns:0, feedbackCount:0, lowFeedbackCount:0, trend:"NO_DATA", hasData:false };
-  const dailyAverage = daily.length ? Math.round(daily.reduce((a,b)=>a+b,0) / daily.length) : Math.round(feedback.reduce((a,b)=>a+b,0) / feedback.length);
-  const feedbackAverage = feedback.length ? Math.round(feedback.reduce((a,b)=>a+b,0) / feedback.length) : dailyAverage;
-  const score = Math.round(dailyAverage * .65 + feedbackAverage * .35);
-  const lowFeedbackCount = feedback.filter(x => x < 52).length;
-  const trend = lowFeedbackCount >= 2 ? "ACCUMULATING_FATIGUE" : score >= 75 ? "BUILDING_WELL" : score >= 55 ? "MANAGE_LOAD" : "RECOVERY_NEEDED";
-  return { score, dailyAverage, feedbackAverage, checkIns:daily.length, feedbackCount:feedback.length, lowFeedbackCount, trend, hasData:true };
+  if (!hasData) return { score:null, dailyAverage:null, priorDailyAverage:null, feedbackAverage:null, checkIns:0, priorCheckIns:0, feedbackCount:0, lowFeedbackCount:0, moderateFeedbackCount:0, trendModifier:0, trend:"NO_DATA", hasData:false };
+  const dailyAverage = daily.length ? Math.round(daily.reduce((a,b)=>a+b,0) / daily.length) : null;
+  const priorDailyAverage = priorDaily.length ? Math.round(priorDaily.reduce((a,b)=>a+b,0) / priorDaily.length) : null;
+  const feedbackAverage = feedback.length ? Math.round(feedback.reduce((a,b)=>a+b,0) / feedback.length) : null;
+  const available = [];
+  if (dailyAverage != null) available.push({ value:dailyAverage, weight:.65 });
+  if (feedbackAverage != null) available.push({ value:feedbackAverage, weight:.35 });
+  const totalWeight = available.reduce((sum,item)=>sum+item.weight,0) || 1;
+  const score = Math.round(available.reduce((sum,item)=>sum+item.value*item.weight,0) / totalWeight);
+  const lowFeedbackCount = feedback.filter(value => value < 52).length;
+  const moderateFeedbackCount = feedback.filter(value => value >= 52 && value < 65).length;
+  const summary = { score, dailyAverage, priorDailyAverage, feedbackAverage, checkIns:daily.length, priorCheckIns:priorDaily.length, feedbackCount:feedback.length, lowFeedbackCount, moderateFeedbackCount, trend:"", hasData:true };
+  summary.trendModifier = readinessTrendModifier(summary);
+  summary.trend = summary.trendModifier <= -8 ? "RECOVERY_NEEDED" : summary.trendModifier <= -3 ? "MANAGE_LOAD" : summary.trendModifier >= 2 ? "BUILDING_WELL" : "STABLE";
+  return summary;
+}
+
+function readinessBreakdown(readiness = data.settings.readiness || {}) {
+  const dailyScore = rawDailyReadinessScore(readiness);
+  const weekly = weeklyReadinessSummary();
+  const trendModifier = weekly.trendModifier || 0;
+  let protectiveModifier = 0;
+  let protectiveCap = null;
+  const reasons = [];
+  const isToday = readiness.lastPromptDate === todayKey();
+  const painToday = isToday && (readiness.painToday === true || readiness.painToday === "yes");
+  if (painToday) {
+    protectiveCap = 45;
+    reasons.push("Pain reported today");
+  }
+  const preliminary = Math.max(0, Math.min(100, dailyScore + trendModifier));
+  let finalScore = preliminary;
+  if (protectiveCap != null && finalScore > protectiveCap) {
+    protectiveModifier = protectiveCap - finalScore;
+    finalScore = protectiveCap;
+  }
+  if (trendModifier < 0) reasons.push(`Recent recovery trend ${trendModifier}`);
+  else if (trendModifier > 0) reasons.push(`Recent recovery trend +${trendModifier}`);
+  if (!reasons.length) reasons.push("Today’s check-in is driving the score");
+  return {
+    dailyScore,
+    trendModifier,
+    protectiveModifier,
+    protectiveCap,
+    finalScore:Math.round(finalScore),
+    weekly,
+    reasons,
+    explanation: protectiveCap != null
+      ? `Protective limit applied because pain was reported today.`
+      : trendModifier < 0
+        ? `Today’s check-in was adjusted ${Math.abs(trendModifier)} points for recent recovery feedback.`
+        : trendModifier > 0
+          ? `Recent recovery feedback added ${trendModifier} points.`
+          : `Today’s check-in was used without a recovery penalty.`
+  };
 }
 
 function readinessScore() {
-  const today = rawDailyReadinessScore();
-  const weekly = weeklyReadinessSummary();
-  let adjusted = weekly.hasData ? Math.round(today * .72 + weekly.score * .28) : today;
-  if (weekly.lowFeedbackCount >= 2) adjusted = Math.min(adjusted, 68);
-  if (weekly.lowFeedbackCount >= 3) adjusted = Math.min(adjusted, 50);
-  const current=data.settings.readiness||{};
-  if(current.lastPromptDate===todayKey()&&(current.painToday===true||current.painToday==="yes"))adjusted=Math.min(adjusted,45);
-  return Math.max(0, Math.min(100, adjusted));
+  return readinessBreakdown().finalScore;
 }
 
 function readinessStatus(score = readinessScore()) {
@@ -126,12 +232,28 @@ function collectReadinessFrom(prefix = "") {
 
 function commitReadiness(values) {
   data.settings.readiness = { ...data.settings.readiness, ...values, lastPromptDate:todayKey() };
-  const rawScore = rawDailyReadinessScore(data.settings.readiness);
-  const entry = { date:todayKey(), score:rawScore, status:readinessStatus(rawScore), ...values };
+  const breakdown = readinessBreakdown(data.settings.readiness);
+  const entry = {
+    date:todayKey(),
+    score:breakdown.finalScore,
+    dailyScore:breakdown.dailyScore,
+    trendModifier:breakdown.trendModifier,
+    protectiveModifier:breakdown.protectiveModifier,
+    status:readinessStatus(breakdown.finalScore),
+    ...values
+  };
   const index = data.readinessLog.findIndex(x => x.date === entry.date);
   if (index >= 0) data.readinessLog[index] = entry; else data.readinessLog.push(entry);
-  data.settings.readiness.score = readinessScore();
-  data.settings.readiness.status = readinessStatus();
+  data.settings.readiness.score = breakdown.finalScore;
+  data.settings.readiness.status = readinessStatus(breakdown.finalScore);
+  data.settings.readiness.breakdown = {
+    dailyScore:breakdown.dailyScore,
+    trendModifier:breakdown.trendModifier,
+    protectiveModifier:breakdown.protectiveModifier,
+    feedbackCount:breakdown.weekly.feedbackCount,
+    explanation:breakdown.explanation,
+    calculatedAt:new Date().toISOString()
+  };
 }
 
 function saveReadiness() {

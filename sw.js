@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-21-2-workout-modal-centering";
+const CACHE_NAME = "bell-performance-13-21-3-readiness-transparency";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -29,6 +29,7 @@ const APP_SHELL = [
   "./css/settings-1376.css?v=13760",
   "./css/workout-experience-1385.css?v=13850",
   "./css/workout-preview-warmup-13210.css?v=132100",
+  "./css/readiness-transparency-13213.css?v=132130",
   "./data/workouts.js?v=10007",
   "./js/adaptive-weekly-schedule.js?v=13730",
   "./js/api-integration.js?v=131300",
@@ -45,7 +46,7 @@ const APP_SHELL = [
   "./js/coaching-pathways.js?v=13600",
   "./js/completion-engine-13717.js?v=13718",
   "./js/daily-mission-13710.js?v=13718",
-  "./js/dashboard-command-center.js?v=13650",
+  "./js/dashboard-command-center.js?v=132130",
   "./js/dual-goals.js?v=10006",
   "./js/equipment.js?v=13640",
   "./js/event-coaching.js?v=13721",
@@ -76,7 +77,7 @@ const APP_SHELL = [
   "./js/prescription-application-13150.js?v=131600",
   "./js/progression.js?v=10006",
   "./js/quote-cache.js?v=10006",
-  "./js/readiness.js?v=13840",
+  "./js/readiness.js?v=132130",
   "./js/real-world-chaos-13160.js?v=131670",
   "./js/settings-1376.js?v=13760",
   "./js/storage.js?v=13841",

@@ -11,7 +11,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <link href="./assets/logo-shield.svg?v=13720" rel="icon" type="image/svg+xml"/>
-<title>Bell Performance 13.17.4 — Atomic Session Identity & Workout Title Integrity</title>
+<title>Bell Performance 13.21.3 — Readiness Transparency & Fatigue-Cap Repair</title>
 <link href="./css/app.css?v=13710" rel="stylesheet"/>
 <link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
 <link href="./css/independent-daily-sessions-1382.css?v=13840" rel="stylesheet"/>
@@ -32,6 +32,7 @@
 <link href="./css/guided-workout-13206.css?v=132060" rel="stylesheet"/>
 <link href="./css/guided-workout-13212.css?v=132120" rel="stylesheet"/>
 <link href="./css/workout-preview-warmup-13210.css?v=132100" rel="stylesheet"/>
+<link href="./css/readiness-transparency-13213.css?v=132130" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -78,6 +79,12 @@ main{display:block}.screen{display:none}.screen.active{display:block}
           <span>Time <b id="commandTime">—</b></span>
         </div>
       </div>
+      <div class="command-readiness-breakdown" id="commandReadinessBreakdown" hidden>
+        <span><small>Today’s check-in</small><b id="readinessDailyScore">—</b></span>
+        <span><small>7-day trend</small><b id="readinessTrendModifier">0</b></span>
+        <span><small>Protection</small><b id="readinessProtectiveModifier">0</b></span>
+      </div>
+      <p class="command-readiness-explanation" id="readinessScoreExplanation">Complete today’s check-in to see how Bell calculated readiness.</p>
       <p class="command-visually-hidden" id="premiumReadinessDetail">Complete today’s check-in to personalize your training.</p>
       <button class="command-text-action premium-readiness-update" onclick="document.getElementById('dailyReadinessModal').classList.remove('hidden')" type="button">Update Check-In ›</button>
     </article>
@@ -372,7 +379,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="hint">Faith-based messages are always optional and can be changed here at any time.</div>
 </div>
 <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input accept="application/json" id="importFile" onchange="importData(event)" type="file"/><button class="danger" onclick="resetApp()">Reset App</button></div>
-<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.21.2 · Workout Modal Centering & Dock Alignment Repair</strong><p class="hint">The workout modal remains centered while its dock reserves live space and stays aligned at every viewport size.</p></div>
+<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.21.3 · Readiness Transparency & Fatigue-Cap Repair</strong><p class="hint">Readiness now shows today’s score, a bounded recovery-trend modifier, and any protective adjustment without a silent fatigue cap.</p></div>
 <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
 </section>
 </main>
@@ -689,11 +696,11 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.21.2-workout-modal-centering";</script>
+<script>window.BELL_APP_VERSION = "13.21.3-readiness-transparency";</script>
 <script src="./data/workouts.js?v=10007"></script>
 <script src="./js/exercise-library.js?v=13710"></script>
 <script src="./js/storage.js?v=13841"></script>
-<script src="./js/readiness.js?v=13840"></script>
+<script src="./js/readiness.js?v=132130"></script>
 <script src="./js/equipment.js?v=13640"></script>
 <script>{const grid=document.getElementById("equipmentGrid");if(grid)grid.innerHTML=equipmentCheckboxesHtml("equipment");const onboardingGrid=document.getElementById("onboardingEquipmentGrid");if(onboardingGrid)onboardingGrid.innerHTML=equipmentCheckboxesHtml("onboardingEquipment", "syncOnboardingEquipmentFromChecks()");}</script>
 <script src="./js/training-blocks.js?v=13600"></script>
@@ -726,7 +733,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/plan-progress.js?v=10006"></script>
 <script src="./js/bell-api.js?v=131300"></script>
 <script src="./js/api-integration.js?v=131300"></script>
-<script src="./js/dashboard-command-center.js?v=13650"></script>
+<script src="./js/dashboard-command-center.js?v=132130"></script>
 <script src="./js/adaptive-weekly-schedule.js?v=13730"></script>
 <script src="./js/powerlifting-programming.js?v=12212"></script>
 <script src="./js/powerlifting-meet-prep.js?v=12213"></script>

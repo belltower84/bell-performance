@@ -6,10 +6,10 @@ CSS_FILES=[
  'css/app.css','css/guided-workout-13193.css','css/guided-workout-13203.css',
  'css/guided-workout-13216.css','css/guided-workout-13205.css','css/guided-workout-13206.css',
  'css/guided-workout-13212.css','css/guided-workout-cleanup-13216.css',
- 'css/guided-workout-paired-rounds-13217.css'
+ 'css/guided-workout-paired-rounds-13218.css'
 ]
 CSS='\n'.join((ROOT/f).read_text() for f in CSS_FILES)
-JS=(ROOT/'js/guided-workout-13217.js').read_text()+'\n'+(ROOT/'js/guided-workout-13212.js').read_text()
+JS=(ROOT/'js/guided-workout-13218.js').read_text()+'\n'+(ROOT/'js/guided-workout-13212.js').read_text()
 HTML='''<!doctype html><html><head><meta charset="utf-8"></head><body class="workout-open">
 <div id="workoutModal" class="modal"><div class="modal-box workout-shell-1385"><div id="restPanel" class="hidden"></div><div id="activeExercises"></div><div id="workoutCompletionCard"></div></div></div>
 <script>

@@ -1,0 +1,17 @@
+Bell Performance 13.21.8 — Full-Width Superset Adjustment Notice
+
+1. Use bell13218_work as the repository/project root.
+2. Start the local server from that folder using the same localhost port as your current pilot profile:
+
+   py -m http.server 8012
+
+3. Open http://localhost:8012
+4. Perform one hard refresh: Ctrl + Shift + R
+5. Open Settings > Help & Data > Bell Diagnostics and confirm:
+   13.21.8 · Full-Width Superset Adjustment Notice
+
+Focused check:
+- Open a superset where one exercise was changed for equipment availability.
+- Confirm the Equipment Adjustment notice spans above both exercise cards.
+- Confirm the A and B exercise cards start at the same height.
+- Confirm A1/B1, A2/B2, and A3/B3 remain on shared rows.

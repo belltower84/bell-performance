@@ -1,0 +1,13 @@
+Bell Performance 13.21.8 — Full-Width Superset Adjustment Notice
+
+PASS: equipment adjustment notice spans the complete paired summary and set-table width.
+PASS: no equipment notice remains nested inside either individual superset summary card.
+PASS: both exercise summary cards share equal top and bottom alignment.
+PASS: A1/B1, A2/B2, and A3/B3 remain aligned by shared round.
+PASS: desktop and mobile horizontal overflow checks.
+PASS: Band Pressdown identifies Triceps as the primary muscle.
+PASS: explicit superset identity regression checks.
+PASS: readiness transparency regression checks.
+PASS: JavaScript and service-worker syntax.
+PASS: local HTML and service-worker asset references.
+PASS: manifest JSON and ZIP integrity.

@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-21-0-workout-ux-consolidation";
+const CACHE_NAME = "bell-performance-13-21-2-workout-modal-centering";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -24,6 +24,7 @@ const APP_SHELL = [
   "./css/guided-workout-13204.css?v=132040",
   "./css/guided-workout-13205.css?v=132050",
   "./css/guided-workout-13206.css?v=132060",
+  "./css/guided-workout-13212.css?v=132120",
   "./css/independent-daily-sessions-1382.css?v=13840",
   "./css/settings-1376.css?v=13760",
   "./css/workout-experience-1385.css?v=13850",
@@ -55,6 +56,7 @@ const APP_SHELL = [
   "./js/guided-workout-13204.js?v=132040",
   "./js/guided-workout-13205.js?v=132050",
   "./js/guided-workout-13206.js?v=132060",
+  "./js/guided-workout-13212.js?v=132120",
   "./js/habits.js?v=10006",
   "./js/how-to.js?v=13740",
   "./js/independent-daily-sessions-1382.js?v=13850",

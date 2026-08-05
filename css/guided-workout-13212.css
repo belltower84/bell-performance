@@ -1,0 +1,99 @@
+/* Bell Performance 13.21.2 — Workout Modal Centering & Dock Alignment Repair */
+
+/*
+   The modal box is the only scrolling surface during working sets.
+   Earlier releases created a nested 100dvh scroller inside the modal; the fixed
+   action dock then covered rows because its dynamic reservation lived on the
+   wrong element. Keep the commercial shell in normal document flow and reserve
+   the real dock height on both the modal and the explicit spacer.
+*/
+body.workout-open #workoutModal .modal-box.gw-stable-13204{
+  --gw-dock-clearance:40px;
+  box-sizing:border-box!important;
+  top:0!important;
+  bottom:0!important;
+  left:0!important;
+  right:0!important;
+  width:min(1080px,100vw)!important;
+  max-width:none!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  transform:none!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding-bottom:0!important;
+  scroll-padding-bottom:calc(var(--gw-action-dock-height,176px) + var(--gw-dock-clearance) + env(safe-area-inset-bottom,0px))!important;
+}
+
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-commercial-shell{
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:100%!important;
+  overflow:visible!important;
+  padding-bottom:0!important;
+  scroll-padding-bottom:0!important;
+}
+
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-action-spacer{
+  display:block!important;
+  width:100%!important;
+  height:calc(var(--gw-action-dock-height,176px) + var(--gw-dock-clearance) + env(safe-area-inset-bottom,0px))!important;
+  min-height:calc(var(--gw-action-dock-height,176px) + var(--gw-dock-clearance) + env(safe-area-inset-bottom,0px))!important;
+  flex:0 0 auto!important;
+  pointer-events:none!important;
+}
+
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-action-dock{
+  position:fixed!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:0!important;
+  transform:translateX(-50%)!important;
+  box-sizing:border-box!important;
+  z-index:80!important;
+  width:min(1080px,100vw)!important;
+  max-height:min(48dvh,430px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+}
+
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-log-row:last-child,
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-add-set,
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-feel.gw-feel-reveal{
+  scroll-margin-bottom:calc(var(--gw-action-dock-height,176px) + var(--gw-dock-clearance) + 12px)!important;
+}
+
+/* Ensure the set list itself can grow naturally rather than being clipped by an ancestor. */
+body.workout-open #workoutModal .modal-box.gw-stable-13204 #activeExercises,
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-exercise-group,
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-group-exercise,
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-log-wrap,
+body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-log-list{
+  max-height:none!important;
+  overflow:visible!important;
+}
+
+@media(max-width:900px){
+  body.workout-open #workoutModal .modal-box.gw-stable-13204{--gw-dock-clearance:32px}
+  body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-action-dock{max-height:min(54dvh,440px)!important}
+}
+
+@media(max-width:620px){
+  body.workout-open #workoutModal .modal-box.gw-stable-13204{--gw-dock-clearance:24px}
+  body.workout-open #workoutModal .modal-box.gw-stable-13204 .gw-action-dock{width:100vw!important;max-height:min(58dvh,450px)!important}
+}
+
+@media(max-width:619px){
+  body.workout-open #workoutModal .modal-box.gw-stable-13204{
+    left:0!important;
+    right:0!important;
+    width:100vw!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    transform:none!important;
+  }
+}

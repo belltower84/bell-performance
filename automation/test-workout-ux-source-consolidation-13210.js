@@ -13,7 +13,7 @@ const checks=[
   ['working sets gated',workouts.includes('if(!bellWarmupHandled(active))')],
   ['legacy warm-up override removed',!v8.includes('function bellWarmupRoutine')],
   ['versioned workout source',html.includes('./js/workouts.js?v=132100')],
-  ['active build visible',html.includes('13.21.0 · Workout UX Source Consolidation')]
+  ['active build visible',html.includes('13.21.2 · Workout Modal Centering & Dock Alignment Repair')]
 ];
 let failed=0;
 for(const [name,ok] of checks){console.log(`${ok?'PASS':'FAIL'}: ${name}`);if(!ok)failed++;}

@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-22-3-evidence-warmup-plate-math-movement-guides";
+const CACHE_NAME = "bell-performance-13-22-4-visible-general-warmup-modality";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -42,6 +42,7 @@ const APP_SHELL = [
   "./js/integrated-movement-preparation-13221.js?v=132210",
   "./js/integrated-warmup-sequence-13222.js?v=132220",
   "./js/evidence-warmup-plate-guides-13223.js?v=132230",
+  "./js/integrated-warmup-modality-13224.js?v=132240",
   "./js/api-integration.js?v=131300",
   "./js/app.js?v=12101",
   "./js/artwork.js?v=10006",

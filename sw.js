@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-22-5-mission-location-engine-selectors";
+const CACHE_NAME = "bell-performance-13-22-6-coachs-dashboard";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -37,6 +37,7 @@ const APP_SHELL = [
   "./css/integrated-warmup-sequence-13222.css?v=132220",
   "./css/evidence-warmup-plate-guides-13223.css?v=132230",
   "./css/mission-setup-selectors-13225.css?v=132250",
+  "./css/coach-dashboard-13226.css?v=132260",
   "./data/workouts.js?v=132160",
   "./js/adaptive-weekly-schedule.js?v=13730",
   "./js/adaptive-mobility-rehab-13220.js?v=132200",
@@ -45,6 +46,7 @@ const APP_SHELL = [
   "./js/evidence-warmup-plate-guides-13223.js?v=132230",
   "./js/integrated-warmup-modality-13224.js?v=132240",
   "./js/mission-setup-selectors-13225.js?v=132250",
+  "./js/coach-dashboard-13226.js?v=132260",
   "./js/api-integration.js?v=131300",
   "./js/app.js?v=12101",
   "./js/artwork.js?v=10006",
@@ -53,7 +55,7 @@ const APP_SHELL = [
   "./js/bell-coaching-engine.js?v=13200",
   "./js/bell13-athlete-experience.js?v=13650",
   "./js/bell13-coach-intelligence.js?v=13620",
-  "./js/bell13-commercial-home.js?v=13850",
+  "./js/bell13-commercial-home.js?v=132260",
   "./js/bell13-dashboard.js?v=13850",
   "./js/block-lifecycle.js?v=10006",
   "./js/coaching-pathways.js?v=13600",

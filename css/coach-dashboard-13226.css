@@ -1,0 +1,17 @@
+/* Bell Performance 13.22.6 — Coach's Dashboard */
+.b135-welcome{display:grid!important;grid-template-columns:minmax(360px,.78fr) minmax(520px,1.22fr);align-items:stretch!important;gap:28px!important}
+.b135-welcome-copy{align-self:center;min-width:0}
+.b135-coach-dashboard{min-width:0;padding:16px 18px 17px;border:1px solid rgba(215,170,59,.20);border-top-color:rgba(226,184,77,.62);border-radius:18px;background:radial-gradient(circle at 92% 8%,rgba(215,170,59,.12),transparent 35%),linear-gradient(145deg,rgba(22,28,34,.96),rgba(12,16,20,.96));box-shadow:0 18px 42px rgba(0,0,0,.22)}
+.b135-coach-dashboard-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-bottom:11px;border-bottom:1px solid rgba(255,255,255,.08)}
+.b135-coach-dashboard-head strong{display:block;margin-top:3px;font-size:16px;color:#f4f6f7}
+.b135-coach-open{width:auto!important;min-height:34px!important;padding:0!important;border:0!important;background:transparent!important;color:#d9bd79!important;font-size:11px!important;font-weight:850!important;white-space:nowrap}
+.b135-coach-dashboard-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(230px,.92fr);gap:18px;padding-top:13px}
+.b135-coach-word,.b135-coach-focus{min-width:0}
+.b135-coach-word{padding-right:18px;border-right:1px solid rgba(255,255,255,.08)}
+.b135-coach-word>span,.b135-coach-focus>span{display:block;margin-bottom:6px;color:#9ca5af;font-size:9px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+.b135-coach-word blockquote{margin:0;color:#f2f3f4;font-size:14px;font-weight:700;line-height:1.42;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.b135-coach-word cite{display:block;margin-top:7px;color:#d7aa3b;font-size:10px;font-style:normal;line-height:1.25}
+.b135-coach-focus strong{display:block;color:#f0cc70;font-size:17px;line-height:1.15}
+.b135-coach-focus p{margin:7px 0 0;color:#bdc5cd;font-size:11px;line-height:1.45;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+@media(max-width:980px){.b135-welcome{grid-template-columns:1fr!important;gap:16px!important}.b135-coach-dashboard-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.b135-coach-dashboard{padding:15px}.b135-coach-dashboard-grid{grid-template-columns:1fr;gap:13px}.b135-coach-word{padding-right:0;padding-bottom:13px;border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}.b135-coach-word blockquote{-webkit-line-clamp:4}.b135-coach-focus p{-webkit-line-clamp:5}}

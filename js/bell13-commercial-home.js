@@ -26,6 +26,43 @@
       return clean(s?.detail||template?.purpose||template?.detail||template?.description||"");
     }catch(_){return clean(s?.detail||"");}
   }
+  function dailyWord(){
+    try{
+      const selected=window.BellQuoteCache?.selected?.()||BellQuoteCache?.selected?.();
+      if(Array.isArray(selected)&&selected[0])return {text:clean(selected[0]),source:clean(selected[1]||"Bell Performance Coach")};
+    }catch(_){}
+    const hiddenText=clean(text("premiumQuoteText"));
+    const hiddenSource=clean(text("premiumQuoteSource"));
+    return {text:hiddenText||"Consistency beats perfection. Win today.",source:hiddenSource||"Bell Performance Coach"};
+  }
+  function focusFromText(label,detail,type=""){
+    const corpus=clean(`${label} ${detail} ${type}`).toLowerCase();
+    let title="Execute with Intent";
+    let cue="Complete the prescribed work with controlled effort and quality execution.";
+    if(/recovery|mobility|prehab|rehab|rest/.test(corpus)){title="Restore & Prepare";cue="Move with control, reduce unnecessary fatigue, and leave the session feeling better than you started.";}
+    else if(/easy run|zone 2|aerobic base|easy aerobic|recovery cardio/.test(corpus)){title="Aerobic Base";cue="Stay conversational, keep the effort controlled, and finish with more in reserve.";}
+    else if(/long run|long ride|long aerobic|durability/.test(corpus)){title="Aerobic Durability";cue="Hold a sustainable rhythm, fuel the work, and avoid turning the session into a race.";}
+    else if(/interval|sprint|speed|tempo|threshold/.test(corpus)){title="Repeatable Quality";cue="Make every hard effort look alike. Protect mechanics and stop before quality breaks down.";}
+    else if(/power|push press|clean|snatch|jerk|jump|throw/.test(corpus)){title="Speed & Power";cue="Move explosively, keep repetitions crisp, and avoid slow grinders.";}
+    else if(/squat|deadlift|lower strength|leg/.test(corpus)){title="Lower-Body Strength";cue="Own position and bracing first. Add force without sacrificing clean movement.";}
+    else if(/bench|press|upper strength|chin-up|pull-up|row/.test(corpus)){title="Upper-Body Strength";cue="Create stable positions, control every repetition, and preserve strong bar or body speed.";}
+    else if(/hypertrophy|bodybuilding|recomposition|muscle/.test(corpus)){title="Controlled Tension";cue="Use full useful range, controlled reps, and enough effort to stimulate without wasting recovery.";}
+    else if(/hybrid|tactical|work capacity|conditioning/.test(corpus)){title="Strength + Engine Balance";cue="Protect the primary training quality while building capacity that does not steal from tomorrow.";}
+    return {title,detail:cue,mission:clean(label||"Today’s mission")};
+  }
+  function coachDashboardModel(m,independent){
+    const word=dailyWord();
+    if(independent){
+      const rows=Array.isArray(independent.rows)?independent.rows:[];
+      const row=rows.find(item=>item.required&&!item.completed&&(item.type==="strength"||item.type==="engine"))||rows.find(item=>!item.completed&&(item.type==="strength"||item.type==="engine"))||rows[0];
+      const focus=focusFromText(row?.label||independent.title,row?.description||independent.purpose,row?.type||"");
+      return {word,focus};
+    }
+    const selected=m?.sessions?.length?selectedMissionSession(m):null;
+    const focus=focusFromText(selected?sessionLabel(selected):m?.title,selected?sessionPurpose(selected):m?.purpose,selected?sessionType(selected):m?.type);
+    return {word,focus};
+  }
+
   function todayMission(){
     const rawSessions=currentSessions();
     if(!rawSessions.length)return {title:"Recovery Day",purpose:"Recover, move well, and prepare for the next training day.",minutes:"Flexible",type:"Recovery",sessions:[],budget:null};
@@ -41,7 +78,16 @@
   }
 
   function markup(){return `<div class="b135-home" id="b135Home" data-control="coach">
-    <section class="b135-welcome"><div><span class="b135-eyebrow">Bell Performance</span><h1><span id="b135Greeting">Good morning</span>, <span id="b135Athlete">Athlete</span></h1><p id="b135WelcomeLine">Here is what matters today.</p></div></section>
+    <section class="b135-welcome">
+      <div class="b135-welcome-copy"><span class="b135-eyebrow">Bell Performance</span><h1><span id="b135Greeting">Good morning</span>, <span id="b135Athlete">Athlete</span></h1><p id="b135WelcomeLine">Here is what matters today.</p></div>
+      <aside class="b135-coach-dashboard" aria-labelledby="b135CoachDashboardTitle">
+        <div class="b135-coach-dashboard-head"><div><span class="b135-eyebrow">Coach’s Dashboard</span><strong id="b135CoachDashboardTitle">Today at a glance</strong></div><button class="b135-coach-open" id="b135CoachDashboardOpen" type="button">Open Coach ›</button></div>
+        <div class="b135-coach-dashboard-grid">
+          <section class="b135-coach-word"><span>Word of the Day</span><blockquote id="b135WordText">Consistency beats perfection. Win today.</blockquote><cite id="b135WordSource">Bell Performance Coach</cite></section>
+          <section class="b135-coach-focus"><span>Today’s Mission Focus</span><strong id="b135TrainingFocus">Execute with intent</strong><p id="b135TrainingFocusDetail">Complete the prescribed work with controlled effort and quality execution.</p></section>
+        </div>
+      </aside>
+    </section>
     <section class="b135-card b135-readiness-card" id="b135ReadinessCard" data-status="neutral"><div class="b135-readiness-main"><div class="b135-readiness-score"><strong id="b135ReadinessScore">—</strong><span>/100</span></div><div class="b135-readiness-copy"><span class="b135-eyebrow">Today’s readiness</span><strong id="b135ReadinessStatus">Check-in needed</strong><small id="b135ReadinessDetail">Complete your check-in before training.</small></div></div><div class="b135-readiness-actions"><span class="b135-readiness-level"><i></i><b id="b135ReadinessLevel">Not scored</b></span><button class="b135-readiness-update" id="b135ReadinessUpdate" type="button">Update Check-In</button></div></section>
     <section class="b135-card b135-primary"><div class="b135-primary-body"><div class="b135-mission-top"><div><span class="b135-eyebrow">Today’s training</span><h2 id="b135MissionTitle">Preparing your training</h2><p id="b135MissionPurpose">Bell is loading today’s prescription.</p></div><span class="b135-duration" id="b135MissionDuration">—</span></div><div class="b135-session-summary" id="b135SessionSummary"></div><div class="b135-primary-actions"><button class="b135-start" id="b135Start" type="button">Start Training</button><button class="b135-secondary" id="b135View" type="button">View Session</button><button class="b135-secondary" id="b135Modify" type="button">Modify</button></div><button class="b135-why" type="button" id="b135WhyMission">Why this workout?</button></div></section>
     <div class="b135-grid"><section class="b135-card b135-section b135-week-card"><div class="b135-section-head"><div><span class="b135-eyebrow">This week</span><h3 id="b135WeekTitle">Your training week</h3></div><button class="b135-link" type="button" onclick="showScreen('plan')">View Plan</button></div><div class="b135-week" id="b135Week" role="tablist" aria-label="Training days"></div><div class="b135-week-summary" id="b135WeekSummary" aria-live="polite"></div><div class="b135-week-foot"><span id="b135WeekComplete">0 of 0 sessions complete</span><strong id="b135WeekNext">Next: Today</strong></div></section>
@@ -208,6 +254,11 @@
     $("b135Home").dataset.control=mode;
     $("b135Greeting").textContent=greeting();$("b135Athlete").textContent=athlete();$("b135WelcomeLine").textContent=coachMode?"Your plan, readiness, and coaching direction for today.":"Your workout plan and readiness at a glance.";
     $("b135MissionTitle").textContent=independent?.title||m.title;$("b135MissionPurpose").textContent=independent?.purpose||m.purpose;$("b135MissionDuration").textContent=independent?.minutes||m.minutes;renderSessions(m,independent);renderWeek();
+    const coachDash=coachDashboardModel(m,independent);
+    if($("b135WordText"))$("b135WordText").textContent=coachDash.word.text;
+    if($("b135WordSource"))$("b135WordSource").textContent=coachDash.word.source;
+    if($("b135TrainingFocus"))$("b135TrainingFocus").textContent=coachDash.focus.title;
+    if($("b135TrainingFocusDetail"))$("b135TrainingFocusDetail").textContent=`${coachDash.focus.mission} · ${coachDash.focus.detail}`;
     const checked=typeof hasTodayReadiness==="function"?hasTodayReadiness():window.data?.settings?.readiness?.lastPromptDate===todayDateKey();
     const score=typeof readinessScore==="function"?readinessScore():Number(window.data?.settings?.readiness?.score)||0;
     const status=typeof readinessStatus==="function"?readinessStatus(score):"GREEN";
@@ -255,6 +306,7 @@
 
   function bind(){
     $("b135ReadinessUpdate").onclick=()=>{if(typeof openDailyReadiness==="function")openDailyReadiness();};
+    if($("b135CoachDashboardOpen"))$("b135CoachDashboardOpen").onclick=()=>{if(typeof openCommandTile==="function")openCommandTile("coaching");};
   }
 
   function navButtonByAction(fragment){return [...document.querySelectorAll('.app-nav button')].find(button=>(button.getAttribute('onclick')||'').includes(fragment));}

@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-22-0-adaptive-movement-preparation-rehab-support";
+const CACHE_NAME = "bell-performance-13-22-1-integrated-movement-preparation-scheduling";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -33,9 +33,11 @@ const APP_SHELL = [
   "./css/workout-preview-warmup-13210.css?v=132100",
   "./css/readiness-transparency-13213.css?v=132130",
   "./css/adaptive-mobility-rehab-13220.css?v=132200",
+  "./css/integrated-movement-preparation-13221.css?v=132210",
   "./data/workouts.js?v=132160",
   "./js/adaptive-weekly-schedule.js?v=13730",
   "./js/adaptive-mobility-rehab-13220.js?v=132200",
+  "./js/integrated-movement-preparation-13221.js?v=132210",
   "./js/api-integration.js?v=131300",
   "./js/app.js?v=12101",
   "./js/artwork.js?v=10006",

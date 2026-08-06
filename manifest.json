@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 13.22.0",
+  "name": "Bell Performance 13.22.1",
   "short_name": "Bell Performance",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Adaptive performance coaching with discipline-specific movement preparation and injury-aware rehab support."
+  "description": "Adaptive performance coaching with strength-integrated movement preparation and injury-aware daily rehab scheduling."
 }

@@ -58,13 +58,48 @@ function bellMissionSessionDescription(session){
   const template=scaledTemplate(session?.mission)||{};
   return String(session?.detail||template.coachBrief||template.description||premiumSessionDescription(session)||"Complete the prescribed work with controlled effort and quality execution.").replace(/\s+/g," ").trim();
 }
+function bellMissionSetupLabel(session){
+  if(session?.type==="strength"){
+    try{return activeEquipmentLocation()?.name||"Training location";}catch(_){return "Training location";}
+  }
+  if(session?.type==="engine")return data.settings?.cardioType||"Running";
+  return "";
+}
+function bellMissionSetupControl(session){
+  if(session?.type==="strength"){
+    try{
+      normalizeEquipmentSettings();
+      const setup=data.settings.equipmentSetup||{locations:[]};
+      const active=activeEquipmentLocation();
+      const options=(setup.locations||[]).map(location=>`<option value="${escapeHtml(location.id)}" ${location.id===active?.id?'selected':''}>${escapeHtml(location.name)}</option>`).join("");
+      return `<label class="command-session-setup strength"><span>Training at</span><select aria-label="Training location for today’s strength session" onchange="bellChangeMissionLocation(this.value)">${options}</select><small>Bell updates equipment substitutions for this location.</small></label>`;
+    }catch(_){return "";}
+  }
+  if(session?.type==="engine"){
+    const options=["Running","Cycling","Rower","Swimming","Hiking / Rucking","Sprint / Field","Air Bike","Elliptical","Stair Climber"];
+    const active=data.settings?.cardioType||"Running";
+    return `<label class="command-session-setup engine"><span>Engine mode</span><select aria-label="Engine modality for today’s session" onchange="bellChangeMissionEngine(this.value)">${options.map(option=>`<option value="${escapeHtml(option)}" ${option===active?'selected':''}>${escapeHtml(option)}</option>`).join("")}</select><small>Bell preserves the prescribed effort and duration in the selected modality.</small></label>`;
+  }
+  return "";
+}
+function bellChangeMissionLocation(value){
+  if(typeof switchEquipmentLocation==="function")switchEquipmentLocation(value);
+  else if(data.settings?.equipmentSetup){data.settings.equipmentSetup.activeLocationId=value;saveData();}
+  window.requestAnimationFrame(()=>renderPremiumMission());
+}
+function bellChangeMissionEngine(value){
+  if(typeof switchQuickEngineMode==="function")switchQuickEngineMode(value);
+  else{data.settings.cardioType=value;saveData();}
+  window.requestAnimationFrame(()=>renderPremiumMission());
+}
 function bellSelectMissionSession(sessionKey){bellSelectedMissionSessionKey=sessionKey;renderPremiumMission();}
 function bellMissionSessionCards(budget,futureDay){
   return budget.sessions.map(session=>{
     const selected=session.sessionKey===bellSelectedMissionSessionKey;
     const type=session.type==="engine"?"Engine":"Strength";
     const status=session.completed?"Complete":session.optional?"Optional":"Required";
-    return `<button type="button" class="command-session-choice${selected?' selected':''}${session.completed?' complete':''}" onclick="bellSelectMissionSession('${escapeHtml(session.sessionKey)}')" aria-pressed="${selected}"><span class="command-session-choice-top"><b>${escapeHtml(type)}</b><em class="${session.optional?'optional':''}">${escapeHtml(status)}</em></span><strong>${escapeHtml(premiumDisplayLabel(session))}</strong><small>${session.minutes} min${session.optional?' · not included in required total':''}</small><i>${futureDay?'Preview':'Select'} ›</i></button>`;
+    const setupLabel=bellMissionSetupLabel(session);
+    return `<button type="button" class="command-session-choice${selected?' selected':''}${session.completed?' complete':''}" onclick="bellSelectMissionSession('${escapeHtml(session.sessionKey)}')" aria-pressed="${selected}"><span class="command-session-choice-top"><b>${escapeHtml(type)}</b><em class="${session.optional?'optional':''}">${escapeHtml(status)}</em></span><strong>${escapeHtml(premiumDisplayLabel(session))}</strong><small>${session.minutes} min${session.optional?' · not included in required total':''}${setupLabel?` · ${escapeHtml(setupLabel)}`:''}</small><i>${futureDay?'Preview':'Select'} ›</i></button>`;
   }).join("");
 }
 function bellRenderSelectedMissionDetail(session,budget,futureDay){
@@ -74,7 +109,7 @@ function bellRenderSelectedMissionDetail(session,budget,futureDay){
   if(!detail)return;
   if(!session){detail.innerHTML="";detail.classList.add("hidden");return;}
   detail.classList.remove("hidden");
-  detail.innerHTML=`<div><span>${escapeHtml(session.type==="engine"?'Engine Session':'Strength Session')} · ${session.optional?'Optional':'Required'}</span><h3>${escapeHtml(premiumDisplayLabel(session))}</h3><p>${escapeHtml(bellMissionSessionDescription(session))}</p></div><div class="command-selected-session-time"><strong>${session.minutes}</strong><small>minutes</small></div>`;
+  detail.innerHTML=`<div class="command-selected-session-copy"><span>${escapeHtml(session.type==="engine"?'Engine Session':'Strength Session')} · ${session.optional?'Optional':'Required'}</span><h3>${escapeHtml(premiumDisplayLabel(session))}</h3><p>${escapeHtml(bellMissionSessionDescription(session))}</p>${bellMissionSetupControl(session)}</div><div class="command-selected-session-time"><strong>${session.minutes}</strong><small>minutes</small></div>`;
   const start=document.getElementById("commandStartWorkout"),view=document.getElementById("commandViewSession"),modify=document.getElementById("commandModifySession");
   if(start){
     const active=data.activeWorkout?.planSessionKey===session.sessionKey;

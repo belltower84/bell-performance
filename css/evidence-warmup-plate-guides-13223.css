@@ -1,0 +1,51 @@
+/* Bell Performance 13.22.3 — Evidence Warm-Ups, Plate Math & Movement Guides */
+.bp13223-prep-tools{display:flex;flex-wrap:wrap;gap:8px;margin:13px 0 10px}
+.bp13223-prep-tool{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:0 13px;border:1px solid #48545f;border-radius:9px;background:#111820;color:#dce3e9;font-size:10px;font-weight:900;letter-spacing:.08em;cursor:pointer}
+.bp13223-prep-tool:hover{border-color:#7b8791;background:#17212a}
+.bp13223-prep-tool span{display:grid;place-items:center;width:19px;height:19px;border:1px solid #697681;border-radius:50%;color:#f1bf36;font-size:11px}
+.bp13223-plate-tool{border-color:#6a571f;color:#efc34b;background:rgba(94,72,14,.15)}
+.bp13223-workout-plate{white-space:nowrap}
+.bp13223-plate-icon{display:inline-grid;place-items:center;color:#e6b62c;font-size:15px}
+
+.bp13223-modal{position:fixed;inset:0;z-index:5000;display:grid;place-items:center;padding:22px;background:rgba(0,0,0,.76);backdrop-filter:blur(9px)}
+.bp13223-modal.hidden{display:none!important}
+.bp13223-modal-card{width:min(920px,100%);max-height:min(90dvh,880px);overflow:auto;border:1px solid #37424c;border-radius:18px;background:radial-gradient(circle at 75% 0,rgba(97,75,20,.16),transparent 34%),#0a0f14;color:#f4f5f3;box-shadow:0 30px 90px rgba(0,0,0,.72)}
+.bp13223-modal-card>header{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:24px 26px 18px;border-bottom:1px solid #303943;background:rgba(10,15,20,.96);backdrop-filter:blur(12px)}
+.bp13223-modal-card>header h2{margin:5px 0 4px;font-size:clamp(25px,4vw,38px);line-height:1.05}
+.bp13223-modal-card>header p{margin:0;color:#9aa5af;font-size:12px;line-height:1.5}
+.bp13223-modal-card>header>button{width:38px;height:38px;flex:0 0 38px;border:1px solid #48535e;border-radius:50%;background:#111820;color:#eef1f3;font-size:24px;cursor:pointer}
+.bp13223-modal-card>footer{display:flex;justify-content:flex-end;padding:18px 26px 24px;border-top:1px solid #303943}
+.bp13223-modal-card>footer button{min-width:190px;min-height:48px}
+.bp13223-guide-purpose{margin:22px 26px 0;padding:17px 18px;border:1px solid #66521b;border-radius:12px;background:rgba(101,78,17,.14)}
+.bp13223-guide-purpose span,.bp13223-guide-grid span{display:block;color:#e1b33a;font-size:9px;font-weight:950;letter-spacing:.14em}
+.bp13223-guide-purpose p{margin:7px 0 0;color:#d9dee2;line-height:1.55}
+.bp13223-guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:16px 26px 24px}
+.bp13223-guide-grid section{padding:16px 17px;border:1px solid #303943;border-radius:12px;background:#0e141a}
+.bp13223-guide-grid p,.bp13223-guide-grid ol{margin:8px 0 0;color:#c1c8ce;font-size:13px;line-height:1.55}
+.bp13223-guide-grid ol{padding-left:19px}.bp13223-guide-grid li+li{margin-top:6px}
+.bp13223-guide-warning{margin:0 26px 22px;padding:13px 15px;border-left:3px solid #df9a2d;background:rgba(129,75,19,.14);color:#e5c18b;font-size:12px;line-height:1.5}
+
+.bp13223-plate-controls{display:grid;grid-template-columns:1.1fr .8fr .9fr;gap:12px;padding:22px 26px 14px}
+.bp13223-plate-controls label{display:grid;gap:7px}.bp13223-plate-controls label>span{color:#9ca6af;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.bp13223-plate-controls input,.bp13223-plate-controls select{width:100%;height:48px;box-sizing:border-box;border:1px solid #4b5761;border-radius:10px;background:#0c1218;color:#fff;padding:0 13px;font-size:16px;font-weight:750}
+#bp13223PlateResult{padding:8px 26px 25px}
+.bp13223-plate-total{display:flex;align-items:baseline;gap:12px;padding:15px 17px;border:1px solid #655119;border-radius:12px;background:rgba(102,78,16,.14)}
+.bp13223-plate-total span{color:#d5a92f;font-size:9px;font-weight:950;letter-spacing:.14em}.bp13223-plate-total strong{font-size:28px}.bp13223-plate-total small{margin-left:auto;color:#9fa8b0}
+.bp13223-per-side{display:grid;grid-template-columns:1fr 96px 1fr;gap:14px;align-items:center;margin-top:16px}
+.bp13223-per-side>div:not(.bp13223-bar-graphic){min-height:150px;padding:15px;border:1px solid #303943;border-radius:13px;background:#0d1319}
+.bp13223-per-side>div>span{display:block;color:#98a3ac;font-size:9px;font-weight:950;letter-spacing:.13em;text-align:center}
+.bp13223-per-side>div>div{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
+.bp13223-plate-chip{display:grid;place-items:center;width:58px;height:58px;border:5px solid #454f58;border-radius:50%;background:#171e24;box-shadow:inset 0 0 0 2px #11171c;color:#f3f4f4}
+.bp13223-plate-chip b{font-size:17px;line-height:1}.bp13223-plate-chip small{margin-top:3px;color:#b5bdc4;font-size:8px}
+.bp13223-bar-graphic{display:grid;place-items:center;height:190px;border-radius:999px;background:linear-gradient(90deg,#5d6870,#d0d5d8 42%,#747f87 55%,#4f5a63);color:#0a0d10;box-shadow:inset 0 0 0 5px rgba(0,0,0,.18)}
+.bp13223-bar-graphic span{font-size:23px;font-weight:950}.bp13223-bar-graphic small{font-size:8px;font-weight:950;letter-spacing:.08em}
+.bp13223-empty-bar{display:inline-flex!important;align-items:center;justify-content:center;min-height:48px;padding:0 14px;border:1px dashed #596570;border-radius:10px;color:#c6cdd2!important;font-size:10px!important}
+.bp13223-plate-note,.bp13223-plate-empty{margin:14px 0 0;color:#9aa4ad;font-size:11px;text-align:center}
+
+@media(max-width:700px){
+  .bp13223-modal{padding:8px}.bp13223-modal-card{max-height:96dvh;border-radius:14px}.bp13223-modal-card>header{padding:18px 17px 14px}.bp13223-modal-card>footer{padding:14px 17px 18px}
+  .bp13223-guide-purpose{margin:16px 17px 0}.bp13223-guide-grid{grid-template-columns:1fr;padding:12px 17px 18px}.bp13223-guide-warning{margin:0 17px 18px}
+  .bp13223-plate-controls{grid-template-columns:1fr 1fr;padding:17px}.bp13223-plate-controls label:first-child{grid-column:1/-1}
+  #bp13223PlateResult{padding:4px 17px 20px}.bp13223-per-side{grid-template-columns:1fr 62px 1fr;gap:7px}.bp13223-per-side>div:not(.bp13223-bar-graphic){padding:10px 6px}.bp13223-plate-chip{width:46px;height:46px;border-width:4px}.bp13223-plate-chip b{font-size:14px}.bp13223-bar-graphic{height:170px}.bp13223-plate-total{flex-wrap:wrap}.bp13223-plate-total small{width:100%;margin-left:0}
+}
+@media(max-width:470px){.bp13223-prep-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.bp13223-prep-tool{padding:0 8px}.bp13223-per-side{grid-template-columns:1fr 48px 1fr}.bp13223-plate-chip{width:39px;height:39px}.bp13223-plate-chip small{display:none}.bp13223-bar-graphic{height:150px}.bp13223-modal-card>footer button{width:100%}}

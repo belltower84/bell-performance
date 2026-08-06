@@ -11,7 +11,7 @@
 <meta content="Bell Performance" name="apple-mobile-web-app-title"/>
 <link href="manifest.json" rel="manifest"/>
 <link href="./assets/logo-shield.svg?v=13720" rel="icon" type="image/svg+xml"/>
-<title>Bell Performance 13.22.1 — Integrated Movement Preparation Scheduling</title>
+<title>Bell Performance 13.22.3 — Evidence Warm-Ups, Plate Math & Movement Guides</title>
 <link href="./css/app.css?v=13710" rel="stylesheet"/>
 <link href="./css/first-flight-1372.css?v=13721" rel="stylesheet"/>
 <link href="./css/independent-daily-sessions-1382.css?v=13840" rel="stylesheet"/>
@@ -37,6 +37,8 @@
 <link href="./css/readiness-transparency-13213.css?v=132130" rel="stylesheet"/>
 <link href="./css/adaptive-mobility-rehab-13220.css?v=132200" rel="stylesheet"/>
 <link href="./css/integrated-movement-preparation-13221.css?v=132210" rel="stylesheet"/>
+<link href="./css/integrated-warmup-sequence-13222.css?v=132220" rel="stylesheet"/>
+<link href="./css/evidence-warmup-plate-guides-13223.css?v=132230" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -383,7 +385,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="hint">Faith-based messages are always optional and can be changed here at any time.</div>
 </div>
 <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input accept="application/json" id="importFile" onchange="importData(event)" type="file"/><button class="danger" onclick="resetApp()">Reset App</button></div>
-<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.22.0 · Adaptive Movement Preparation & Rehab Support</strong><p class="hint">Movement preparation now adapts to discipline and today’s workout. Active injury profiles replace mobility with conservative, guideline-informed Rehab Support.</p></div>
+<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.22.3 · Evidence Warm-Ups, Plate Math &amp; Movement Guides</strong><p class="hint">Strength sessions use low-volume barbell ramps, practical plate loading, and expanded movement-preparation guides.</p></div>
 <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
 </section>
 </main>
@@ -700,7 +702,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.22.1-integrated-movement-preparation-scheduling";</script>
+<script>window.BELL_APP_VERSION = "13.22.3-evidence-warmup-plate-math-movement-guides";</script>
 <script src="./data/workouts.js?v=132160"></script>
 <script src="./js/exercise-library.js?v=132160"></script>
 <script src="./js/storage.js?v=13841"></script>
@@ -763,5 +765,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/guided-workout-13212.js?v=132120"></script>
 <script src="./js/adaptive-mobility-rehab-13220.js?v=132200"></script>
 <script src="./js/integrated-movement-preparation-13221.js?v=132210"></script>
+<script src="./js/integrated-warmup-sequence-13222.js?v=132220"></script>
+<script src="./js/evidence-warmup-plate-guides-13223.js?v=132230"></script>
 </body>
 </html>

@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 250);
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js?v=132270", {
+    navigator.serviceWorker.register("./sw.js", {
       scope: "./",
       updateViaCache: "none"
     }).then(registration => registration.update()).catch(error => {
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   if ("caches" in window) {
     caches.keys().then(keys => Promise.all(
-      keys.filter(key => key.startsWith("bell-performance-") && key !== `bell-performance-${BELL_APP_VERSION}`)
+      keys.filter(key => key.startsWith("bell-performance-") && key !== "bell-performance-13-22-8")
           .map(key => caches.delete(key))
     )).catch(() => {});
   }

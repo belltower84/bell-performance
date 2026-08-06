@@ -1,8 +1,0 @@
-Bell Performance 13.0.1 — Powerlifting Loading Fix
-
-1. Copy index.html into the repository root.
-2. Copy js/workouts.js and js/ui.js into the repository js folder.
-3. Commit and push the changes.
-
-Suggested commit message:
-Fix powerlifting back-off loading and restore onboarding maxes

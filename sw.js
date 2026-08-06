@@ -1,9 +1,10 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-22-6-coachs-dashboard";
+const CACHE_NAME = "bell-performance-13-22-7-github-pages-refresh-repair";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./manifest.json",
+  "./manifest.json?v=132270",
+  "./version.json?v=132270",
   "./assets/artwork/engine/mountain-trail.jpg?v=10006",
   "./assets/artwork/strength/powerlifting.jpg?v=10006",
   "./assets/icons/engine-mark.svg?v=10006",
@@ -46,9 +47,10 @@ const APP_SHELL = [
   "./js/evidence-warmup-plate-guides-13223.js?v=132230",
   "./js/integrated-warmup-modality-13224.js?v=132240",
   "./js/mission-setup-selectors-13225.js?v=132250",
-  "./js/coach-dashboard-13226.js?v=132260",
+  "./js/coach-dashboard-13226.js?v=132270",
+  "./js/deployment-refresh-13227.js?v=132270",
   "./js/api-integration.js?v=131300",
-  "./js/app.js?v=12101",
+  "./js/app.js?v=132270",
   "./js/artwork.js?v=10006",
   "./js/athlete-response-13130.js?v=131670",
   "./js/bell-api.js?v=131300",
@@ -109,7 +111,7 @@ const APP_SHELL = [
 async function networkFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   try {
-    const response = await fetch(request, { cache: "no-store" });
+    const response = await fetch(request, { cache: "reload" });
     if (response && response.ok) await cache.put(request, response.clone());
     return response;
   } catch (error) {

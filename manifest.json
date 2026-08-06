@@ -1,9 +1,9 @@
 {
-  "name": "Bell Performance 13.22.3",
+  "name": "Bell Performance 13.22.7",
   "short_name": "Bell Performance",
-  "start_url": "./",
+  "start_url": "./?build=13227",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Adaptive performance coaching with evidence-informed warm-up ramps, plate math, movement preparation guides, and injury-aware rehab support."
+  "description": "Adaptive performance coaching with Coach’s Dashboard, evidence-informed warm-ups, plate math, movement guides, and GitHub Pages refresh protection."
 }

@@ -347,16 +347,10 @@
   wrapRender("renderWarmupPanel",decorateWarmup);
   wrapRender("renderActiveWorkout",decorateWorkingSets);
 
-  function updateBuildLabel(){
-    window.BELL_APP_VERSION="13.22.3-evidence-warmup-plate-math-movement-guides";
-    const card=document.querySelector(".bp-build-card"),build=card?.querySelector("strong"),hint=card?.querySelector(".hint");
-    if(build&&build.textContent!=="13.22.3 · Evidence Warm-Ups, Plate Math & Movement Guides")build.textContent="13.22.3 · Evidence Warm-Ups, Plate Math & Movement Guides";
-    const hintText="Strength sessions use low-volume barbell ramps, practical plate loading, and expanded movement-preparation guides.";
-    if(hint&&hint.textContent!==hintText)hint.textContent=hintText;
-  }
-
-  const observer=typeof MutationObserver!=="undefined"?new MutationObserver(()=>{decorateWarmup();decorateWorkingSets();updateBuildLabel();}):null;
-  function init(){ensureModals();decorateWarmup();decorateWorkingSets();updateBuildLabel();observer?.observe(document.body,{childList:true,subtree:true});}
+  // Build identity is owned by the final release module. Older feature modules
+  // must never fight over the Diagnostics label inside MutationObserver callbacks.
+  const observer=typeof MutationObserver!=="undefined"?new MutationObserver(()=>{decorateWarmup();decorateWorkingSets();}):null;
+  function init(){ensureModals();decorateWarmup();decorateWorkingSets();observer?.observe(document.body,{childList:true,subtree:true});}
 
   window.BellWarmupPlateGuides={version:VERSION,liftProfile,evidenceWarmupSetsFor,platePlan,guideForItem,openGuide,closeGuide,openPlateMath,closePlateMath,renderPlateMath,changePlateUnit,decorateWarmup,decorateWorkingSets};
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();

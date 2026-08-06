@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 250);
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js", {
+    navigator.serviceWorker.register("./sw.js?v=132290", {
       scope: "./",
       updateViaCache: "none"
     }).then(registration => registration.update()).catch(error => {
@@ -56,10 +56,4 @@ document.addEventListener("DOMContentLoaded", () => {
       if (card) card.classList.add("artwork-unavailable");
     }, { once: true });
   });
-  if ("caches" in window) {
-    caches.keys().then(keys => Promise.all(
-      keys.filter(key => key.startsWith("bell-performance-") && key !== "bell-performance-13-22-8")
-          .map(key => caches.delete(key))
-    )).catch(() => {});
-  }
 });

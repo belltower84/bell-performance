@@ -47,20 +47,6 @@
     try{bellWarmupBlueprint=wrapped;}catch(_){/* global lexical binding may be unavailable */}
   }
 
-  function updateBuildLabel(){
-    window.BELL_APP_VERSION="13.22.4-visible-general-warmup-modality";
-    const card=document.querySelector(".bp-build-card");
-    const build=card?.querySelector("strong");
-    const hint=card?.querySelector(".hint");
-    if(build&&build.textContent!=="13.22.4 · Visible General Warm-Up Modality"){
-      build.textContent="13.22.4 · Visible General Warm-Up Modality";
-    }
-    if(hint){
-      const text="The prescribed cardio modality is shown directly on the General Warm-Up card.";
-      if(hint.textContent!==text)hint.textContent=text;
-    }
-  }
-
   function refreshWarmup(){
     try{
       const panel=document.getElementById("warmupPanel");
@@ -70,14 +56,10 @@
     }catch(_){/* no active workout */}
   }
 
-  const observer=(typeof MutationObserver!=="undefined")
-    ? new MutationObserver(updateBuildLabel)
-    : null;
-
   function init(){
-    updateBuildLabel();
+    // The feature only updates the visible warm-up modality. Build identity is
+    // intentionally left to the final release module to avoid observer loops.
     refreshWarmup();
-    observer?.observe(document.body,{childList:true,subtree:true});
   }
 
   window.BellVisibleWarmupModality={version:VERSION,modalityFrom,makeVisible};

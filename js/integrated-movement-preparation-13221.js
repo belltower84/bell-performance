@@ -328,7 +328,6 @@
         if(button){button.textContent=role.done?`${p.kind} Completed Today ✓`:p.blocked?"Review Safety Screen":p.mode==="healthy"?"Open Optional Prehab":`Open ${p.kind}`;button.disabled=role.done;button.onclick=()=>baseOpenMobility.call(window,key);}
       }
     }
-    const build=document.querySelector(".bp-build-card strong");if(build)build.textContent="13.22.1 · Integrated Movement Preparation Scheduling";
   }
 
   function wrapRender(name){

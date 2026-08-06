@@ -230,8 +230,6 @@
   }
 
   function updateLabels(){
-    const build=document.querySelector(".bp-build-card strong");
-    if(build)build.textContent="13.22.2 · Integrated Warm-Up Phase Sequence";
     const support=document.querySelector(".premium-support-art.mobility .premium-support-art-copy")||[...document.querySelectorAll(".premium-support-art-copy")].find(copy=>/inside today|movement preparation|rehab support/i.test(copy.textContent||""));
     const active=data.activeWorkout;
     if(support&&(!active||isStrength(active))){

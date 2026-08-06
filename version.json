@@ -1,6 +1,5 @@
 {
-  "version": "13.22.8",
-  "build": "13.22.8-github-pages-deployment-repair",
-  "label": "13.22.8 · GitHub Pages Deployment Repair",
-  "published": "2026-08-06"
+  "version": "13.22.9",
+  "build": "13.22.9-runtime-stability-repair",
+  "label": "Runtime Stability & GitHub Pages Repair"
 }

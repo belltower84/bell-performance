@@ -1,0 +1,15 @@
+Bell Performance 13.22.0
+Adaptive Movement Preparation & Rehab Support
+
+1. Extract bell13220_work.
+2. Serve the folder on the SAME localhost port used for your current profile.
+3. Do not clear browser site data.
+4. Hard refresh once after the server restarts: Ctrl + Shift + R.
+5. Confirm Bell Diagnostics shows 13.22.0.
+
+Example:
+  cd "C:\path\to\bell13220_work"
+  py -m http.server 8012
+
+Open:
+  http://localhost:8012

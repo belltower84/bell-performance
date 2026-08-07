@@ -1,0 +1,11 @@
+Bell Performance 13.22.10 — GitHub Actions Deployment
+Build ID: 13.22.10-github-actions-deployment
+Cache ID: bell-performance-13-22-10-github-actions-deployment
+
+Purpose
+- Preserve the clean 13.22.9 application behavior with no training/UI feature changes.
+- Replace GitHub Pages branch auto-builds with an explicit GitHub Actions static deployment workflow.
+- Stage only the static site files required by Bell Performance before uploading the Pages artifact.
+
+GitHub Pages setting required
+Settings > Pages > Build and deployment > Source: GitHub Actions

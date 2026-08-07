@@ -1,10 +1,24 @@
 {
-  "name": "Bell Performance 13.22.9",
-  "short_name": "Bell 13.22.9",
-  "start_url": "./?build=13227",
+  "name": "Bell Performance 13.22.10",
+  "short_name": "Bell 13.22.10",
+  "start_url": "./?build=132210",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Adaptive performance coaching with Coach\u2019s Dashboard, evidence-informed warm-ups, plate math, movement guides, and GitHub Pages refresh protection.",
-  "version": "13.22.9"
+  "description": "Bell Performance 13.22.10 preserves the clean 13.22.9 runtime baseline and adds an explicit GitHub Actions workflow for static GitHub Pages deployment.",
+  "version": "13.22.10",
+  "icons": [
+    {
+      "src": "./assets/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }

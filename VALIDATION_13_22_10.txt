@@ -1,0 +1,25 @@
+Bell Performance 13.22.10 — GitHub Actions Deployment Validation
+
+Release intent
+- Deployment-only release.
+- No intentional training logic or UI feature changes from the clean 13.22.9 baseline.
+
+Validation
+- 84 JavaScript/data JavaScript files passed node --check.
+- All JSON files parsed successfully.
+- 213 index/service-worker local references checked; 0 missing.
+- GitHub Pages staged artifact: 174 files, approximately 13 MB.
+- Staged artifact reference check: 0 missing.
+- Workflow YAML parsed successfully.
+- HTTP smoke test returned 200 for /, index.html, sw.js, version.json, manifest.json, refresh.html, js/app.js, runtime stability module, and css/app.css.
+
+Deployment workflow
+.github/workflows/deploy-pages.yml
+- actions/checkout@v6
+- actions/configure-pages@v5
+- actions/upload-pages-artifact@v4
+- actions/deploy-pages@v4
+- stages only Bell static runtime assets into _site before upload
+
+Required GitHub setting
+Settings > Pages > Build and deployment > Source: GitHub Actions

@@ -1,0 +1,7 @@
+Bell Performance 13.22.13 — Week Plan Integrity Repair
+
+- Future weeks that contain only reset/mobility placeholders are no longer treated as valid generated weeks.
+- Cached future weeks with zero formal Strength/Engine sessions regenerate automatically.
+- Existing completed-session state is merged back into regenerated weeks.
+- Vacation/planned-time-off weeks remain intentionally empty.
+- Built from Bell Performance 13.22.12.

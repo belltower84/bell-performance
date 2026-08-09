@@ -1,12 +1,12 @@
 {
-  "name": "Bell Performance 13.22.12",
+  "name": "Bell Performance 13.22.13",
   "short_name": "Bell Performance",
-  "start_url": "./?build=132212",
+  "start_url": "./?build=132213",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Bell Performance 13.22.12 makes Engine session type explicit and adapts modality to the athlete\u2019s selected location and available equipment while preserving the intended training stimulus.",
-  "version": "13.22.12",
+  "description": "Bell Performance 13.22.13 repairs empty future training weeks by regenerating cached weeks that contain no formal Strength or Engine sessions, while preserving intentional vacation weeks.",
+  "version": "13.22.13",
   "icons": [
     {
       "src": "./assets/app-icon-192.png",

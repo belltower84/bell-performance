@@ -5,7 +5,7 @@
    roles, and phase-aware variation for long-horizon training blocks. */
 
 (function(){
-  const VERSION="13.12.3";
+  const VERSION="13.22.13";
   const WEEKDAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   const clone=value=>value==null?value:JSON.parse(JSON.stringify(value));
   const text=value=>String(value||"").trim();
@@ -445,7 +445,8 @@
     const entries=[];
     for(let week=1;week<=total;week++){
       const existing=prior.find(item=>Number(item.week)===week),phase=phaseFor(block,week),status=weekStatus(block,week);
-      const reusable=existing?.plan?.length&&existing.schemaVersion===VERSION&&existing.configSignature===signature&&!force;
+      const formalCount=Array.isArray(existing?.plan)?existing.plan.filter(item=>!/^M-/i.test(text(item?.mission))).length:0;
+      const reusable=formalCount>0&&existing.schemaVersion===VERSION&&existing.configSignature===signature&&!force;
       const generated=reusable?clone(existing.plan):generateWeek(block,week);
       const plan=mergeCompletion(existing?.plan,generated);
       const startDate=weekStart(block,week),endDate=typeof addLocalDays==="function"?addLocalDays(startDate,6):(()=>{const d=new Date(`${startDate}T12:00:00`);d.setDate(d.getDate()+6);return d.toISOString().slice(0,10);})();

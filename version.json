@@ -1,5 +1,4 @@
 {
-  "version": "13.22.10",
-  "build": "13.22.10-github-actions-deployment",
-  "label": "GitHub Actions Deployment"
+  "version": "13.22.12",
+  "build": "13.22.12-engine-type-modality-adaptation"
 }

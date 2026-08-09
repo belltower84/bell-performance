@@ -1,9 +1,9 @@
 "use strict";
 (function(){
-  const VERSION="13.22.10";
-  const BUILD="13.22.10-github-actions-deployment";
-  const LABEL="13.22.10 · GitHub Actions Deployment";
-  const HINT="Stable runtime baseline for continued Bell Performance development, with competing build observers removed and resilient network-first updates retained.";
+  const VERSION="13.22.12";
+  const BUILD="13.22.12-engine-type-modality-adaptation";
+  const LABEL="13.22.12 · Engine Type & Modality Adaptation";
+  const HINT="Engine sessions explicitly identify their training type and can adapt modality to the selected location and available equipment without changing the intended stimulus.";
 
   function applyBuildIdentity(){
     window.BELL_BUILD_IDENTITY_LOCK=true;

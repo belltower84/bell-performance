@@ -1,12 +1,12 @@
 {
-  "name": "Bell Performance 13.22.10",
-  "short_name": "Bell 13.22.10",
-  "start_url": "./?build=132210",
+  "name": "Bell Performance 13.22.12",
+  "short_name": "Bell Performance",
+  "start_url": "./?build=132212",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Bell Performance 13.22.10 preserves the clean 13.22.9 runtime baseline and adds an explicit GitHub Actions workflow for static GitHub Pages deployment.",
-  "version": "13.22.10",
+  "description": "Bell Performance 13.22.12 makes Engine session type explicit and adapts modality to the athlete\u2019s selected location and available equipment while preserving the intended training stimulus.",
+  "version": "13.22.12",
   "icons": [
     {
       "src": "./assets/app-icon-192.png",

@@ -1,0 +1,9 @@
+Bell Performance 13.22.11
+Mission Focus Fidelity · Historical Session Logging · Engine Platform Unification
+
+Changes:
+- Coach Dashboard mission focus prioritizes the day's required strength session when one exists.
+- Weekly preview removes exact Engine duration and shows session type/purpose instead.
+- Past incomplete days expose Log Missed Session and retain the original scheduled date.
+- Engine execution now uses a guided commercial layout aligned with Strength.
+- GitHub Actions Pages deployment workflow retained from 13.22.10.

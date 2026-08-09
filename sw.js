@@ -1,14 +1,14 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-22-10-github-actions-deployment";
+const CACHE_NAME = "bell-performance-13-22-12";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./manifest.json?v=1322100",
-  "./version.json?v=1322100",
-  "./refresh.html?v=1322100",
-  "./favicon.ico?v=1322100",
-  "./assets/app-icon-192.png?v=1322100",
-  "./assets/app-icon-512.png?v=1322100",
+  "./manifest.json?v=1322110",
+  "./version.json?v=1322110",
+  "./refresh.html?v=1322110",
+  "./favicon.ico?v=1322110",
+  "./assets/app-icon-192.png?v=1322110",
+  "./assets/app-icon-512.png?v=1322110",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/artwork/strength/powerlifting.jpg?v=10006",
   "./assets/artwork/engine/mountain-trail.jpg?v=10006",
@@ -52,7 +52,7 @@ const APP_SHELL = [
   "./js/adaptive-weekly-schedule.js?v=13730",
   "./js/powerlifting-programming.js?v=12212",
   "./js/powerlifting-meet-prep.js?v=12213",
-  "./js/app.js?v=1322100",
+  "./js/app.js?v=1322110",
   "./js/bell-coaching-engine.js?v=13200",
   "./js/bell13-dashboard.js?v=13850",
   "./js/bell13-athlete-experience.js?v=13650",
@@ -79,7 +79,7 @@ const APP_SHELL = [
   "./js/integrated-warmup-modality-13224.js?v=132240",
   "./js/mission-setup-selectors-13225.js?v=132250",
   "./js/coach-dashboard-13226.js?v=132270",
-  "./js/runtime-stability-13229.js?v=1322100",
+  "./js/runtime-stability-13229.js?v=1322110",
   "./assets/logo-shield.svg?v=13720",
   "./css/app.css?v=13710",
   "./css/first-flight-1372.css?v=13721",
@@ -109,7 +109,9 @@ const APP_SHELL = [
   "./css/integrated-warmup-sequence-13222.css?v=132220",
   "./css/evidence-warmup-plate-guides-13223.css?v=132230",
   "./css/mission-setup-selectors-13225.css?v=132250",
-  "./css/coach-dashboard-13226.css?v=132260"
+  "./css/coach-dashboard-13226.css?v=132260",
+  "./js/engine-type-modality-132212.js?v=132212",
+  "./css/engine-type-modality-132212.css?v=132212"
 ];
 
 async function safePrecache() {

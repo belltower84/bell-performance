@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 250);
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js?v=1322100", {
+    navigator.serviceWorker.register("./sw.js?v=1322110", {
       scope: "./",
       updateViaCache: "none"
     }).then(registration => registration.update()).catch(error => {

@@ -1,0 +1,5 @@
+Bell Performance 13.22.14 — Engine Session Identity Repair
+
+- Canonical Engine mission mapping: Easy R-2, Quality R-4, Long R-5.
+- Repairs legacy planned sessions whose label/detail and mission code disagree.
+- Keeps the daily allocated duration authoritative in preview/start flow.

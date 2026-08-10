@@ -5,7 +5,7 @@
    roles, and phase-aware variation for long-horizon training blocks. */
 
 (function(){
-  const VERSION="13.22.13";
+  const VERSION="13.22.14";
   const WEEKDAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   const clone=value=>value==null?value:JSON.parse(JSON.stringify(value));
   const text=value=>String(value||"").trim();

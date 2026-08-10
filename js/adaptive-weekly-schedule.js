@@ -89,9 +89,9 @@ function bellCloneSessionTemplate(source,role,index){
     "strength-upper-secondary":{mission:"S-3",label:"Athletic Upper Strength"},
     "strength-lower-secondary":{mission:"S-4",label:"Secondary Lower Strength"},
     "strength-full-body":{mission:"S-4",label:"Full-Body Strength"},
-    "engine-easy":{mission:"R-1",label:"Easy Aerobic Support"},
-    "engine-quality":{mission:"R-2",label:"Run Quality"},
-    "engine-long":{mission:"R-3",label:"Long Run"}
+    "engine-easy":{mission:"R-2",label:"Easy Aerobic Support"},
+    "engine-quality":{mission:"R-4",label:"Run Quality"},
+    "engine-long":{mission:"R-5",label:"Long Run"}
   };
   const d=definitions[role];if(d){item.mission=d.mission;item.customLabel=d.label;}
   if(role.startsWith("engine-")){

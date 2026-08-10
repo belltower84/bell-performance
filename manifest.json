@@ -1,12 +1,12 @@
 {
-  "name": "Bell Performance 13.22.13",
+  "name": "Bell Performance 13.22.14",
   "short_name": "Bell Performance",
-  "start_url": "./?build=132213",
+  "start_url": "./?build=132214",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Bell Performance 13.22.13 repairs empty future training weeks by regenerating cached weeks that contain no formal Strength or Engine sessions, while preserving intentional vacation weeks.",
-  "version": "13.22.13",
+  "description": "Bell Performance 13.22.14 repairs Engine session identity so dashboard, preview, and launched workout use the same physiological prescription and canonical mission.",
+  "version": "13.22.14",
   "icons": [
     {
       "src": "./assets/app-icon-192.png",

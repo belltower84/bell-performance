@@ -1,14 +1,14 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-22-18";
+const CACHE_NAME = "bell-performance-13-22-19";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./manifest.json?v=132218",
-  "./version.json?v=132218",
-  "./refresh.html?v=132218",
-  "./favicon.ico?v=132218",
-  "./assets/app-icon-192.png?v=132218",
-  "./assets/app-icon-512.png?v=132218",
+  "./manifest.json?v=132219",
+  "./version.json?v=132219",
+  "./refresh.html?v=132219",
+  "./favicon.ico?v=132219",
+  "./assets/app-icon-192.png?v=132219",
+  "./assets/app-icon-512.png?v=132219",
   "./assets/logo-bell-emblem.png?v=12210",
   "./assets/artwork/strength/powerlifting.jpg?v=10006",
   "./assets/artwork/engine/mountain-trail.jpg?v=10006",
@@ -116,6 +116,7 @@ const APP_SHELL = [
   "./js/execution-integrity-engine-flow-132215.js?v=132215",
   "./css/execution-integrity-engine-flow-132215.css?v=132215",
   "./js/schedule-completion-identity-132218.js?v=132218",
+  "./js/adversity-resilience-132219.js?v=132219",
 ];
 
 async function safePrecache() {

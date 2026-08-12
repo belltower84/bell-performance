@@ -1,12 +1,12 @@
 {
-  "name": "Bell Performance 13.22.18",
+  "name": "Bell Performance 13.22.19",
   "short_name": "Bell Performance",
-  "start_url": "./?build=132218",
+  "start_url": "./?build=132219",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Bell Performance 13.22.18 uses strict date-and-workout completion identity so rescheduled plans cannot inherit completion from a different session.",
-  "version": "13.22.18",
+  "description": "Bell Performance 13.22.19 keeps the active plan anchored to the calendar and adapts mid-week availability changes without losing completed work or derailing the block.",
+  "version": "13.22.19",
   "icons": [
     {
       "src": "./assets/app-icon-192.png",

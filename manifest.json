@@ -1,12 +1,12 @@
 {
-  "name": "Bell Performance 13.22.16",
+  "name": "Bell Performance 13.22.17",
   "short_name": "Bell Performance",
-  "start_url": "./?build=132216",
+  "start_url": "./?build=132217",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Bell Performance 13.22.16 repairs rescheduled warm-up targeting, persistent strength rest timing, pressing muscle metadata, and Engine launch/setup flow.",
-  "version": "13.22.16",
+  "description": "Bell Performance 13.22.17 repairs the completion-identity recursion that could prevent generated training weeks from rendering after a schedule-change migration.",
+  "version": "13.22.17",
   "icons": [
     {
       "src": "./assets/app-icon-192.png",

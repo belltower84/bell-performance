@@ -1,12 +1,12 @@
 {
-  "name": "Bell Performance 13.22.14",
+  "name": "Bell Performance 13.22.15",
   "short_name": "Bell Performance",
-  "start_url": "./?build=132214",
+  "start_url": "./?build=132215",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Bell Performance 13.22.14 repairs Engine session identity so dashboard, preview, and launched workout use the same physiological prescription and canonical mission.",
-  "version": "13.22.14",
+  "description": "Bell Performance 13.22.15 repairs rescheduled warm-up targeting, persistent strength rest timing, pressing muscle metadata, and Engine launch/setup flow.",
+  "version": "13.22.15",
   "icons": [
     {
       "src": "./assets/app-icon-192.png",

@@ -1,0 +1,13 @@
+/* Bell Performance 13.22.15 */
+.b132215-rest-banner{margin:10px 0 12px;border:1px solid #394450;border-radius:12px;background:linear-gradient(135deg,#151b22,#0d1218);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.b132215-rest-banner.running{border-color:#c79625;box-shadow:0 0 0 1px rgba(217,165,29,.12),0 8px 22px rgba(0,0,0,.22)}
+.b132215-rest-copy small,.b132215-engine-setup small,.b132215-engine-plan small{display:block;color:#9aa5b1;text-transform:uppercase;letter-spacing:.13em;font-size:.62rem;font-weight:800}
+.b132215-rest-copy strong{display:block;color:#f0b92e;font-size:1.65rem;line-height:1;margin-top:3px;font-variant-numeric:tabular-nums}
+.b132215-rest-actions{display:flex;gap:5px}.b132215-rest-actions button{min-height:34px;padding:0 9px;border-radius:8px;border:1px solid #3a4652;background:#171e26;color:#fff;font-weight:800}
+.b132215-engine-launch{margin-top:14px;padding:16px;border:1px solid #34404c;border-radius:16px;background:linear-gradient(145deg,#151a20,#0b1015)}
+.b132215-engine-launch h3{margin:3px 0 7px;font-size:1.25rem}.b132215-engine-launch p{margin:0;color:#aab3bd;line-height:1.45}
+.b132215-mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.b132215-mode{padding:11px 10px;text-align:left;border:1px solid #35414d;border-radius:11px;background:#10161c;color:#fff;font-weight:850}.b132215-mode span{display:block;color:#929ca7;font-weight:600;font-size:.7rem;margin-top:2px}.b132215-mode.active{border-color:#dda91f;background:linear-gradient(145deg,#2a2416,#15140f);box-shadow:inset 3px 0 #dda91f}
+.b132215-covered{margin-top:12px;padding:10px 11px;border:1px solid #2e684c;border-radius:10px;background:#102219;color:#bde8cf;font-size:.82rem;line-height:1.4}
+.b132215-engine-top-setup{margin:10px 0 12px}.b132215-engine-top-setup .b132212-engine-setup{margin:0!important}
+.b132215-engine-plan{margin:12px 0;padding:14px;border:1px solid #34404c;border-radius:14px;background:#0e141a}.b132215-engine-plan h3{font-size:1.1rem;margin:3px 0 10px}.b132215-interval-structure{display:grid;grid-template-columns:auto 1fr;gap:7px 10px;align-items:center}.b132215-interval-structure b{color:#e0ad2d;font-size:.75rem;letter-spacing:.08em}.b132215-interval-structure span{color:#e8edf2;font-weight:750}.b132215-engine-note{margin:10px 0 0;color:#9da8b3;font-size:.78rem;line-height:1.45}
+@media(max-width:520px){.b132215-mode-grid{grid-template-columns:1fr 1fr}.b132215-rest-copy strong{font-size:1.35rem}.b132215-rest-actions button{padding:0 7px;font-size:.68rem}.b132215-engine-launch{padding:13px}}

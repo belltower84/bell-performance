@@ -357,11 +357,21 @@
   }
   function planText(key){
     const parts=[];
+    // When a workout is open, its actual exercise list is authoritative. This prevents
+    // a rescheduled upper-body session from inheriting mobility context from another
+    // session that happens to occupy the same day after availability changes.
+    try{
+      const active=data.activeWorkout;
+      const activeKey=String(active?.scheduledDate||active?.dailySessionDate||key).slice(0,10);
+      if(active&&activeKey===key){
+        parts.push(active.name,active.label,active.displayLabel,active.coachBrief,...(active.exercises||[]).map(x=>`${x.name||""} ${x.block||""}`));
+        return parts.filter(Boolean).join(" ").toLowerCase();
+      }
+    }catch(_){}
     try{
       if(typeof premiumAllSessions==="function"){(premiumAllSessions()||[]).forEach(session=>parts.push(session?.mission,session?.label,session?.detail,session?.name));}
     }catch(_){}
     try{(data.plan||[]).filter(item=>String(item.scheduledDate||"").slice(0,10)===key).forEach(item=>parts.push(item.mission,item.label,item.detail,item.name));}catch(_){}
-    try{if(data.activeWorkout&&String(data.activeWorkout.scheduledDate||key).slice(0,10)===key)parts.push(data.activeWorkout.name,data.activeWorkout.label,...(data.activeWorkout.exercises||[]).map(x=>x.name));}catch(_){}
     if(!parts.length){try{const p=typeof currentPlan==="function"?currentPlan():null;parts.push(p?.mission,p?.label,p?.detail);}catch(_){} }
     return parts.filter(Boolean).join(" ").toLowerCase();
   }

@@ -1,8 +1,8 @@
 "use strict";
 (function(){
-  const VERSION="13.22.12";
-  const BUILD="13.22.12-engine-type-modality-adaptation";
-  const LABEL="13.22.12 · Engine Type & Modality Adaptation";
+  const VERSION="13.22.15";
+  const BUILD="13.22.15-execution-integrity-engine-flow";
+  const LABEL="13.22.15 · Execution Integrity & Engine Flow";
   const HINT="Engine sessions explicitly identify their training type and can adapt modality to the selected location and available equipment without changing the intended stimulus.";
 
   function applyBuildIdentity(){

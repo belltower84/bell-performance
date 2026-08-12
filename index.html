@@ -46,6 +46,7 @@
 <link href="./css/mission-setup-selectors-13225.css?v=132250" rel="stylesheet"/>
 <link href="./css/coach-dashboard-13226.css?v=132260" rel="stylesheet"/>
 <link href="./css/engine-type-modality-132212.css?v=132212" rel="stylesheet"/>
+<link href="./css/execution-integrity-engine-flow-132215.css?v=132215" rel="stylesheet"/>
 <style id="critical-ui-guard">
 html,body{margin:0;min-height:100%;background:#07090b;color:#f4f6f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
@@ -393,7 +394,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="hint">Faith-based messages are always optional and can be changed here at any time.</div>
 </div>
 <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input accept="application/json" id="importFile" onchange="importData(event)" type="file"/><button class="danger" onclick="resetApp()">Reset App</button></div>
-<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.22.12 · Engine Type & Modality Adaptation</strong><p class="hint">Engine sessions show their training type and adapt execution to the selected location and available equipment.</p></div>
+<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.22.15 · Execution Integrity & Engine Flow</strong><p class="hint">Rescheduled warm-ups follow the opened workout, strength rest timing is persistent, press muscle metadata is corrected, and Engine launch adapts to prior same-day strength work.</p></div>
 <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
 </section>
 </main>
@@ -710,7 +711,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.22.14-engine-session-identity-repair";</script>
+<script>window.BELL_APP_VERSION = "13.22.15-execution-integrity-engine-flow";</script>
 <script src="./data/workouts.js?v=132160"></script>
 <script src="./js/exercise-library.js?v=132160"></script>
 <script src="./js/storage.js?v=13841"></script>
@@ -782,5 +783,6 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/dashboard-engine-history-132211.js?v=132211"></script>
 <script src="./js/engine-type-modality-132212.js?v=132212"></script>
 <script src="./js/engine-session-identity-132214.js?v=132214"></script>
+<script src="./js/execution-integrity-engine-flow-132215.js?v=132215"></script>
 </body>
 </html>

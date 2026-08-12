@@ -1,0 +1,8 @@
+Bell Performance 13.22.15 — Execution Integrity & Engine Flow
+
+1. Rescheduled strength warm-ups now classify from the workout actually opened, not surrounding same-day plan context.
+2. Strength workout gets a persistent, prominent rest timer banner after completed sets.
+3. Flat DB Press and related DB horizontal presses identify Chest as primary instead of Shoulders.
+4. Engine launch now asks for the available modality after Start Engine.
+5. If a strength session was completed within 150 minutes on the same scheduled day, Engine skips the redundant full warm-up and recommends only a short modality transition.
+6. Engine training screen shows a clearer Today's Plan block, including parsed hard/easy interval structure when available.

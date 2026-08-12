@@ -394,7 +394,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <div class="hint">Faith-based messages are always optional and can be changed here at any time.</div>
 </div>
 <div class="card"><h3>Backup</h3><button class="secondary" onclick="exportData()">Export Data</button><label>Restore Backup</label><input accept="application/json" id="importFile" onchange="importData(event)" type="file"/><button class="danger" onclick="resetApp()">Reset App</button></div>
-<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.22.15 · Execution Integrity & Engine Flow</strong><p class="hint">Rescheduled warm-ups follow the opened workout, strength rest timing is persistent, press muscle metadata is corrected, and Engine launch adapts to prior same-day strength work.</p></div>
+<div class="card bp-build-card"><span class="metric-label">Bell Diagnostics</span><h3>Active Build</h3><strong>13.22.16 · Schedule Completion Identity Repair</strong><p class="hint">Completed workouts stay attached to their original scheduled date when training availability changes; future sessions cannot inherit completion from a moved plan slot.</p></div>
 <p class="hint">Workout logs and settings are stored on this device. Export a backup periodically.</p>
 </section>
 </main>
@@ -711,7 +711,7 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <button class="desktop-nav-item" type="button" onclick="openExerciseLibrary()"><span class="icon">◫</span><span>Library</span></button>
 <button data-screen="more"><span class="icon">⚙</span><span class="mobile-more-label">More</span><span class="desktop-settings-label">Settings</span></button>
 </nav>
-<script>window.BELL_APP_VERSION = "13.22.15-execution-integrity-engine-flow";</script>
+<script>window.BELL_APP_VERSION = "13.22.16-schedule-completion-identity-repair";</script>
 <script src="./data/workouts.js?v=132160"></script>
 <script src="./js/exercise-library.js?v=132160"></script>
 <script src="./js/storage.js?v=13841"></script>
@@ -784,5 +784,6 @@ main{display:block}.screen{display:none}.screen.active{display:block}
 <script src="./js/engine-type-modality-132212.js?v=132212"></script>
 <script src="./js/engine-session-identity-132214.js?v=132214"></script>
 <script src="./js/execution-integrity-engine-flow-132215.js?v=132215"></script>
+<script src="./js/schedule-completion-identity-132216.js?v=132216"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "bell-performance-13-22-15";
+const CACHE_NAME = "bell-performance-13-22-16";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -115,6 +115,7 @@ const APP_SHELL = [
   "./css/engine-type-modality-132212.css?v=132212",
   "./js/execution-integrity-engine-flow-132215.js?v=132215",
   "./css/execution-integrity-engine-flow-132215.css?v=132215",
+  "./js/schedule-completion-identity-132216.js?v=132216",
 ];
 
 async function safePrecache() {

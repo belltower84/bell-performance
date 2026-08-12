@@ -1,12 +1,12 @@
 {
-  "name": "Bell Performance 13.22.15",
+  "name": "Bell Performance 13.22.16",
   "short_name": "Bell Performance",
-  "start_url": "./?build=132215",
+  "start_url": "./?build=132216",
   "display": "standalone",
   "background_color": "#050709",
   "theme_color": "#050709",
-  "description": "Bell Performance 13.22.15 repairs rescheduled warm-up targeting, persistent strength rest timing, pressing muscle metadata, and Engine launch/setup flow.",
-  "version": "13.22.15",
+  "description": "Bell Performance 13.22.16 repairs rescheduled warm-up targeting, persistent strength rest timing, pressing muscle metadata, and Engine launch/setup flow.",
+  "version": "13.22.16",
   "icons": [
     {
       "src": "./assets/app-icon-192.png",

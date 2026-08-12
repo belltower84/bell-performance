@@ -1,4 +1,4 @@
 {
-  "version": "13.22.17",
-  "build": "13.22.17-completion-repair-stability"
+  "version": "13.22.18",
+  "build": "13.22.18-strict-completion-identity"
 }

@@ -1,3 +1,7 @@
+# Bell Performance 13.22.18 — Strict Completion Identity
+
+This build repairs false completion carryover after schedule changes. A workout is complete only when history matches both its scheduled date and workout identity.
+
 # Bell Performance 13.22.10 — GitHub Actions Deployment
 
 Deployment-only release based on the clean 13.22.9 runtime baseline. No training logic or UI features were intentionally changed.

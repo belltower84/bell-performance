@@ -1,0 +1,3 @@
+Bell Performance 13.22.18 — Strict Completion Identity
+
+Fixes false completed-session carryover after training availability changes. Completion requires matching scheduled date and workout identity.
